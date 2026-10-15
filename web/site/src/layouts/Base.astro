@@ -6,8 +6,8 @@ const { title, description, lang, alt, noindex = false, jsonLd = [], ogImage } =
 const og = ogImage ?? `/og/${lang}/home.png`;
 const site = Astro.site?.origin ?? 'https://kortex.site';
 const nav = lang === 'fr'
-  ? { tools: 'Outils', all: '/outils', other: 'EN' }
-  : { tools: 'Tools', all: '/en/tools', other: 'FR' };
+  ? { tools: 'Outils', all: '/outils', other: 'EN', account: 'Compte', accountHref: '/compte' }
+  : { tools: 'Tools', all: '/en/tools', other: 'FR', account: 'Account', accountHref: '/en/account' };
 const otherHref = alt ? (lang === 'fr' ? alt.en : alt.fr) : (lang === 'fr' ? '/en' : '/');
 ---
 <!doctype html>
@@ -52,6 +52,7 @@ const otherHref = alt ? (lang === 'fr' ? alt.en : alt.fr) : (lang === 'fr' ? '/e
         </select>
         <button class="theme-toggle" type="button" data-theme-toggle aria-label={lang === 'fr' ? 'Changer de thème' : 'Switch theme'}>◐</button>
         <a href={nav.all}>{nav.tools}</a>
+        <a href={nav.accountHref}>{nav.account}</a>
         <a href={otherHref} hreflang={lang === 'fr' ? 'en' : 'fr'}>{nav.other}</a>
       </nav>
     </header>

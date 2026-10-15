@@ -1,0 +1,187 @@
+---
+import Base from '../layouts/Base.astro';
+import type { Lang } from '../lib/data';
+const { lang } = Astro.props as { lang: Lang };
+const api = (import.meta.env.PUBLIC_API_ORIGIN ?? 'https://api.kortex.site').replace(/\/$/, '');
+const T = {
+  fr: {
+    title: 'Compte — Kortex', h1: 'Votre compte',
+    intro: 'Un compte sert à synchroniser vos préférences et à utiliser l’IA. Vos fichiers, eux, ne quittent jamais votre appareil.',
+    login: 'Se connecter', register: 'Créer un compte', email: 'Adresse e-mail', password: 'Mot de passe (10 caractères minimum)',
+    switchToRegister: 'Pas encore de compte ? Créer un compte', switchToLogin: 'Déjà un compte ? Se connecter',
+    note: 'Votre mot de passe est transformé sur votre appareil avant l’envoi : nous ne le recevons jamais.',
+    signedAs: 'Connecté en tant que', logout: 'Se déconnecter', credits: 'Crédits IA', creditsHint: 'Se rechargent progressivement toutes les 3 heures.',
+    paused: 'IA en pause, elle revient vers', empty: 'Crédits épuisés, prochaine recharge dans', min: 'min', h: 'h',
+    data: 'Vos données', export: 'Exporter mes données', del: 'Supprimer mon compte', delConfirm: 'Saisissez votre mot de passe pour confirmer la suppression définitive.',
+    delBtn: 'Supprimer définitivement', cancel: 'Annuler', working: 'Un instant…', deleted: 'Compte supprimé.',
+    errors: {
+      invalid_email: 'Adresse e-mail invalide.', too_short: 'Le mot de passe doit faire au moins 10 caractères.', too_long: 'Mot de passe trop long.',
+      too_common: 'Ce mot de passe est trop courant.', email_taken: 'Un compte existe déjà avec cette adresse.',
+      invalid_credentials: 'E-mail ou mot de passe incorrect.', rate_limited: 'Trop de tentatives, réessayez dans quelques minutes.',
+      network: 'Impossible de joindre le serveur.', other: 'Une erreur est survenue.',
+    },
+  },
+  en: {
+    title: 'Account — Kortex', h1: 'Your account',
+    intro: 'An account syncs your preferences and unlocks AI. Your files never leave your device.',
+    login: 'Sign in', register: 'Create account', email: 'Email address', password: 'Password (10 characters minimum)',
+    switchToRegister: 'No account yet? Create one', switchToLogin: 'Already have an account? Sign in',
+    note: 'Your password is transformed on your device before it is sent: we never receive it.',
+    signedAs: 'Signed in as', logout: 'Sign out', credits: 'AI credits', creditsHint: 'Gradually refill every 3 hours.',
+    paused: 'AI is paused, back around', empty: 'Credits used up, next refill in', min: 'min', h: 'h',
+    data: 'Your data', export: 'Export my data', del: 'Delete my account', delConfirm: 'Enter your password to confirm permanent deletion.',
+    delBtn: 'Delete permanently', cancel: 'Cancel', working: 'One moment…', deleted: 'Account deleted.',
+    errors: {
+      invalid_email: 'Invalid email address.', too_short: 'The password must be at least 10 characters.', too_long: 'Password too long.',
+      too_common: 'This password is too common.', email_taken: 'An account already exists with this address.',
+      invalid_credentials: 'Wrong email or password.', rate_limited: 'Too many attempts, try again in a few minutes.',
+      network: 'Could not reach the server.', other: 'Something went wrong.',
+    },
+  },
+}[lang];
+---
+<Base title={T.title} description={T.intro} lang={lang} alt={{ fr: '/compte', en: '/en/account' }} noindex>
+  <h1>{T.h1}</h1>
+  <p class="k-muted">{T.intro}</p>
+  <div data-account data-api={api} data-lang={lang} data-t={JSON.stringify(T)}>
+    <section class="k-card k-stack" data-view="auth" hidden>
+      <h2 data-title>{T.login}</h2>
+      <form class="k-stack" data-form novalidate>
+        <label class="k-field"><span class="k-muted">{T.email}</span><input class="k-input" type="email" name="email" autocomplete="username" required /></label>
+        <label class="k-field"><span class="k-muted">{T.password}</span><input class="k-input" type="password" name="password" autocomplete="current-password" required /></label>
+        <p class="k-error" role="alert" data-error hidden></p>
+        <button class="k-btn" type="submit" data-submit>{T.login}</button>
+      </form>
+      <button class="acct-link" type="button" data-switch>{T.switchToRegister}</button>
+      <p class="k-muted acct-note">{T.note}</p>
+    </section>
+    <section class="k-card k-stack" data-view="me" hidden>
+      <p>{T.signedAs} <strong data-email></strong></p>
+      <div class="k-stack" data-credits>
+        <h2>{T.credits}</h2>
+        <div class="k-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" data-gauge><div class="k-progress-bar" data-bar style="width:0"></div></div>
+        <p class="k-muted" data-credits-text></p>
+      </div>
+      <h2>{T.data}</h2>
+      <div class="acct-actions">
+        <button class="k-btn" data-variant="ghost" type="button" data-export>{T.export}</button>
+        <button class="k-btn" data-variant="ghost" type="button" data-logout>{T.logout}</button>
+        <button class="k-btn" data-variant="ghost" type="button" data-del-open>{T.del}</button>
+      </div>
+      <form class="k-stack" data-del-form hidden novalidate>
+        <p class="k-muted">{T.delConfirm}</p>
+        <input class="k-input" type="password" name="password" autocomplete="current-password" required />
+        <p class="k-error" role="alert" data-del-error hidden></p>
+        <div class="acct-actions"><button class="k-btn" type="submit">{T.delBtn}</button><button class="k-btn" data-variant="ghost" type="button" data-del-cancel>{T.cancel}</button></div>
+      </form>
+    </section>
+  </div>
+</Base>
+<style is:global>
+  .acct-link { justify-self: start; border: 0; background: none; color: var(--k-accent); font: inherit; cursor: pointer; padding: 0; }
+  .acct-note { font-size: 0.85rem; margin: 0; }
+  .acct-actions { display: flex; gap: var(--k-space-3); flex-wrap: wrap; }
+  [data-account] { max-width: 480px; margin-top: var(--k-space-6); }
+</style>
+<script>
+  import { checkPasswordPolicy, deriveAuthKey } from '../../../../services/shared/src/auth';
+
+  const root = document.querySelector<HTMLElement>('[data-account]')!;
+  const api = root.dataset.api!;
+  const T = JSON.parse(root.dataset.t!);
+  const $ = <E extends HTMLElement>(sel: string) => root.querySelector<E>(sel)!;
+  const authView = $('[data-view=auth]'), meView = $('[data-view=me]');
+  let mode: 'login' | 'register' = 'login';
+
+  const request = async (method: string, path: string, body?: unknown) => {
+    try {
+      const res = await fetch(`${api}${path}`, { method, credentials: 'include', headers: body ? { 'Content-Type': 'application/json' } : {}, body: body ? JSON.stringify(body) : undefined });
+      const data = await res.json().catch(() => null);
+      return { ok: res.ok, status: res.status, data, res };
+    } catch { return { ok: false, status: 0, data: { error: 'network' }, res: null }; }
+  };
+  const message = (code: string) => T.errors[code] ?? (code === 'password_too_short' ? T.errors.too_short : T.errors.other);
+  const show = (el: HTMLElement, text: string | null) => { el.hidden = text === null; if (text !== null) el.textContent = text; };
+
+  const renderCredits = async () => {
+    const r = await request('GET', '/v1/ai/credits');
+    if (!r.ok) { $('[data-credits]').hidden = true; return; }
+    const { percent, status, resets_in_seconds: s } = r.data;
+    $<HTMLElement>('[data-bar]').style.width = `${percent}%`;
+    $('[data-gauge]').setAttribute('aria-valuenow', String(percent));
+    const when = (sec: number) => (sec >= 3600 ? `${Math.round(sec / 3600)} ${T.h}` : `${Math.max(1, Math.round(sec / 60))} ${T.min}`);
+    $('[data-credits-text]').textContent =
+      status === 'paused' ? `${T.paused} ${new Date(Date.now() + s * 1000).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}`
+      : status === 'empty' ? `${T.empty} ${when(s)}` : `${percent} % — ${T.creditsHint}`;
+  };
+
+  const refresh = async () => {
+    const r = await request('GET', '/v1/me');
+    if (r.ok) {
+      $('[data-email]').textContent = r.data.email;
+      authView.hidden = true; meView.hidden = false;
+      void renderCredits();
+    } else { authView.hidden = false; meView.hidden = true; }
+  };
+
+  const setMode = (m: 'login' | 'register') => {
+    mode = m;
+    $('[data-title]').textContent = m === 'login' ? T.login : T.register;
+    $('[data-submit]').textContent = m === 'login' ? T.login : T.register;
+    $('[data-switch]').textContent = m === 'login' ? T.switchToRegister : T.switchToLogin;
+    $<HTMLInputElement>('[name=password]').autocomplete = m === 'login' ? 'current-password' : 'new-password';
+    show($('[data-error]'), null);
+  };
+  $('[data-switch]').addEventListener('click', () => setMode(mode === 'login' ? 'register' : 'login'));
+
+  $<HTMLFormElement>('[data-form]').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const f = e.currentTarget as HTMLFormElement;
+    const email = (f.elements.namedItem('email') as HTMLInputElement).value.trim();
+    const password = (f.elements.namedItem('password') as HTMLInputElement).value;
+    const err = $('[data-error]'), btn = $<HTMLButtonElement>('[data-submit]');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return show(err, T.errors.invalid_email);
+    if (mode === 'register') {
+      const p = checkPasswordPolicy(password);
+      if (p !== 'ok') return show(err, message(p));
+    }
+    btn.disabled = true; const label = btn.textContent; btn.textContent = T.working; show(err, null);
+    // The password never leaves this page: only the slow-KDF derived key is sent (ADR 0005).
+    const auth_key = await deriveAuthKey(email, password);
+    const r = await request('POST', `/v1/auth/${mode}`, { email, auth_key, kdf: 1 });
+    btn.disabled = false; btn.textContent = label;
+    if (!r.ok) return show(err, message(r.data?.error ?? 'other'));
+    f.reset();
+    void refresh();
+  });
+
+  $('[data-logout]').addEventListener('click', async () => {
+    await request('POST', '/v1/auth/logout', {});
+    setMode('login'); // back to the sign-in form, not whatever mode was used before
+    void refresh();
+  });
+  $('[data-export]').addEventListener('click', async () => {
+    const r = await request('GET', '/v1/me/export');
+    if (!r.ok) return;
+    const url = URL.createObjectURL(new Blob([JSON.stringify(r.data, null, 2)], { type: 'application/json' }));
+    const a = Object.assign(document.createElement('a'), { href: url, download: 'kortex-export.json' });
+    a.click(); URL.revokeObjectURL(url);
+  });
+  const delForm = $<HTMLFormElement>('[data-del-form]');
+  $('[data-del-open]').addEventListener('click', () => { delForm.hidden = false; });
+  $('[data-del-cancel]').addEventListener('click', () => { delForm.hidden = true; delForm.reset(); });
+  delForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = $('[data-email]').textContent ?? '';
+    const password = (delForm.elements.namedItem('password') as HTMLInputElement).value;
+    const err = $('[data-del-error]');
+    show(err, null);
+    const auth_key = await deriveAuthKey(email, password);
+    const r = await request('DELETE', '/v1/me', { auth_key, kdf: 1 });
+    if (!r.ok) return show(err, message(r.data?.error === 'invalid_credentials' ? 'invalid_credentials' : 'other'));
+    delForm.reset(); delForm.hidden = true;
+    void refresh();
+  });
+
+  void refresh();
+</script>
