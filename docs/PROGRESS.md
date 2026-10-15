@@ -44,6 +44,8 @@ Phase 0 — Cadrage, spikes, nettoyage (≈ 98 %) — Phase 1 quasi finie, Phase
 - Tailles brotli des bundles : password 330 Ko, hash 344 Ko, qr 343 Ko, **pdf.merge 536 Ko (> budget 400 Ko)**. Base Dioxus+runtime ≈ 330 Ko. Pistes : moteur lourd chargé à la demande / en Web Worker séparé, `wasm-opt` plus agressif, budget par outil déclaré dans le contrat + vérifié par `xtask check` (§12.6 pas encore implémenté).
 - Outil pilote #1 `image.convert` (beta) : PNG/JPG/WebP(lossless)/BMP/GIF en lot, format détecté par signature, transparence aplatie, garde-fou 20 000 px, 6 variantes SEO (png↔jpg, webp→png…) ; 5 tests ; testé navigateur (png→jpg OK). brotli 508 Ko (> budget). HEIC non supporté (à faire).
 
+- `scripts/gate.sh` : garde-fou local strict (fmt, clippy -D warnings, tests, tokens, registry, check) à lancer AVANT chaque commit (`./scripts/gate.sh && git commit`). Leçon : ne jamais enchaîner via des pipes (`| tail`) qui masquent les échecs.
+
 ## Decisions (user, session 1)
 - Pas de Homebrew.
 - Dossiers du Bureau : NE PAS TOUCHER.
