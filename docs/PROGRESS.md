@@ -2,7 +2,7 @@
 _Last update: 2026-10-15 — session 1_
 
 ## Current phase
-Phase 0 — Cadrage, spikes, nettoyage (≈ 92 %) — Phase 1 quasi finie, Phase 2 démarrée, premier outil pilote
+Phase 0 — Cadrage, spikes, nettoyage (≈ 95 %) — Phase 1 quasi finie, Phase 2 démarrée, premier outil pilote
 
 ## Done this session
 - Master prompt copié dans `docs/MASTER_PROMPT.md`; `CLAUDE.md`/`AGENTS.md` créés.
@@ -33,6 +33,8 @@ Phase 0 — Cadrage, spikes, nettoyage (≈ 92 %) — Phase 1 quasi finie, Phase
 - `cargo xtask build <id>` : génère un wrapper Dioxus, `dx build`, publie `dist/run/<id>/`. Password generator : wasm 1,2 Mo brut, testé dans le navigateur (aléa WebCrypto OK).
 - Stage (fenêtre flottante, View Transition, iframe cross-origin, `?open=1`, préchargement au survol, Échap, plein écran) testé. Config locale : serveurs `site` (4321) et `run` (autoPort) dans `.claude/launch.json`; `PUBLIC_RUN_ORIGIN` pour le site.
 - CI : job `site` ajouté.
+- Site : sitemap.xml (hreflang, brouillons exclus), robots.txt, manifeste PWA + icône + service worker (cache hors-ligne), pages légales FR/EN (confidentialité et conditions rédigées ; mentions légales en brouillon noindex).
+- Taille wasm password-generator : 1184 Ko brut, 412 Ko gzip, 338 Ko brotli (budget 400 Ko brotli OK, marge faible).
 
 ## Decisions (user, session 1)
 - Pas de Homebrew.
@@ -49,6 +51,8 @@ Phase 0 — Cadrage, spikes, nettoyage (≈ 92 %) — Phase 1 quasi finie, Phase
 - Puis Phase 1 (monorepo, tokens, kortex-ui, xtask).
 
 ## Blockers / waiting for user
+- Mentions légales : identité de l'éditeur (nom, adresse, e-mail, directeur de publication) à fournir avant le lancement.
+- Accord pour le 1er déploiement public sur Cloudflare (kortex.site).
 - Révoquer/recréer le jeton Cloudflare ; rien d'autre.
 
 ## Hypotheses in use

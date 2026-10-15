@@ -131,6 +131,8 @@ fn App() -> Element {{
     .map_err(|e| e.to_string())?;
 
     let target = root.join(".kortex/target");
+    // dx keeps stale hashed files from previous builds: start from a clean output dir.
+    let _ = fs::remove_dir_all(target.join("dx").join(format!("run-{universe}-{name}")));
     println!("… compilation de {id} (dx build, premier build lent)");
     let status = Command::new("dx")
         .args(["build", "--release", "--platform", "web"])

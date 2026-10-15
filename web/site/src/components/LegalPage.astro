@@ -1,0 +1,13 @@
+---
+import Base from '../layouts/Base.astro';
+import type { Lang } from '../lib/data';
+import type { LegalPage } from '../lib/legal';
+const { page, lang } = Astro.props as { page: LegalPage; lang: Lang };
+const path = (l: Lang) => (l === 'fr' ? `/${page.slug.fr}` : `/en/${page.slug.en}`);
+---
+<Base title={`${page.title[lang]} — Kortex`} description={page.title[lang]} lang={lang} alt={{ fr: path('fr'), en: path('en') }} noindex={page.draft}>
+  <article class="prose">
+    <h1>{page.title[lang]}</h1>
+    {page.body[lang].map((line) => line.startsWith('## ') ? <h2>{line.slice(3)}</h2> : <p>{line}</p>)}
+  </article>
+</Base>

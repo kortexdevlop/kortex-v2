@@ -1,0 +1,10 @@
+{
+  "name": "Kortex",
+  "short_name": "Kortex",
+  "description": "Free, fast, private tools. Your files never leave your device.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0a84ff",
+  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}

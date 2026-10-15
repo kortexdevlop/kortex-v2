@@ -21,6 +21,8 @@ const otherHref = alt ? (lang === 'fr' ? alt.en : alt.fr) : (lang === 'fr' ? '/e
     {alt && <link rel="alternate" hreflang="en" href={`${site}${alt.en}`} />}
     {alt && <link rel="alternate" hreflang="x-default" href={`${site}${alt.fr}`} />}
     <meta name="theme-color" content="#ffffff" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="/kortex.css" />
     <script is:inline>
       try { const t = localStorage.getItem('k-theme'); if (t) document.documentElement.dataset.theme = t; } catch {}
@@ -42,7 +44,13 @@ const otherHref = alt ? (lang === 'fr' ? alt.en : alt.fr) : (lang === 'fr' ? '/e
     <footer class="site-foot k-muted">
       <span>© Kortex</span>
       <span>{lang === 'fr' ? 'Vos fichiers ne quittent jamais votre appareil.' : 'Your files never leave your device.'}</span>
+      <nav class="foot-links">
+        {lang === 'fr'
+          ? <><a href="/confidentialite">Confidentialité</a><a href="/conditions">Conditions</a><a href="/mentions-legales">Mentions légales</a></>
+          : <><a href="/en/privacy">Privacy</a><a href="/en/terms">Terms</a><a href="/en/legal-notice">Legal notice</a></>}
+      </nav>
     </footer>
+    <script is:inline>if ('serviceWorker' in navigator && location.hostname !== 'localhost') navigator.serviceWorker.register('/sw.js');</script>
   </body>
 </html>
 <style is:global>
@@ -59,6 +67,7 @@ const otherHref = alt ? (lang === 'fr' ? alt.en : alt.fr) : (lang === 'fr' ? '/e
   .badges { display: flex; flex-wrap: wrap; gap: var(--k-space-2); margin: var(--k-space-4) 0; }
   .badge { padding: var(--k-space-1) var(--k-space-3); border-radius: 999px; background: var(--k-surface-2); font-size: 0.85rem; color: var(--k-text-2); }
   .prose h2 { margin-top: var(--k-space-7); }
+  .foot-links { display: flex; gap: var(--k-space-4); flex-wrap: wrap; } .foot-links a { color: inherit; }
   details { padding: var(--k-space-3) 0; border-bottom: 1px solid var(--k-border); }
   summary { cursor: pointer; font-weight: 600; }
 </style>
