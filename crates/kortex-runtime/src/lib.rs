@@ -60,13 +60,15 @@ impl CancelToken {
     }
 }
 
+type EntropySource = Box<dyn FnMut(&mut [u8])>;
+
 /// Execution context handed to every engine: progress, cancellation, journal.
 #[derive(Default)]
 pub struct Cx {
     progress: f32,
     cancel: CancelToken,
     journal: Vec<String>,
-    entropy: Option<Box<dyn FnMut(&mut [u8])>>,
+    entropy: Option<EntropySource>,
 }
 
 impl Cx {
