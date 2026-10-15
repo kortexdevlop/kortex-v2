@@ -4,6 +4,220 @@
     {
       "inputs": [
         {
+          "id": "content",
+          "label": {
+            "en": "Content (link, text…)",
+            "fr": "Contenu (lien, texte…)"
+          },
+          "max_len": 2048,
+          "required": true,
+          "type": "text"
+        }
+      ],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 10
+      },
+      "outputs": [
+        {
+          "default_format": "image/png",
+          "formats": [
+            "image/png",
+            "image/svg+xml"
+          ],
+          "id": "image",
+          "type": "file<image/*>"
+        }
+      ],
+      "params": [
+        {
+          "default": "png",
+          "id": "format",
+          "label": {
+            "en": "Format",
+            "fr": "Format"
+          },
+          "level": "simple",
+          "options": [
+            "png",
+            "svg"
+          ],
+          "range": null,
+          "type": "enum"
+        },
+        {
+          "default": 1024,
+          "id": "size",
+          "label": {
+            "en": "Size (px)",
+            "fr": "Taille (px)"
+          },
+          "level": "medium",
+          "options": null,
+          "range": [
+            64.0,
+            4096.0
+          ],
+          "type": "integer"
+        },
+        {
+          "default": "#0B0F19",
+          "id": "foreground",
+          "label": {
+            "en": "Module color",
+            "fr": "Couleur des modules"
+          },
+          "level": "medium",
+          "options": null,
+          "range": null,
+          "type": "color"
+        },
+        {
+          "default": "#FFFFFF",
+          "id": "background",
+          "label": {
+            "en": "Background color",
+            "fr": "Couleur de fond"
+          },
+          "level": "medium",
+          "options": null,
+          "range": null,
+          "type": "color"
+        },
+        {
+          "default": "M",
+          "id": "error_correction",
+          "label": {
+            "en": "Error correction",
+            "fr": "Correction d'erreur"
+          },
+          "level": "pro",
+          "options": [
+            "L",
+            "M",
+            "Q",
+            "H"
+          ],
+          "range": null,
+          "type": "enum"
+        },
+        {
+          "default": 4,
+          "id": "margin",
+          "label": {
+            "en": "Margin (modules)",
+            "fr": "Marge (modules)"
+          },
+          "level": "pro",
+          "options": null,
+          "range": [
+            0.0,
+            16.0
+          ],
+          "type": "integer"
+        }
+      ],
+      "permissions": {
+        "clipboard": "none",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "put a link in a qr code",
+            "make a qr code for my website"
+          ],
+          "fr": [
+            "mettre un lien dans un qr code",
+            "créer un qr code pour mon site"
+          ]
+        },
+        "keywords": {
+          "en": [
+            "qr code",
+            "qr generator",
+            "qrcode",
+            "link"
+          ],
+          "fr": [
+            "qr code",
+            "qrcode",
+            "code qr",
+            "générateur",
+            "lien",
+            "wifi"
+          ]
+        },
+        "related": [
+          "secure.password-generator"
+        ]
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "qr.generator",
+        "name": {
+          "en": "QR Code Generator",
+          "fr": "Générateur de QR code"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "qr-code-generator",
+          "fr": "generateur-qr-code"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Crisp, customizable QR codes, created on your device.",
+          "fr": "Des QR codes nets, personnalisables, créés sur votre appareil."
+        },
+        "ui": "auto",
+        "universe": "qr",
+        "version": "1.0.0",
+        "viral_priority": 1
+      },
+      "variants": [
+        {
+          "id": "png",
+          "name": {
+            "en": "QR Code PNG Generator",
+            "fr": "Générateur de QR code PNG"
+          },
+          "preset": {
+            "format": "png"
+          },
+          "slug": {
+            "en": "qr-code-png-generator",
+            "fr": "qr-code-png"
+          }
+        },
+        {
+          "id": "svg",
+          "name": {
+            "en": "QR Code SVG Generator",
+            "fr": "Générateur de QR code SVG"
+          },
+          "preset": {
+            "format": "svg"
+          },
+          "slug": {
+            "en": "qr-code-svg-generator",
+            "fr": "qr-code-svg"
+          }
+        }
+      ]
+    },
+    {
+      "inputs": [
+        {
           "id": "file",
           "label": {
             "en": "File",

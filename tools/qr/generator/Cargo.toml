@@ -1,0 +1,13 @@
+[package]
+name = "tool-qr-generator"
+version = "0.1.0"
+edition.workspace = true
+publish.workspace = true
+license.workspace = true
+
+[dependencies]
+kortex = { path = "../../../crates/kortex" }
+qrcodegen = "1.8"
+
+[dev-dependencies]
+png = "0.17"

@@ -1,0 +1,10 @@
+[ui]
+title = "QR Code Generator"
+[errors]
+empty_content = "Enter the QR code content."
+invalid_color = "Invalid color (use #RRGGBB)."
+content_too_long = "Content is too long for a QR code."
+invalid_param = "Invalid value."
+cancelled = "Cancelled."
+[outputs]
+image = "Your QR code"

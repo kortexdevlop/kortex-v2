@@ -391,6 +391,14 @@ pub fn AutoTool(
                         h3 { "{result_label}" }
                         for (id , v) in map {
                             for file in output_files(&v) {
+                                if file.mime.starts_with("image/") {
+                                    img {
+                                        key: "{id}-{file.name}-preview",
+                                        class: "k-preview",
+                                        alt: "{file.name}",
+                                        src: "data:{file.mime};base64,{base64(&file.bytes)}",
+                                    }
+                                }
                                 div { key: "{id}-{file.name}", class: "k-output",
                                     code { "{file.name}" }
                                     Button {

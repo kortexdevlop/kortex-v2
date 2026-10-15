@@ -39,6 +39,7 @@
   select.k-input { appearance: auto; }
   .k-stack { display: grid; gap: var(--k-space-4); }
   .k-output-group { display: grid; gap: var(--k-space-1); }
+  .k-preview { max-width: 100%; max-height: 360px; margin-inline: auto; border-radius: var(--k-radius-field); border: 1px solid var(--k-border); image-rendering: pixelated; background: var(--k-surface-2); }
   .k-muted { color: var(--k-text-2); }
   @media (prefers-reduced-motion: reduce) { * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; } }
 }

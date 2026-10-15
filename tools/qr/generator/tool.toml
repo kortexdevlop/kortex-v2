@@ -1,0 +1,110 @@
+schema = 1
+
+[tool]
+id = "qr.generator"
+version = "1.0.0"
+universe = "qr"
+status = "beta"
+ui = "auto"
+platforms = ["web", "desktop"]
+offline = true
+ai = false
+viral_priority = 1
+
+[tool.name]
+fr = "Générateur de QR code"
+en = "QR Code Generator"
+[tool.tagline]
+fr = "Des QR codes nets, personnalisables, créés sur votre appareil."
+en = "Crisp, customizable QR codes, created on your device."
+[tool.slug]
+fr = "generateur-qr-code"
+en = "qr-code-generator"
+
+[search]
+keywords.fr = ["qr code", "qrcode", "code qr", "générateur", "lien", "wifi"]
+keywords.en = ["qr code", "qr generator", "qrcode", "link"]
+intents.fr = ["mettre un lien dans un qr code", "créer un qr code pour mon site"]
+intents.en = ["put a link in a qr code", "make a qr code for my website"]
+related = ["secure.password-generator"]
+
+[limits]
+timeout_s = 10
+
+[[inputs]]
+id = "content"
+type = "text"
+required = true
+max_len = 2048
+label = { fr = "Contenu (lien, texte…)", en = "Content (link, text…)" }
+
+[[params]]
+id = "format"
+type = "enum"
+options = ["png", "svg"]
+default = "png"
+level = "simple"
+label = { fr = "Format", en = "Format" }
+
+[[params]]
+id = "size"
+type = "integer"
+range = [64, 4096]
+default = 1024
+level = "medium"
+label = { fr = "Taille (px)", en = "Size (px)" }
+
+[[params]]
+id = "foreground"
+type = "color"
+default = "#0B0F19"
+level = "medium"
+label = { fr = "Couleur des modules", en = "Module color" }
+
+[[params]]
+id = "background"
+type = "color"
+default = "#FFFFFF"
+level = "medium"
+label = { fr = "Couleur de fond", en = "Background color" }
+
+[[params]]
+id = "error_correction"
+type = "enum"
+options = ["L", "M", "Q", "H"]
+default = "M"
+level = "pro"
+label = { fr = "Correction d'erreur", en = "Error correction" }
+
+[[params]]
+id = "margin"
+type = "integer"
+range = [0, 16]
+default = 4
+level = "pro"
+label = { fr = "Marge (modules)", en = "Margin (modules)" }
+
+[[outputs]]
+id = "image"
+type = "file<image/*>"
+formats = ["image/png", "image/svg+xml"]
+default_format = "image/png"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "none"
+sensitive = false
+privacy = "local"
+
+[[variants]]
+id = "png"
+slug = { fr = "qr-code-png", en = "qr-code-png-generator" }
+name = { fr = "Générateur de QR code PNG", en = "QR Code PNG Generator" }
+preset = { format = "png" }
+
+[[variants]]
+id = "svg"
+slug = { fr = "qr-code-svg", en = "qr-code-svg-generator" }
+name = { fr = "Générateur de QR code SVG", en = "QR Code SVG Generator" }
+preset = { format = "svg" }
