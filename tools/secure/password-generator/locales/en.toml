@@ -1,0 +1,9 @@
+[ui]
+title = "Password Generator"
+copy = "Copy"
+[errors]
+no_character_class = "Choose at least one character type."
+length_too_short = "Length is too short for the selected types."
+invalid_param = "Invalid value."
+entropy_unavailable = "System randomness unavailable."
+cancelled = "Cancelled."

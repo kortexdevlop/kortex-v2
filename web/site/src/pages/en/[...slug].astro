@@ -1,0 +1,14 @@
+---
+// One template generates every tool and variant page from registry data.
+import ToolPage from '../../components/ToolPage.astro';
+import { tools } from '../../lib/data';
+const lang = 'en' as const;
+export function getStaticPaths() {
+  return tools.flatMap((t) => [
+    { params: { slug: t.tool.slug.en }, props: { t } },
+    ...t.variants.map((v) => ({ params: { slug: `${t.tool.slug.en}/${v.slug.en}` }, props: { t, variant: v } })),
+  ]);
+}
+const { t, variant } = Astro.props;
+---
+<ToolPage t={t} lang={lang} variant={variant} />

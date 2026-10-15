@@ -1,0 +1,17 @@
+---
+import Base from '../layouts/Base.astro';
+import ToolCard from './ToolCard.astro';
+import { tools, ui, byPriority, type Lang } from '../lib/data';
+const { lang } = Astro.props as { lang: Lang };
+const t = ui[lang];
+const popular = [...tools].filter((x) => x.tool.status !== 'draft').sort(byPriority).slice(0, 12);
+---
+<Base title={`Kortex — ${t.tagline}`} description={t.sub} lang={lang} alt={{ fr: '/', en: '/en' }}>
+  <section class="hero">
+    <h1>{t.tagline}</h1>
+    <p class="k-muted">{t.sub}</p>
+  </section>
+  {popular.length === 0
+    ? <p class="k-muted">{t.empty}</p>
+    : <div class="grid">{popular.map((x) => <ToolCard t={x} lang={lang} />)}</div>}
+</Base>

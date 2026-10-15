@@ -1,4 +1,195 @@
 {
   "schema": 1,
-  "tools": []
+  "tools": [
+    {
+      "inputs": [],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 5
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "password",
+          "type": "text"
+        }
+      ],
+      "params": [
+        {
+          "default": 16,
+          "id": "length",
+          "label": {
+            "en": "Length",
+            "fr": "Longueur"
+          },
+          "level": "simple",
+          "options": null,
+          "range": [
+            8.0,
+            128.0
+          ],
+          "type": "integer"
+        },
+        {
+          "default": true,
+          "id": "lowercase",
+          "label": {
+            "en": "Lowercase (a-z)",
+            "fr": "Minuscules (a-z)"
+          },
+          "level": "medium",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        },
+        {
+          "default": true,
+          "id": "uppercase",
+          "label": {
+            "en": "Uppercase (A-Z)",
+            "fr": "Majuscules (A-Z)"
+          },
+          "level": "medium",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        },
+        {
+          "default": true,
+          "id": "digits",
+          "label": {
+            "en": "Digits (0-9)",
+            "fr": "Chiffres (0-9)"
+          },
+          "level": "medium",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        },
+        {
+          "default": true,
+          "id": "symbols",
+          "label": {
+            "en": "Symbols (!@#…)",
+            "fr": "Symboles (!@#…)"
+          },
+          "level": "medium",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        },
+        {
+          "default": false,
+          "id": "exclude_ambiguous",
+          "label": {
+            "en": "Exclude ambiguous characters (0 O l 1 I)",
+            "fr": "Exclure les caractères ambigus (0 O l 1 I)"
+          },
+          "level": "pro",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "create a strong password",
+            "generate a random password"
+          ],
+          "fr": [
+            "créer un mot de passe sécurisé",
+            "générer un mot de passe aléatoire"
+          ]
+        },
+        "keywords": {
+          "en": [
+            "password",
+            "generator",
+            "random",
+            "secure",
+            "strong"
+          ],
+          "fr": [
+            "mot de passe",
+            "générateur",
+            "password",
+            "sécurisé",
+            "aléatoire"
+          ]
+        },
+        "related": []
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "secure.password-generator",
+        "name": {
+          "en": "Password Generator",
+          "fr": "Générateur de mots de passe"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "password-generator",
+          "fr": "generateur-mot-de-passe"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Strong passwords, generated on your device.",
+          "fr": "Des mots de passe solides, créés sur votre appareil."
+        },
+        "ui": "auto",
+        "universe": "secure",
+        "version": "1.0.0",
+        "viral_priority": 1
+      },
+      "variants": [
+        {
+          "id": "16",
+          "name": {
+            "en": "16-character password",
+            "fr": "Mot de passe de 16 caractères"
+          },
+          "preset": {
+            "length": 16
+          },
+          "slug": {
+            "en": "16-character-password",
+            "fr": "mot-de-passe-16-caracteres"
+          }
+        },
+        {
+          "id": "pin",
+          "name": {
+            "en": "Random PIN",
+            "fr": "Code PIN aléatoire"
+          },
+          "preset": {
+            "length": 8,
+            "lowercase": false,
+            "symbols": false,
+            "uppercase": false
+          },
+          "slug": {
+            "en": "random-pin",
+            "fr": "code-pin-aleatoire"
+          }
+        }
+      ]
+    }
+  ]
 }

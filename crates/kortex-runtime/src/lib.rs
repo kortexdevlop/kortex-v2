@@ -66,6 +66,7 @@ pub struct Cx {
     progress: f32,
     cancel: CancelToken,
     journal: Vec<String>,
+    entropy: Option<Box<dyn FnMut(&mut [u8])>>,
 }
 
 impl Cx {
@@ -100,6 +101,25 @@ impl Cx {
         } else {
             Ok(())
         }
+    }
+
+    /// Inject a deterministic entropy source (tests, reproducible runs).
+    #[must_use]
+    pub fn with_entropy(mut self, source: impl FnMut(&mut [u8]) + 'static) -> Self {
+        self.entropy = Some(Box::new(source));
+        self
+    }
+
+    /// Fill `buf` with random bytes (OS CSPRNG unless an entropy source was injected).
+    ///
+    /// # Errors
+    /// `entropy_unavailable` when the platform cannot provide randomness.
+    pub fn fill_random(&mut self, buf: &mut [u8]) -> Result<(), ToolError> {
+        if let Some(src) = &mut self.entropy {
+            src(buf);
+            return Ok(());
+        }
+        getrandom::fill(buf).map_err(|_| ToolError::new("entropy_unavailable"))
     }
 
     pub fn log(&mut self, line: impl Into<String>) {
@@ -146,6 +166,17 @@ mod tests {
             cx.check_cancelled(),
             Err(ToolError::new(ToolError::CANCELLED))
         );
+    }
+
+    #[test]
+    fn entropy_is_injectable_and_os_works() {
+        let mut cx = Cx::new().with_entropy(|b| b.fill(7));
+        let mut buf = [0_u8; 4];
+        assert!(cx.fill_random(&mut buf).is_ok());
+        assert_eq!(buf, [7; 4]);
+        let mut os = [0_u8; 32];
+        assert!(Cx::new().fill_random(&mut os).is_ok());
+        assert_ne!(os, [0_u8; 32]);
     }
 
     #[test]

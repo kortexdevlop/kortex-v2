@@ -1,0 +1,47 @@
+// Copies generated design CSS and builds the site data from registry + tool content.
+import { cpSync, mkdirSync, readFileSync, readdirSync, existsSync, writeFileSync } from 'node:fs';
+import { join, resolve } from 'node:path';
+
+const root = resolve(import.meta.dirname, '../../..');
+const out = resolve(import.meta.dirname, '..');
+mkdirSync(join(out, 'public'), { recursive: true });
+mkdirSync(join(out, 'src/generated'), { recursive: true });
+cpSync(join(root, 'design/dist/kortex.css'), join(out, 'public/kortex.css'));
+
+const registry = JSON.parse(readFileSync(join(root, 'registry/index.json'), 'utf8'));
+const read = (p) => (existsSync(p) ? readFileSync(p, 'utf8') : '');
+
+// "## Title" sections; "### Question" lines inside become FAQ entries (question + answer).
+function parseContent(md) {
+  const sections = [];
+  let cur = null;
+  for (const line of md.split('\n')) {
+    if (line.startsWith('## ')) { cur = { title: line.slice(3).trim(), body: [] }; sections.push(cur); }
+    else if (cur) cur.body.push(line);
+  }
+  return sections.map((s) => {
+    const body = s.body.join('\n').trim();
+    if (!body.includes('### ')) return { title: s.title, text: body, faq: [] };
+    const faq = body.split(/^### /m).filter(Boolean).map((b) => {
+      const [q, ...a] = b.split('\n');
+      return { q: q.trim(), a: a.join('\n').trim() };
+    });
+    return { title: s.title, text: '', faq };
+  });
+}
+
+const universes = [...read(join(root, 'brand/universes.toml')).matchAll(/id = "([^"]+)"\nname = "([^"]+)"\nhue = (\d+)/g)]
+  .map((m) => ({ id: m[1], name: m[2], hue: Number(m[3]) }));
+
+const tools = registry.tools.map((t) => {
+  const [u, n] = t.tool.id.split('.');
+  const dir = join(root, 'tools', u, n);
+  return {
+    ...t,
+    glyph: read(join(dir, 'glyph.svg')),
+    content: { fr: parseContent(read(join(dir, 'content/fr.md'))), en: parseContent(read(join(dir, 'content/en.md'))) },
+  };
+});
+
+writeFileSync(join(out, 'src/generated/site-data.json'), JSON.stringify({ universes, tools }, null, 1));
+console.log(`site data: ${tools.length} tool(s), ${universes.length} universe(s)`);

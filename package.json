@@ -1,0 +1,9 @@
+{
+  "name": "kortex",
+  "private": true,
+  "packageManager": "pnpm@12.6.0",
+  "scripts": {
+    "site:dev": "pnpm --filter @kortex/site dev",
+    "site:build": "pnpm --filter @kortex/site build"
+  }
+}

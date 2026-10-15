@@ -12,7 +12,7 @@
 @layer k-components {
   .k-card { background: var(--k-surface); border: 1px solid var(--k-border); border-radius: var(--k-radius-card); box-shadow: var(--k-shadow-2); padding: var(--k-space-5); transition: transform var(--k-motion-base) var(--k-motion-ease), box-shadow var(--k-motion-base) var(--k-motion-ease); }
   .k-card:hover { transform: translateY(-2px); box-shadow: var(--k-shadow-3); }
-  .k-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 var(--k-space-5); border: 0; border-radius: var(--k-radius-control); background: var(--k-accent); color: var(--k-accent-text); font: inherit; font-weight: 600; cursor: pointer; transition: transform var(--k-motion-fast) var(--k-motion-ease), box-shadow var(--k-motion-base) var(--k-motion-ease); }
+  .k-btn { text-decoration: none; display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 var(--k-space-5); border: 0; border-radius: var(--k-radius-control); background: var(--k-accent); color: var(--k-accent-text); font: inherit; font-weight: 600; cursor: pointer; transition: transform var(--k-motion-fast) var(--k-motion-ease), box-shadow var(--k-motion-base) var(--k-motion-ease); }
   .k-btn:active { transform: scale(0.98); }
   .k-btn[data-variant="ghost"] { background: var(--k-surface-2); color: var(--k-text); }
   .k-input { min-height: 44px; width: 100%; padding: 0 var(--k-space-4); border: 1px solid var(--k-border); border-radius: var(--k-radius-field); background: var(--k-bg); color: var(--k-text); font: inherit; }

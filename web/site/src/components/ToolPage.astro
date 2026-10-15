@@ -1,0 +1,43 @@
+---
+import Base from '../layouts/Base.astro';
+import { toolPath, variantPath, ui, type Lang, type ToolEntry } from '../lib/data';
+const { t, lang, variant } = Astro.props as { t: ToolEntry; lang: Lang; variant?: ToolEntry['variants'][number] };
+const L = ui[lang];
+const name = variant ? variant.name[lang] : t.tool.name[lang];
+const content = t.content[lang];
+const faq = content.flatMap((s) => s.faq);
+const other: Lang = lang === 'fr' ? 'en' : 'fr';
+const path = (l: Lang) => (variant ? variantPath(t, variant, l) : toolPath(t, l));
+const jsonLd = [
+  { '@context': 'https://schema.org', '@type': 'SoftwareApplication', name, applicationCategory: 'UtilitiesApplication', operatingSystem: 'Web, Windows, macOS, Linux', offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' } },
+  ...(faq.length ? [{ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) }] : []),
+];
+---
+<Base title={`${name} — Kortex`} description={t.tool.tagline[lang]} lang={lang} alt={{ fr: path('fr'), en: path('en') }} jsonLd={jsonLd}>
+  <section class="hero">
+    <span class="glyph" set:html={t.glyph} />
+    <h1>{name}</h1>
+    <p class="k-muted">{t.tool.tagline[lang]}</p>
+    <div class="badges">
+      <span class="badge">{L.local}</span>
+      {t.tool.offline && <span class="badge">{L.offline}</span>}
+      <span class="badge">{L.free}</span>
+    </div>
+    <a class="k-btn" href="?open=1" data-tool={t.tool.id} data-variant-id={variant?.id}>{L.open}</a>
+  </section>
+  <div class="prose">
+    {content.map((s) => (
+      <section>
+        <h2>{s.title}</h2>
+        {s.text && <div style="white-space: pre-line">{s.text}</div>}
+        {s.faq.map((f) => <details><summary>{f.q}</summary><p>{f.a}</p></details>)}
+      </section>
+    ))}
+    {!variant && t.variants.length > 0 && (
+      <section>
+        <h2>{L.related}</h2>
+        <ul>{t.variants.map((v) => <li><a href={variantPath(t, v, lang)}>{v.name[lang]}</a></li>)}</ul>
+      </section>
+    )}
+  </div>
+</Base>

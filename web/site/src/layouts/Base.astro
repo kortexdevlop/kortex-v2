@@ -1,0 +1,64 @@
+---
+import { prefix, type Lang } from '../lib/data';
+interface Props { title: string; description: string; lang: Lang; alt?: { fr: string; en: string }; noindex?: boolean; jsonLd?: object[] }
+const { title, description, lang, alt, noindex = false, jsonLd = [] } = Astro.props;
+const site = Astro.site?.origin ?? 'https://kortex.site';
+const nav = lang === 'fr'
+  ? { tools: 'Outils', all: '/outils', other: 'EN' }
+  : { tools: 'Tools', all: '/en/tools', other: 'FR' };
+const otherHref = alt ? (lang === 'fr' ? alt.en : alt.fr) : (lang === 'fr' ? '/en' : '/');
+---
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <link rel="canonical" href={`${site}${Astro.url.pathname}`} />
+    {alt && <link rel="alternate" hreflang="fr" href={`${site}${alt.fr}`} />}
+    {alt && <link rel="alternate" hreflang="en" href={`${site}${alt.en}`} />}
+    {alt && <link rel="alternate" hreflang="x-default" href={`${site}${alt.fr}`} />}
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="stylesheet" href="/kortex.css" />
+    <script is:inline>
+      try { const t = localStorage.getItem('k-theme'); if (t) document.documentElement.dataset.theme = t; } catch {}
+    </script>
+    {jsonLd.map((d) => <script type="application/ld+json" set:html={JSON.stringify(d)} />)}
+  </head>
+  <body>
+    <header class="site-head">
+      <a class="brand" href={prefix(lang) || '/'} aria-label="Kortex">
+        <svg width="28" height="28" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 13V51M22 33C30 33 37 28 43 15C46 25 40 32 33 36C41 38 46 44 47 51" /></svg>
+        <span>Kortex</span>
+      </a>
+      <nav>
+        <a href={nav.all}>{nav.tools}</a>
+        <a href={otherHref} hreflang={lang === 'fr' ? 'en' : 'fr'}>{nav.other}</a>
+      </nav>
+    </header>
+    <main><slot /></main>
+    <footer class="site-foot k-muted">
+      <span>© Kortex</span>
+      <span>{lang === 'fr' ? 'Vos fichiers ne quittent jamais votre appareil.' : 'Your files never leave your device.'}</span>
+    </footer>
+  </body>
+</html>
+<style is:global>
+  main { max-width: 1080px; margin: 0 auto; padding: var(--k-space-8) var(--k-space-4) var(--k-space-9); }
+  .site-head { position: sticky; top: var(--k-space-3); z-index: 10; display: flex; justify-content: space-between; align-items: center; max-width: 1080px; margin: var(--k-space-3) auto 0; padding: var(--k-space-2) var(--k-space-4); border: 1px solid var(--k-border); border-radius: var(--k-radius-panel); background: var(--k-overlay); backdrop-filter: blur(20px) saturate(1.4); box-shadow: var(--k-shadow-2); }
+  .site-head a { color: inherit; text-decoration: none; }
+  .brand { display: inline-flex; align-items: center; gap: var(--k-space-2); font-weight: 650; letter-spacing: -0.02em; }
+  .site-head nav { display: flex; gap: var(--k-space-5); align-items: center; }
+  .site-foot { display: flex; justify-content: space-between; gap: var(--k-space-4); flex-wrap: wrap; max-width: 1080px; margin: 0 auto; padding: var(--k-space-6) var(--k-space-4); }
+  .hero h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); margin: 0 0 var(--k-space-4); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: var(--k-space-4); }
+  .tool-card { display: grid; gap: var(--k-space-2); color: inherit; text-decoration: none; }
+  .tool-card svg, .glyph svg { width: 32px; height: 32px; color: var(--k-accent); }
+  .badges { display: flex; flex-wrap: wrap; gap: var(--k-space-2); margin: var(--k-space-4) 0; }
+  .badge { padding: var(--k-space-1) var(--k-space-3); border-radius: 999px; background: var(--k-surface-2); font-size: 0.85rem; color: var(--k-text-2); }
+  .prose h2 { margin-top: var(--k-space-7); }
+  details { padding: var(--k-space-3) 0; border-bottom: 1px solid var(--k-border); }
+  summary { cursor: pointer; font-weight: 600; }
+</style>

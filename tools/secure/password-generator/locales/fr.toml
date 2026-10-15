@@ -1,0 +1,9 @@
+[ui]
+title = "Générateur de mots de passe"
+copy = "Copier"
+[errors]
+no_character_class = "Choisissez au moins un type de caractères."
+length_too_short = "La longueur est trop courte pour les types choisis."
+invalid_param = "Valeur invalide."
+entropy_unavailable = "Aléa système indisponible."
+cancelled = "Annulé."

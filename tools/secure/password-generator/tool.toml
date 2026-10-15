@@ -1,0 +1,98 @@
+schema = 1
+
+[tool]
+id = "secure.password-generator"
+version = "1.0.0"
+universe = "secure"
+status = "beta"
+ui = "auto"
+platforms = ["web", "desktop"]
+offline = true
+ai = false
+viral_priority = 1
+
+[tool.name]
+fr = "Générateur de mots de passe"
+en = "Password Generator"
+[tool.tagline]
+fr = "Des mots de passe solides, créés sur votre appareil."
+en = "Strong passwords, generated on your device."
+[tool.slug]
+fr = "generateur-mot-de-passe"
+en = "password-generator"
+
+[search]
+keywords.fr = ["mot de passe", "générateur", "password", "sécurisé", "aléatoire"]
+keywords.en = ["password", "generator", "random", "secure", "strong"]
+intents.fr = ["créer un mot de passe sécurisé", "générer un mot de passe aléatoire"]
+intents.en = ["create a strong password", "generate a random password"]
+related = []
+
+[limits]
+timeout_s = 5
+
+[[params]]
+id = "length"
+type = "integer"
+range = [8, 128]
+default = 16
+level = "simple"
+label = { fr = "Longueur", en = "Length" }
+
+[[params]]
+id = "lowercase"
+type = "bool"
+default = true
+level = "medium"
+label = { fr = "Minuscules (a-z)", en = "Lowercase (a-z)" }
+
+[[params]]
+id = "uppercase"
+type = "bool"
+default = true
+level = "medium"
+label = { fr = "Majuscules (A-Z)", en = "Uppercase (A-Z)" }
+
+[[params]]
+id = "digits"
+type = "bool"
+default = true
+level = "medium"
+label = { fr = "Chiffres (0-9)", en = "Digits (0-9)" }
+
+[[params]]
+id = "symbols"
+type = "bool"
+default = true
+level = "medium"
+label = { fr = "Symboles (!@#…)", en = "Symbols (!@#…)" }
+
+[[params]]
+id = "exclude_ambiguous"
+type = "bool"
+default = false
+level = "pro"
+label = { fr = "Exclure les caractères ambigus (0 O l 1 I)", en = "Exclude ambiguous characters (0 O l 1 I)" }
+
+[[outputs]]
+id = "password"
+type = "text"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "write"
+sensitive = false
+privacy = "local"
+
+[[variants]]
+id = "16"
+slug = { fr = "mot-de-passe-16-caracteres", en = "16-character-password" }
+name = { fr = "Mot de passe de 16 caractères", en = "16-character password" }
+preset = { length = 16 }
+
+[[variants]]
+id = "pin"
+slug = { fr = "code-pin-aleatoire", en = "random-pin" }
+name = { fr = "Code PIN aléatoire", en = "Random PIN" }
+preset = { length = 8, lowercase = false, uppercase = false, symbols = false }

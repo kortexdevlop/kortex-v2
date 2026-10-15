@@ -6,3 +6,7 @@ node_modules/
 .DS_Store
 dist/
 .wrangler/
+node_modules/
+.astro/
+web/site/src/generated/
+web/site/public/kortex.css

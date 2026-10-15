@@ -2,7 +2,7 @@
 _Last update: 2026-10-15 — session 1_
 
 ## Current phase
-Phase 0 — Cadrage, spikes, nettoyage (≈ 75 %) — Phase 1 en cours
+Phase 0 — Cadrage, spikes, nettoyage (≈ 85 %) — Phase 1 quasi finie, Phase 2 démarrée, premier outil pilote
 
 ## Done this session
 - Master prompt copié dans `docs/MASTER_PROMPT.md`; `CLAUDE.md`/`AGENTS.md` créés.
@@ -25,6 +25,9 @@ Phase 0 — Cadrage, spikes, nettoyage (≈ 75 %) — Phase 1 en cours
 - xtask : `tokens`, `registry`, `check [id]`, `new-tool` ; `tools/_template` ; `docs/guides/add-tool.md` ; CI Linux (`.github/workflows/ci.yml`). Test négatif de `check` OK.
 - Crates `kortex-runtime` (Cx, ToolError, CancelToken, FileData, Table, block_on), `kortex-platform` (traits Storage/Clipboard + MemoryPlatform), `kortex-i18n` (Catalog), `kortex-macros` (`contract!` génère Inputs/Params/Outputs/validate, `#[engine]` contrôle la signature), façade `kortex`. Template d'outil branché sur la macro et validé de bout en bout (outil temporaire, supprimé).
 - Crate `kortex-ui` : Button, Card, TextField, Switch, Progress, DropZone, ModeSwitch, `AutoTool` (UI générée du contrat, params filtrés par mode Simple/Medium/Pro), CSS des composants dans `components.css`; 5 tests (dont rendu SSR). `cargo xtask stats`.
+- Site Astro 7.4 (`web/site`) : layout (en-tête verre dépoli, thème auto clair/sombre, hreflang, JSON-LD), accueil, catalogue, page d'outil/variantes générées depuis le registre (`sync.mjs`), galerie `/design` (noindex). Preuve : 1 outil = 6 pages sans toucher au site.
+- Outil pilote #5 `secure.password-generator` (beta) : moteur + 7 tests, FR/EN, 2 variantes SEO. `Cx::fill_random` ajouté (getrandom).
+- Aperçu local : `.claude/launch.json` (serveur `site`).
 
 ## Decisions (user, session 1)
 - Pas de Homebrew.
@@ -35,7 +38,8 @@ Phase 0 — Cadrage, spikes, nettoyage (≈ 75 %) — Phase 1 en cours
 - Crédits IA : affichés en % restant, calculé d'après les neurons consommés (pas en nombre de requêtes) ; limite par utilisateur généreuse mais raisonnable.
 
 ## Next action (exact)
-- Phase 1 suite : impls plateforme web/desktop, `kortex-io`, `kortex-bus`, xtask `icons`/`dev`/`build`, galerie `/_design` (dans web/site, Phase 2), xtask `icons`/`dev`/`build`/`stats`, galerie `/_design`, vérifier la CI sur GitHub.
+- Phase 2 suite : Stage (fenêtre flottante + View Transition) et chargement des bundles outils (`run.`), PWA, sitemap, OG, pages légales, accueil animée, ⌘K, déploiement Cloudflare (Workers Static Assets, wrangler).
+- Phase 1 reste : impls plateforme web/desktop, `kortex-io`, `kortex-bus`, xtask `icons`/`dev`/`build`, galerie `/_design` (dans web/site, Phase 2), xtask `icons`/`dev`/`build`/`stats`, galerie `/_design`, vérifier la CI sur GitHub.
 - Spikes restants (b) Stage iframe, (c) Web Worker, (f) WebCodecs, (e) CI 3 OS ; ADR contrat/auth/codecs.
 - Puis Phase 1 (monorepo, tokens, kortex-ui, xtask).
 

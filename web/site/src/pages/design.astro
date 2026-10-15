@@ -1,0 +1,23 @@
+---
+import Base from '../layouts/Base.astro';
+const sp = [1,2,3,4,5,6,7,8,9,10];
+const sh = [0,1,2,3,4,5];
+const colors = ['bg','surface','surface-2','text','text-2','accent','accent-2','success','danger'];
+---
+<Base title="Design" description="Kortex design system" lang="fr" noindex>
+  <h1>Design system</h1>
+  <h2>Couleurs</h2>
+  <div class="grid">{colors.map((c) => <div class="k-card"><div style={`height:48px;border-radius:var(--k-radius-control);background:var(--k-${c});border:1px solid var(--k-border)`}></div><code>--k-{c}</code></div>)}</div>
+  <h2>Ombres</h2>
+  <div class="grid">{sh.map((s) => <div class="k-card" style={`box-shadow:var(--k-shadow-${s})`}>Niveau {s}</div>)}</div>
+  <h2>Boutons et champs</h2>
+  <p><button class="k-btn">Principal</button> <button class="k-btn" data-variant="ghost">Secondaire</button></p>
+  <p><input class="k-input" placeholder="Champ de saisie" /></p>
+  <div class="k-segmented" role="radiogroup"><button class="k-segment" aria-checked="false">Simple</button><button class="k-segment" aria-checked="true">Medium</button><button class="k-segment" aria-checked="false">Pro</button></div>
+  <h2>Zone de dépôt</h2>
+  <div class="k-dropzone" tabindex="0"><strong>Déposer un fichier</strong><span class="k-muted">ou cliquer pour choisir</span></div>
+  <h2>Progression</h2>
+  <div class="k-progress"><div class="k-progress-bar" style="width:60%"></div></div>
+  <h2>Espacements</h2>
+  {sp.map((s) => <div style={`height:12px;margin:4px 0;width:var(--k-space-${s});background:var(--k-accent);border-radius:6px`}></div>)}
+</Base>

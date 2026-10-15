@@ -1,0 +1,9 @@
+---
+import { toolPath, type Lang, type ToolEntry } from '../lib/data';
+const { t, lang } = Astro.props as { t: ToolEntry; lang: Lang };
+---
+<a class="k-card tool-card" href={toolPath(t, lang)}>
+  <span class="glyph" set:html={t.glyph} />
+  <strong>{t.tool.name[lang]}</strong>
+  <span class="k-muted">{t.tool.tagline[lang]}</span>
+</a>
