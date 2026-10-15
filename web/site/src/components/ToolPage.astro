@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import Stage from './Stage.astro';
 import { toolPath, variantPath, ui, type Lang, type ToolEntry } from '../lib/data';
 const { t, lang, variant } = Astro.props as { t: ToolEntry; lang: Lang; variant?: ToolEntry['variants'][number] };
 const L = ui[lang];
@@ -23,7 +24,7 @@ const jsonLd = [
       {t.tool.offline && <span class="badge">{L.offline}</span>}
       <span class="badge">{L.free}</span>
     </div>
-    <a class="k-btn" href="?open=1" data-tool={t.tool.id} data-variant-id={variant?.id}>{L.open}</a>
+    <Stage toolId={t.tool.id} name={name} lang={lang} variantId={variant?.id} label={L.open} />
   </section>
   <div class="prose">
     {content.map((s) => (

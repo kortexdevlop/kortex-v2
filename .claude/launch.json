@@ -1,6 +1,29 @@
 {
   "version": "0.0.1",
   "configurations": [
-    { "name": "site", "runtimeExecutable": "pnpm", "runtimeArgs": ["--filter", "@kortex/site", "exec", "astro", "preview", "--port", "4321"], "port": 4321 }
+    {
+      "name": "site",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "--filter",
+        "@kortex/site",
+        "exec",
+        "astro",
+        "preview",
+        "--port",
+        "4321"
+      ],
+      "port": 4321
+    },
+    {
+      "name": "run",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "python3 -m http.server $PORT --directory dist/run"
+      ],
+      "port": 4330,
+      "autoPort": true
+    }
   ]
 }

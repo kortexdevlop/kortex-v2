@@ -1,4 +1,5 @@
 //! Project tooling: `cargo xtask <command>`.
+mod build;
 mod check;
 mod new_tool;
 mod registry;
@@ -8,8 +9,7 @@ mod tools;
 
 use std::process::ExitCode;
 
-const USAGE: &str =
-    "Commandes : tokens | registry | check [id] | stats | new-tool --universe U --name N";
+const USAGE: &str = "Commandes : tokens | registry | check [id] | stats | build <id> | new-tool --universe U --name N";
 
 fn main() -> ExitCode {
     let args: Vec<String> = std::env::args().skip(1).collect();
@@ -17,6 +17,7 @@ fn main() -> ExitCode {
         Some("tokens") => tokens::run(),
         Some("registry") => registry::run(),
         Some("check") => check::run(args.get(1).map(String::as_str)),
+        Some("build") => build::run(&args[1..]),
         Some("stats") => stats::run(),
         Some("new-tool") => new_tool::run(&args[1..]),
         Some(other) => Err(format!("commande inconnue : {other}\n{USAGE}")),

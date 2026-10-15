@@ -189,6 +189,58 @@ fn generate(c: &ToolContract, raw_path: &str) -> Result<String, String> {
     }
     let _ = writeln!(out, "        ::core::result::Result::Ok(())\n    }}\n}}");
 
+    // Dynamic entry points: ValueMap <-> typed structs, and `run_map` (calls `engine::run`).
+    let _ = writeln!(
+        out,
+        "impl Inputs {{\n    /// # Errors\n    /// `missing_input` / `invalid_param`.\n    pub fn from_map(m: &::kortex::runtime::ValueMap) -> ::core::result::Result<Self, ::kortex::runtime::ToolError> {{\n        ::core::result::Result::Ok(Self {{"
+    );
+    for i in &c.inputs {
+        let t = rust_type(&i.ty);
+        if i.required {
+            let _ = writeln!(
+                out,
+                "            {id}: <{t} as ::kortex::runtime::FromValue>::from_value(m.get({id:?}).ok_or_else(|| ::kortex::runtime::ToolError::with_detail(\"missing_input\", {id:?}))?)?,",
+                id = i.id
+            );
+        } else {
+            let _ = writeln!(
+                out,
+                "            {id}: match m.get({id:?}) {{ ::core::option::Option::Some(v) => ::core::option::Option::Some(<{t} as ::kortex::runtime::FromValue>::from_value(v)?), ::core::option::Option::None => ::core::option::Option::None }},",
+                id = i.id
+            );
+        }
+    }
+    let _ = writeln!(out, "        }})\n    }}\n}}");
+    let _ = writeln!(
+        out,
+        "impl Params {{\n    /// Missing keys keep their contract defaults.\n    ///\n    /// # Errors\n    /// `invalid_param` on a wrongly typed value.\n    pub fn from_map(m: &::kortex::runtime::ValueMap) -> ::core::result::Result<Self, ::kortex::runtime::ToolError> {{\n        #[allow(unused_mut)]\n        let mut s = Self::default();"
+    );
+    for p in &c.params {
+        let _ = writeln!(
+            out,
+            "        if let ::core::option::Option::Some(v) = m.get({id:?}) {{ s.{id} = <{t} as ::kortex::runtime::FromValue>::from_value(v)?; }}",
+            id = p.id,
+            t = rust_type(&p.ty)
+        );
+    }
+    let _ = writeln!(out, "        ::core::result::Result::Ok(s)\n    }}\n}}");
+    let _ = writeln!(
+        out,
+        "impl Outputs {{\n    #[must_use]\n    pub fn into_map(self) -> ::kortex::runtime::ValueMap {{\n        #[allow(unused_mut)]\n        let mut m = ::kortex::runtime::ValueMap::new();"
+    );
+    for o in &c.outputs {
+        let _ = writeln!(
+            out,
+            "        m.insert({id:?}.to_owned(), ::kortex::runtime::IntoValue::into_value(self.{id}));",
+            id = o.id
+        );
+    }
+    let _ = writeln!(out, "        m\n    }}\n}}");
+    let _ = writeln!(
+        out,
+        "/// Dynamic entry used by hosts that only know the contract (UI, Flow, Mind, CLI).\n///\n/// # Errors\n/// Conversion errors, or whatever `engine::run` returns.\npub async fn run_map(inputs: &::kortex::runtime::ValueMap, params: &::kortex::runtime::ValueMap, cx: &mut ::kortex::runtime::Cx) -> ::core::result::Result<::kortex::runtime::ValueMap, ::kortex::runtime::ToolError> {{\n    let out = engine::run(Inputs::from_map(inputs)?, Params::from_map(params)?, cx).await?;\n    ::core::result::Result::Ok(out.into_map())\n}}"
+    );
+
     // Levels available to the auto UI.
     let _ = write!(out, "pub const PARAM_LEVELS: &[(&str, &str)] = &[");
     for p in &c.params {

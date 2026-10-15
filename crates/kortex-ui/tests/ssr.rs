@@ -1,5 +1,10 @@
 use dioxus::prelude::*;
-use kortex_ui::{AutoTool, Button, Progress};
+use kortex_runtime::ValueMap;
+use kortex_ui::{AutoTool, Button, Progress, RunFuture, Runner};
+
+fn noop_runner(_: ValueMap, _: ValueMap) -> RunFuture {
+    Box::pin(async { Ok(ValueMap::new()) })
+}
 
 fn render<P: Clone + 'static>(app: fn(P) -> Element, props: P) -> String {
     let mut vdom = VirtualDom::new_with_props(app, props);
@@ -67,7 +72,7 @@ privacy = "local"
     #[derive(Clone, PartialEq)]
     struct P(kortex_contract::ToolContract);
     fn app(p: P) -> Element {
-        rsx! { AutoTool { contract: p.0, lang: "fr".to_owned(), on_run: |_| {} } }
+        rsx! { AutoTool { contract: p.0, lang: "fr".to_owned(), locale: kortex_i18n::Catalog::default(), runner: Runner(noop_runner) } }
     }
     let html = render(app, P(c));
     assert!(html.contains("Mon outil"), "{html}");

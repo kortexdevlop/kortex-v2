@@ -27,6 +27,11 @@
   .k-segment { min-height: 36px; padding: 0 var(--k-space-4); border: 0; border-radius: var(--k-radius-control); background: transparent; color: var(--k-text-2); font: inherit; cursor: pointer; }
   .k-segment[aria-checked="true"] { background: var(--k-bg); color: var(--k-text); box-shadow: var(--k-shadow-1); }
   .k-tool-head { display: flex; align-items: center; justify-content: space-between; gap: var(--k-space-4); flex-wrap: wrap; margin-bottom: var(--k-space-5); }
+  .k-actions { margin-top: var(--k-space-5); }
+  .k-result { margin-top: var(--k-space-5); display: grid; gap: var(--k-space-3); }
+  .k-output { display: flex; align-items: center; justify-content: space-between; gap: var(--k-space-3); padding: var(--k-space-4); border-radius: var(--k-radius-field); background: var(--k-surface-2); }
+  .k-output code { font-family: var(--k-type-mono); overflow-wrap: anywhere; user-select: all; }
+  .k-error { color: var(--k-danger); }
   .k-muted { color: var(--k-text-2); }
   @media (prefers-reduced-motion: reduce) { * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; } }
 }

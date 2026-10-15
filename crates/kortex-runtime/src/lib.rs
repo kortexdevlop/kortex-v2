@@ -5,6 +5,68 @@ use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::task::{Context, Poll, Waker};
 
+/// Dynamically typed value crossing the tool boundary (UI, bus, Flow, Mind, CLI).
+#[derive(Debug, Clone, PartialEq)]
+pub enum Value {
+    Text(String),
+    Number(f64),
+    Int(i64),
+    Bool(bool),
+    File(FileData),
+    Files(Vec<FileData>),
+    Table(Table),
+}
+
+/// Named values: inputs, params or outputs of a tool run.
+pub type ValueMap = std::collections::BTreeMap<String, Value>;
+
+/// Conversion from a dynamic [`Value`] (used by the generated `from_map`).
+pub trait FromValue: Sized {
+    /// # Errors
+    /// `invalid_param` when the value has the wrong type.
+    fn from_value(v: &Value) -> Result<Self, ToolError>;
+}
+
+/// Conversion into a dynamic [`Value`] (used by the generated `into_map`).
+pub trait IntoValue {
+    fn into_value(self) -> Value;
+}
+
+macro_rules! value_impls {
+    ($($ty:ty => $variant:ident),* $(,)?) => {$(
+        impl FromValue for $ty {
+            fn from_value(v: &Value) -> Result<Self, ToolError> {
+                match v {
+                    Value::$variant(x) => Ok(x.clone()),
+                    _ => Err(ToolError::new(ToolError::INVALID_PARAM)),
+                }
+            }
+        }
+        impl IntoValue for $ty {
+            fn into_value(self) -> Value { Value::$variant(self) }
+        }
+    )*};
+}
+
+value_impls!(String => Text, i64 => Int, bool => Bool, FileData => File, Vec<FileData> => Files, Table => Table);
+
+impl FromValue for f64 {
+    #[allow(clippy::cast_precision_loss)]
+    fn from_value(v: &Value) -> Result<Self, ToolError> {
+        match v {
+            Value::Number(x) => Ok(*x),
+            Value::Int(i) => Ok(*i as f64),
+            _ => Err(ToolError::new(ToolError::INVALID_PARAM)),
+        }
+    }
+}
+
+impl IntoValue for f64 {
+    fn into_value(self) -> Value {
+        Value::Number(self)
+    }
+}
+
 /// Typed engine error. `code` is translated by the UI via `locales/` (never shown raw).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ToolError {
@@ -179,6 +241,14 @@ mod tests {
         let mut os = [0_u8; 32];
         assert!(Cx::new().fill_random(&mut os).is_ok());
         assert_ne!(os, [0_u8; 32]);
+    }
+
+    #[test]
+    fn value_conversions() {
+        assert_eq!(i64::from_value(&Value::Int(3)), Ok(3));
+        assert_eq!(f64::from_value(&Value::Int(3)), Ok(3.0));
+        assert!(bool::from_value(&Value::Text("x".into())).is_err());
+        assert_eq!("a".to_owned().into_value(), Value::Text("a".into()));
     }
 
     #[test]

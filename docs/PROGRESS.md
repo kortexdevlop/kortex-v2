@@ -2,7 +2,7 @@
 _Last update: 2026-10-15 — session 1_
 
 ## Current phase
-Phase 0 — Cadrage, spikes, nettoyage (≈ 85 %) — Phase 1 quasi finie, Phase 2 démarrée, premier outil pilote
+Phase 0 — Cadrage, spikes, nettoyage (≈ 92 %) — Phase 1 quasi finie, Phase 2 démarrée, premier outil pilote
 
 ## Done this session
 - Master prompt copié dans `docs/MASTER_PROMPT.md`; `CLAUDE.md`/`AGENTS.md` créés.
@@ -28,6 +28,11 @@ Phase 0 — Cadrage, spikes, nettoyage (≈ 85 %) — Phase 1 quasi finie, Phase
 - Site Astro 7.4 (`web/site`) : layout (en-tête verre dépoli, thème auto clair/sombre, hreflang, JSON-LD), accueil, catalogue, page d'outil/variantes générées depuis le registre (`sync.mjs`), galerie `/design` (noindex). Preuve : 1 outil = 6 pages sans toucher au site.
 - Outil pilote #5 `secure.password-generator` (beta) : moteur + 7 tests, FR/EN, 2 variantes SEO. `Cx::fill_random` ajouté (getrandom).
 - Aperçu local : `.claude/launch.json` (serveur `site`).
+- Entrée dynamique générée par la macro (`Inputs/Params::from_map`, `Outputs::into_map`, `run_map`) + `Value`/`ValueMap` (base de Flow/Mind/CLI).
+- `AutoTool` exécute l'outil (async), affiche résultat + Copier + erreurs traduites (`Runner`).
+- `cargo xtask build <id>` : génère un wrapper Dioxus, `dx build`, publie `dist/run/<id>/`. Password generator : wasm 1,2 Mo brut, testé dans le navigateur (aléa WebCrypto OK).
+- Stage (fenêtre flottante, View Transition, iframe cross-origin, `?open=1`, préchargement au survol, Échap, plein écran) testé. Config locale : serveurs `site` (4321) et `run` (autoPort) dans `.claude/launch.json`; `PUBLIC_RUN_ORIGIN` pour le site.
+- CI : job `site` ajouté.
 
 ## Decisions (user, session 1)
 - Pas de Homebrew.
@@ -38,7 +43,7 @@ Phase 0 — Cadrage, spikes, nettoyage (≈ 85 %) — Phase 1 quasi finie, Phase
 - Crédits IA : affichés en % restant, calculé d'après les neurons consommés (pas en nombre de requêtes) ; limite par utilisateur généreuse mais raisonnable.
 
 ## Next action (exact)
-- Phase 2 suite : Stage (fenêtre flottante + View Transition) et chargement des bundles outils (`run.`), PWA, sitemap, OG, pages légales, accueil animée, ⌘K, déploiement Cloudflare (Workers Static Assets, wrangler).
+- Phase 2 suite : drag-and-drop de fichier → Stage (bus postMessage), thème/mode transmis à l'iframe, variantes/presets appliqués, taille wasm (budget 400 Ko brotli), moteur en Web Worker (spike c), PWA, sitemap, OG, pages légales, accueil animée, ⌘K, déploiement Cloudflare (Workers Static Assets, wrangler).
 - Phase 1 reste : impls plateforme web/desktop, `kortex-io`, `kortex-bus`, xtask `icons`/`dev`/`build`, galerie `/_design` (dans web/site, Phase 2), xtask `icons`/`dev`/`build`/`stats`, galerie `/_design`, vérifier la CI sur GitHub.
 - Spikes restants (b) Stage iframe, (c) Web Worker, (f) WebCodecs, (e) CI 3 OS ; ADR contrat/auth/codecs.
 - Puis Phase 1 (monorepo, tokens, kortex-ui, xtask).

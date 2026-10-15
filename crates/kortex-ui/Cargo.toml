@@ -5,8 +5,10 @@ edition.workspace = true
 publish.workspace = true
 
 [dependencies]
-dioxus = { version = "0.7.10", default-features = false, features = ["macro", "html", "signals", "hooks"] }
+dioxus = { version = "0.7.10", default-features = false, features = ["macro", "html", "signals", "hooks", "document"] }
 kortex-contract = { path = "../kortex-contract" }
+kortex-i18n = { path = "../kortex-i18n" }
+kortex-runtime = { path = "../kortex-runtime" }
 toml = "0.9"
 
 [dev-dependencies]

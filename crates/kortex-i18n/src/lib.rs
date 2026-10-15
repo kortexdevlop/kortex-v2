@@ -1,7 +1,7 @@
 //! Locale catalogs from `locales/<lang>.toml` (`[section] key = "text"` -> `section.key`).
 use std::collections::BTreeMap;
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct Catalog(BTreeMap<String, String>);
 
 impl Catalog {

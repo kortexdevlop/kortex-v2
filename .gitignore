@@ -10,3 +10,5 @@ node_modules/
 .astro/
 web/site/src/generated/
 web/site/public/kortex.css
+.kortex/
+dist/

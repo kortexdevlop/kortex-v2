@@ -1,20 +1,24 @@
 use kortex::runtime::{Cx, ToolError, block_on};
 
 mod demo {
-    use kortex::runtime::{Cx, ToolError};
-
     kortex::contract!("tests/fixtures/demo.toml");
 
-    #[kortex::engine]
-    pub async fn run(input: Inputs, params: Params, cx: &mut Cx) -> Result<Outputs, ToolError> {
-        params.validate()?;
-        cx.check_cancelled()?;
-        Ok(Outputs {
-            result: input
-                .content
-                .repeat(usize::try_from(params.size).unwrap_or(1)),
-        })
+    pub mod engine {
+        use super::{Inputs, Outputs, Params};
+        use kortex::runtime::{Cx, ToolError};
+
+        #[kortex::engine]
+        pub async fn run(input: Inputs, params: Params, cx: &mut Cx) -> Result<Outputs, ToolError> {
+            params.validate()?;
+            cx.check_cancelled()?;
+            Ok(Outputs {
+                result: input
+                    .content
+                    .repeat(usize::try_from(params.size).unwrap_or(1)),
+            })
+        }
     }
+    pub use engine::run;
 }
 
 #[test]
@@ -55,4 +59,23 @@ fn range_is_enforced() {
         out.map(|o| o.result).map_err(|e| e.code),
         Err(ToolError::INVALID_PARAM)
     );
+}
+
+#[test]
+fn dynamic_entry_point() {
+    use kortex::runtime::{Value, ValueMap};
+    let inputs = ValueMap::from([("content".to_owned(), Value::Text("ab".into()))]);
+    let params = ValueMap::from([("size".to_owned(), Value::Int(2))]);
+    let out = block_on(demo::run_map(&inputs, &params, &mut Cx::new()));
+    assert_eq!(
+        out.map(|m| m.get("result").cloned()),
+        Ok(Some(Value::Text("abab".into())))
+    );
+    let missing = block_on(demo::run_map(&ValueMap::new(), &params, &mut Cx::new()));
+    assert_eq!(
+        missing.map(|_| ()).map_err(|e| e.code),
+        Err("missing_input")
+    );
+    let bad = ValueMap::from([("size".to_owned(), Value::Text("x".into()))]);
+    assert!(block_on(demo::run_map(&inputs, &bad, &mut Cx::new())).is_err());
 }
