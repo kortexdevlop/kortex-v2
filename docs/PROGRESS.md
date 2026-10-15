@@ -49,6 +49,9 @@ Phase 0 — Cadrage, spikes, nettoyage (≈ 100 % des pilotes) — Phase 1 quasi
   - Sources vérifiées : PASS 2026 (4 005 €/mois), Agirc-Arrco T1 3,15 % / T2 8,64 % / CEG 0,86 % et 1,08 % / CET 0,14 %. NON reconfirmés par source officielle : vieillesse de base 6,90 % / 0,40 % et APEC 0,024 % → à revérifier (Urssaf) et chaque janvier. Résultat présenté comme estimation. Les sites secondaires consultés contenaient des erreurs (ex. « chômage salarié 2,40 % ») : ne pas s'y fier.
 - AutoTool : sorties dans l'ordre du contrat, nombres affichés à 2 décimales.
 - **6 pilotes terminés** (password, hash, qr, pdf.merge, image.convert, salary) : catalogue = 6 outils beta, ~24 pages SEO FR/EN.
+- Accueil animée (logo qui se dessine, halo suivant le curseur, révélations `animation-timeline: view()`, grille des 17 univers avec compteurs, section vie privée) FR/EN.
+- Kortex Seek niveau 1 (`web/site/src/lib/seek.ts`) : recherche locale hors-ligne (accents, fautes, préfixes, synonymes FR/EN, mots vides, variantes) ; palette ⌘K / Ctrl+K / « / » dans l'en-tête ; index `public/seek-index.json` généré par sync ; 9 tests `node --test` (+ CI). Testé navigateur.
+- Décision user : on ne s'occupe plus du budget de taille wasm sauf cas inadmissible.
 
 ## Decisions (user, session 1)
 - Pas de Homebrew.
@@ -60,8 +63,7 @@ Phase 0 — Cadrage, spikes, nettoyage (≈ 100 % des pilotes) — Phase 1 quasi
 
 ## Next action (exact)
 - Revérifier vieillesse de base + APEC (calc.gross-net-salary).
-- Budget wasm : check xtask + stratégie moteur lourd séparé (pdf.merge 536 Ko, image.convert 508 Ko brotli).
-- Phase 2 reste : accueil animée, ⌘K (Seek niveau 1), OG images, drag de fichier sur la page → Stage, thème→iframe, spike Web Worker. Puis check de budget wasm, champ couleur natif, vCard/Wi-Fi QR. Dépôt de fichier sur la page → Stage (bus postMessage), thème/mode transmis à l'iframe, taille wasm (budget 400 Ko brotli), moteur en Web Worker (spike c), PWA, sitemap, OG, pages légales, accueil animée, ⌘K, déploiement Cloudflare (Workers Static Assets, wrangler).
+- Phase 2 reste : OG images (resvg), icônes composées (squircle+glyphe) `xtask icons`, drag de fichier sur la page → Stage, thème→iframe, spike Web Worker. Puis check de budget wasm, champ couleur natif, vCard/Wi-Fi QR. Dépôt de fichier sur la page → Stage (bus postMessage), thème/mode transmis à l'iframe, taille wasm (budget 400 Ko brotli), moteur en Web Worker (spike c), PWA, sitemap, OG, pages légales, accueil animée, ⌘K, déploiement Cloudflare (Workers Static Assets, wrangler).
 - Phase 1 reste : impls plateforme web/desktop, `kortex-io`, `kortex-bus`, xtask `icons`/`dev`/`build`, galerie `/_design` (dans web/site, Phase 2), xtask `icons`/`dev`/`build`/`stats`, galerie `/_design`, vérifier la CI sur GitHub.
 - Spikes restants (b) Stage iframe, (c) Web Worker, (f) WebCodecs, (e) CI 3 OS ; ADR contrat/auth/codecs.
 - Puis Phase 1 (monorepo, tokens, kortex-ui, xtask).

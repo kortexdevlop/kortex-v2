@@ -1,5 +1,6 @@
 ---
 import { prefix, type Lang } from '../lib/data';
+import Seek from '../components/Seek.astro';
 interface Props { title: string; description: string; lang: Lang; alt?: { fr: string; en: string }; noindex?: boolean; jsonLd?: object[] }
 const { title, description, lang, alt, noindex = false, jsonLd = [] } = Astro.props;
 const site = Astro.site?.origin ?? 'https://kortex.site';
@@ -36,6 +37,7 @@ const otherHref = alt ? (lang === 'fr' ? alt.en : alt.fr) : (lang === 'fr' ? '/e
         <span>Kortex</span>
       </a>
       <nav>
+        <Seek lang={lang} />
         <a href={nav.all}>{nav.tools}</a>
         <a href={otherHref} hreflang={lang === 'fr' ? 'en' : 'fr'}>{nav.other}</a>
       </nav>

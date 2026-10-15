@@ -1,17 +1,124 @@
 ---
 import Base from '../layouts/Base.astro';
 import ToolCard from './ToolCard.astro';
-import { tools, ui, byPriority, type Lang } from '../lib/data';
+import { tools, universes, byPriority, type Lang } from '../lib/data';
 const { lang } = Astro.props as { lang: Lang };
-const t = ui[lang];
+const T = {
+  fr: {
+    title: 'Kortex — des outils gratuits, rapides et privés',
+    h1a: 'Des outils gratuits.', h1b: 'Vos fichiers restent chez vous.',
+    sub: 'Convertir, fusionner, calculer, sécuriser : tout s’exécute sur votre appareil, sans compte, sans envoi.',
+    cta: 'Que voulez-vous faire ?', popular: 'Outils populaires', all: 'Tous les outils', allHref: '/outils',
+    universes: 'Des univers pour tout faire', soon: 'Bientôt', tool: 'outil', toolsN: 'outils',
+    privacyTitle: 'Privé par conception', privacySub: 'Pas une promesse : une architecture.',
+    points: [
+      ['Traitement local', 'Chaque outil tourne dans votre navigateur ou votre application. Il n’y a pas de serveur de fichiers.'],
+      ['Aucun envoi', 'Vos documents, photos et mots de passe ne quittent jamais votre appareil.'],
+      ['Hors ligne', 'Après un premier chargement, les outils fonctionnent sans connexion.'],
+    ],
+    emptyTools: 'Les premiers outils arrivent bientôt.',
+  },
+  en: {
+    title: 'Kortex — free, fast, private tools',
+    h1a: 'Free tools.', h1b: 'Your files stay with you.',
+    sub: 'Convert, merge, calculate, secure: everything runs on your device, with no account and no upload.',
+    cta: 'What do you want to do?', popular: 'Popular tools', all: 'All tools', allHref: '/en/tools',
+    universes: 'A universe for everything', soon: 'Soon', tool: 'tool', toolsN: 'tools',
+    privacyTitle: 'Private by design', privacySub: 'Not a promise: an architecture.',
+    points: [
+      ['Local processing', 'Every tool runs in your browser or app. There is no file server.'],
+      ['Nothing uploaded', 'Your documents, photos and passwords never leave your device.'],
+      ['Works offline', 'After a first load, tools work without a connection.'],
+    ],
+    emptyTools: 'The first tools are coming soon.',
+  },
+}[lang];
 const popular = [...tools].filter((x) => x.tool.status !== 'draft').sort(byPriority).slice(0, 12);
+const counts = (id: string) => tools.filter((x) => x.tool.universe === id).length;
 ---
-<Base title={`Kortex — ${t.tagline}`} description={t.sub} lang={lang} alt={{ fr: '/', en: '/en' }}>
-  <section class="hero">
-    <h1>{t.tagline}</h1>
-    <p class="k-muted">{t.sub}</p>
+<Base title={T.title} description={T.sub} lang={lang} alt={{ fr: '/', en: '/en' }}>
+  <section class="hero home-hero" data-glow>
+    <div class="home-glow" aria-hidden="true"></div>
+    <svg class="home-mark" width="72" height="72" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path pathLength="1" d="M22 13V51M22 33C30 33 37 28 43 15C46 25 40 32 33 36C41 38 46 44 47 51" />
+    </svg>
+    <h1>{T.h1a}<br /><span class="home-grad">{T.h1b}</span></h1>
+    <p class="home-sub">{T.sub}</p>
+    <button class="home-search" type="button" data-seek-open>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
+      <span>{T.cta}</span><kbd data-seek-kbd>⌘K</kbd>
+    </button>
   </section>
-  {popular.length === 0
-    ? <p class="k-muted">{t.empty}</p>
-    : <div class="grid">{popular.map((x) => <ToolCard t={x} lang={lang} />)}</div>}
+
+  <section class="reveal home-section">
+    <div class="home-head"><h2>{T.popular}</h2><a href={T.allHref}>{T.all} →</a></div>
+    {popular.length === 0
+      ? <p class="k-muted">{T.emptyTools}</p>
+      : <div class="grid">{popular.map((x) => <ToolCard t={x} lang={lang} />)}</div>}
+  </section>
+
+  <section class="reveal home-section">
+    <h2>{T.universes}</h2>
+    <div class="grid home-universes">
+      {universes.map((u) => (
+        <div class="k-card home-universe" style={`--hue:${u.hue}`}>
+          <span class="home-dot" aria-hidden="true"></span>
+          <strong>{u.name}</strong>
+          <span class="k-muted">{counts(u.id) ? `${counts(u.id)} ${counts(u.id) > 1 ? T.toolsN : T.tool}` : T.soon}</span>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="reveal home-section home-privacy">
+    <h2>{T.privacyTitle}</h2>
+    <p class="k-muted">{T.privacySub}</p>
+    <div class="grid">{T.points.map(([h, p]) => <div class="k-card"><strong>{h}</strong><p class="k-muted">{p}</p></div>)}</div>
+  </section>
 </Base>
+
+<style is:global>
+  .home-hero { position: relative; text-align: center; padding: var(--k-space-8) 0 var(--k-space-7); isolation: isolate; }
+  .home-glow { position: absolute; inset: -20% -10% auto; height: 120%; z-index: -1; pointer-events: none; opacity: 0.55;
+    background: radial-gradient(520px 320px at var(--gx, 50%) var(--gy, 30%), color-mix(in oklab, var(--k-accent) 28%, transparent), transparent 70%),
+                radial-gradient(420px 280px at calc(var(--gx, 50%) + 18%) calc(var(--gy, 30%) + 12%), color-mix(in oklab, var(--k-accent-2) 22%, transparent), transparent 70%);
+    transition: background-position var(--k-motion-slow) var(--k-motion-ease); }
+  .home-mark { color: var(--k-accent); margin-bottom: var(--k-space-5); }
+  .home-mark path { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 1.4s var(--k-motion-ease) 0.15s forwards; }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  .home-grad { background: linear-gradient(90deg, var(--k-accent), var(--k-accent-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .home-sub { max-width: 560px; margin: 0 auto var(--k-space-6); color: var(--k-text-2); font-size: 1.15rem; }
+  .home-search { display: inline-flex; align-items: center; gap: var(--k-space-3); min-height: 56px; padding: 0 var(--k-space-5); width: min(520px, 100%); border: 1px solid var(--k-border); border-radius: 999px; background: var(--k-surface); color: var(--k-text-2); font: inherit; font-size: 1.05rem; cursor: pointer; box-shadow: var(--k-shadow-3); transition: transform var(--k-motion-base) var(--k-motion-ease), box-shadow var(--k-motion-base) var(--k-motion-ease); }
+  .home-search:hover { transform: translateY(-2px); box-shadow: var(--k-shadow-4); color: var(--k-text); }
+  .home-search span { flex: 1; text-align: left; }
+  .home-search kbd { font: inherit; font-size: 0.8rem; padding: 2px 8px; border-radius: 8px; background: var(--k-surface-2); }
+  .home-section { margin-top: var(--k-space-9); }
+  .home-head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--k-space-4); flex-wrap: wrap; }
+  .home-head a { color: var(--k-accent); text-decoration: none; }
+  .home-universes { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+  .home-universe { display: grid; gap: var(--k-space-1); }
+  .home-dot { width: 12px; height: 12px; border-radius: 50%; background: oklch(0.72 0.14 var(--hue)); box-shadow: 0 0 0 4px color-mix(in oklab, oklch(0.72 0.14 var(--hue)) 18%, transparent); }
+  .home-privacy .k-card p { margin-bottom: 0; }
+  /* Scroll-driven reveal (native); sections are simply visible where unsupported. */
+  @supports (animation-timeline: view()) {
+    .reveal { animation: reveal linear both; animation-timeline: view(); animation-range: entry 0% entry 35%; }
+    @keyframes reveal { from { opacity: 0; transform: translateY(28px) scale(0.985); } to { opacity: 1; transform: none; } }
+  }
+  @media (prefers-reduced-motion: reduce) { .home-mark path { animation: none; stroke-dashoffset: 0; } .reveal { animation: none; } }
+</style>
+<script>
+  // Soft glow that follows the cursor over the hero (skipped for reduced motion / touch).
+  const hero = document.querySelector<HTMLElement>('[data-glow]');
+  const glow = hero?.querySelector<HTMLElement>('.home-glow');
+  if (hero && glow && !matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(hover: hover)').matches) {
+    let raf = 0;
+    hero.addEventListener('pointermove', (e) => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const r = hero.getBoundingClientRect();
+        glow.style.setProperty('--gx', `${((e.clientX - r.left) / r.width) * 100}%`);
+        glow.style.setProperty('--gy', `${((e.clientY - r.top) / r.height) * 100}%`);
+      });
+    });
+  }
+</script>

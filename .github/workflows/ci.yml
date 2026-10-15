@@ -33,4 +33,5 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - run: cargo xtask tokens
       - run: cargo xtask registry
+      - run: pnpm --filter @kortex/site test
       - run: pnpm site:build

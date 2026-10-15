@@ -43,5 +43,23 @@ const tools = registry.tools.map((t) => {
   };
 });
 
+// Seek level-1 index (per language) used by the ⌘K palette.
+const seek = { fr: [], en: [] };
+for (const t of tools) {
+  for (const lang of ['fr', 'en']) {
+    const base = lang === 'fr' ? '' : '/en';
+    seek[lang].push({
+      id: t.tool.id,
+      name: t.tool.name[lang],
+      tagline: t.tool.tagline[lang],
+      keywords: t.search?.keywords?.[lang] ?? [],
+      intents: t.search?.intents?.[lang] ?? [],
+      path: `${base}/${t.tool.slug[lang]}`,
+      glyph: t.glyph,
+      variants: t.variants.map((v) => ({ name: v.name[lang], path: `${base}/${t.tool.slug[lang]}/${v.slug[lang]}` })),
+    });
+  }
+}
+writeFileSync(join(out, 'public/seek-index.json'), JSON.stringify(seek));
 writeFileSync(join(out, 'src/generated/site-data.json'), JSON.stringify({ universes, tools }, null, 1));
 console.log(`site data: ${tools.length} tool(s), ${universes.length} universe(s)`);
