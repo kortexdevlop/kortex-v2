@@ -1,18 +1,16 @@
 //! Pure engine: no UI, no direct platform access.
+use kortex::runtime::{Cx, ToolError};
 
-/// Engine error codes (translated in `locales/`).
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ToolError {
-    EmptyInput,
-}
+use crate::{Inputs, Outputs, Params};
 
 /// Placeholder behaviour: returns the input unchanged.
-///
-/// # Errors
-/// `ToolError::EmptyInput` when `text` is empty.
-pub fn run(text: &str) -> Result<String, ToolError> {
-    if text.is_empty() {
-        return Err(ToolError::EmptyInput);
+#[kortex::engine]
+pub async fn run(input: Inputs, params: Params, cx: &mut Cx) -> Result<Outputs, ToolError> {
+    params.validate()?;
+    cx.check_cancelled()?;
+    if input.text.is_empty() {
+        return Err(ToolError::new("empty_input"));
     }
-    Ok(text.to_owned())
+    cx.progress(1.0);
+    Ok(Outputs { text: input.text })
 }

@@ -1,0 +1,9 @@
+[package]
+name = "kortex"
+version = "0.1.0"
+edition.workspace = true
+publish.workspace = true
+
+[dependencies]
+kortex-macros = { path = "../kortex-macros" }
+kortex-runtime = { path = "../kortex-runtime" }

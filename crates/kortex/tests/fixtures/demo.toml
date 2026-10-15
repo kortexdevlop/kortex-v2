@@ -1,0 +1,34 @@
+schema = 1
+[tool]
+id = "text.demo"
+version = "1.0.0"
+universe = "text"
+status = "draft"
+ui = "auto"
+platforms = ["web"]
+name = { fr = "Démo", en = "Demo" }
+tagline = { fr = "x", en = "x" }
+slug = { fr = "demo", en = "demo" }
+[[inputs]]
+id = "content"
+type = "text"
+required = true
+[[params]]
+id = "size"
+type = "integer"
+range = [1, 10]
+default = 5
+level = "simple"
+[[params]]
+id = "label"
+type = "text"
+default = "hi"
+level = "pro"
+[[outputs]]
+id = "result"
+type = "text"
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "none"
+privacy = "local"

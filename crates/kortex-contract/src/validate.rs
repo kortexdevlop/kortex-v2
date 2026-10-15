@@ -22,6 +22,53 @@ fn is_semver(v: &str) -> bool {
             .all(|p| !p.is_empty() && p.chars().all(|c| c.is_ascii_digit()))
 }
 
+fn is_ident(s: &str) -> bool {
+    let mut cs = s.chars();
+    cs.next().is_some_and(|c| c.is_ascii_lowercase())
+        && cs.all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '_')
+        && !matches!(
+            s,
+            "type"
+                | "match"
+                | "use"
+                | "fn"
+                | "self"
+                | "mod"
+                | "in"
+                | "as"
+                | "ref"
+                | "move"
+                | "loop"
+                | "where"
+                | "impl"
+                | "trait"
+                | "struct"
+                | "enum"
+                | "for"
+                | "if"
+                | "else"
+                | "let"
+                | "mut"
+                | "pub"
+                | "return"
+                | "static"
+                | "super"
+                | "true"
+                | "false"
+                | "while"
+                | "async"
+                | "await"
+                | "crate"
+                | "const"
+                | "dyn"
+                | "box"
+                | "extern"
+                | "break"
+                | "continue"
+                | "unsafe"
+        )
+}
+
 fn is_slug(s: &str) -> bool {
     !s.is_empty()
         && s.chars()
@@ -70,6 +117,20 @@ pub fn validate(c: &ToolContract, universes: &[String]) -> Vec<Issue> {
         if !is_slug(slug) {
             issues.push(Issue(format!(
                 "slug {lang} `{slug}` invalide (a-z, 0-9, -)"
+            )));
+        }
+    }
+
+    for id in c
+        .inputs
+        .iter()
+        .map(|i| &i.id)
+        .chain(c.params.iter().map(|p| &p.id))
+        .chain(c.outputs.iter().map(|o| &o.id))
+    {
+        if !is_ident(id) {
+            issues.push(Issue(format!(
+                "identifiant `{id}` invalide : snake_case ASCII (a-z, 0-9, _), pas un mot-clé Rust"
             )));
         }
     }

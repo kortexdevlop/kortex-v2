@@ -1,0 +1,12 @@
+[package]
+name = "kortex-macros"
+version = "0.1.0"
+edition.workspace = true
+publish.workspace = true
+
+[lib]
+proc-macro = true
+
+[dependencies]
+kortex-contract = { path = "../kortex-contract" }
+toml = "0.9"

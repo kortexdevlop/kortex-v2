@@ -1,11 +1,14 @@
-use {{crate}}::engine::{ToolError, run};
+use kortex::runtime::{Cx, block_on};
+use {{crate}}::{Inputs, Params, engine::run};
 
 #[test]
 fn nominal() {
-    assert_eq!(run("hello"), Ok("hello".to_owned()));
+    let out = block_on(run(Inputs { text: "hello".into() }, Params::default(), &mut Cx::new()));
+    assert_eq!(out.map(|o| o.text), Ok("hello".to_owned()));
 }
 
 #[test]
 fn error_on_empty_input() {
-    assert_eq!(run(""), Err(ToolError::EmptyInput));
+    let out = block_on(run(Inputs { text: String::new() }, Params::default(), &mut Cx::new()));
+    assert_eq!(out.map_err(|e| e.code), Err("empty_input"));
 }
