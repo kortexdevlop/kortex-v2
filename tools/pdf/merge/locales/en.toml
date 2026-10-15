@@ -1,0 +1,11 @@
+[ui]
+title = "Merge PDF"
+[errors]
+need_two_files = "Add at least two PDF files."
+invalid_pdf = "One of the files is not a valid PDF."
+encrypted_pdf = "One of the PDFs is password-protected."
+write_failed = "Could not create the merged PDF."
+missing_input = "Add at least two PDF files."
+cancelled = "Cancelled."
+[outputs]
+merged = "Merged PDF"

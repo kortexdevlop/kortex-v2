@@ -1,0 +1,11 @@
+[ui]
+title = "Fusionner des PDF"
+[errors]
+need_two_files = "Ajoutez au moins deux fichiers PDF."
+invalid_pdf = "Un des fichiers n'est pas un PDF valide."
+encrypted_pdf = "Un des PDF est protégé par mot de passe."
+write_failed = "Impossible de créer le PDF fusionné."
+missing_input = "Ajoutez au moins deux fichiers PDF."
+cancelled = "Annulé."
+[outputs]
+merged = "PDF fusionné"

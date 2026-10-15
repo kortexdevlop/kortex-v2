@@ -40,6 +40,11 @@
   .k-stack { display: grid; gap: var(--k-space-4); }
   .k-output-group { display: grid; gap: var(--k-space-1); }
   .k-preview { max-width: 100%; max-height: 360px; margin-inline: auto; border-radius: var(--k-radius-field); border: 1px solid var(--k-border); image-rendering: pixelated; background: var(--k-surface-2); }
+  .k-file-row { display: flex; align-items: center; justify-content: space-between; gap: var(--k-space-3); padding: var(--k-space-2) var(--k-space-3); border-radius: var(--k-radius-control); background: var(--k-surface-2); overflow-wrap: anywhere; }
+  .k-file-actions { display: inline-flex; gap: var(--k-space-1); flex-shrink: 0; }
+  .k-icon-btn { min-width: 36px; min-height: 36px; border: 0; border-radius: var(--k-radius-control); background: transparent; color: var(--k-text-2); font: inherit; cursor: pointer; }
+  .k-icon-btn:hover:not(:disabled) { background: var(--k-bg); color: var(--k-text); }
+  .k-icon-btn:disabled { opacity: 0.35; cursor: default; }
   .k-muted { color: var(--k-text-2); }
   @media (prefers-reduced-motion: reduce) { * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; } }
 }

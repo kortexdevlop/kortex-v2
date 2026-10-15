@@ -51,6 +51,9 @@ fn s(lang: &str, key: &str) -> &'static str {
         ("fr", "drop_hint") => "ou cliquer pour choisir",
         ("fr", "result") => "Résultat",
         ("fr", "download") => "Télécharger",
+        ("fr", "up") => "Monter",
+        ("fr", "down") => "Descendre",
+        ("fr", "remove") => "Retirer",
         ("fr", "err_missing_input") => "Ajoutez d'abord le contenu à traiter.",
         ("fr", "err_invalid_param") => "Valeur invalide.",
         ("fr", "err_cancelled") => "Annulé.",
@@ -61,6 +64,9 @@ fn s(lang: &str, key: &str) -> &'static str {
         (_, "drop_hint") => "or click to choose",
         (_, "result") => "Result",
         (_, "download") => "Download",
+        (_, "up") => "Move up",
+        (_, "down") => "Move down",
+        (_, "remove") => "Remove",
         (_, "err_missing_input") => "Add the content to process first.",
         (_, "err_invalid_param") => "Invalid value.",
         (_, "err_cancelled") => "Cancelled.",
@@ -90,6 +96,37 @@ pub fn to_values(c: &ToolContract, strings: &ParamValues) -> ValueMap {
         }
     }
     out
+}
+
+/// Typed engine inputs from what the user entered: text fields and chosen files.
+fn collect_inputs(
+    c: &ToolContract,
+    texts: &ParamValues,
+    files: &BTreeMap<String, Vec<FileData>>,
+) -> ValueMap {
+    let mut inputs = ValueMap::new();
+    for i in &c.inputs {
+        match &i.ty {
+            PortType::Text => {
+                inputs.insert(
+                    i.id.clone(),
+                    Value::Text(texts.get(&i.id).cloned().unwrap_or_default()),
+                );
+            }
+            PortType::File(_) => {
+                if let Some(f) = files.get(&i.id).and_then(|v| v.first()) {
+                    inputs.insert(i.id.clone(), Value::File(f.clone()));
+                }
+            }
+            PortType::Files(_) => {
+                if let Some(v) = files.get(&i.id).filter(|v| !v.is_empty()) {
+                    inputs.insert(i.id.clone(), Value::Files(v.clone()));
+                }
+            }
+            _ => {}
+        }
+    }
+    inputs
 }
 
 /// Minimal base64 encoder (standard alphabet) for browser downloads.
@@ -228,6 +265,8 @@ pub fn AutoTool(
         .cloned()
         .collect();
 
+    let (move_up_label, move_down_label, remove_label) =
+        (s(&lang, "up"), s(&lang, "down"), s(&lang, "remove"));
     let (run_label, running_label, copy_label, result_label, download_label) = (
         s(&lang, "run"),
         s(&lang, "running"),
@@ -241,17 +280,7 @@ pub fn AutoTool(
             return;
         }
         let params = to_values(&run_contract, &values.read());
-        let inputs: ValueMap = run_contract
-            .inputs
-            .iter()
-            .filter(|i| i.ty == PortType::Text)
-            .map(|i| {
-                (
-                    i.id.clone(),
-                    Value::Text(text_inputs.read().get(&i.id).cloned().unwrap_or_default()),
-                )
-            })
-            .collect();
+        let inputs = collect_inputs(&run_contract, &text_inputs.read(), &files.read());
         running.set(true);
         spawn(async move {
             let r = (runner.0)(inputs, params).await;
@@ -279,8 +308,10 @@ pub fn AutoTool(
                         .get(&i.id)
                         .map(|v| v.iter().map(|f| format!("{} ({} Ko)", f.name, f.bytes.len() / 1024)).collect())
                         .unwrap_or_default();
+                    let count = names.len();
+                    let list_id = i.id.clone();
                     rsx! {
-                        div { key: "file-{i.id}",
+                        div { key: "file-{i.id}", class: "k-stack",
                             DropZone {
                                 label: s(&lang, "drop").to_owned(),
                                 hint: s(&lang, "drop_hint").to_owned(),
@@ -301,13 +332,67 @@ pub fn AutoTool(
                                         if !multiple {
                                             read.truncate(1);
                                         }
-                                        files.write().insert(id, read);
+                                        if multiple {
+                                            files.write().entry(id).or_default().extend(read);
+                                        } else {
+                                            files.write().insert(id, read);
+                                        }
                                     });
                                 },
                             }
                             ul { class: "k-files",
-                                for n in names {
-                                    li { key: "{n}", "{n}" }
+                                for (idx , n) in names.into_iter().enumerate() {
+                                    li { key: "{idx}-{n}", class: "k-file-row",
+                                        span { "{n}" }
+                                        if multiple {
+                                            span { class: "k-file-actions",
+                                                button {
+                                                    class: "k-icon-btn",
+                                                    r#type: "button",
+                                                    "aria-label": "{move_up_label}",
+                                                    disabled: idx == 0,
+                                                    onclick: {
+                                                        let id = list_id.clone();
+                                                        move |_| {
+                                                            if let Some(v) = files.write().get_mut(&id) {
+                                                                v.swap(idx, idx - 1);
+                                                            }
+                                                        }
+                                                    },
+                                                    "↑"
+                                                }
+                                                button {
+                                                    class: "k-icon-btn",
+                                                    r#type: "button",
+                                                    "aria-label": "{move_down_label}",
+                                                    disabled: idx + 1 >= count,
+                                                    onclick: {
+                                                        let id = list_id.clone();
+                                                        move |_| {
+                                                            if let Some(v) = files.write().get_mut(&id) {
+                                                                v.swap(idx, idx + 1);
+                                                            }
+                                                        }
+                                                    },
+                                                    "↓"
+                                                }
+                                                button {
+                                                    class: "k-icon-btn",
+                                                    r#type: "button",
+                                                    "aria-label": "{remove_label}",
+                                                    onclick: {
+                                                        let id = list_id.clone();
+                                                        move |_| {
+                                                            if let Some(v) = files.write().get_mut(&id) {
+                                                                v.remove(idx);
+                                                            }
+                                                        }
+                                                    },
+                                                    "✕"
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -448,7 +533,75 @@ pub fn AutoTool(
 
 #[cfg(test)]
 mod tests {
-    use super::base64;
+    use super::{ParamValues, base64, collect_inputs};
+    use kortex_runtime::{FileData, Value};
+    use std::collections::BTreeMap;
+
+    fn contract() -> kortex_contract::ToolContract {
+        kortex_contract::parse(
+            r#"
+schema = 1
+[tool]
+id = "text.t"
+version = "1.0.0"
+universe = "text"
+status = "draft"
+ui = "auto"
+platforms = ["web"]
+name = { fr = "T", en = "T" }
+tagline = { fr = "x", en = "x" }
+slug = { fr = "t", en = "t" }
+[[inputs]]
+id = "one"
+type = "file<*/*>"
+[[inputs]]
+id = "many"
+type = "files<application/pdf>"
+[[inputs]]
+id = "note"
+type = "text"
+[[outputs]]
+id = "o"
+type = "text"
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "none"
+privacy = "local"
+"#,
+        )
+        .unwrap_or_else(|e| unreachable!("{e}"))
+    }
+
+    fn file(name: &str) -> FileData {
+        FileData {
+            name: name.to_owned(),
+            mime: String::new(),
+            bytes: vec![1],
+        }
+    }
+
+    #[test]
+    fn collects_files_and_text_inputs() {
+        let files = BTreeMap::from([
+            ("one".to_owned(), vec![file("a"), file("b")]),
+            ("many".to_owned(), vec![file("c"), file("d")]),
+        ]);
+        let texts = ParamValues::from([("note".to_owned(), "hi".to_owned())]);
+        let m = collect_inputs(&contract(), &texts, &files);
+        assert_eq!(m.get("one"), Some(&Value::File(file("a"))));
+        assert_eq!(
+            m.get("many"),
+            Some(&Value::Files(vec![file("c"), file("d")]))
+        );
+        assert_eq!(m.get("note"), Some(&Value::Text("hi".into())));
+    }
+
+    #[test]
+    fn omits_empty_file_inputs() {
+        let m = collect_inputs(&contract(), &ParamValues::new(), &BTreeMap::new());
+        assert!(!m.contains_key("one") && !m.contains_key("many"));
+    }
 
     #[test]
     fn base64_matches_reference() {

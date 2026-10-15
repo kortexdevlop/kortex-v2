@@ -4,6 +4,115 @@
     {
       "inputs": [
         {
+          "id": "files",
+          "label": {
+            "en": "PDF files",
+            "fr": "Fichiers PDF"
+          },
+          "max_len": null,
+          "required": true,
+          "type": "files<application/pdf>"
+        }
+      ],
+      "limits": {
+        "max_batch": 50,
+        "max_input_bytes": "500MB",
+        "timeout_s": 120
+      },
+      "outputs": [
+        {
+          "default_format": "application/pdf",
+          "formats": [
+            "application/pdf"
+          ],
+          "id": "merged",
+          "type": "file<application/pdf>"
+        }
+      ],
+      "params": [
+        {
+          "default": false,
+          "id": "compress",
+          "label": {
+            "en": "Compress the result",
+            "fr": "Compresser le résultat"
+          },
+          "level": "pro",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        }
+      ],
+      "permissions": {
+        "clipboard": "none",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "merge several pdfs into one",
+            "combine pdf documents"
+          ],
+          "fr": [
+            "fusionner plusieurs pdf en un seul",
+            "assembler des documents pdf"
+          ]
+        },
+        "keywords": {
+          "en": [
+            "merge pdf",
+            "combine pdf",
+            "join pdf",
+            "pdf"
+          ],
+          "fr": [
+            "fusionner pdf",
+            "assembler pdf",
+            "joindre pdf",
+            "combiner pdf",
+            "pdf"
+          ]
+        },
+        "related": [
+          "secure.hash-calculator"
+        ]
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "pdf.merge",
+        "name": {
+          "en": "Merge PDF",
+          "fr": "Fusionner des PDF"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "merge-pdf",
+          "fr": "fusionner-pdf"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Combine several PDFs into one, without uploading them.",
+          "fr": "Assemblez plusieurs PDF en un seul, sans les envoyer nulle part."
+        },
+        "ui": "auto",
+        "universe": "pdf",
+        "version": "1.0.0",
+        "viral_priority": 1
+      },
+      "variants": []
+    },
+    {
+      "inputs": [
+        {
           "id": "content",
           "label": {
             "en": "Content (link, text…)",

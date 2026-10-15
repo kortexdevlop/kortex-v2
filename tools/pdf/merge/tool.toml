@@ -1,0 +1,60 @@
+schema = 1
+
+[tool]
+id = "pdf.merge"
+version = "1.0.0"
+universe = "pdf"
+status = "beta"
+ui = "auto"
+platforms = ["web", "desktop"]
+offline = true
+ai = false
+viral_priority = 1
+
+[tool.name]
+fr = "Fusionner des PDF"
+en = "Merge PDF"
+[tool.tagline]
+fr = "Assemblez plusieurs PDF en un seul, sans les envoyer nulle part."
+en = "Combine several PDFs into one, without uploading them."
+[tool.slug]
+fr = "fusionner-pdf"
+en = "merge-pdf"
+
+[search]
+keywords.fr = ["fusionner pdf", "assembler pdf", "joindre pdf", "combiner pdf", "pdf"]
+keywords.en = ["merge pdf", "combine pdf", "join pdf", "pdf"]
+intents.fr = ["fusionner plusieurs pdf en un seul", "assembler des documents pdf"]
+intents.en = ["merge several pdfs into one", "combine pdf documents"]
+related = ["secure.hash-calculator"]
+
+[limits]
+max_input_bytes = "500MB"
+max_batch = 50
+timeout_s = 120
+
+[[inputs]]
+id = "files"
+type = "files<application/pdf>"
+required = true
+label = { fr = "Fichiers PDF", en = "PDF files" }
+
+[[params]]
+id = "compress"
+type = "bool"
+default = false
+level = "pro"
+label = { fr = "Compresser le résultat", en = "Compress the result" }
+
+[[outputs]]
+id = "merged"
+type = "file<application/pdf>"
+formats = ["application/pdf"]
+default_format = "application/pdf"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "none"
+sensitive = false
+privacy = "local"

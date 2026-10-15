@@ -2,7 +2,7 @@
 _Last update: 2026-10-15 — session 1_
 
 ## Current phase
-Phase 0 — Cadrage, spikes, nettoyage (≈ 97 %) — Phase 1 quasi finie, Phase 2 démarrée, premier outil pilote
+Phase 0 — Cadrage, spikes, nettoyage (≈ 98 %) — Phase 1 quasi finie, Phase 2 démarrée, premier outil pilote
 
 ## Done this session
 - Master prompt copié dans `docs/MASTER_PROMPT.md`; `CLAUDE.md`/`AGENTS.md` créés.
@@ -39,6 +39,9 @@ Phase 0 — Cadrage, spikes, nettoyage (≈ 97 %) — Phase 1 quasi finie, Phase
 - Outil pilote #3 `secure.hash-calculator` (beta) : MD5/SHA-1/SHA-256/SHA-512, texte ou fichier, comparaison ; 5 tests (vecteurs de référence), 2 variantes SEO ; testé dans le navigateur. wasm 1239 Ko brut.
 - Mentions légales : nom + région renseignés (page toujours brouillon : adresse et e-mail manquants).
 - Outil pilote #4 `qr.generator` (beta) : PNG (palette 1 bit, encodeur maison validé par décodage `png`) ou SVG, couleurs, correction d'erreur, marge ; 4 tests ; aperçu image dans AutoTool ; testé dans le navigateur. TODO : champ couleur natif (`input type=color`) pour les params `color`, variantes Wi-Fi/vCard (templates de contenu).
+- Outil pilote #2 `pdf.merge` (beta) : fusion dans l'ordre choisi, héritage MediaBox/Resources conservé, option compression, refus PDF chiffré/invalide ; 4 tests ; liste de fichiers avec monter/descendre/retirer ; testé dans le navigateur (2 PDF, ordre inversé, téléchargement OK).
+- BUG corrigé : `AutoTool` ne transmettait pas les fichiers choisis au moteur (remplacement automatique raté en silence). Maintenant `collect_inputs` testé unitairement. Leçon : après un `cargo fmt`, toujours vérifier qu'un remplacement scripté a bien été appliqué.
+- Tailles brotli des bundles : password 330 Ko, hash 344 Ko, qr 343 Ko, **pdf.merge 536 Ko (> budget 400 Ko)**. Base Dioxus+runtime ≈ 330 Ko. Pistes : moteur lourd chargé à la demande / en Web Worker séparé, `wasm-opt` plus agressif, budget par outil déclaré dans le contrat + vérifié par `xtask check` (§12.6 pas encore implémenté).
 
 ## Decisions (user, session 1)
 - Pas de Homebrew.
@@ -49,7 +52,7 @@ Phase 0 — Cadrage, spikes, nettoyage (≈ 97 %) — Phase 1 quasi finie, Phase
 - Crédits IA : affichés en % restant, calculé d'après les neurons consommés (pas en nombre de requêtes) ; limite par utilisateur généreuse mais raisonnable.
 
 ## Next action (exact)
-- Pilotes restants : pdf.merge (multi-fichiers + réordonnancement), image.convert, calc salaire brut/net. Dépôt de fichier sur la page → Stage (bus postMessage), thème/mode transmis à l'iframe, taille wasm (budget 400 Ko brotli), moteur en Web Worker (spike c), PWA, sitemap, OG, pages légales, accueil animée, ⌘K, déploiement Cloudflare (Workers Static Assets, wrangler).
+- Pilotes restants : image.convert (variantes SEO png↔jpg…), calc salaire brut/net (UI auto pure). Puis check de budget wasm, champ couleur natif, vCard/Wi-Fi QR. Dépôt de fichier sur la page → Stage (bus postMessage), thème/mode transmis à l'iframe, taille wasm (budget 400 Ko brotli), moteur en Web Worker (spike c), PWA, sitemap, OG, pages légales, accueil animée, ⌘K, déploiement Cloudflare (Workers Static Assets, wrangler).
 - Phase 1 reste : impls plateforme web/desktop, `kortex-io`, `kortex-bus`, xtask `icons`/`dev`/`build`, galerie `/_design` (dans web/site, Phase 2), xtask `icons`/`dev`/`build`/`stats`, galerie `/_design`, vérifier la CI sur GitHub.
 - Spikes restants (b) Stage iframe, (c) Web Worker, (f) WebCodecs, (e) CI 3 OS ; ADR contrat/auth/codecs.
 - Puis Phase 1 (monorepo, tokens, kortex-ui, xtask).
