@@ -75,7 +75,7 @@ pub fn run(args: &[String]) -> Result<(), String> {
         dest.display()
     );
     println!(
-        "  Ajoute `tools/{universe}/{name}` aux membres du workspace si besoin, puis : cargo xtask check {universe}.{name}"
+        "  Ajoute `tools/{universe}/{name}` aux membres du workspace si besoin, puis : cargo xtask registry && cargo xtask cli-gen && cargo xtask check {universe}.{name}"
     );
     Ok(())
 }

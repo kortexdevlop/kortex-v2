@@ -14,7 +14,10 @@ Puis, dans `tools/pdf/merge/` :
 
 ```bash
 cargo xtask registry                 # régénère registry/index.json (à committer)
+cargo xtask cli-gen                  # relie l'outil à la CLI `kortex` (crates/kortex-cli, à committer)
 cargo xtask check <univers>.<nom>    # garde-fous
 cargo test -p tool-<univers>-<nom>
 ```
+Vérifier l'outil en ligne de commande : `cargo run -p kortex-cli -- run <univers>.<nom> --input … --param …`.
+
 Ne jamais modifier `web/site` : l'outil apparaît automatiquement partout via le registre.

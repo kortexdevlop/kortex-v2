@@ -1072,6 +1072,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "kortex-cli"
+version = "0.1.0"
+dependencies = [
+ "kortex-contract",
+ "kortex-runtime",
+ "tool-calc-gross-net-salary",
+ "tool-image-convert",
+ "tool-pdf-merge",
+ "tool-qr-generator",
+ "tool-secure-hash-calculator",
+ "tool-secure-password-generator",
+]
+
+[[package]]
 name = "kortex-contract"
 version = "0.1.0"
 dependencies = [

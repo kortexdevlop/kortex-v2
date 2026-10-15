@@ -64,6 +64,8 @@ Phase 0 — Cadrage, spikes, nettoyage (≈ 100 % des pilotes) — Phase 1 quasi
 - 33 tests API au total.
 - **Page Compte** (`/compte`, `/en/account`, noindex) : inscription/connexion (mot de passe → `deriveAuthKey` dans le navigateur, politique côté client), jauge de crédits IA en %, export JSON, suppression de compte (mot de passe re-demandé, cascade vérifiée sur D1 local), déconnexion. Testé en vrai navigateur contre `wrangler dev` (site 4321 ↔ API 8787, cookie inter-origines OK) : session conservée au rechargement, mauvais mot de passe = message générique, export, suppression refusée/acceptée. Variables de build : `PUBLIC_API_ORIGIN` (défaut `https://api.kortex.site`), `PUBLIC_RUN_ORIGIN`. Dérivation 600 000 it. : ~0,3 s en Node, ~1-2 s dans le navigateur de test.
 - Lien « Compte » dans l'en-tête.
+- **CLI `kortex`** (`crates/kortex-cli`, binaire `kortex`) : `list`, `search`, `info`, `run` (entrées `nom=valeur` ou `nom=@fichier`, sorties fichier écrites sans écraser ni sortir du dossier, `--json`), mêmes moteurs que le web (`run_map`). Liste des outils générée par `cargo xtask cli-gen` (vérifiée fraîche par `xtask check` : un outil ajouté sans `cli-gen` fait échouer le contrôle). 9 tests (dont fusion de PDF en ligne de commande). Base du mode headless pour Flow/Mind.
+- Reste Phase 5 : `kortex install/update/remove/doctor/login` (nécessite le registre signé Ed25519 + dépôt `kortex-releases` + compte), Kortex Store (Dioxus desktop), scripts `install.sh/ps1`, paquets desktop par outil, CI de release (matrice 3 OS).
 
 ## Decisions (user, session 1)
 - Pas de Homebrew.
