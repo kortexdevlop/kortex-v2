@@ -14,3 +14,4 @@ web/site/public/kortex.css
 dist/
 web/site/public/icons/
 web/site/public/og/
+.wrangler/

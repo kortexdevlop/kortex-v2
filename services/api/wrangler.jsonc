@@ -1,0 +1,25 @@
+{
+  // Local development only for now: nothing is deployed (decision: no public deploy yet).
+  "name": "kortex-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-01",
+  "d1_databases": [
+    { "binding": "DB", "database_name": "kortex-accounts", "database_id": "00000000-0000-0000-0000-000000000000", "migrations_dir": "migrations" }
+  ],
+  "vars": {
+    "ALLOWED_ORIGINS": "http://localhost:4321,http://localhost:8787",
+    "COOKIE_NAME": "kortex_session",
+    "COOKIE_SECURE": "false",
+    "PBKDF2_ITERATIONS": "5000"
+  },
+  "env": {
+    "production": {
+      "vars": {
+        "ALLOWED_ORIGINS": "https://kortex.site,https://workspace.kortex.site,https://flow.kortex.site,https://agent.kortex.site,https://search.kortex.site,https://dashboard.kortex.site",
+        "COOKIE_NAME": "__Host-kortex_session",
+        "COOKIE_SECURE": "true",
+        "PBKDF2_ITERATIONS": "5000"
+      }
+    }
+  }
+}

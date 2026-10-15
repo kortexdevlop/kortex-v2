@@ -56,6 +56,10 @@ Phase 0 — Cadrage, spikes, nettoyage (≈ 100 % des pilotes) — Phase 1 quasi
 - TODO police : Inter auto-hébergée (téléchargement à valider avec l'utilisateur) → déposer dans `design/fonts/` pour des images OG et un site fidèles à la charte.
 - Bus hôte↔outil (ADR 0004) : iframe cross-origin, `kortex:ready` / `kortex:init {theme}` / `kortex:files {files}`, origine et fenêtre source vérifiées des deux côtés. Glisser un fichier n'importe où sur la page d'un outil ouvre le Stage et lui transmet le fichier (testé : abc.txt reçu). Sélecteur de thème auto/clair/sombre dans l'en-tête, propagé à l'iframe (testé). `cargo xtask build all` reconstruit tous les outils.
 - Mode Simple/Medium/Pro global : sélecteur dans l'en-tête (localStorage `k-mode`), passé à l'iframe (`?mode=` au chargement puis `kortex:init {mode}` en direct) ; `AutoTool` prop `host_mode`, réglable ensuite par outil. Testé (Pro → Simple en direct).
+- **Phase 4 (backend) démarrée, local uniquement** : `services/api` (Worker TypeScript, D1) — inscription/connexion, sessions (cookie `HttpOnly` host-only, id stocké haché SHA-256, 30 j), déconnexion, `/v1/me`, suppression de compte (RGPD, cascade) et export JSON, réglages (≤16 Ko), sync versionnée (≤64 Ko, conflit 409 avec copie courante, 200 clés max), compteurs d'usage journaliers (90 j), limitation de débit D1, CSRF (Origin liste blanche ou en-tête `X-Kortex-Request`), CORS liste blanche, en-têtes de sécurité. 22 tests (SQLite `node:sqlite` en simulateur D1) + test de fumée réel sur `wrangler dev` (workerd + D1 local). Schéma `migrations/0001_init.sql`.
+- **ADR 0005** : PBKDF2 100 000 côté Worker ≈ 60 ms (limite gratuite 10 ms CPU) → le mot de passe ne quitte pas l'appareil ; le client dérive `auth_key` (PBKDF2 600 000 it., ~310 ms navigateur, `services/shared/src/auth.ts`), le Worker n'en fait qu'un PBKDF2 léger (5 000). Politique de mot de passe côté client. `kdf: 1` pour migrations futures.
+- `services/shared` (auth client, 3 tests). Gate et CI couvrent site, shared, api. `pnpm-workspace.yaml` : scripts d'installation tiers ignorés (esbuild, workerd).
+- Reste backend : passkeys (WebAuthn), jetons d'appareil (CLI/desktop), Turnstile (nécessite des clés), pages connexion/inscription dans le site (utiliser `deriveAuthKey`), `ai-gateway` (crédits en %, budget global), mesure CPU réelle en production (impossible en local).
 
 ## Decisions (user, session 1)
 - Pas de Homebrew.
@@ -67,7 +71,7 @@ Phase 0 — Cadrage, spikes, nettoyage (≈ 100 % des pilotes) — Phase 1 quasi
 
 ## Next action (exact)
 - Phase 2 (site) restant : crate `kortex-bus` côté Rust (protocole typé, pour Desk/Flow), spike Web Worker (c), police Inter auto-hébergée (téléchargement à valider), pages univers `/[univers]`.
-- Phase 4 (backend, développé en local avec `wrangler dev`, SANS déployer) : `services/api` (auth passkeys + PBKDF2, sessions, D1, sync), `services/ai-gateway` (crédits en %, budget global 10 000 neurons/jour).
+- Phase 4 suite (local, SANS déployer) : passkeys, pages connexion/inscription du site, `services/ai-gateway` (crédits en %, budget global 10 000 neurons/jour), jetons d'appareil.
 - Plus tard : Phase 5 desktop/CLI/Store, 6 Seek niveau 2, 7 Desk, 8 Mind, 9 Flow, 10 Hub, 11 catalogue (≥150 outils), 12 finition.
 - À revérifier : vieillesse de base 6,90 %/0,40 % et APEC 0,024 % (calc.gross-net-salary) ; champ couleur natif ; QR Wi-Fi/vCard ; HEIC.
 - Hors périmètre (décision user) : budget de taille wasm.

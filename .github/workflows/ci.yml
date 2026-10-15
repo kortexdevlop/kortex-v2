@@ -35,3 +35,17 @@ jobs:
       - run: cargo xtask icons
       - run: pnpm --filter @kortex/site test
       - run: pnpm site:build
+  services:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @kortex/shared test
+      - run: pnpm --filter @kortex/api typecheck
+      - run: pnpm --filter @kortex/api test

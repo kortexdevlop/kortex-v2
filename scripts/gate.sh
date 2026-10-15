@@ -10,4 +10,8 @@ cargo xtask registry
 after=$(cat design/dist/kortex.css registry/index.json | shasum)
 [ "$before" = "$after" ] || { echo "✗ design/dist ou registry était périmé : régénéré, relance le gate"; exit 1; }
 cargo xtask check
+pnpm --filter @kortex/site test
+pnpm --filter @kortex/shared test
+pnpm --filter @kortex/api typecheck
+pnpm --filter @kortex/api test
 echo "✓ gate OK"
