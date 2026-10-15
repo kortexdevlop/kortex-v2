@@ -2,7 +2,7 @@
 _Last update: 2026-10-15 — session 1_
 
 ## Current phase
-Phase 0 — Cadrage, spikes, nettoyage (≈ 45 %) — Phase 1 démarrée
+Phase 0 — Cadrage, spikes, nettoyage (≈ 55 %) — Phase 1 en cours
 
 ## Done this session
 - Master prompt copié dans `docs/MASTER_PROMPT.md`; `CLAUDE.md`/`AGENTS.md` créés.
@@ -21,6 +21,8 @@ Phase 0 — Cadrage, spikes, nettoyage (≈ 45 %) — Phase 1 démarrée
 
 - Choix user : logo B, nommage option 1 (Kortex Mind/Seek/Desk/Flow/Hub). `brand/names.toml`, `universes.toml` (17), `domains.toml`, logo SVG écrits.
 - Phase 1 : workspace Cargo (membre `xtask`), toolchain figée 1.99.0, tokens `design/tokens/*.toml` + `design/components.css` → `cargo xtask tokens` génère `design/dist/kortex.css` (clair/sombre).
+- Crate `kortex-contract` (schéma tool.toml, types de ports + conversions, validation FR) : 7 tests OK.
+- xtask : `tokens`, `registry`, `check [id]`, `new-tool` ; `tools/_template` ; `docs/guides/add-tool.md` ; CI Linux (`.github/workflows/ci.yml`). Test négatif de `check` OK.
 
 ## Decisions (user, session 1)
 - Pas de Homebrew.
@@ -31,7 +33,7 @@ Phase 0 — Cadrage, spikes, nettoyage (≈ 45 %) — Phase 1 démarrée
 - Crédits IA : affichés en % restant, calculé d'après les neurons consommés (pas en nombre de requêtes) ; limite par utilisateur généreuse mais raisonnable.
 
 ## Next action (exact)
-- Phase 1 suite : xtask (`check`, `registry`, `new-tool`, `icons`, `dev`), crates `kortex-contract`/`macros`/`runtime`/`platform`/`i18n`/`ui`, `tools/_template`, CI de base, galerie `/_design`.
+- Phase 1 suite : crates `kortex-macros` (`contract!`), `kortex-runtime`, `kortex-platform`, `kortex-i18n`, `kortex-ui` (composants + AutoTool), xtask `icons`/`dev`/`build`/`stats`, galerie `/_design`, vérifier la CI sur GitHub.
 - Spikes restants (b) Stage iframe, (c) Web Worker, (f) WebCodecs, (e) CI 3 OS ; ADR contrat/auth/codecs.
 - Puis Phase 1 (monorepo, tokens, kortex-ui, xtask).
 

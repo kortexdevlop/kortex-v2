@@ -6,3 +6,5 @@ publish.workspace = true
 
 [dependencies]
 toml = "0.9"
+kortex-contract = { path = "../crates/kortex-contract" }
+serde_json = "1"

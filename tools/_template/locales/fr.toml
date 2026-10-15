@@ -1,0 +1,4 @@
+[ui]
+title = "{{Name}}"
+[errors]
+empty_input = "Le texte est vide."
