@@ -54,6 +54,7 @@ Phase 0 — Cadrage, spikes, nettoyage (≈ 100 % des pilotes) — Phase 1 quasi
 - Décision user : on ne s'occupe plus du budget de taille wasm sauf cas inadmissible.
 - `cargo xtask icons` : icônes composées par outil (squircle + dégradé OKLCH de l'univers + glyphe + ombre) en SVG, icônes de marque PNG 192/512, images Open Graph 1200×630 FR/EN par outil + accueil (resvg, polices système ; si `design/fonts/*.ttf` existe elles sont chargées). Site : balises OG/Twitter, apple-touch-icon, manifeste PWA PNG, icônes sur cartes et pages d'outil. `design/dist` est ignoré par git (régénéré par xtask/CI).
 - TODO police : Inter auto-hébergée (téléchargement à valider avec l'utilisateur) → déposer dans `design/fonts/` pour des images OG et un site fidèles à la charte.
+- Bus hôte↔outil (ADR 0004) : iframe cross-origin, `kortex:ready` / `kortex:init {theme}` / `kortex:files {files}`, origine et fenêtre source vérifiées des deux côtés. Glisser un fichier n'importe où sur la page d'un outil ouvre le Stage et lui transmet le fichier (testé : abc.txt reçu). Sélecteur de thème auto/clair/sombre dans l'en-tête, propagé à l'iframe (testé). `cargo xtask build all` reconstruit tous les outils.
 
 ## Decisions (user, session 1)
 - Pas de Homebrew.
@@ -64,7 +65,7 @@ Phase 0 — Cadrage, spikes, nettoyage (≈ 100 % des pilotes) — Phase 1 quasi
 - Crédits IA : affichés en % restant, calculé d'après les neurons consommés (pas en nombre de requêtes) ; limite par utilisateur généreuse mais raisonnable.
 
 ## Next action (exact)
-- Phase 2 (site) restant : glisser un fichier n'importe où sur la page → ouvre le Stage (bus postMessage typé `kortex-bus`), transmettre thème/mode à l'iframe, spike Web Worker (c), police Inter auto-hébergée (téléchargement à valider), pages univers `/[univers]`.
+- Phase 2 (site) restant : crate `kortex-bus` côté Rust (protocole typé, pour Desk/Flow), mode Simple/Medium/Pro global transmis à l'iframe, spike Web Worker (c), police Inter auto-hébergée (téléchargement à valider), pages univers `/[univers]`.
 - Phase 4 (backend, développé en local avec `wrangler dev`, SANS déployer) : `services/api` (auth passkeys + PBKDF2, sessions, D1, sync), `services/ai-gateway` (crédits en %, budget global 10 000 neurons/jour).
 - Plus tard : Phase 5 desktop/CLI/Store, 6 Seek niveau 2, 7 Desk, 8 Mind, 9 Flow, 10 Hub, 11 catalogue (≥150 outils), 12 finition.
 - À revérifier : vieillesse de base 6,90 %/0,40 % et APEC 0,024 % (calc.gross-net-salary) ; champ couleur natif ; QR Wi-Fi/vCard ; HEIC.

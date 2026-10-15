@@ -7,10 +7,11 @@ const runOrigin = (import.meta.env.PUBLIC_RUN_ORIGIN ?? 'https://run.kortex.site
 const query = new URLSearchParams({ lang, ...(variantId ? { variant: variantId } : {}) }).toString();
 const src = `${runOrigin}/${toolId}/?${query}`;
 const t = lang === 'fr'
-  ? { close: 'Fermer', full: 'Plein écran' }
-  : { close: 'Close', full: 'Full screen' };
+  ? { close: 'Fermer', full: 'Plein écran', drop: 'Déposez vos fichiers pour ouvrir l’outil' }
+  : { close: 'Close', full: 'Full screen', drop: 'Drop your files to open the tool' };
 ---
 <button class="k-btn stage-open" type="button" data-stage-open data-src={src}>{label}</button>
+<div class="stage-drop" data-stage-drop hidden>{t.drop}</div>
 <div class="stage" data-stage hidden>
   <div class="stage-backdrop" data-stage-close></div>
   <section class="stage-window" role="dialog" aria-modal="true" aria-label={name}>
@@ -34,15 +35,41 @@ const t = lang === 'fr'
   .stage-actions { display: flex; gap: var(--k-space-2); }
   .stage-window iframe { width: 100%; height: 100%; border: 0; background: var(--k-bg); }
   @media (max-width: 640px) { .stage-window { width: 100vw; height: 100dvh; border-radius: 0; } }
+  .stage-drop { position: fixed; inset: var(--k-space-3); z-index: 60; display: grid; place-items: center; border: 2px dashed var(--k-accent); border-radius: var(--k-radius-panel); background: var(--k-overlay); backdrop-filter: blur(12px); font-size: 1.4rem; font-weight: 600; pointer-events: none; }
+  .stage-drop[hidden] { display: none; }
   .stage-open.vt { view-transition-name: stage-window; }
   ::view-transition-group(stage-window) { animation-duration: var(--k-motion-slower); animation-timing-function: var(--k-motion-ease); }
 </style>
 <script>
   const root = document.querySelector<HTMLElement>('[data-stage]')!;
   const opener = document.querySelector<HTMLButtonElement>('[data-stage-open]')!;
+  const dropHint = document.querySelector<HTMLElement>('[data-stage-drop]')!;
   const win = root.querySelector<HTMLElement>('.stage-window')!;
   const frame = root.querySelector('iframe')!;
+  const runOrigin = new URL(opener.dataset.src!).origin;
   let loaded = false;
+  let ready = false;
+  let pendingFiles: File[] | null = null;
+
+  // --- host <-> tool bus: only messages from our own iframe and its exact origin are trusted ---
+  const post = (msg: object) => frame.contentWindow?.postMessage(msg, runOrigin);
+  const theme = (): 'light' | 'dark' => {
+    const forced = document.documentElement.dataset.theme;
+    if (forced === 'light' || forced === 'dark') return forced;
+    return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  };
+  const flush = () => {
+    if (!ready) return;
+    post({ type: 'kortex:init', theme: theme() });
+    if (pendingFiles) { post({ type: 'kortex:files', files: pendingFiles }); pendingFiles = null; }
+  };
+  addEventListener('message', (e) => {
+    if (e.source !== frame.contentWindow || e.origin !== runOrigin || e.data?.type !== 'kortex:ready') return;
+    ready = true;
+    flush();
+  });
+  addEventListener('kortex:theme', () => post({ type: 'kortex:init', theme: theme() }));
+  frame.addEventListener('load', () => { ready = false; });
 
   const load = () => {
     if (loaded) return;
@@ -86,5 +113,22 @@ const t = lang === 'fr'
   root.querySelectorAll('[data-stage-close]').forEach((el) => el.addEventListener('click', close));
   root.querySelector('[data-stage-full]')!.addEventListener('click', () => win.toggleAttribute('data-full'));
   addEventListener('keydown', (e) => { if (e.key === 'Escape' && !root.hidden) close(); });
+
+  // --- drop files anywhere on the page: open the tool and hand the files over ---
+  const hasFiles = (e: DragEvent) => !!e.dataTransfer && [...e.dataTransfer.types].includes('Files');
+  let depth = 0;
+  addEventListener('dragenter', (e) => { if (!hasFiles(e) || !root.hidden) return; depth++; dropHint.hidden = false; });
+  addEventListener('dragover', (e) => { if (hasFiles(e) && root.hidden) e.preventDefault(); });
+  addEventListener('dragleave', (e) => { if (!hasFiles(e)) return; depth = Math.max(0, depth - 1); if (!depth) dropHint.hidden = true; });
+  addEventListener('drop', (e) => {
+    if (!hasFiles(e) || !root.hidden) return;
+    e.preventDefault();
+    depth = 0;
+    dropHint.hidden = true;
+    pendingFiles = [...(e.dataTransfer?.files ?? [])];
+    open();
+    flush();
+  });
+
   if (new URLSearchParams(location.search).get('open') === '1') open();
 </script>

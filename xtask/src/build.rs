@@ -29,13 +29,61 @@ fn copy_dir(from: &Path, to: &Path) -> Result<(), String> {
     Ok(())
 }
 
+// Host <-> tool bus (see docs/adr/0004-host-tool-bus.md). Only the embedding window and its exact
+// origin are trusted; messages are plain JSON-like objects { type: "kortex:*", ... }.
+const BUS_JS: &str = r#"
+(() => {
+  if (window.__kortexBus) return;
+  window.__kortexBus = true;
+  const host = (location.ancestorOrigins && location.ancestorOrigins[0]) || (document.referrer ? new URL(document.referrer).origin : '');
+  if (!host || window.parent === window) return;
+  const send = (msg) => window.parent.postMessage(msg, host);
+  let pending = null;
+  const deliver = () => {
+    const input = document.querySelector('input[type=file]');
+    if (!pending || !input) return false;
+    const dt = new DataTransfer();
+    for (const f of pending) { if (f instanceof File) dt.items.add(f); }
+    pending = null;
+    input.files = dt.files;
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+    return true;
+  };
+  window.addEventListener('message', (e) => {
+    if (e.source !== window.parent || e.origin !== host || !e.data || typeof e.data.type !== 'string') return;
+    if (e.data.type === 'kortex:init') {
+      if (e.data.theme === 'light' || e.data.theme === 'dark') document.documentElement.dataset.theme = e.data.theme;
+      else delete document.documentElement.dataset.theme;
+    } else if (e.data.type === 'kortex:files' && Array.isArray(e.data.files)) {
+      pending = e.data.files;
+      let tries = 0;
+      const t = setInterval(() => { if (deliver() || ++tries > 60) clearInterval(t); }, 100);
+    }
+  });
+  send({ type: 'kortex:ready' });
+})();
+"#;
+
 pub fn run(args: &[String]) -> Result<(), String> {
     let id = args
         .first()
-        .ok_or("usage : cargo xtask build <univers.nom>")?;
+        .ok_or("usage : cargo xtask build <univers.nom | all>")?;
+    if id == "all" {
+        for t in tools::discover()? {
+            let c = t
+                .contract
+                .map_err(|e| format!("{} : {e}", t.dir.display()))?;
+            build_one(&c.tool.id)?;
+        }
+        return Ok(());
+    }
+    build_one(id)
+}
+
+fn build_one(id: &str) -> Result<(), String> {
     let tool = tools::discover()?
         .into_iter()
-        .find(|t| t.contract.as_ref().is_ok_and(|c| &c.tool.id == id))
+        .find(|t| t.contract.as_ref().is_ok_and(|c| c.tool.id == id))
         .ok_or_else(|| format!("outil `{id}` introuvable"))?;
     let (universe, name) = id.split_once('.').ok_or("id invalide")?;
     let crate_name = format!("tool-{universe}-{name}");
@@ -85,6 +133,7 @@ panic = "abort"
     if !work.join("Cargo.lock").exists() {
         let _ = fs::copy("Cargo.lock", work.join("Cargo.lock"));
     }
+    fs::write(work.join("src/bus.js"), BUS_JS).map_err(|e| e.to_string())?;
     fs::write(
         work.join("src/main.rs"),
         format!(
@@ -95,6 +144,7 @@ use kortex_ui::{{AutoTool, RunFuture, Runner}};
 use {lib_name} as tool;
 
 const CSS: Asset = asset!("/assets/kortex.css");
+const BUS_JS: &str = include_str!("bus.js");
 
 fn runner(inputs: ValueMap, params: ValueMap) -> RunFuture {{
     Box::pin(async move {{
@@ -109,6 +159,9 @@ fn main() {{
 
 #[component]
 fn App() -> Element {{
+    use_effect(|| {{
+        document::eval(BUS_JS);
+    }});
     let query = use_resource(|| async {{
         let mut ev = document::eval("const q = new URLSearchParams(location.search); dioxus.send((q.get('lang') || 'fr') + '|' + (q.get('variant') || ''))");
         ev.recv::<String>().await.unwrap_or_else(|_| "fr|".to_owned())
