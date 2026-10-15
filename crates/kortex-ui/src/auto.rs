@@ -233,8 +233,20 @@ pub fn AutoTool(
     runner: Runner,
     /// Variant id whose preset overrides param defaults (SEO variants).
     variant: Option<String>,
+    /// Global mode chosen by the host (site header, Desk); the user can still override per tool.
+    host_mode: Option<String>,
 ) -> Element {
-    let mut mode = use_signal(Mode::default);
+    let mut mode = use_signal(|| {
+        host_mode
+            .as_deref()
+            .and_then(Mode::from_id)
+            .unwrap_or_default()
+    });
+    use_effect(use_reactive!(|host_mode| {
+        if let Some(m) = host_mode.as_deref().and_then(Mode::from_id) {
+            mode.set(m);
+        }
+    }));
     let mut values = use_signal(|| {
         let mut v = contract
             .params

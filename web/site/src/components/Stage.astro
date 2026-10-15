@@ -58,9 +58,10 @@ const t = lang === 'fr'
     if (forced === 'light' || forced === 'dark') return forced;
     return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   };
+  const mode = (): string => { try { return localStorage.getItem('k-mode') || 'medium'; } catch { return 'medium'; } };
   const flush = () => {
     if (!ready) return;
-    post({ type: 'kortex:init', theme: theme() });
+    post({ type: 'kortex:init', theme: theme(), mode: mode() });
     if (pendingFiles) { post({ type: 'kortex:files', files: pendingFiles }); pendingFiles = null; }
   };
   addEventListener('message', (e) => {
@@ -68,13 +69,15 @@ const t = lang === 'fr'
     ready = true;
     flush();
   });
-  addEventListener('kortex:theme', () => post({ type: 'kortex:init', theme: theme() }));
+  const sync = () => post({ type: 'kortex:init', theme: theme(), mode: mode() });
+  addEventListener('kortex:theme', sync);
+  addEventListener('kortex:mode', sync);
   frame.addEventListener('load', () => { ready = false; });
 
   const load = () => {
     if (loaded) return;
     loaded = true;
-    frame.src = opener.dataset.src!;
+    frame.src = `${opener.dataset.src!}&mode=${mode()}`;
   };
   const swap = (fn: () => void) => {
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;

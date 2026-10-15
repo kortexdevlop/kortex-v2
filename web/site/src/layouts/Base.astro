@@ -47,6 +47,9 @@ const otherHref = alt ? (lang === 'fr' ? alt.en : alt.fr) : (lang === 'fr' ? '/e
       </a>
       <nav>
         <Seek lang={lang} />
+        <select class="mode-select" data-mode-select aria-label={lang === 'fr' ? 'Mode (Simple, Medium, Pro)' : 'Mode (Simple, Medium, Pro)'}>
+          <option value="simple">Simple</option><option value="medium" selected>Medium</option><option value="pro">Pro</option>
+        </select>
         <button class="theme-toggle" type="button" data-theme-toggle aria-label={lang === 'fr' ? 'Changer de thème' : 'Switch theme'}>◐</button>
         <a href={nav.all}>{nav.tools}</a>
         <a href={otherHref} hreflang={lang === 'fr' ? 'en' : 'fr'}>{nav.other}</a>
@@ -79,6 +82,17 @@ const otherHref = alt ? (lang === 'fr' ? alt.en : alt.fr) : (lang === 'fr' ? '/e
         btn.addEventListener('click', () => apply(order[(order.indexOf(cur()) + 1) % order.length]));
       })();
     </script>
+    <script is:inline>
+      (() => {
+        const sel = document.querySelector('[data-mode-select]');
+        if (!sel) return;
+        try { sel.value = localStorage.getItem('k-mode') || 'medium'; } catch {}
+        sel.addEventListener('change', () => {
+          try { localStorage.setItem('k-mode', sel.value); } catch {}
+          window.dispatchEvent(new Event('kortex:mode'));
+        });
+      })();
+    </script>
     <script is:inline>if ('serviceWorker' in navigator && location.hostname !== 'localhost') navigator.serviceWorker.register('/sw.js');</script>
   </body>
 </html>
@@ -97,6 +111,7 @@ const otherHref = alt ? (lang === 'fr' ? alt.en : alt.fr) : (lang === 'fr' ? '/e
   .badges { display: flex; flex-wrap: wrap; gap: var(--k-space-2); margin: var(--k-space-4) 0; }
   .badge { padding: var(--k-space-1) var(--k-space-3); border-radius: 999px; background: var(--k-surface-2); font-size: 0.85rem; color: var(--k-text-2); }
   .prose h2 { margin-top: var(--k-space-7); }
+  .mode-select { min-height: 36px; padding: 0 var(--k-space-3); border: 1px solid var(--k-border); border-radius: 999px; background: var(--k-surface); color: var(--k-text-2); font: inherit; cursor: pointer; }
   .theme-toggle { min-width: 36px; min-height: 36px; border: 1px solid var(--k-border); border-radius: 999px; background: var(--k-surface); color: var(--k-text-2); font: inherit; cursor: pointer; }
   .theme-toggle:hover { color: var(--k-text); box-shadow: var(--k-shadow-1); }
   .foot-links { display: flex; gap: var(--k-space-4); flex-wrap: wrap; } .foot-links a { color: inherit; }

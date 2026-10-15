@@ -54,6 +54,7 @@ const BUS_JS: &str = r#"
     if (e.data.type === 'kortex:init') {
       if (e.data.theme === 'light' || e.data.theme === 'dark') document.documentElement.dataset.theme = e.data.theme;
       else delete document.documentElement.dataset.theme;
+      if (['simple', 'medium', 'pro'].includes(e.data.mode) && typeof dioxus !== 'undefined') dioxus.send(e.data.mode);
     } else if (e.data.type === 'kortex:files' && Array.isArray(e.data.files)) {
       pending = e.data.files;
       let tries = 0;
@@ -159,25 +160,33 @@ fn main() {{
 
 #[component]
 fn App() -> Element {{
-    use_effect(|| {{
-        document::eval(BUS_JS);
+    // The bus script lives for the whole session; mode changes from the host arrive on its channel.
+    let mut host_mode = use_signal(|| None::<String>);
+    use_future(move || async move {{
+        let mut bus = document::eval(BUS_JS);
+        while let Ok(mode) = bus.recv::<String>().await {{
+            host_mode.set(Some(mode));
+        }}
     }});
     let query = use_resource(|| async {{
-        let mut ev = document::eval("const q = new URLSearchParams(location.search); dioxus.send((q.get('lang') || 'fr') + '|' + (q.get('variant') || ''))");
-        ev.recv::<String>().await.unwrap_or_else(|_| "fr|".to_owned())
+        let mut ev = document::eval("const q = new URLSearchParams(location.search); dioxus.send((q.get('lang') || 'fr') + '|' + (q.get('variant') || '') + '|' + (q.get('mode') || ''))");
+        ev.recv::<String>().await.unwrap_or_else(|_| "fr||".to_owned())
     }});
     // Wait for the URL query: initial param values (variant presets) are computed once.
     let Some(query) = query.read().clone() else {{
         return rsx! {{}};
     }};
-    let (lang, variant) = query.split_once('|').map_or(("fr".to_owned(), None), |(l, v)| (l.to_owned(), (!v.is_empty()).then(|| v.to_owned())));
+    let mut parts = query.split('|');
+    let lang = parts.next().unwrap_or("fr").to_owned();
+    let variant = parts.next().filter(|v| !v.is_empty()).map(str::to_owned);
+    let initial_mode = parts.next().filter(|m| !m.is_empty()).map(str::to_owned);
     let contract = kortex_contract::parse(tool::CONTRACT).expect("contract");
     let locale_src = if lang == "en" {{ include_str!("{tool_dir}/locales/en.toml") }} else {{ include_str!("{tool_dir}/locales/fr.toml") }};
     let locale = kortex_i18n::Catalog::from_toml(locale_src).unwrap_or_default();
     rsx! {{
         document::Stylesheet {{ href: CSS }}
         main {{ style: "padding: var(--k-space-4); max-width: 720px; margin: 0 auto;",
-            AutoTool {{ contract, lang, locale, runner: Runner(runner), variant }}
+            AutoTool {{ contract, lang, locale, runner: Runner(runner), variant, host_mode: host_mode().or(initial_mode) }}
         }}
     }}
 }}
