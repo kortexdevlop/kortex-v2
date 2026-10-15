@@ -42,6 +42,7 @@ Phase 0 — Cadrage, spikes, nettoyage (≈ 98 %) — Phase 1 quasi finie, Phase
 - Outil pilote #2 `pdf.merge` (beta) : fusion dans l'ordre choisi, héritage MediaBox/Resources conservé, option compression, refus PDF chiffré/invalide ; 4 tests ; liste de fichiers avec monter/descendre/retirer ; testé dans le navigateur (2 PDF, ordre inversé, téléchargement OK).
 - BUG corrigé : `AutoTool` ne transmettait pas les fichiers choisis au moteur (remplacement automatique raté en silence). Maintenant `collect_inputs` testé unitairement. Leçon : après un `cargo fmt`, toujours vérifier qu'un remplacement scripté a bien été appliqué.
 - Tailles brotli des bundles : password 330 Ko, hash 344 Ko, qr 343 Ko, **pdf.merge 536 Ko (> budget 400 Ko)**. Base Dioxus+runtime ≈ 330 Ko. Pistes : moteur lourd chargé à la demande / en Web Worker séparé, `wasm-opt` plus agressif, budget par outil déclaré dans le contrat + vérifié par `xtask check` (§12.6 pas encore implémenté).
+- Outil pilote #1 `image.convert` (beta) : PNG/JPG/WebP(lossless)/BMP/GIF en lot, format détecté par signature, transparence aplatie, garde-fou 20 000 px, 6 variantes SEO (png↔jpg, webp→png…) ; 5 tests ; testé navigateur (png→jpg OK). brotli 508 Ko (> budget). HEIC non supporté (à faire).
 
 ## Decisions (user, session 1)
 - Pas de Homebrew.
@@ -52,7 +53,7 @@ Phase 0 — Cadrage, spikes, nettoyage (≈ 98 %) — Phase 1 quasi finie, Phase
 - Crédits IA : affichés en % restant, calculé d'après les neurons consommés (pas en nombre de requêtes) ; limite par utilisateur généreuse mais raisonnable.
 
 ## Next action (exact)
-- Pilotes restants : image.convert (variantes SEO png↔jpg…), calc salaire brut/net (UI auto pure). Puis check de budget wasm, champ couleur natif, vCard/Wi-Fi QR. Dépôt de fichier sur la page → Stage (bus postMessage), thème/mode transmis à l'iframe, taille wasm (budget 400 Ko brotli), moteur en Web Worker (spike c), PWA, sitemap, OG, pages légales, accueil animée, ⌘K, déploiement Cloudflare (Workers Static Assets, wrangler).
+- Pilote restant : calc salaire brut/net (UI auto pure ; taux officiels à vérifier, résultat étiqueté « estimation »). Puis check de budget wasm, champ couleur natif, vCard/Wi-Fi QR. Dépôt de fichier sur la page → Stage (bus postMessage), thème/mode transmis à l'iframe, taille wasm (budget 400 Ko brotli), moteur en Web Worker (spike c), PWA, sitemap, OG, pages légales, accueil animée, ⌘K, déploiement Cloudflare (Workers Static Assets, wrangler).
 - Phase 1 reste : impls plateforme web/desktop, `kortex-io`, `kortex-bus`, xtask `icons`/`dev`/`build`, galerie `/_design` (dans web/site, Phase 2), xtask `icons`/`dev`/`build`/`stats`, galerie `/_design`, vérifier la CI sur GitHub.
 - Spikes restants (b) Stage iframe, (c) Web Worker, (f) WebCodecs, (e) CI 3 OS ; ADR contrat/auth/codecs.
 - Puis Phase 1 (monorepo, tokens, kortex-ui, xtask).

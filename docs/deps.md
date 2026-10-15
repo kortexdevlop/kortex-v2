@@ -13,3 +13,4 @@
 | `qrcodegen` 1.8 | tool qr.generator | encodeur QR de référence (Nayuki), sans dépendance | réécriture (Reed-Solomon, masques) | minime |
 | `png` 0.17 | tool qr.generator (dev) | décodeur indépendant pour valider notre encodeur PNG | — | dev only |
 | `lopdf` 0.45 (sans features par défaut) | tool pdf.merge | lecture/écriture PDF, irréaliste à réécrire | pdf-writer (écriture seule) | ~200 Ko brotli |
+| `image` 0.25 (png, jpeg, webp, gif, bmp) | tool image.convert | décodeurs/encodeurs de référence | codecs individuels (plus de glue) | ~170 Ko brotli |

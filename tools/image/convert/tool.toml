@@ -1,0 +1,112 @@
+schema = 1
+
+[tool]
+id = "image.convert"
+version = "1.0.0"
+universe = "image"
+status = "beta"
+ui = "auto"
+platforms = ["web", "desktop"]
+offline = true
+ai = false
+viral_priority = 1
+
+[tool.name]
+fr = "Convertisseur d'images"
+en = "Image Converter"
+[tool.tagline]
+fr = "PNG, JPG, WebP, BMP, GIF : convertissez vos images sans les envoyer."
+en = "PNG, JPG, WebP, BMP, GIF: convert your images without uploading them."
+[tool.slug]
+fr = "convertisseur-images"
+en = "image-converter"
+
+[search]
+keywords.fr = ["convertir image", "png en jpg", "jpg en png", "webp", "convertisseur", "image"]
+keywords.en = ["convert image", "png to jpg", "jpg to png", "webp", "converter", "image"]
+intents.fr = ["convertir une image png en jpg", "transformer des images webp en png"]
+intents.en = ["convert a png image to jpg", "turn webp images into png"]
+related = ["pdf.merge"]
+
+[limits]
+max_input_bytes = "100MB"
+max_batch = 100
+timeout_s = 120
+
+[[inputs]]
+id = "images"
+type = "files<image/*>"
+required = true
+label = { fr = "Images", en = "Images" }
+
+[[params]]
+id = "format"
+type = "enum"
+options = ["png", "jpg", "webp", "bmp", "gif"]
+default = "png"
+level = "simple"
+label = { fr = "Format de sortie", en = "Output format" }
+
+[[params]]
+id = "quality"
+type = "integer"
+range = [1, 100]
+default = 90
+level = "medium"
+label = { fr = "Qualité JPG (1-100)", en = "JPG quality (1-100)" }
+
+[[params]]
+id = "background"
+type = "color"
+default = "#FFFFFF"
+level = "pro"
+label = { fr = "Fond pour la transparence (JPG, BMP)", en = "Background for transparency (JPG, BMP)" }
+
+[[outputs]]
+id = "converted"
+type = "files<image/*>"
+formats = ["image/png", "image/jpeg", "image/webp", "image/bmp", "image/gif"]
+default_format = "image/png"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "none"
+sensitive = false
+privacy = "local"
+
+[[variants]]
+id = "png-to-jpg"
+slug = { fr = "convertir-png-en-jpg", en = "png-to-jpg-converter" }
+name = { fr = "Convertir PNG en JPG", en = "PNG to JPG Converter" }
+preset = { format = "jpg" }
+
+[[variants]]
+id = "jpg-to-png"
+slug = { fr = "convertir-jpg-en-png", en = "jpg-to-png-converter" }
+name = { fr = "Convertir JPG en PNG", en = "JPG to PNG Converter" }
+preset = { format = "png" }
+
+[[variants]]
+id = "webp-to-png"
+slug = { fr = "convertir-webp-en-png", en = "webp-to-png-converter" }
+name = { fr = "Convertir WebP en PNG", en = "WebP to PNG Converter" }
+preset = { format = "png" }
+
+[[variants]]
+id = "png-to-webp"
+slug = { fr = "convertir-png-en-webp", en = "png-to-webp-converter" }
+name = { fr = "Convertir PNG en WebP", en = "PNG to WebP Converter" }
+preset = { format = "webp" }
+
+[[variants]]
+id = "jpg-to-webp"
+slug = { fr = "convertir-jpg-en-webp", en = "jpg-to-webp-converter" }
+name = { fr = "Convertir JPG en WebP", en = "JPG to WebP Converter" }
+preset = { format = "webp" }
+
+[[variants]]
+id = "webp-to-jpg"
+slug = { fr = "convertir-webp-en-jpg", en = "webp-to-jpg-converter" }
+name = { fr = "Convertir WebP en JPG", en = "WebP to JPG Converter" }
+preset = { format = "jpg" }

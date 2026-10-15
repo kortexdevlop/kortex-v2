@@ -1,0 +1,11 @@
+[ui]
+title = "Image Converter"
+[errors]
+missing_input = "Add at least one image."
+invalid_image = "One of the files is not a valid image or exceeds 20,000 px."
+invalid_color = "Invalid color (use #RRGGBB)."
+encode_failed = "Could not encode the image."
+invalid_param = "Invalid value."
+cancelled = "Cancelled."
+[outputs]
+converted = "Converted images"

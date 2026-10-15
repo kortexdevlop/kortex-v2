@@ -4,6 +4,240 @@
     {
       "inputs": [
         {
+          "id": "images",
+          "label": {
+            "en": "Images",
+            "fr": "Images"
+          },
+          "max_len": null,
+          "required": true,
+          "type": "files<image/*>"
+        }
+      ],
+      "limits": {
+        "max_batch": 100,
+        "max_input_bytes": "100MB",
+        "timeout_s": 120
+      },
+      "outputs": [
+        {
+          "default_format": "image/png",
+          "formats": [
+            "image/png",
+            "image/jpeg",
+            "image/webp",
+            "image/bmp",
+            "image/gif"
+          ],
+          "id": "converted",
+          "type": "files<image/*>"
+        }
+      ],
+      "params": [
+        {
+          "default": "png",
+          "id": "format",
+          "label": {
+            "en": "Output format",
+            "fr": "Format de sortie"
+          },
+          "level": "simple",
+          "options": [
+            "png",
+            "jpg",
+            "webp",
+            "bmp",
+            "gif"
+          ],
+          "range": null,
+          "type": "enum"
+        },
+        {
+          "default": 90,
+          "id": "quality",
+          "label": {
+            "en": "JPG quality (1-100)",
+            "fr": "Qualité JPG (1-100)"
+          },
+          "level": "medium",
+          "options": null,
+          "range": [
+            1.0,
+            100.0
+          ],
+          "type": "integer"
+        },
+        {
+          "default": "#FFFFFF",
+          "id": "background",
+          "label": {
+            "en": "Background for transparency (JPG, BMP)",
+            "fr": "Fond pour la transparence (JPG, BMP)"
+          },
+          "level": "pro",
+          "options": null,
+          "range": null,
+          "type": "color"
+        }
+      ],
+      "permissions": {
+        "clipboard": "none",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "convert a png image to jpg",
+            "turn webp images into png"
+          ],
+          "fr": [
+            "convertir une image png en jpg",
+            "transformer des images webp en png"
+          ]
+        },
+        "keywords": {
+          "en": [
+            "convert image",
+            "png to jpg",
+            "jpg to png",
+            "webp",
+            "converter",
+            "image"
+          ],
+          "fr": [
+            "convertir image",
+            "png en jpg",
+            "jpg en png",
+            "webp",
+            "convertisseur",
+            "image"
+          ]
+        },
+        "related": [
+          "pdf.merge"
+        ]
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "image.convert",
+        "name": {
+          "en": "Image Converter",
+          "fr": "Convertisseur d'images"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "image-converter",
+          "fr": "convertisseur-images"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "PNG, JPG, WebP, BMP, GIF: convert your images without uploading them.",
+          "fr": "PNG, JPG, WebP, BMP, GIF : convertissez vos images sans les envoyer."
+        },
+        "ui": "auto",
+        "universe": "image",
+        "version": "1.0.0",
+        "viral_priority": 1
+      },
+      "variants": [
+        {
+          "id": "png-to-jpg",
+          "name": {
+            "en": "PNG to JPG Converter",
+            "fr": "Convertir PNG en JPG"
+          },
+          "preset": {
+            "format": "jpg"
+          },
+          "slug": {
+            "en": "png-to-jpg-converter",
+            "fr": "convertir-png-en-jpg"
+          }
+        },
+        {
+          "id": "jpg-to-png",
+          "name": {
+            "en": "JPG to PNG Converter",
+            "fr": "Convertir JPG en PNG"
+          },
+          "preset": {
+            "format": "png"
+          },
+          "slug": {
+            "en": "jpg-to-png-converter",
+            "fr": "convertir-jpg-en-png"
+          }
+        },
+        {
+          "id": "webp-to-png",
+          "name": {
+            "en": "WebP to PNG Converter",
+            "fr": "Convertir WebP en PNG"
+          },
+          "preset": {
+            "format": "png"
+          },
+          "slug": {
+            "en": "webp-to-png-converter",
+            "fr": "convertir-webp-en-png"
+          }
+        },
+        {
+          "id": "png-to-webp",
+          "name": {
+            "en": "PNG to WebP Converter",
+            "fr": "Convertir PNG en WebP"
+          },
+          "preset": {
+            "format": "webp"
+          },
+          "slug": {
+            "en": "png-to-webp-converter",
+            "fr": "convertir-png-en-webp"
+          }
+        },
+        {
+          "id": "jpg-to-webp",
+          "name": {
+            "en": "JPG to WebP Converter",
+            "fr": "Convertir JPG en WebP"
+          },
+          "preset": {
+            "format": "webp"
+          },
+          "slug": {
+            "en": "jpg-to-webp-converter",
+            "fr": "convertir-jpg-en-webp"
+          }
+        },
+        {
+          "id": "webp-to-jpg",
+          "name": {
+            "en": "WebP to JPG Converter",
+            "fr": "Convertir WebP en JPG"
+          },
+          "preset": {
+            "format": "jpg"
+          },
+          "slug": {
+            "en": "webp-to-jpg-converter",
+            "fr": "convertir-webp-en-jpg"
+          }
+        }
+      ]
+    },
+    {
+      "inputs": [
+        {
           "id": "files",
           "label": {
             "en": "PDF files",

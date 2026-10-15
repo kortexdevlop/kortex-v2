@@ -1,0 +1,11 @@
+[ui]
+title = "Convertisseur d'images"
+[errors]
+missing_input = "Ajoutez au moins une image."
+invalid_image = "Un des fichiers n'est pas une image valide ou dépasse 20 000 px."
+invalid_color = "Couleur invalide (format #RRGGBB)."
+encode_failed = "Impossible d'encoder l'image."
+invalid_param = "Valeur invalide."
+cancelled = "Annulé."
+[outputs]
+converted = "Images converties"
