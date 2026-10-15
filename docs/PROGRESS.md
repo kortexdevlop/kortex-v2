@@ -2,7 +2,7 @@
 _Last update: 2026-10-15 — session 1_
 
 ## Current phase
-Phase 0 — Cadrage, spikes, nettoyage (≈ 20 %)
+Phase 0 — Cadrage, spikes, nettoyage (≈ 40 %)
 
 ## Done this session
 - Master prompt copié dans `docs/MASTER_PROMPT.md`; `CLAUDE.md`/`AGENTS.md` créés.
@@ -14,6 +14,11 @@ Phase 0 — Cadrage, spikes, nettoyage (≈ 20 %)
 - Jeton Cloudflare dans `~/.kortex-cf-token` (hors dépôt) — À RÉVOQUER puis recréer un jeton limité (il a été collé dans le chat).
 - GitHub : `gh` connecté (kortexdevlop). Dépôt privé `kortexdevlop/kortex-v2` créé et poussé (l'ancien `kortex` intact). Dépôt public `kortex-releases` : pas encore créé (accord requis).
 
+- Dépôt public `kortexdevlop/kortex-releases` créé (vide). DNS e-mail conservés (décision user).
+- Docs lues : versions Dioxus 0.7.10 / Astro 7.4.0 / wrangler 4.151 ; quotas gratuits Cloudflare notés dans `docs/spikes.md`.
+- Spike (a)+(d) OK (web + desktop, wasm 261 Ko gzip hello world). ADR 0001–0003 écrits.
+- Propositions logo (4) + nommage (2) : `brand/proposals/logo-naming.html`.
+
 ## Decisions (user, session 1)
 - Pas de Homebrew.
 - Dossiers du Bureau : NE PAS TOUCHER.
@@ -23,12 +28,12 @@ Phase 0 — Cadrage, spikes, nettoyage (≈ 20 %)
 - Crédits IA : affichés en % restant, calculé d'après les neurons consommés (pas en nombre de requêtes) ; limite par utilisateur généreuse mais raisonnable.
 
 ## Next action (exact)
-- Attendre fin de `cargo install dioxus-cli wasm-bindgen-cli`.
-- Décider du sort des DNS e-mail ; créer `kortex-releases` (public) après accord.
-- Lire les docs à jour (Dioxus, Astro, quotas Cloudflare), spikes (a)–(f), ADR fondateurs, 4 logos + 2 systèmes de nommage.
+- Attendre le choix logo/nommage (Q1), puis figer `brand/names.toml`.
+- Spikes restants (b) Stage iframe, (c) Web Worker, (f) WebCodecs, (e) CI 3 OS ; ADR contrat/auth/codecs.
+- Puis Phase 1 (monorepo, tokens, kortex-ui, xtask).
 
 ## Blockers / waiting for user
-- Révoquer/recréer le jeton Cloudflare ; décision DNS e-mail ; accord pour créer le dépôt public `kortex-releases`.
+- Révoquer/recréer le jeton Cloudflare ; choix du logo (A–D) et du système de nommage (1 ou 2).
 
 ## Hypotheses in use
 - Passkeys + mot de passe PBKDF2, sans vérification d'e-mail au départ.
