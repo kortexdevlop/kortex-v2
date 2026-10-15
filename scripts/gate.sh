@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Local quality gate: same checks as CI. Any failure stops the script (non-zero exit).
 set -euo pipefail
+pnpm install --frozen-lockfile --silent   # same as CI: the lockfile must match every package.json
 cargo fmt --all -- --check
 cargo clippy --workspace --all-targets -- -D warnings
 cargo test --workspace
