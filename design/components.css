@@ -16,6 +16,17 @@
   .k-btn:active { transform: scale(0.98); }
   .k-btn[data-variant="ghost"] { background: var(--k-surface-2); color: var(--k-text); }
   .k-input { min-height: 44px; width: 100%; padding: 0 var(--k-space-4); border: 1px solid var(--k-border); border-radius: var(--k-radius-field); background: var(--k-bg); color: var(--k-text); font: inherit; }
+  .k-field { display: grid; gap: var(--k-space-2); }
+  .k-switch { display: inline-flex; align-items: center; gap: var(--k-space-3); min-height: 44px; cursor: pointer; }
+  .k-switch input { accent-color: var(--k-accent); width: 20px; height: 20px; }
+  .k-progress { height: 8px; border-radius: var(--k-radius-control); background: var(--k-surface-2); overflow: hidden; }
+  .k-progress-bar { height: 100%; background: linear-gradient(90deg, var(--k-accent), var(--k-accent-2)); transition: width var(--k-motion-base) var(--k-motion-ease); }
+  .k-dropzone { display: grid; gap: var(--k-space-2); place-items: center; padding: var(--k-space-7) var(--k-space-5); border: 1px dashed var(--k-border); border-radius: var(--k-radius-card); background: var(--k-surface-2); text-align: center; cursor: pointer; transition: transform var(--k-motion-slow) var(--k-motion-ease); }
+  .k-dropzone:hover, .k-dropzone:focus-visible { transform: scale(1.01); border-color: var(--k-accent); }
+  .k-segmented { display: inline-flex; padding: var(--k-space-1); gap: var(--k-space-1); border-radius: var(--k-radius-field); background: var(--k-surface-2); }
+  .k-segment { min-height: 36px; padding: 0 var(--k-space-4); border: 0; border-radius: var(--k-radius-control); background: transparent; color: var(--k-text-2); font: inherit; cursor: pointer; }
+  .k-segment[aria-checked="true"] { background: var(--k-bg); color: var(--k-text); box-shadow: var(--k-shadow-1); }
+  .k-tool-head { display: flex; align-items: center; justify-content: space-between; gap: var(--k-space-4); flex-wrap: wrap; margin-bottom: var(--k-space-5); }
   .k-muted { color: var(--k-text-2); }
   @media (prefers-reduced-motion: reduce) { * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; } }
 }

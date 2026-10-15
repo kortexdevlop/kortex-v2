@@ -30,7 +30,7 @@ pub enum ParamLevel {
     Pro,
 }
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct ToolMeta {
     pub id: String,
     pub version: String,
@@ -56,7 +56,7 @@ const fn default_priority() -> u8 {
     3
 }
 
-#[derive(Debug, Clone, Default, Deserialize, Serialize)]
+#[derive(Debug, Clone, Default, PartialEq, Deserialize, Serialize)]
 pub struct Search {
     #[serde(default)]
     pub keywords: BTreeMap<String, Vec<String>>,
@@ -66,14 +66,14 @@ pub struct Search {
     pub related: Vec<String>,
 }
 
-#[derive(Debug, Clone, Default, Deserialize, Serialize)]
+#[derive(Debug, Clone, Default, PartialEq, Deserialize, Serialize)]
 pub struct Limits {
     pub max_input_bytes: Option<String>,
     pub max_batch: Option<u32>,
     pub timeout_s: Option<u32>,
 }
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct Input {
     pub id: String,
     #[serde(rename = "type")]
@@ -84,7 +84,7 @@ pub struct Input {
     pub label: Option<Localized>,
 }
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct Param {
     pub id: String,
     #[serde(rename = "type")]
@@ -96,7 +96,7 @@ pub struct Param {
     pub label: Option<Localized>,
 }
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct Output {
     pub id: String,
     #[serde(rename = "type")]
@@ -105,7 +105,7 @@ pub struct Output {
     pub default_format: Option<String>,
 }
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct Permissions {
     pub network: bool,
     pub filesystem: String,
@@ -115,7 +115,7 @@ pub struct Permissions {
     pub privacy: String,
 }
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct Variant {
     pub id: String,
     pub slug: Localized,
@@ -123,7 +123,7 @@ pub struct Variant {
     pub preset: Option<toml::Table>,
 }
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct ToolContract {
     pub schema: u32,
     pub tool: ToolMeta,
