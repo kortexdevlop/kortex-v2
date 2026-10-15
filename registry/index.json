@@ -2,6 +2,191 @@
   "schema": 1,
   "tools": [
     {
+      "inputs": [
+        {
+          "id": "file",
+          "label": {
+            "en": "File",
+            "fr": "Fichier"
+          },
+          "max_len": null,
+          "required": false,
+          "type": "file<*/*>"
+        },
+        {
+          "id": "text",
+          "label": {
+            "en": "Text (if no file)",
+            "fr": "Texte (si aucun fichier)"
+          },
+          "max_len": 1000000,
+          "required": false,
+          "type": "text"
+        }
+      ],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": "2GB",
+        "timeout_s": 120
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "hash",
+          "type": "text"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "verdict",
+          "type": "text"
+        }
+      ],
+      "params": [
+        {
+          "default": "sha256",
+          "id": "algorithm",
+          "label": {
+            "en": "Algorithm",
+            "fr": "Algorithme"
+          },
+          "level": "simple",
+          "options": [
+            "sha256",
+            "sha1",
+            "md5",
+            "sha512"
+          ],
+          "range": null,
+          "type": "enum"
+        },
+        {
+          "default": false,
+          "id": "uppercase",
+          "label": {
+            "en": "Uppercase",
+            "fr": "Majuscules"
+          },
+          "level": "medium",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        },
+        {
+          "default": "",
+          "id": "compare_with",
+          "label": {
+            "en": "Compare with (expected hash)",
+            "fr": "Comparer avec (hash attendu)"
+          },
+          "level": "pro",
+          "options": null,
+          "range": null,
+          "type": "text"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "compute the sha256 of a file",
+            "verify a download's integrity"
+          ],
+          "fr": [
+            "calculer le sha256 d'un fichier",
+            "vérifier l'intégrité d'un téléchargement"
+          ]
+        },
+        "keywords": {
+          "en": [
+            "hash",
+            "sha256",
+            "md5",
+            "sha1",
+            "checksum",
+            "digest"
+          ],
+          "fr": [
+            "hash",
+            "sha256",
+            "md5",
+            "sha1",
+            "checksum",
+            "somme de contrôle",
+            "empreinte"
+          ]
+        },
+        "related": [
+          "secure.password-generator"
+        ]
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "secure.hash-calculator",
+        "name": {
+          "en": "Hash Calculator",
+          "fr": "Calculateur de hash"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "hash-calculator",
+          "fr": "calculateur-hash"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "MD5, SHA-1, SHA-256, SHA-512 of a text or a file, without uploading it.",
+          "fr": "MD5, SHA-1, SHA-256, SHA-512 d'un texte ou d'un fichier, sans l'envoyer."
+        },
+        "ui": "auto",
+        "universe": "secure",
+        "version": "1.0.0",
+        "viral_priority": 1
+      },
+      "variants": [
+        {
+          "id": "sha256",
+          "name": {
+            "en": "SHA-256 Calculator",
+            "fr": "Calculateur SHA-256"
+          },
+          "preset": {
+            "algorithm": "sha256"
+          },
+          "slug": {
+            "en": "sha256-calculator",
+            "fr": "calculateur-sha256"
+          }
+        },
+        {
+          "id": "md5",
+          "name": {
+            "en": "MD5 Calculator",
+            "fr": "Calculateur MD5"
+          },
+          "preset": {
+            "algorithm": "md5"
+          },
+          "slug": {
+            "en": "md5-calculator",
+            "fr": "calculateur-md5"
+          }
+        }
+      ]
+    },
+    {
       "inputs": [],
       "limits": {
         "max_batch": null,

@@ -1,0 +1,12 @@
+[package]
+name = "tool-secure-hash-calculator"
+version = "0.1.0"
+edition.workspace = true
+publish.workspace = true
+license.workspace = true
+
+[dependencies]
+kortex = { path = "../../../crates/kortex" }
+md-5 = "0.10"
+sha1 = "0.10"
+sha2 = "0.10"

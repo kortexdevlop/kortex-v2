@@ -109,18 +109,22 @@ fn main() {{
 
 #[component]
 fn App() -> Element {{
-    let lang = use_resource(|| async {{
-        let mut ev = document::eval("dioxus.send(new URLSearchParams(location.search).get('lang') || document.documentElement.lang || 'fr')");
-        ev.recv::<String>().await.unwrap_or_else(|_| "fr".to_owned())
+    let query = use_resource(|| async {{
+        let mut ev = document::eval("const q = new URLSearchParams(location.search); dioxus.send((q.get('lang') || 'fr') + '|' + (q.get('variant') || ''))");
+        ev.recv::<String>().await.unwrap_or_else(|_| "fr|".to_owned())
     }});
-    let lang = lang.read().clone().unwrap_or_else(|| "fr".to_owned());
+    // Wait for the URL query: initial param values (variant presets) are computed once.
+    let Some(query) = query.read().clone() else {{
+        return rsx! {{}};
+    }};
+    let (lang, variant) = query.split_once('|').map_or(("fr".to_owned(), None), |(l, v)| (l.to_owned(), (!v.is_empty()).then(|| v.to_owned())));
     let contract = kortex_contract::parse(tool::CONTRACT).expect("contract");
     let locale_src = if lang == "en" {{ include_str!("{tool_dir}/locales/en.toml") }} else {{ include_str!("{tool_dir}/locales/fr.toml") }};
     let locale = kortex_i18n::Catalog::from_toml(locale_src).unwrap_or_default();
     rsx! {{
         document::Stylesheet {{ href: CSS }}
         main {{ style: "padding: var(--k-space-4); max-width: 720px; margin: 0 auto;",
-            AutoTool {{ contract, lang, locale, runner: Runner(runner) }}
+            AutoTool {{ contract, lang, locale, runner: Runner(runner), variant }}
         }}
     }}
 }}

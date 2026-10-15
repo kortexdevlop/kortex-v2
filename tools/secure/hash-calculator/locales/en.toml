@@ -1,0 +1,13 @@
+[ui]
+title = "Hash Calculator"
+[errors]
+missing_input = "Drop a file or enter some text."
+invalid_param = "Invalid algorithm."
+cancelled = "Cancelled."
+[outputs]
+hash = "Hash"
+verdict = "Verification"
+[values]
+verdict_none = ""
+verdict_match = "✓ Matches the expected hash"
+verdict_mismatch = "✗ Does not match the expected hash"

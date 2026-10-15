@@ -27,8 +27,10 @@ pub fn Button(
 }
 
 #[component]
-pub fn Card(children: Element) -> Element {
-    rsx! { div { class: "k-card", {children} } }
+pub fn Card(children: Element, #[props(default)] class: String) -> Element {
+    rsx! {
+        div { class: "k-card {class}", {children} }
+    }
 }
 
 #[component]
@@ -40,6 +42,28 @@ pub fn TextField(label: String, value: String, oninput: EventHandler<String>) ->
                 class: "k-input",
                 value: "{value}",
                 oninput: move |e| oninput.call(e.value()),
+            }
+        }
+    }
+}
+
+#[component]
+pub fn Select(
+    label: String,
+    value: String,
+    options: Vec<String>,
+    onchange: EventHandler<String>,
+) -> Element {
+    rsx! {
+        label { class: "k-field",
+            span { class: "k-muted", "{label}" }
+            select {
+                class: "k-input",
+                value: "{value}",
+                onchange: move |e| onchange.call(e.value()),
+                for o in options {
+                    option { key: "{o}", value: "{o}", selected: o == value, "{o}" }
+                }
             }
         }
     }
@@ -70,11 +94,37 @@ pub fn Progress(value: f32) -> Element {
     }
 }
 
-/// Drop target for files; the host reads the dropped files from its own handlers.
+/// Drop target for files (drag & drop or file picker). Calls `onfiles` with the chosen files.
 #[component]
-pub fn DropZone(label: String, hint: String) -> Element {
+pub fn DropZone(
+    label: String,
+    hint: String,
+    #[props(default)] multiple: bool,
+    accept: Option<String>,
+    onfiles: EventHandler<Vec<dioxus::html::FileData>>,
+) -> Element {
+    let mut over = use_signal(|| false);
     rsx! {
-        div { class: "k-dropzone", tabindex: "0", role: "button", "aria-label": "{label}",
+        label {
+            class: "k-dropzone",
+            "data-over": "{over}",
+            ondragover: move |e| {
+                e.prevent_default();
+                over.set(true);
+            },
+            ondragleave: move |_| over.set(false),
+            ondrop: move |e| {
+                e.prevent_default();
+                over.set(false);
+                onfiles.call(e.data_transfer().files());
+            },
+            input {
+                class: "k-visually-hidden",
+                r#type: "file",
+                multiple,
+                accept,
+                onchange: move |e| onfiles.call(e.files()),
+            }
             strong { "{label}" }
             span { class: "k-muted", "{hint}" }
         }

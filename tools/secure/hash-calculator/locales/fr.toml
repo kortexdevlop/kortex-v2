@@ -1,0 +1,13 @@
+[ui]
+title = "Calculateur de hash"
+[errors]
+missing_input = "Déposez un fichier ou saisissez un texte."
+invalid_param = "Algorithme invalide."
+cancelled = "Annulé."
+[outputs]
+hash = "Empreinte"
+verdict = "Vérification"
+[values]
+verdict_none = ""
+verdict_match = "✓ Identique à l'empreinte attendue"
+verdict_mismatch = "✗ Différente de l'empreinte attendue"

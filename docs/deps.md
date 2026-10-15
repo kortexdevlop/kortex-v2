@@ -9,3 +9,4 @@
 | `getrandom` 0.3 | kortex-runtime | CSPRNG de l'OS / WebCrypto (mots de passe, clés) | rand (plus lourd) | minime |
 | `astro` 7.4.0 | web/site | site statique, 0 JS par défaut | Eleventy, Next | build-time |
 | `dioxus-ssr` 0.7 | kortex-ui (dev) | tests de rendu HTML | navigateur headless (lent) | dev only |
+| `md-5`, `sha1`, `sha2` 0.10 | tool secure.hash-calculator | RustCrypto audité, impensable à réécrire | blake3 seul (moins courant) | ~30 Ko wasm |

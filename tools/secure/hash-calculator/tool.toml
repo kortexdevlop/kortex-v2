@@ -1,0 +1,95 @@
+schema = 1
+
+[tool]
+id = "secure.hash-calculator"
+version = "1.0.0"
+universe = "secure"
+status = "beta"
+ui = "auto"
+platforms = ["web", "desktop"]
+offline = true
+ai = false
+viral_priority = 1
+
+[tool.name]
+fr = "Calculateur de hash"
+en = "Hash Calculator"
+[tool.tagline]
+fr = "MD5, SHA-1, SHA-256, SHA-512 d'un texte ou d'un fichier, sans l'envoyer."
+en = "MD5, SHA-1, SHA-256, SHA-512 of a text or a file, without uploading it."
+[tool.slug]
+fr = "calculateur-hash"
+en = "hash-calculator"
+
+[search]
+keywords.fr = ["hash", "sha256", "md5", "sha1", "checksum", "somme de contrôle", "empreinte"]
+keywords.en = ["hash", "sha256", "md5", "sha1", "checksum", "digest"]
+intents.fr = ["calculer le sha256 d'un fichier", "vérifier l'intégrité d'un téléchargement"]
+intents.en = ["compute the sha256 of a file", "verify a download's integrity"]
+related = ["secure.password-generator"]
+
+[limits]
+max_input_bytes = "2GB"
+timeout_s = 120
+
+[[inputs]]
+id = "file"
+type = "file<*/*>"
+required = false
+label = { fr = "Fichier", en = "File" }
+
+[[inputs]]
+id = "text"
+type = "text"
+required = false
+max_len = 1000000
+label = { fr = "Texte (si aucun fichier)", en = "Text (if no file)" }
+
+[[params]]
+id = "algorithm"
+type = "enum"
+options = ["sha256", "sha1", "md5", "sha512"]
+default = "sha256"
+level = "simple"
+label = { fr = "Algorithme", en = "Algorithm" }
+
+[[params]]
+id = "uppercase"
+type = "bool"
+default = false
+level = "medium"
+label = { fr = "Majuscules", en = "Uppercase" }
+
+[[params]]
+id = "compare_with"
+type = "text"
+default = ""
+level = "pro"
+label = { fr = "Comparer avec (hash attendu)", en = "Compare with (expected hash)" }
+
+[[outputs]]
+id = "hash"
+type = "text"
+
+[[outputs]]
+id = "verdict"
+type = "text"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "write"
+sensitive = false
+privacy = "local"
+
+[[variants]]
+id = "sha256"
+slug = { fr = "calculateur-sha256", en = "sha256-calculator" }
+name = { fr = "Calculateur SHA-256", en = "SHA-256 Calculator" }
+preset = { algorithm = "sha256" }
+
+[[variants]]
+id = "md5"
+slug = { fr = "calculateur-md5", en = "md5-calculator" }
+name = { fr = "Calculateur MD5", en = "MD5 Calculator" }
+preset = { algorithm = "md5" }

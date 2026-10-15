@@ -2,7 +2,7 @@
 _Last update: 2026-10-15 — session 1_
 
 ## Current phase
-Phase 0 — Cadrage, spikes, nettoyage (≈ 95 %) — Phase 1 quasi finie, Phase 2 démarrée, premier outil pilote
+Phase 0 — Cadrage, spikes, nettoyage (≈ 97 %) — Phase 1 quasi finie, Phase 2 démarrée, premier outil pilote
 
 ## Done this session
 - Master prompt copié dans `docs/MASTER_PROMPT.md`; `CLAUDE.md`/`AGENTS.md` créés.
@@ -35,6 +35,9 @@ Phase 0 — Cadrage, spikes, nettoyage (≈ 95 %) — Phase 1 quasi finie, Phase
 - CI : job `site` ajouté.
 - Site : sitemap.xml (hreflang, brouillons exclus), robots.txt, manifeste PWA + icône + service worker (cache hors-ligne), pages légales FR/EN (confidentialité et conditions rédigées ; mentions légales en brouillon noindex).
 - Taille wasm password-generator : 1184 Ko brut, 412 Ko gzip, 338 Ko brotli (budget 400 Ko brotli OK, marge faible).
+- DropZone fonctionnelle (glisser-déposer + sélecteur), fichiers lus en octets, sorties fichier téléchargeables (base64+Blob), `Select` pour les enums, presets de variantes appliqués (`?variant=`), sorties traduisibles via `[outputs]`/`[values]` des locales (valeur vide = masquée).
+- Outil pilote #3 `secure.hash-calculator` (beta) : MD5/SHA-1/SHA-256/SHA-512, texte ou fichier, comparaison ; 5 tests (vecteurs de référence), 2 variantes SEO ; testé dans le navigateur. wasm 1239 Ko brut.
+- Mentions légales : nom + région renseignés (page toujours brouillon : adresse et e-mail manquants).
 
 ## Decisions (user, session 1)
 - Pas de Homebrew.
@@ -45,14 +48,14 @@ Phase 0 — Cadrage, spikes, nettoyage (≈ 95 %) — Phase 1 quasi finie, Phase
 - Crédits IA : affichés en % restant, calculé d'après les neurons consommés (pas en nombre de requêtes) ; limite par utilisateur généreuse mais raisonnable.
 
 ## Next action (exact)
-- Phase 2 suite : drag-and-drop de fichier → Stage (bus postMessage), thème/mode transmis à l'iframe, variantes/presets appliqués, taille wasm (budget 400 Ko brotli), moteur en Web Worker (spike c), PWA, sitemap, OG, pages légales, accueil animée, ⌘K, déploiement Cloudflare (Workers Static Assets, wrangler).
+- Pilotes restants : qr.generate (UI custom), pdf.merge (multi-fichiers + réordonnancement), image.convert, calc salaire brut/net. Dépôt de fichier sur la page → Stage (bus postMessage), thème/mode transmis à l'iframe, taille wasm (budget 400 Ko brotli), moteur en Web Worker (spike c), PWA, sitemap, OG, pages légales, accueil animée, ⌘K, déploiement Cloudflare (Workers Static Assets, wrangler).
 - Phase 1 reste : impls plateforme web/desktop, `kortex-io`, `kortex-bus`, xtask `icons`/`dev`/`build`, galerie `/_design` (dans web/site, Phase 2), xtask `icons`/`dev`/`build`/`stats`, galerie `/_design`, vérifier la CI sur GitHub.
 - Spikes restants (b) Stage iframe, (c) Web Worker, (f) WebCodecs, (e) CI 3 OS ; ADR contrat/auth/codecs.
 - Puis Phase 1 (monorepo, tokens, kortex-ui, xtask).
 
 ## Blockers / waiting for user
-- Mentions légales : identité de l'éditeur (nom, adresse, e-mail, directeur de publication) à fournir avant le lancement.
-- Accord pour le 1er déploiement public sur Cloudflare (kortex.site).
+- Mentions légales : reste l'adresse postale (ou recours à l'hébergeur pour les particuliers) et l'e-mail de contact (ex. `contact@kortex.site` via Email Routing déjà configuré). Nom et région renseignés.
+- Déploiement public : NE PAS déployer pour l'instant (décision user).
 - Révoquer/recréer le jeton Cloudflare ; rien d'autre.
 
 ## Hypotheses in use
