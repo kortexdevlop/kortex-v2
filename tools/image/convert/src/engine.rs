@@ -41,8 +41,8 @@ fn flatten(img: &RgbaImage, bg: [u8; 3]) -> Vec<u8> {
     let mut out = Vec::with_capacity(img.pixels().len() * 3);
     for p in img.pixels() {
         let a = u32::from(p.0[3]);
-        for c in 0..3 {
-            let v = (u32::from(p.0[c]) * a + u32::from(bg[c]) * (255 - a) + 127) / 255;
+        for (channel, bg_channel) in p.0.iter().take(3).zip(bg) {
+            let v = (u32::from(*channel) * a + u32::from(bg_channel) * (255 - a) + 127) / 255;
             out.push(u8::try_from(v).unwrap_or(255));
         }
     }
