@@ -1,6 +1,7 @@
 import type { Ctx, Env } from './env.ts';
 import { HttpError, allowedOrigins, errorBody, json } from './http.ts';
 import * as auth from './routes/auth.ts';
+import * as ai from './routes/ai.ts';
 import * as data from './routes/data.ts';
 
 type Handler = (ctx: Ctx, params: Record<string, string>) => Promise<Response>;
@@ -25,6 +26,8 @@ add('PUT', '/v1/sync/:key', data.putSync);
 add('DELETE', '/v1/sync/:key', data.deleteSync);
 add('POST', '/v1/usage', data.postUsage);
 add('GET', '/v1/usage', data.getUsage);
+add('GET', '/v1/ai/credits', ai.getCredits);
+add('POST', '/v1/ai/chat', ai.chat);
 
 const SECURITY_HEADERS = {
   'X-Content-Type-Options': 'nosniff',

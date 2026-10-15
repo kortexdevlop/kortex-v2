@@ -60,6 +60,8 @@ Phase 0 — Cadrage, spikes, nettoyage (≈ 100 % des pilotes) — Phase 1 quasi
 - **ADR 0005** : PBKDF2 100 000 côté Worker ≈ 60 ms (limite gratuite 10 ms CPU) → le mot de passe ne quitte pas l'appareil ; le client dérive `auth_key` (PBKDF2 600 000 it., ~310 ms navigateur, `services/shared/src/auth.ts`), le Worker n'en fait qu'un PBKDF2 léger (5 000). Politique de mot de passe côté client. `kdf: 1` pour migrations futures.
 - `services/shared` (auth client, 3 tests). Gate et CI couvrent site, shared, api. `pnpm-workspace.yaml` : scripts d'installation tiers ignorés (esbuild, workerd).
 - Reste backend : passkeys (WebAuthn), jetons d'appareil (CLI/desktop), Turnstile (nécessite des clés), pages connexion/inscription dans le site (utiliser `deriveAuthKey`), `ai-gateway` (crédits en %, budget global), mesure CPU réelle en production (impossible en local).
+- **Passerelle IA** (`/v1/ai/credits`, `/v1/ai/chat`, ADR 0006) : crédits en % d'après les neurons réellement consommés ; seau 1 200 neurons (+400/3 h), budget global 9 000/jour (marge sous les 10 000 gratuits) ; réservation puis règlement sur usage réel, remboursement si échec, pause globale « IA en pause » jusqu'à minuit UTC ; consentement obligatoire ; aucun prompt/réponse stocké. 11 tests (faux modèle). Bug trouvé par les tests et corrigé : la 1re requête du jour contournait le plafond global (INSERT non gardé) ; vérifié sur D1 local réel. Non testable en local : l'appel réel au binding `AI` (nécessite le compte Cloudflare) → à valider au premier déploiement.
+- 33 tests API au total.
 
 ## Decisions (user, session 1)
 - Pas de Homebrew.
@@ -71,7 +73,7 @@ Phase 0 — Cadrage, spikes, nettoyage (≈ 100 % des pilotes) — Phase 1 quasi
 
 ## Next action (exact)
 - Phase 2 (site) restant : crate `kortex-bus` côté Rust (protocole typé, pour Desk/Flow), spike Web Worker (c), police Inter auto-hébergée (téléchargement à valider), pages univers `/[univers]`.
-- Phase 4 suite (local, SANS déployer) : passkeys, pages connexion/inscription du site, `services/ai-gateway` (crédits en %, budget global 10 000 neurons/jour), jetons d'appareil.
+- Phase 4 suite (local, SANS déployer) : passkeys, pages connexion/inscription du site (`deriveAuthKey`, jauge de crédits IA), jetons d'appareil (CLI/desktop), install liée au compte.
 - Plus tard : Phase 5 desktop/CLI/Store, 6 Seek niveau 2, 7 Desk, 8 Mind, 9 Flow, 10 Hub, 11 catalogue (≥150 outils), 12 finition.
 - À revérifier : vieillesse de base 6,90 %/0,40 % et APEC 0,024 % (calc.gross-net-salary) ; champ couleur natif ; QR Wi-Fi/vCard ; HEIC.
 - Hors périmètre (décision user) : budget de taille wasm.
