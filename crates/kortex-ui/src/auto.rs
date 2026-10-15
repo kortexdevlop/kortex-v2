@@ -98,6 +98,16 @@ pub fn to_values(c: &ToolContract, strings: &ParamValues) -> ValueMap {
     out
 }
 
+/// Outputs in the order declared by the contract (then any extra keys), not alphabetical.
+fn in_contract_order(ids: &[String], mut map: ValueMap) -> Vec<(String, Value)> {
+    let mut out: Vec<(String, Value)> = ids
+        .iter()
+        .filter_map(|id| map.remove(id).map(|v| (id.clone(), v)))
+        .collect();
+    out.extend(map);
+    out
+}
+
 /// Typed engine inputs from what the user entered: text fields and chosen files.
 fn collect_inputs(
     c: &ToolContract,
@@ -207,7 +217,7 @@ fn output_files(v: &Value) -> Vec<FileData> {
 fn text_output(v: &Value) -> Option<String> {
     match v {
         Value::Text(t) => Some(t.clone()),
-        Value::Number(n) => Some(n.to_string()),
+        Value::Number(n) => Some(format!("{n:.2}")),
         Value::Int(i) => Some(i.to_string()),
         Value::Bool(b) => Some(b.to_string()),
         _ => None,
@@ -274,6 +284,7 @@ pub fn AutoTool(
         s(&lang, "result"),
         s(&lang, "download"),
     );
+    let out_ids: Vec<String> = contract.outputs.iter().map(|o| o.id.clone()).collect();
     let run_contract = contract.clone();
     let run = move |_| {
         if running() {
@@ -471,10 +482,12 @@ pub fn AutoTool(
                 Progress { value: 0.5 }
             }
             match result() {
-                Some(Ok(map)) => rsx! {
+                Some(Ok(map)) => {
+                    let ordered = in_contract_order(&out_ids, map);
+                    rsx! {
                     section { class: "k-result", "aria-live": "polite",
                         h3 { "{result_label}" }
-                        for (id , v) in map {
+                        for (id , v) in ordered {
                             for file in output_files(&v) {
                                 div { key: "{id}-{file.name}", class: "k-output-group",
                                     if file.mime.starts_with("image/") {
@@ -518,7 +531,8 @@ pub fn AutoTool(
                             }
                         }
                     }
-                },
+                    }
+                }
                 Some(Err(e)) => {
                     let message = error_text(&locale, &lang, e.code);
                     rsx! {
@@ -533,7 +547,7 @@ pub fn AutoTool(
 
 #[cfg(test)]
 mod tests {
-    use super::{ParamValues, base64, collect_inputs};
+    use super::{ParamValues, base64, collect_inputs, in_contract_order};
     use kortex_runtime::{FileData, Value};
     use std::collections::BTreeMap;
 
@@ -595,6 +609,21 @@ privacy = "local"
             Some(&Value::Files(vec![file("c"), file("d")]))
         );
         assert_eq!(m.get("note"), Some(&Value::Text("hi".into())));
+    }
+
+    #[test]
+    fn outputs_follow_contract_order() {
+        let map = kortex_runtime::ValueMap::from([
+            ("a".to_owned(), Value::Int(1)),
+            ("b".to_owned(), Value::Int(2)),
+            ("c".to_owned(), Value::Int(3)),
+        ]);
+        let ids = ["c".to_owned(), "a".to_owned()];
+        let order: Vec<String> = in_contract_order(&ids, map)
+            .into_iter()
+            .map(|(k, _)| k)
+            .collect();
+        assert_eq!(order, ["c", "a", "b"]);
     }
 
     #[test]

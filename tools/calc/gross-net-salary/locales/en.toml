@@ -1,0 +1,14 @@
+[ui]
+title = "Gross to Net Salary (France)"
+[errors]
+invalid_param = "Invalid value: check the amount (≥ 0) and the rate (0 to 45%)."
+cancelled = "Cancelled."
+[outputs]
+gross = "Gross salary (€)"
+social_contributions = "Employee contributions (€)"
+csg_crds = "CSG and CRDS (€)"
+net_taxable = "Taxable net (€)"
+net_before_tax = "Net before tax (€)"
+income_tax = "Withholding tax (€)"
+net_after_tax = "Net after tax (€)"
+charges_rate = "Charges as a share of gross (%)"

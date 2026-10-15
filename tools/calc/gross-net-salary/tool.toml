@@ -1,0 +1,134 @@
+schema = 1
+
+[tool]
+id = "calc.gross-net-salary"
+version = "1.0.0"
+universe = "calc"
+status = "beta"
+ui = "auto"
+platforms = ["web", "desktop"]
+offline = true
+ai = false
+viral_priority = 1
+
+[tool.name]
+fr = "Salaire brut en net"
+en = "Gross to Net Salary (France)"
+[tool.tagline]
+fr = "Estimez votre salaire net à partir du brut (ou l'inverse), barème 2026, secteur privé."
+en = "Estimate your net salary from gross (or the reverse), 2026 French private-sector rates."
+[tool.slug]
+fr = "salaire-brut-net"
+en = "gross-net-salary-france"
+
+[search]
+keywords.fr = ["salaire brut net", "brut en net", "net en brut", "calcul salaire", "fiche de paie", "cotisations"]
+keywords.en = ["gross to net", "salary france", "net salary", "payslip", "social contributions"]
+intents.fr = ["calculer mon salaire net", "convertir un salaire brut en net"]
+intents.en = ["calculate my net salary in france", "convert gross salary to net france"]
+related = []
+
+[limits]
+timeout_s = 5
+
+[[params]]
+id = "amount"
+type = "number"
+range = [0, 10000000]
+default = 3000
+level = "simple"
+label = { fr = "Montant (€)", en = "Amount (€)" }
+
+[[params]]
+id = "mode"
+type = "enum"
+options = ["gross_to_net", "net_to_gross"]
+default = "gross_to_net"
+level = "simple"
+label = { fr = "Sens du calcul", en = "Direction" }
+
+[[params]]
+id = "period"
+type = "enum"
+options = ["monthly", "annual"]
+default = "monthly"
+level = "simple"
+label = { fr = "Période", en = "Period" }
+
+[[params]]
+id = "cadre"
+type = "bool"
+default = false
+level = "medium"
+label = { fr = "Statut cadre (cotisation APEC)", en = "Executive status (APEC contribution)" }
+
+[[params]]
+id = "tax_rate"
+type = "number"
+range = [0, 45]
+default = 0
+level = "medium"
+label = { fr = "Taux de prélèvement à la source (%)", en = "Withholding tax rate (%)" }
+
+[[outputs]]
+id = "gross"
+type = "number"
+
+[[outputs]]
+id = "social_contributions"
+type = "number"
+
+[[outputs]]
+id = "csg_crds"
+type = "number"
+
+[[outputs]]
+id = "net_taxable"
+type = "number"
+
+[[outputs]]
+id = "net_before_tax"
+type = "number"
+
+[[outputs]]
+id = "income_tax"
+type = "number"
+
+[[outputs]]
+id = "net_after_tax"
+type = "number"
+
+[[outputs]]
+id = "charges_rate"
+type = "number"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "write"
+sensitive = false
+privacy = "local"
+
+[[variants]]
+id = "gross-to-net"
+slug = { fr = "brut-en-net", en = "gross-to-net-salary" }
+name = { fr = "Brut en net", en = "Gross to Net" }
+preset = { mode = "gross_to_net" }
+
+[[variants]]
+id = "net-to-gross"
+slug = { fr = "net-en-brut", en = "net-to-gross-salary" }
+name = { fr = "Net en brut", en = "Net to Gross" }
+preset = { mode = "net_to_gross" }
+
+[[variants]]
+id = "cadre"
+slug = { fr = "salaire-brut-net-cadre", en = "executive-gross-net-salary" }
+name = { fr = "Salaire brut net cadre", en = "Executive Gross to Net" }
+preset = { cadre = true }
+
+[[variants]]
+id = "annual"
+slug = { fr = "salaire-brut-net-annuel", en = "annual-gross-net-salary" }
+name = { fr = "Salaire brut net annuel", en = "Annual Gross to Net" }
+preset = { period = "annual" }

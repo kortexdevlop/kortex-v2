@@ -1,0 +1,14 @@
+[ui]
+title = "Salaire brut en net"
+[errors]
+invalid_param = "Valeur invalide : vérifiez le montant (≥ 0) et le taux (0 à 45 %)."
+cancelled = "Annulé."
+[outputs]
+gross = "Salaire brut (€)"
+social_contributions = "Cotisations salariales (€)"
+csg_crds = "CSG et CRDS (€)"
+net_taxable = "Net imposable (€)"
+net_before_tax = "Net avant impôt (€)"
+income_tax = "Prélèvement à la source (€)"
+net_after_tax = "Net après impôt (€)"
+charges_rate = "Part des charges dans le brut (%)"

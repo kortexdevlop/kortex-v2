@@ -2,7 +2,7 @@
 _Last update: 2026-10-15 — session 1_
 
 ## Current phase
-Phase 0 — Cadrage, spikes, nettoyage (≈ 98 %) — Phase 1 quasi finie, Phase 2 démarrée, premier outil pilote
+Phase 0 — Cadrage, spikes, nettoyage (≈ 100 % des pilotes) — Phase 1 quasi finie, Phase 2 démarrée, premier outil pilote
 
 ## Done this session
 - Master prompt copié dans `docs/MASTER_PROMPT.md`; `CLAUDE.md`/`AGENTS.md` créés.
@@ -45,6 +45,10 @@ Phase 0 — Cadrage, spikes, nettoyage (≈ 98 %) — Phase 1 quasi finie, Phase
 - Outil pilote #1 `image.convert` (beta) : PNG/JPG/WebP(lossless)/BMP/GIF en lot, format détecté par signature, transparence aplatie, garde-fou 20 000 px, 6 variantes SEO (png↔jpg, webp→png…) ; 5 tests ; testé navigateur (png→jpg OK). brotli 508 Ko (> budget). HEIC non supporté (à faire).
 
 - `scripts/gate.sh` : garde-fou local strict (fmt, clippy -D warnings, tests, tokens, registry, check) à lancer AVANT chaque commit (`./scripts/gate.sh && git commit`). Leçon : ne jamais enchaîner via des pipes (`| tail`) qui masquent les échecs.
+- Outil pilote #6 `calc.gross-net-salary` (beta) : brut↔net France secteur privé, taux salariaux 2026, mensuel/annuel, cadre (APEC), PAS ; 7 tests (cas 2500 € calculé à la main, inversion net→brut, marche du CET au plafond, annuel, erreurs) ; testé navigateur (282,75 € cotisations, 238,26 € CSG/CRDS, 1978,99 € net). 4 variantes SEO. 339 Ko brotli.
+  - Sources vérifiées : PASS 2026 (4 005 €/mois), Agirc-Arrco T1 3,15 % / T2 8,64 % / CEG 0,86 % et 1,08 % / CET 0,14 %. NON reconfirmés par source officielle : vieillesse de base 6,90 % / 0,40 % et APEC 0,024 % → à revérifier (Urssaf) et chaque janvier. Résultat présenté comme estimation. Les sites secondaires consultés contenaient des erreurs (ex. « chômage salarié 2,40 % ») : ne pas s'y fier.
+- AutoTool : sorties dans l'ordre du contrat, nombres affichés à 2 décimales.
+- **6 pilotes terminés** (password, hash, qr, pdf.merge, image.convert, salary) : catalogue = 6 outils beta, ~24 pages SEO FR/EN.
 
 ## Decisions (user, session 1)
 - Pas de Homebrew.
@@ -55,7 +59,9 @@ Phase 0 — Cadrage, spikes, nettoyage (≈ 98 %) — Phase 1 quasi finie, Phase
 - Crédits IA : affichés en % restant, calculé d'après les neurons consommés (pas en nombre de requêtes) ; limite par utilisateur généreuse mais raisonnable.
 
 ## Next action (exact)
-- Pilote restant : calc salaire brut/net (UI auto pure ; taux officiels à vérifier, résultat étiqueté « estimation »). Puis check de budget wasm, champ couleur natif, vCard/Wi-Fi QR. Dépôt de fichier sur la page → Stage (bus postMessage), thème/mode transmis à l'iframe, taille wasm (budget 400 Ko brotli), moteur en Web Worker (spike c), PWA, sitemap, OG, pages légales, accueil animée, ⌘K, déploiement Cloudflare (Workers Static Assets, wrangler).
+- Revérifier vieillesse de base + APEC (calc.gross-net-salary).
+- Budget wasm : check xtask + stratégie moteur lourd séparé (pdf.merge 536 Ko, image.convert 508 Ko brotli).
+- Phase 2 reste : accueil animée, ⌘K (Seek niveau 1), OG images, drag de fichier sur la page → Stage, thème→iframe, spike Web Worker. Puis check de budget wasm, champ couleur natif, vCard/Wi-Fi QR. Dépôt de fichier sur la page → Stage (bus postMessage), thème/mode transmis à l'iframe, taille wasm (budget 400 Ko brotli), moteur en Web Worker (spike c), PWA, sitemap, OG, pages légales, accueil animée, ⌘K, déploiement Cloudflare (Workers Static Assets, wrangler).
 - Phase 1 reste : impls plateforme web/desktop, `kortex-io`, `kortex-bus`, xtask `icons`/`dev`/`build`, galerie `/_design` (dans web/site, Phase 2), xtask `icons`/`dev`/`build`/`stats`, galerie `/_design`, vérifier la CI sur GitHub.
 - Spikes restants (b) Stage iframe, (c) Web Worker, (f) WebCodecs, (e) CI 3 OS ; ADR contrat/auth/codecs.
 - Puis Phase 1 (monorepo, tokens, kortex-ui, xtask).

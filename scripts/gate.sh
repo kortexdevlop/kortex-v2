@@ -4,8 +4,10 @@ set -euo pipefail
 cargo fmt --all -- --check
 cargo clippy --workspace --all-targets -- -D warnings
 cargo test --workspace
+before=$(cat design/dist/kortex.css registry/index.json | shasum)
 cargo xtask tokens
 cargo xtask registry
+after=$(cat design/dist/kortex.css registry/index.json | shasum)
+[ "$before" = "$after" ] || { echo "✗ design/dist ou registry était périmé : régénéré, relance le gate"; exit 1; }
 cargo xtask check
-git diff --exit-code design/dist registry >/dev/null || { echo "✗ design/dist ou registry non committé (régénéré par ce script)"; exit 1; }
 echo "✓ gate OK"
