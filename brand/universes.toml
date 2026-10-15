@@ -1,0 +1,86 @@
+# Tool universes. `hue` = OKLCH hue used to compose icons. Add one block to add a universe.
+
+[[universe]]
+id = "convert"
+name = "Kortex Convert"
+hue = 250
+
+[[universe]]
+id = "pdf"
+name = "Kortex PDF"
+hue = 25
+
+[[universe]]
+id = "document"
+name = "Kortex Document"
+hue = 60
+
+[[universe]]
+id = "image"
+name = "Kortex Image"
+hue = 320
+
+[[universe]]
+id = "video"
+name = "Kortex Video"
+hue = 290
+
+[[universe]]
+id = "audio"
+name = "Kortex Audio"
+hue = 150
+
+[[universe]]
+id = "text"
+name = "Kortex Text"
+hue = 210
+
+[[universe]]
+id = "code"
+name = "Kortex Code"
+hue = 270
+
+[[universe]]
+id = "data"
+name = "Kortex Data"
+hue = 190
+
+[[universe]]
+id = "calc"
+name = "Kortex Calc"
+hue = 95
+
+[[universe]]
+id = "secure"
+name = "Kortex Secure"
+hue = 155
+
+[[universe]]
+id = "qr"
+name = "Kortex QR"
+hue = 235
+
+[[universe]]
+id = "web"
+name = "Kortex Web"
+hue = 220
+
+[[universe]]
+id = "color"
+name = "Kortex Color"
+hue = 340
+
+[[universe]]
+id = "life"
+name = "Kortex Life"
+hue = 120
+
+[[universe]]
+id = "play"
+name = "Kortex Play"
+hue = 10
+
+[[universe]]
+id = "ai"
+name = "Kortex AI"
+hue = 300

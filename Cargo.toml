@@ -1,0 +1,16 @@
+[workspace]
+resolver = "3"
+# crates/*, tools/*/*, apps/* are added as they are created (globs must match something)
+members = ["xtask"]
+
+[workspace.package]
+edition = "2024"
+license = "LicenseRef-Proprietary"
+publish = false
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+# NOTE: never set `strip = true` (breaks wasm-bindgen, see docs/spikes.md)

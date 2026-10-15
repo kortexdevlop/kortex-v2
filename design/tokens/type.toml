@@ -1,0 +1,8 @@
+sans = "'Inter Variable', system-ui, -apple-system, 'Segoe UI', sans-serif"
+mono = "'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace"
+scale-0 = "1rem"
+scale-1 = "1.25rem"
+scale-2 = "1.5625rem"
+scale-3 = "1.953rem"
+scale-4 = "2.441rem"
+scale-5 = "3.052rem"

@@ -1,0 +1,16 @@
+# Single source of truth for all brand names. Rename here only.
+[brand]
+name = "Kortex"
+logo = "brand/logo/kortex-mark.svg"   # chosen: proposal B (2026-10-15)
+
+[apps]            # pattern: "Kortex" + short English word
+mind  = "Kortex Mind"
+seek  = "Kortex Seek"
+desk  = "Kortex Desk"
+flow  = "Kortex Flow"
+hub   = "Kortex Hub"
+store = "Kortex Store"
+sync  = "Kortex Sync"
+id    = "Kortex ID"
+os    = "Kortex OS"
+cli   = "kortex"

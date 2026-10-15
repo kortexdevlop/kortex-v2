@@ -1,0 +1,9 @@
+[domains]
+root     = "kortex.site"
+run      = "run.kortex.site"
+desk     = "workspace.kortex.site"
+flow     = "flow.kortex.site"
+mind     = "agent.kortex.site"
+seek     = "search.kortex.site"
+hub      = "dashboard.kortex.site"
+api      = "api.kortex.site"

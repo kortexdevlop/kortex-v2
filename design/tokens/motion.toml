@@ -1,0 +1,5 @@
+ease = "cubic-bezier(.2, .8, .2, 1)"
+fast = "120ms"
+base = "200ms"
+slow = "320ms"
+slower = "500ms"

@@ -2,7 +2,7 @@
 _Last update: 2026-10-15 — session 1_
 
 ## Current phase
-Phase 0 — Cadrage, spikes, nettoyage (≈ 40 %)
+Phase 0 — Cadrage, spikes, nettoyage (≈ 45 %) — Phase 1 démarrée
 
 ## Done this session
 - Master prompt copié dans `docs/MASTER_PROMPT.md`; `CLAUDE.md`/`AGENTS.md` créés.
@@ -19,6 +19,9 @@ Phase 0 — Cadrage, spikes, nettoyage (≈ 40 %)
 - Spike (a)+(d) OK (web + desktop, wasm 261 Ko gzip hello world). ADR 0001–0003 écrits.
 - Propositions logo (4) + nommage (2) : `brand/proposals/logo-naming.html`.
 
+- Choix user : logo B, nommage option 1 (Kortex Mind/Seek/Desk/Flow/Hub). `brand/names.toml`, `universes.toml` (17), `domains.toml`, logo SVG écrits.
+- Phase 1 : workspace Cargo (membre `xtask`), toolchain figée 1.99.0, tokens `design/tokens/*.toml` + `design/components.css` → `cargo xtask tokens` génère `design/dist/kortex.css` (clair/sombre).
+
 ## Decisions (user, session 1)
 - Pas de Homebrew.
 - Dossiers du Bureau : NE PAS TOUCHER.
@@ -28,12 +31,12 @@ Phase 0 — Cadrage, spikes, nettoyage (≈ 40 %)
 - Crédits IA : affichés en % restant, calculé d'après les neurons consommés (pas en nombre de requêtes) ; limite par utilisateur généreuse mais raisonnable.
 
 ## Next action (exact)
-- Attendre le choix logo/nommage (Q1), puis figer `brand/names.toml`.
+- Phase 1 suite : xtask (`check`, `registry`, `new-tool`, `icons`, `dev`), crates `kortex-contract`/`macros`/`runtime`/`platform`/`i18n`/`ui`, `tools/_template`, CI de base, galerie `/_design`.
 - Spikes restants (b) Stage iframe, (c) Web Worker, (f) WebCodecs, (e) CI 3 OS ; ADR contrat/auth/codecs.
 - Puis Phase 1 (monorepo, tokens, kortex-ui, xtask).
 
 ## Blockers / waiting for user
-- Révoquer/recréer le jeton Cloudflare ; choix du logo (A–D) et du système de nommage (1 ou 2).
+- Révoquer/recréer le jeton Cloudflare ; rien d'autre.
 
 ## Hypotheses in use
 - Passkeys + mot de passe PBKDF2, sans vérification d'e-mail au départ.

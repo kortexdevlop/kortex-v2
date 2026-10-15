@@ -1,0 +1,4 @@
+control = "10px"
+field = "16px"
+card = "24px"
+panel = "32px"
