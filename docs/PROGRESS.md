@@ -66,6 +66,7 @@ Phase 0 — Cadrage, spikes, nettoyage (≈ 100 % des pilotes) — Phase 1 quasi
 - Lien « Compte » dans l'en-tête.
 - **CLI `kortex`** (`crates/kortex-cli`, binaire `kortex`) : `list`, `search`, `info`, `run` (entrées `nom=valeur` ou `nom=@fichier`, sorties fichier écrites sans écraser ni sortir du dossier, `--json`), mêmes moteurs que le web (`run_map`). Liste des outils générée par `cargo xtask cli-gen` (vérifiée fraîche par `xtask check` : un outil ajouté sans `cli-gen` fait échouer le contrôle). 9 tests (dont fusion de PDF en ligne de commande). Base du mode headless pour Flow/Mind.
 - Reste Phase 5 : `kortex install/update/remove/doctor/login` (nécessite le registre signé Ed25519 + dépôt `kortex-releases` + compte), Kortex Store (Dioxus desktop), scripts `install.sh/ps1`, paquets desktop par outil, CI de release (matrice 3 OS).
+- **CI GitHub verte** (jobs rust, site, services) après correction du lockfile pnpm (importer `services/shared`) ; `allowBuilds` (pnpm 12) déclaré ; `pnpm install --frozen-lockfile` ajouté au gate pour détecter ce cas en local. Leçon : les 3 commits précédents avaient échoué en CI sans que le gate local le voie → le gate reproduit désormais l'installation gelée de la CI.
 
 ## Decisions (user, session 1)
 - Pas de Homebrew.
