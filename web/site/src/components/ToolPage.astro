@@ -14,9 +14,9 @@ const jsonLd = [
   ...(faq.length ? [{ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) }] : []),
 ];
 ---
-<Base title={`${name} — Kortex`} description={t.tool.tagline[lang]} lang={lang} alt={{ fr: path('fr'), en: path('en') }} jsonLd={jsonLd}>
+<Base title={`${name} — Kortex`} description={t.tool.tagline[lang]} lang={lang} alt={{ fr: path('fr'), en: path('en') }} jsonLd={jsonLd} ogImage={`/og/${lang}/${t.tool.slug[lang]}.png`}>
   <section class="hero">
-    <span class="glyph" set:html={t.glyph} />
+    <img class="tool-icon" src={`/icons/${t.tool.id}.svg`} width="72" height="72" alt="" />
     <h1>{name}</h1>
     <p class="k-muted">{t.tool.tagline[lang]}</p>
     <div class="badges">

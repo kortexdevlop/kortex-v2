@@ -12,3 +12,5 @@ web/site/src/generated/
 web/site/public/kortex.css
 .kortex/
 dist/
+web/site/public/icons/
+web/site/public/og/

@@ -16,7 +16,6 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - run: cargo fmt --all --check
       - run: cargo clippy --workspace --all-targets -- -D warnings
-      - run: cargo xtask tokens && git diff --exit-code design/dist
       - run: cargo xtask check
       - run: cargo test --workspace
   site:
@@ -33,5 +32,6 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - run: cargo xtask tokens
       - run: cargo xtask registry
+      - run: cargo xtask icons
       - run: pnpm --filter @kortex/site test
       - run: pnpm site:build

@@ -52,6 +52,8 @@ Phase 0 — Cadrage, spikes, nettoyage (≈ 100 % des pilotes) — Phase 1 quasi
 - Accueil animée (logo qui se dessine, halo suivant le curseur, révélations `animation-timeline: view()`, grille des 17 univers avec compteurs, section vie privée) FR/EN.
 - Kortex Seek niveau 1 (`web/site/src/lib/seek.ts`) : recherche locale hors-ligne (accents, fautes, préfixes, synonymes FR/EN, mots vides, variantes) ; palette ⌘K / Ctrl+K / « / » dans l'en-tête ; index `public/seek-index.json` généré par sync ; 9 tests `node --test` (+ CI). Testé navigateur.
 - Décision user : on ne s'occupe plus du budget de taille wasm sauf cas inadmissible.
+- `cargo xtask icons` : icônes composées par outil (squircle + dégradé OKLCH de l'univers + glyphe + ombre) en SVG, icônes de marque PNG 192/512, images Open Graph 1200×630 FR/EN par outil + accueil (resvg, polices système ; si `design/fonts/*.ttf` existe elles sont chargées). Site : balises OG/Twitter, apple-touch-icon, manifeste PWA PNG, icônes sur cartes et pages d'outil. `design/dist` est ignoré par git (régénéré par xtask/CI).
+- TODO police : Inter auto-hébergée (téléchargement à valider avec l'utilisateur) → déposer dans `design/fonts/` pour des images OG et un site fidèles à la charte.
 
 ## Decisions (user, session 1)
 - Pas de Homebrew.
@@ -62,19 +64,19 @@ Phase 0 — Cadrage, spikes, nettoyage (≈ 100 % des pilotes) — Phase 1 quasi
 - Crédits IA : affichés en % restant, calculé d'après les neurons consommés (pas en nombre de requêtes) ; limite par utilisateur généreuse mais raisonnable.
 
 ## Next action (exact)
-- Revérifier vieillesse de base + APEC (calc.gross-net-salary).
-- Phase 2 reste : OG images (resvg), icônes composées (squircle+glyphe) `xtask icons`, drag de fichier sur la page → Stage, thème→iframe, spike Web Worker. Puis check de budget wasm, champ couleur natif, vCard/Wi-Fi QR. Dépôt de fichier sur la page → Stage (bus postMessage), thème/mode transmis à l'iframe, taille wasm (budget 400 Ko brotli), moteur en Web Worker (spike c), PWA, sitemap, OG, pages légales, accueil animée, ⌘K, déploiement Cloudflare (Workers Static Assets, wrangler).
-- Phase 1 reste : impls plateforme web/desktop, `kortex-io`, `kortex-bus`, xtask `icons`/`dev`/`build`, galerie `/_design` (dans web/site, Phase 2), xtask `icons`/`dev`/`build`/`stats`, galerie `/_design`, vérifier la CI sur GitHub.
-- Spikes restants (b) Stage iframe, (c) Web Worker, (f) WebCodecs, (e) CI 3 OS ; ADR contrat/auth/codecs.
-- Puis Phase 1 (monorepo, tokens, kortex-ui, xtask).
+- Phase 2 (site) restant : glisser un fichier n'importe où sur la page → ouvre le Stage (bus postMessage typé `kortex-bus`), transmettre thème/mode à l'iframe, spike Web Worker (c), police Inter auto-hébergée (téléchargement à valider), pages univers `/[univers]`.
+- Phase 4 (backend, développé en local avec `wrangler dev`, SANS déployer) : `services/api` (auth passkeys + PBKDF2, sessions, D1, sync), `services/ai-gateway` (crédits en %, budget global 10 000 neurons/jour).
+- Plus tard : Phase 5 desktop/CLI/Store, 6 Seek niveau 2, 7 Desk, 8 Mind, 9 Flow, 10 Hub, 11 catalogue (≥150 outils), 12 finition.
+- À revérifier : vieillesse de base 6,90 %/0,40 % et APEC 0,024 % (calc.gross-net-salary) ; champ couleur natif ; QR Wi-Fi/vCard ; HEIC.
+- Hors périmètre (décision user) : budget de taille wasm.
 
 ## Blockers / waiting for user
 - Mentions légales : reste l'adresse postale (ou recours à l'hébergeur pour les particuliers) et l'e-mail de contact (ex. `contact@kortex.site` via Email Routing déjà configuré). Nom et région renseignés.
 - Déploiement public : NE PAS déployer pour l'instant (décision user).
-- Révoquer/recréer le jeton Cloudflare ; rien d'autre.
+- (rien d'autre pour l'instant)
 
 ## Hypotheses in use
 - Passkeys + mot de passe PBKDF2, sans vérification d'e-mail au départ.
 
 ## Catalogue stats
-stable: 0 · beta: 0 · draft: 0
+stable: 0 · beta: 6 · draft: 0 — password-generator, hash-calculator (secure) · generator (qr) · merge (pdf) · convert (image) · gross-net-salary (calc)
