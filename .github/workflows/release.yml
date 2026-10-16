@@ -11,6 +11,11 @@ on:
       tools:
         description: 'Tool ids to build (space separated) or "all"'
         default: 'secure.password-generator'
+      only:
+        description: 'Run a single OS only: linux, macos, windows or all'
+        type: choice
+        options: [all, linux, macos, windows]
+        default: all
       intel_mac:
         description: 'Also build macOS x86_64 (costs more minutes)'
         type: boolean
@@ -42,6 +47,7 @@ jobs:
           - { os: ubuntu-latest, name: linux, targets: 'x86_64-unknown-linux-gnu' }
           - { os: macos-latest, name: macos, targets: 'aarch64-apple-darwin' }
           - { os: windows-latest, name: windows, targets: 'x86_64-pc-windows-msvc' }
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.only == 'all' || inputs.only == matrix.name }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 90
     defaults:

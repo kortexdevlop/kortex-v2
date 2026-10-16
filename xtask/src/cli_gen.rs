@@ -28,7 +28,7 @@ pub fn build() -> Result<(String, String), String> {
         let _ = writeln!(
             deps,
             "{pkg} = {{ path = \"../../{}\" }}",
-            t.dir.to_string_lossy()
+            crate::fwd(&t.dir)
         );
         let _ = writeln!(
             code,

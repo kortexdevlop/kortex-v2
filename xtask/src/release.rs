@@ -15,7 +15,7 @@ use kortex_pkg::{
     current_target, parse_verified, public_key_b64, sha256_hex, sign_bytes,
 };
 
-use crate::tools;
+use crate::{fwd, tools};
 
 fn flag(args: &[String], name: &str) -> Option<String> {
     args.iter()
@@ -176,8 +176,8 @@ panic = "abort"
 strip = "symbols"
 "#,
             version = c.tool.version,
-            tool = tool_dir.display(),
-            root = root.display()
+            tool = fwd(&tool_dir),
+            root = fwd(&root)
         ),
     )
     .map_err(|e| e.to_string())?;
@@ -246,7 +246,7 @@ fn App() -> Element {{
     }}
 }}
 "##,
-            tool_dir = tool_dir.display()
+            tool_dir = fwd(&tool_dir)
         ),
     )
     .map_err(|e| e.to_string())?;

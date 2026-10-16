@@ -5,7 +5,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-use crate::tools;
+use crate::{fwd, tools};
 
 fn abs(p: &str) -> Result<PathBuf, String> {
     std::env::current_dir()
@@ -119,8 +119,8 @@ lto = true
 codegen-units = 1
 panic = "abort"
 "#,
-            tool = tool_dir.display(),
-            root = root.display()
+            tool = fwd(&tool_dir),
+            root = fwd(&root)
         ),
     )
     .map_err(|e| e.to_string())?;
@@ -191,7 +191,7 @@ fn App() -> Element {{
     }}
 }}
 "#,
-            tool_dir = tool_dir.display()
+            tool_dir = fwd(&tool_dir)
         ),
     )
     .map_err(|e| e.to_string())?;

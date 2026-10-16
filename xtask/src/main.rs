@@ -14,6 +14,12 @@ use std::process::ExitCode;
 
 const USAGE: &str = "Commandes : tokens | registry | check [id] | stats | icons | cli-gen | keygen | build-desktop | build-cli | build-app | list-tools | package | release-index | build <id> | new-tool --universe U --name N";
 
+/// Path for embedding in generated TOML/Rust source: forward slashes work on every OS, while
+/// Windows backslashes would be read as (invalid) escape sequences.
+pub fn fwd(p: &std::path::Path) -> String {
+    p.to_string_lossy().replace('\\', "/")
+}
+
 fn main() -> ExitCode {
     let args: Vec<String> = std::env::args().skip(1).collect();
     let result = match args.first().map(String::as_str) {
