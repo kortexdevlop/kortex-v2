@@ -39,15 +39,25 @@ env:
   INTEL_MAC: ${{ github.event_name == 'workflow_dispatch' && inputs.intel_mac || 'true' }}
 
 jobs:
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      matrix: ${{ steps.m.outputs.matrix }}
+    steps:
+      - id: m
+        env:
+          ONLY: ${{ github.event_name == 'workflow_dispatch' && inputs.only || 'all' }}
+        run: |
+          all='[{"os":"ubuntu-latest","name":"linux","targets":"x86_64-unknown-linux-gnu"},{"os":"macos-latest","name":"macos","targets":"aarch64-apple-darwin"},{"os":"windows-latest","name":"windows","targets":"x86_64-pc-windows-msvc"}]'
+          if [ "$ONLY" = "all" ]; then m="$all"; else m=$(echo "$all" | jq -c --arg n "$ONLY" '[.[] | select(.name == $n)]'); fi
+          echo "matrix={\"include\":$m}" >> "$GITHUB_OUTPUT"
+
   build:
+    needs: plan
     strategy:
       fail-fast: false
-      matrix:
-        include:
-          - { os: ubuntu-latest, name: linux, targets: 'x86_64-unknown-linux-gnu' }
-          - { os: macos-latest, name: macos, targets: 'aarch64-apple-darwin' }
-          - { os: windows-latest, name: windows, targets: 'x86_64-pc-windows-msvc' }
-    if: ${{ github.event_name != 'workflow_dispatch' || inputs.only == 'all' || inputs.only == matrix.name }}
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 90
     defaults:
