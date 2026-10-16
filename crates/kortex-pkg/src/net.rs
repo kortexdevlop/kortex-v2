@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use crate::error::{Kind, PkgError, Result};
 
-fn is_local_host(url: &str) -> bool {
+pub(crate) fn is_local_host(url: &str) -> bool {
     let rest = url.strip_prefix("http://").unwrap_or("");
     let host = rest.split(['/', ':']).next().unwrap_or("");
     host == "localhost" || host == "127.0.0.1" || host == "[::1]"

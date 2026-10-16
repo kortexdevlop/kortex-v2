@@ -17,6 +17,8 @@ export interface Ctx {
   url: URL;
   /** Set by the session guard. */
   userId?: string;
+  /** Set when the caller authenticated with a device token (CLI, desktop, Store). */
+  deviceId?: string;
   /** Resolved client IP (Cloudflare header) used for rate limiting only. */
   ip: string;
 }

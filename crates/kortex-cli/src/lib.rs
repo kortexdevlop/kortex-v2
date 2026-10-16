@@ -45,6 +45,7 @@ Usage :
   kortex install <outil>… | --all        télécharge, vérifie la signature et installe
   kortex update [outil|--all|--self]      met à jour (outils ou la CLI elle-même)
   kortex remove <outil> | open <outil>
+  kortex login [--email E] [--password-stdin] | logout | whoami   compte (facultatif)
   kortex version
 
 Exemples :
@@ -320,6 +321,16 @@ pub fn execute_with(
     out: &mut dyn Write,
     pkg: Option<&pkgcmd::PkgEnv>,
 ) -> Result<(), String> {
+    execute_io(args, out, pkg, &mut pkgcmd::StdIo)
+}
+
+/// Full entry point with an injectable terminal (tests script prompts and use a cheap KDF).
+pub fn execute_io(
+    args: &[String],
+    out: &mut dyn Write,
+    pkg: Option<&pkgcmd::PkgEnv>,
+    io: &mut dyn pkgcmd::CliIo,
+) -> Result<(), String> {
     let mut args = args.to_vec();
     let w = |e: std::io::Error| e.to_string();
     let Some(cmd) = (!args.is_empty()).then(|| args.remove(0)) else {
@@ -456,7 +467,7 @@ pub fn execute_with(
         other => {
             if let Some(env) = pkg {
                 let lang = lang_of(&mut args);
-                if pkgcmd::run(other, &args, out, env, &lang)? {
+                if pkgcmd::run(other, &args, out, env, &lang, io)? {
                     return Ok(());
                 }
             }

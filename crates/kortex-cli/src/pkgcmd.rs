@@ -1,11 +1,53 @@
-//! Package-management commands: install, update, remove, installed, doctor, open.
-use std::io::Write;
+//! Package and account commands: install, update, remove, installed, available, doctor, open,
+//! login, logout, whoami.
+use std::io::{BufRead, Write};
 
 use kortex_pkg::{
-    Index, Kind, PkgError, doctor, install, installed_binary, remove, self_update, statuses, update,
+    Credentials, Index, KDF_ITERATIONS, doctor, install, installed_binary, remove, self_update,
+    statuses, update,
 };
 
-pub use kortex_pkg::{DEFAULT_INDEX, PkgEnv};
+pub use kortex_pkg::{DEFAULT_API, DEFAULT_INDEX, PkgEnv};
+
+/// Terminal access, injectable so tests can script answers and use a cheap KDF.
+pub trait CliIo {
+    /// Visible answer (e-mail). `None` = no terminal / cancelled.
+    fn prompt(&mut self, label: &str) -> Option<String>;
+    /// Hidden answer (password). `from_stdin` reads one line from stdin instead of the terminal.
+    fn password(&mut self, label: &str, from_stdin: bool) -> Option<String>;
+    fn kdf_iterations(&self) -> u32 {
+        KDF_ITERATIONS
+    }
+}
+
+pub struct StdIo;
+
+impl CliIo for StdIo {
+    fn prompt(&mut self, label: &str) -> Option<String> {
+        eprint!("{label}");
+        let _ = std::io::stderr().flush();
+        let mut line = String::new();
+        std::io::stdin()
+            .lock()
+            .read_line(&mut line)
+            .ok()
+            .filter(|n| *n > 0)?;
+        Some(line.trim().to_owned())
+    }
+
+    fn password(&mut self, label: &str, from_stdin: bool) -> Option<String> {
+        if from_stdin {
+            let mut line = String::new();
+            std::io::stdin()
+                .lock()
+                .read_line(&mut line)
+                .ok()
+                .filter(|n| *n > 0)?;
+            return Some(line.trim_end_matches(['\r', '\n']).to_owned());
+        }
+        rpassword::prompt_password(label).ok()
+    }
+}
 
 fn w(e: std::io::Error) -> String {
     e.to_string()
@@ -28,7 +70,68 @@ fn phase_label(p: &str) -> &str {
     }
 }
 
-fn install_one(env: &PkgEnv, index: &Index, id: &str, out: &mut dyn Write) -> Result<(), String> {
+fn take_flag(args: &mut Vec<String>, flag: &str) -> bool {
+    args.iter()
+        .position(|a| a == flag)
+        .map(|i| args.remove(i))
+        .is_some()
+}
+
+fn take_value(args: &mut Vec<String>, flag: &str) -> Option<String> {
+    let i = args.iter().position(|a| a == flag)?;
+    (i + 1 < args.len()).then(|| {
+        let v = args.remove(i + 1);
+        args.remove(i);
+        v
+    })
+}
+
+fn device_name() -> String {
+    std::env::var("HOSTNAME")
+        .or_else(|_| std::env::var("COMPUTERNAME"))
+        .ok()
+        .filter(|h| !h.is_empty())
+        .or_else(|| {
+            std::process::Command::new("hostname")
+                .output()
+                .ok()
+                .and_then(|o| String::from_utf8(o.stdout).ok())
+                .map(|h| h.trim().to_owned())
+                .filter(|h| !h.is_empty())
+        })
+        .unwrap_or_else(|| "kortex-cli".to_owned())
+}
+
+/// If this machine is linked to an account that asks for it, checks the password before changing
+/// anything. Fails closed: when the account server cannot be reached, nothing is installed.
+fn confirm_with_account(
+    creds: Option<&Credentials>,
+    io: &mut dyn CliIo,
+    from_stdin: bool,
+    out: &mut dyn Write,
+) -> Result<(), String> {
+    let Some(c) = creds else { return Ok(()) };
+    let required = kortex_pkg::confirm_required(c).map_err(|e| format!("impossible de vérifier ton compte ({e}) : réessaie en ligne, ou `kortex logout` pour installer sans compte"))?;
+    if !required {
+        return Ok(());
+    }
+    let pw = io.password(&format!("Mot de passe de {} (confirme l'installation) : ", c.email), from_stdin).ok_or("mot de passe requis : lance la commande dans un terminal, utilise --password-stdin, ou désactive la confirmation dans ton compte")?;
+    match kortex_pkg::confirm_password(c, &pw, io.kdf_iterations()).map_err(|e| e.to_string())? {
+        true => {
+            writeln!(out, "✓ identité confirmée").map_err(w)?;
+            Ok(())
+        }
+        false => Err("mot de passe incorrect : installation annulée".into()),
+    }
+}
+
+fn install_one(
+    env: &PkgEnv,
+    index: &Index,
+    id: &str,
+    creds: Option<&Credentials>,
+    out: &mut dyn Write,
+) -> Result<(), String> {
     let target = env.target().map_err(|e| e.to_string())?;
     let mut note = |p: &str| {
         if !phase_label(p).is_empty() {
@@ -43,7 +146,13 @@ fn install_one(env: &PkgEnv, index: &Index, id: &str, out: &mut dyn Write) -> Re
         t.version,
         env.home.binary_path(&t).display()
     )
-    .map_err(w)
+    .map_err(w)?;
+    if let Some(c) = creds
+        && let Err(e) = kortex_pkg::record_install(c, id, &t.version, target)
+    {
+        writeln!(out, "  (installation non enregistrée sur ton compte : {e})").map_err(w)?;
+    }
+    Ok(())
 }
 
 pub fn run(
@@ -52,27 +161,82 @@ pub fn run(
     out: &mut dyn Write,
     env: &PkgEnv,
     lang: &str,
+    io: &mut dyn CliIo,
 ) -> Result<bool, String> {
+    let mut args = args.to_vec();
     match cmd {
+        "login" => {
+            let from_stdin = take_flag(&mut args, "--password-stdin");
+            let name = take_value(&mut args, "--name").unwrap_or_else(device_name);
+            let email = match take_value(&mut args, "--email") {
+                Some(e) => e,
+                None => io.prompt("E-mail : ").ok_or("e-mail requis (--email)")?,
+            };
+            let password = io
+                .password("Mot de passe : ", from_stdin)
+                .ok_or("mot de passe requis (terminal ou --password-stdin)")?;
+            let platform = format!("{}-{}", std::env::consts::OS, std::env::consts::ARCH);
+            let c = kortex_pkg::login_device(
+                &env.home,
+                &env.api,
+                &email,
+                &password,
+                &name,
+                &platform,
+                io.kdf_iterations(),
+            )
+            .map_err(|e| e.to_string())?;
+            writeln!(
+                out,
+                "✓ connecté en tant que {} (appareil « {name} », révocable depuis ton compte)",
+                c.email
+            )
+            .map_err(w)?;
+            Ok(true)
+        }
+        "logout" => {
+            match kortex_pkg::logout(&env.home).map_err(|e| e.to_string())? {
+                true => writeln!(out, "✓ déconnecté, appareil révoqué"),
+                false => writeln!(out, "Déconnecté localement (le serveur n'a pas pu être prévenu : révoque l'appareil depuis ton compte)."),
+            }
+            .map_err(w)?;
+            Ok(true)
+        }
+        "whoami" => {
+            let Some(c) = env.home.load_credentials() else {
+                writeln!(out, "Non connecté (kortex login).").map_err(w)?;
+                return Ok(true);
+            };
+            match kortex_pkg::whoami(&c).map_err(|e| e.to_string())? {
+                Some(email) => writeln!(out, "{email} — appareil {}", c.device_id).map_err(w)?,
+                None => {
+                    writeln!(out, "Jeton révoqué ou expiré : relance `kortex login`.").map_err(w)?
+                }
+            }
+            Ok(true)
+        }
         "install" => {
+            let from_stdin = take_flag(&mut args, "--password-stdin");
             if args.is_empty() {
                 return Err("usage : kortex install <outil>… | kortex install --all".into());
             }
             let index = env.load_index().map_err(|e| e.to_string())?;
-            let ids: Vec<String> = if args.iter().any(|a| a == "--all") {
+            let ids: Vec<String> = if take_flag(&mut args, "--all") {
                 index.tools.keys().cloned().collect()
             } else {
-                args.to_vec()
+                args
             };
+            let creds = env.home.load_credentials();
+            confirm_with_account(creds.as_ref(), io, from_stdin, out)?;
             for id in ids {
-                install_one(env, &index, &id, out)?;
+                install_one(env, &index, &id, creds.as_ref(), out)?;
             }
             Ok(true)
         }
         "update" => {
             let index = env.load_index().map_err(|e| e.to_string())?;
             let target = env.target().map_err(|e| e.to_string())?.to_owned();
-            if args.iter().any(|a| a == "--self") {
+            if take_flag(&mut args, "--self") {
                 let exe = std::env::current_exe().map_err(|e| e.to_string())?;
                 match self_update(
                     &index,
@@ -90,20 +254,27 @@ pub fn run(
                 return Ok(true);
             }
             let reg = env.home.load_registry().map_err(|e| e.to_string())?;
-            let ids: Vec<String> = if args.is_empty() || args.iter().any(|a| a == "--all") {
+            let all = take_flag(&mut args, "--all");
+            let ids: Vec<String> = if args.is_empty() || all {
                 reg.tools.keys().cloned().collect()
             } else {
-                args.to_vec()
+                args
             };
             if ids.is_empty() {
                 writeln!(out, "Aucun outil installé.").map_err(w)?;
             }
+            let creds = env.home.load_credentials();
             for id in ids {
                 let mut note = |_: &str| {};
                 match update(&env.home, &index, &env.index_src, &id, &target, &mut note)
                     .map_err(|e| e.to_string())?
                 {
-                    Some(t) => writeln!(out, "✓ {id} mis à jour en {}", t.version).map_err(w)?,
+                    Some(t) => {
+                        writeln!(out, "✓ {id} mis à jour en {}", t.version).map_err(w)?;
+                        if let Some(c) = &creds {
+                            let _ = kortex_pkg::record_install(c, &id, &t.version, &target);
+                        }
+                    }
                     None => writeln!(out, "{id} est à jour").map_err(w)?,
                 }
             }
@@ -119,6 +290,9 @@ pub fn run(
                 .unwrap_or_else(|| id.clone());
             remove(&env.home, id, &display).map_err(|e| e.to_string())?;
             writeln!(out, "✓ {id} supprimé").map_err(w)?;
+            if let Some(c) = env.home.load_credentials() {
+                let _ = kortex_pkg::forget_install(&c, id);
+            }
             Ok(true)
         }
         "installed" => {
@@ -187,6 +361,19 @@ pub fn run(
                     writeln!(out, "✗ index — {e}").map_err(w)?;
                 }
             }
+            match env.home.load_credentials() {
+                Some(c) => match kortex_pkg::whoami(&c) {
+                    Ok(Some(email)) => writeln!(out, "✓ compte — {email}").map_err(w)?,
+                    Ok(None) => {
+                        bad += 1;
+                        writeln!(out, "✗ compte — jeton révoqué ou expiré (kortex login)")
+                            .map_err(w)?;
+                    }
+                    Err(e) => writeln!(out, "• compte — non vérifié ({e})").map_err(w)?,
+                },
+                None => writeln!(out, "• compte — non connecté (facultatif : kortex login)")
+                    .map_err(w)?,
+            }
             if bad > 0 {
                 Err(format!("{bad} problème(s) détecté(s)"))
             } else {
@@ -204,14 +391,5 @@ pub fn run(
             Ok(true)
         }
         _ => Ok(false),
-    }
-}
-
-/// Kinds worth a friendlier hint at the CLI.
-pub fn hint(e: &PkgError) -> Option<&'static str> {
-    match e.kind() {
-        Kind::BadSignature => Some("l'index n'est pas signé par Kortex : ne l'utilise pas"),
-        Kind::Network => Some("vérifie ta connexion, ou KORTEX_INDEX"),
-        _ => None,
     }
 }

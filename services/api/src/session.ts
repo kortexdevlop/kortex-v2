@@ -14,8 +14,33 @@ export async function createSession(env: Env, userId: string, userAgent: string 
   return token;
 }
 
-/** Resolves the cookie to a user id, or throws 401. Expired sessions are removed. */
+function bearer(req: Request): string | null {
+  const h = req.headers.get('authorization') ?? '';
+  return h.startsWith('Bearer ') ? h.slice(7).trim() || null : null;
+}
+
+/** Resolves a device token (Authorization: Bearer) to its user, or throws 401. */
+async function requireDevice(ctx: Ctx, token: string, now: number): Promise<string> {
+  const row = await ctx.env.DB
+    .prepare('SELECT id, user_id FROM devices WHERE token_hash = ?1')
+    .bind(await sha256Hex(token))
+    .first<{ id: string; user_id: string }>();
+  if (!row) throw new HttpError(401, 'unauthenticated');
+  await ctx.env.DB.prepare('UPDATE devices SET last_seen = ?2 WHERE id = ?1').bind(row.id, now).run();
+  ctx.userId = row.user_id;
+  ctx.deviceId = row.id;
+  return row.user_id;
+}
+
+/** Cookie session OR device token. Use `requireSession` for actions a device must not perform. */
 export async function requireUser(ctx: Ctx, now = Date.now()): Promise<string> {
+  const dev = bearer(ctx.req);
+  if (dev) return requireDevice(ctx, dev, now);
+  return requireSession(ctx, now);
+}
+
+/** Resolves the cookie to a user id, or throws 401. Expired sessions are removed. */
+export async function requireSession(ctx: Ctx, now = Date.now()): Promise<string> {
   const token = readCookie(ctx.env, ctx.req);
   if (!token) throw new HttpError(401, 'unauthenticated');
   const id = await sha256Hex(token);

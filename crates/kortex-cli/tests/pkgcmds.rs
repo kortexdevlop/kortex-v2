@@ -27,6 +27,7 @@ fn fx(name: &str) -> Fx {
         index_src: dir.join("rel/index.json").to_string_lossy().into_owned(),
         public_key: public_key_b64(&SEED),
         target: Some(TARGET.to_owned()),
+        api: "http://127.0.0.1:9".to_owned(), // nothing listens here: these tests never use the account
     };
     Fx { dir, env }
 }

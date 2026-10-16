@@ -11,6 +11,8 @@ pub struct PkgEnv {
     /// Base64 Ed25519 public key that must have signed the index.
     pub public_key: String,
     pub target: Option<String>,
+    /// Base URL of the Kortex API (`$KORTEX_API`).
+    pub api: String,
 }
 
 impl PkgEnv {
@@ -21,6 +23,7 @@ impl PkgEnv {
             index_src: std::env::var("KORTEX_INDEX").unwrap_or_else(|_| DEFAULT_INDEX.to_owned()),
             public_key: crate::RELEASE_PUBLIC_KEY.trim().to_owned(),
             target: current_target().map(str::to_owned),
+            api: std::env::var("KORTEX_API").unwrap_or_else(|_| crate::DEFAULT_API.to_owned()),
         })
     }
 

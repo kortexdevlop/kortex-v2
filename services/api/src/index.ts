@@ -3,6 +3,7 @@ import { HttpError, allowedOrigins, errorBody, json } from './http.ts';
 import * as auth from './routes/auth.ts';
 import * as ai from './routes/ai.ts';
 import * as data from './routes/data.ts';
+import * as dev from './routes/devices.ts';
 
 type Handler = (ctx: Ctx, params: Record<string, string>) => Promise<Response>;
 const routes: [string, RegExp, Handler][] = [];
@@ -15,6 +16,13 @@ add('GET', '/v1/health', async () => json({ ok: true }));
 add('POST', '/v1/auth/register', auth.register);
 add('POST', '/v1/auth/login', auth.login);
 add('POST', '/v1/auth/logout', auth.logout);
+add('POST', '/v1/auth/device', dev.createDevice);
+add('POST', '/v1/auth/confirm', dev.confirm);
+add('GET', '/v1/devices', dev.listDevices);
+add('DELETE', '/v1/devices/:id', dev.deleteDevice);
+add('POST', '/v1/installs', dev.recordInstall);
+add('GET', '/v1/installs', dev.listInstalls);
+add('DELETE', '/v1/installs/:tool', dev.removeInstall);
 add('GET', '/v1/me', auth.me);
 add('DELETE', '/v1/me', auth.deleteMe);
 add('GET', '/v1/me/export', auth.exportMe);
@@ -69,7 +77,7 @@ export async function handle(req: Request, env: Env): Promise<Response> {
         status: 204,
         headers: {
           'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE',
-          'Access-Control-Allow-Headers': 'Content-Type, X-Kortex-Request',
+          'Access-Control-Allow-Headers': 'Content-Type, X-Kortex-Request, Authorization',
           'Access-Control-Max-Age': '600',
         },
       }),

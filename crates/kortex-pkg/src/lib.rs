@@ -5,6 +5,7 @@
 //! the client; artifacts are only accepted if they match the signed hash. Archives are extracted
 //! through an allow-list (never trusting entry names), so a malicious package cannot write outside
 //! its own directory.
+mod account;
 mod env;
 mod error;
 mod home;
@@ -14,6 +15,10 @@ mod net;
 pub mod shortcuts;
 mod version;
 
+pub use account::{
+    Credentials, DEFAULT_API, KDF_ITERATIONS, confirm_password, confirm_required, derive_auth_key,
+    forget_install, login_device, logout, record_install, whoami,
+};
 pub use env::{DEFAULT_INDEX, PkgEnv};
 pub use error::{Kind, PkgError};
 pub use home::{Home, InstalledTool, Registry};
