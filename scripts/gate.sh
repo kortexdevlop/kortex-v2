@@ -2,6 +2,8 @@
 # Local quality gate: same checks as CI. Any failure stops the script (non-zero exit).
 set -euo pipefail
 pnpm install --frozen-lockfile --silent   # same as CI: the lockfile must match every package.json
+rm -f design/dist/kortex.css   # like a clean checkout: it must be (re)generated, never assumed
+cargo xtask tokens            # embedded by the Store and desktop apps
 cargo fmt --all -- --check
 cargo clippy --workspace --all-targets -- -D warnings
 cargo test --workspace
