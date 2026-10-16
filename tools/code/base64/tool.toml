@@ -1,0 +1,85 @@
+schema = 1
+
+[tool]
+id = "code.base64"
+version = "1.0.0"
+universe = "code"
+status = "beta"
+ui = "auto"
+platforms = ["web", "desktop"]
+offline = true
+ai = false
+viral_priority = 2
+
+[tool.name]
+fr = "Encodeur et décodeur Base64"
+en = "Base64 Encoder and Decoder"
+[tool.tagline]
+fr = "Encodez du texte en Base64 ou décodez-le, en variante standard ou URL-safe."
+en = "Encode text to Base64 or decode it, in standard or URL-safe variant."
+[tool.slug]
+fr = "base64"
+en = "base64-encoder-decoder"
+
+[search]
+keywords.fr = ["base64", "encoder base64", "décoder base64", "url safe"]
+keywords.en = ["base64", "encode base64", "decode base64", "url safe"]
+intents.fr = ["décoder une chaîne base64", "encoder du texte en base64"]
+intents.en = ["decode a base64 string", "encode text to base64"]
+related = []
+
+[limits]
+timeout_s = 10
+
+[[inputs]]
+id = "text"
+type = "text"
+required = true
+max_len = 5000000
+multiline = true
+label = { fr = "Texte ou Base64", en = "Text or Base64" }
+
+[[params]]
+id = "direction"
+type = "enum"
+options = ["encode", "decode"]
+default = "encode"
+level = "simple"
+label = { fr = "Sens", en = "Direction" }
+
+[[params]]
+id = "url_safe"
+type = "bool"
+default = false
+level = "medium"
+label = { fr = "Variante URL-safe (- et _ au lieu de + et /)", en = "URL-safe variant (- and _ instead of + and /)" }
+
+[[params]]
+id = "padding"
+type = "bool"
+default = true
+level = "pro"
+label = { fr = "Ajouter le remplissage « = »", en = "Add “=” padding" }
+
+[[outputs]]
+id = "text"
+type = "text"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "write"
+sensitive = false
+privacy = "local"
+
+[[variants]]
+id = "encode"
+slug = { fr = "encoder-base64", en = "base64-encoder" }
+name = { fr = "Encoder en Base64", en = "Base64 Encoder" }
+preset = { direction = "encode" }
+
+[[variants]]
+id = "decode"
+slug = { fr = "decoder-base64", en = "base64-decoder" }
+name = { fr = "Décoder du Base64", en = "Base64 Decoder" }
+preset = { direction = "decode" }

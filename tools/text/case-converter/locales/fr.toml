@@ -1,0 +1,19 @@
+[ui]
+title = "Convertisseur de casse"
+[errors]
+empty_input = "Saisissez un texte à convertir."
+cancelled = "Annulé."
+invalid_param = "Valeur invalide."
+missing_input = "Saisissez d'abord un contenu."
+[outputs]
+text = "Résultat"
+[options]
+case_upper = "MAJUSCULES"
+case_lower = "minuscules"
+case_title = "Première Lettre En Majuscule"
+case_sentence = "Casse de phrase"
+case_camel = "camelCase"
+case_pascal = "PascalCase"
+case_snake = "snake_case"
+case_kebab = "kebab-case"
+case_constant = "CONSTANT_CASE"

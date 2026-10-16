@@ -48,10 +48,54 @@ pub fn TextField(label: String, value: String, oninput: EventHandler<String>) ->
 }
 
 #[component]
+pub fn TextArea(label: String, value: String, oninput: EventHandler<String>) -> Element {
+    rsx! {
+        label { class: "k-field",
+            span { class: "k-muted", "{label}" }
+            textarea {
+                class: "k-input k-textarea",
+                rows: "8",
+                spellcheck: "false",
+                value: "{value}",
+                oninput: move |e| oninput.call(e.value()),
+            }
+        }
+    }
+}
+
+/// Native color picker plus the editable `#rrggbb` text.
+#[component]
+pub fn ColorField(label: String, value: String, oninput: EventHandler<String>) -> Element {
+    let picker = if value.len() == 7 && value.starts_with('#') {
+        value.clone()
+    } else {
+        "#000000".to_owned()
+    };
+    rsx! {
+        label { class: "k-field",
+            span { class: "k-muted", "{label}" }
+            span { class: "k-colorrow",
+                input {
+                    class: "k-color",
+                    r#type: "color",
+                    value: "{picker}",
+                    oninput: move |e| oninput.call(e.value().to_uppercase()),
+                }
+                input {
+                    class: "k-input",
+                    value: "{value}",
+                    oninput: move |e| oninput.call(e.value()),
+                }
+            }
+        }
+    }
+}
+
+#[component]
 pub fn Select(
     label: String,
     value: String,
-    options: Vec<String>,
+    options: Vec<(String, String)>,
     onchange: EventHandler<String>,
 ) -> Element {
     rsx! {
@@ -61,8 +105,8 @@ pub fn Select(
                 class: "k-input",
                 value: "{value}",
                 onchange: move |e| onchange.call(e.value()),
-                for o in options {
-                    option { key: "{o}", value: "{o}", selected: o == value, "{o}" }
+                for (v , text) in options {
+                    option { key: "{v}", value: "{v}", selected: v == value, "{text}" }
                 }
             }
         }

@@ -1,0 +1,17 @@
+[ui]
+title = "Sort and Deduplicate Lines"
+[errors]
+empty_input = "Paste a list, one entry per line."
+cancelled = "Cancelled."
+invalid_param = "Invalid value."
+missing_input = "Enter some content first."
+[outputs]
+text = "Result"
+lines = "Lines kept"
+removed = "Lines removed"
+[options]
+sort_none = "Do not sort"
+sort_asc = "A → Z"
+sort_desc = "Z → A"
+sort_length = "By length"
+sort_reverse = "Reverse order"

@@ -1,0 +1,77 @@
+schema = 1
+
+[tool]
+id = "text.case-converter"
+version = "1.0.0"
+universe = "text"
+status = "beta"
+ui = "auto"
+platforms = ["web", "desktop"]
+offline = true
+ai = false
+viral_priority = 1
+
+[tool.name]
+fr = "Convertisseur de casse"
+en = "Case Converter"
+[tool.tagline]
+fr = "MAJUSCULES, minuscules, Titre, camelCase, snake_case, kebab-case et plus."
+en = "UPPERCASE, lowercase, Title Case, camelCase, snake_case, kebab-case and more."
+[tool.slug]
+fr = "convertisseur-de-casse"
+en = "case-converter"
+
+[search]
+keywords.fr = ["majuscules", "minuscules", "casse", "camelcase", "snake case", "titre"]
+keywords.en = ["uppercase", "lowercase", "case converter", "camelcase", "snake case", "title case"]
+intents.fr = ["mettre un texte en majuscules", "transformer en snake_case"]
+intents.en = ["make a text uppercase", "convert to snake_case"]
+related = []
+
+[limits]
+timeout_s = 10
+
+[[inputs]]
+id = "text"
+type = "text"
+required = true
+max_len = 1000000
+multiline = true
+label = { fr = "Texte à convertir", en = "Text to convert" }
+
+[[params]]
+id = "case"
+type = "enum"
+options = ["upper", "lower", "title", "sentence", "camel", "pascal", "snake", "kebab", "constant"]
+default = "upper"
+level = "simple"
+label = { fr = "Casse", en = "Case" }
+
+[[outputs]]
+id = "text"
+type = "text"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "write"
+sensitive = false
+privacy = "local"
+
+[[variants]]
+id = "uppercase"
+slug = { fr = "texte-en-majuscules", en = "uppercase-converter" }
+name = { fr = "Texte en majuscules", en = "Uppercase Converter" }
+preset = { case = "upper" }
+
+[[variants]]
+id = "snake"
+slug = { fr = "convertisseur-snake-case", en = "snake-case-converter" }
+name = { fr = "Convertisseur snake_case", en = "snake_case Converter" }
+preset = { case = "snake" }
+
+[[variants]]
+id = "camel"
+slug = { fr = "convertisseur-camel-case", en = "camel-case-converter" }
+name = { fr = "Convertisseur camelCase", en = "camelCase Converter" }
+preset = { case = "camel" }

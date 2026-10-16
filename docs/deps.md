@@ -14,3 +14,5 @@
 | `png` 0.17 | tool qr.generator (dev) | décodeur indépendant pour valider notre encodeur PNG | — | dev only |
 | `lopdf` 0.45 (sans features par défaut) | tool pdf.merge | lecture/écriture PDF, irréaliste à réécrire | pdf-writer (écriture seule) | ~200 Ko brotli |
 | `image` 0.25 (png, jpeg, webp, gif, bmp) | tool image.convert | décodeurs/encodeurs de référence | codecs individuels (plus de glue) | ~170 Ko brotli |
+
+| `serde_json` 1 (preserve_order, arbitrary_precision) | tools/code/json-formatter | formatage JSON en gardant l'ordre et les nombres | manuelle | petit |

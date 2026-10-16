@@ -123,6 +123,7 @@ impl CancelToken {
 }
 
 type EntropySource = Box<dyn FnMut(&mut [u8])>;
+type Clock = Box<dyn Fn() -> u64>;
 
 /// Execution context handed to every engine: progress, cancellation, journal.
 #[derive(Default)]
@@ -131,6 +132,7 @@ pub struct Cx {
     cancel: CancelToken,
     journal: Vec<String>,
     entropy: Option<EntropySource>,
+    clock: Option<Clock>,
 }
 
 impl Cx {
@@ -172,6 +174,32 @@ impl Cx {
     pub fn with_entropy(mut self, source: impl FnMut(&mut [u8]) + 'static) -> Self {
         self.entropy = Some(Box::new(source));
         self
+    }
+
+    /// Inject a fixed clock (tests, reproducible runs): milliseconds since the Unix epoch.
+    #[must_use]
+    pub fn with_clock(mut self, now_ms: impl Fn() -> u64 + 'static) -> Self {
+        self.clock = Some(Box::new(now_ms));
+        self
+    }
+
+    /// Current time in milliseconds since the Unix epoch (UTC). Engines get time only through
+    /// here: `SystemTime::now()` panics on `wasm32-unknown-unknown`.
+    #[must_use]
+    pub fn now_ms(&self) -> u64 {
+        if let Some(c) = &self.clock {
+            return c();
+        }
+        #[cfg(target_arch = "wasm32")]
+        {
+            js_sys::Date::now() as u64
+        }
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .map_or(0, |d| d.as_millis() as u64)
+        }
     }
 
     /// Fill `buf` with random bytes (OS CSPRNG unless an entropy source was injected).
@@ -249,6 +277,18 @@ mod tests {
         assert_eq!(f64::from_value(&Value::Int(3)), Ok(3.0));
         assert!(bool::from_value(&Value::Text("x".into())).is_err());
         assert_eq!("a".to_owned().into_value(), Value::Text("a".into()));
+    }
+
+    #[test]
+    fn clock_is_injectable_and_real_clock_is_sane() {
+        assert_eq!(
+            Cx::new().with_clock(|| 1_700_000_000_123).now_ms(),
+            1_700_000_000_123
+        );
+        assert!(
+            Cx::new().now_ms() > 1_700_000_000_000,
+            "the real clock reports a recent date"
+        );
     }
 
     #[test]

@@ -1,0 +1,16 @@
+[ui]
+title = "URL Encoder and Decoder"
+[errors]
+empty_input = "Enter a text or URL."
+invalid_percent = "Invalid “%” sequence."
+not_text = "The decoded content is not UTF-8 text."
+cancelled = "Cancelled."
+invalid_param = "Invalid value."
+missing_input = "Enter some content first."
+[outputs]
+text = "Result"
+[options]
+direction_encode = "Encode"
+direction_decode = "Decode"
+scope_component = "Component (parameter, encode everything)"
+scope_uri = "Full URL (keep : / ? & =)"

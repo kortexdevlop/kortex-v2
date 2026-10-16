@@ -259,12 +259,697 @@
     {
       "inputs": [
         {
+          "id": "text",
+          "label": {
+            "en": "Text or Base64",
+            "fr": "Texte ou Base64"
+          },
+          "max_len": 5000000,
+          "multiline": true,
+          "required": true,
+          "type": "text"
+        }
+      ],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 10
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "text",
+          "type": "text"
+        }
+      ],
+      "params": [
+        {
+          "default": "encode",
+          "id": "direction",
+          "label": {
+            "en": "Direction",
+            "fr": "Sens"
+          },
+          "level": "simple",
+          "options": [
+            "encode",
+            "decode"
+          ],
+          "range": null,
+          "type": "enum"
+        },
+        {
+          "default": false,
+          "id": "url_safe",
+          "label": {
+            "en": "URL-safe variant (- and _ instead of + and /)",
+            "fr": "Variante URL-safe (- et _ au lieu de + et /)"
+          },
+          "level": "medium",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        },
+        {
+          "default": true,
+          "id": "padding",
+          "label": {
+            "en": "Add “=” padding",
+            "fr": "Ajouter le remplissage « = »"
+          },
+          "level": "pro",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "decode a base64 string",
+            "encode text to base64"
+          ],
+          "fr": [
+            "décoder une chaîne base64",
+            "encoder du texte en base64"
+          ]
+        },
+        "keywords": {
+          "en": [
+            "base64",
+            "encode base64",
+            "decode base64",
+            "url safe"
+          ],
+          "fr": [
+            "base64",
+            "encoder base64",
+            "décoder base64",
+            "url safe"
+          ]
+        },
+        "related": []
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "code.base64",
+        "name": {
+          "en": "Base64 Encoder and Decoder",
+          "fr": "Encodeur et décodeur Base64"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "base64-encoder-decoder",
+          "fr": "base64"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Encode text to Base64 or decode it, in standard or URL-safe variant.",
+          "fr": "Encodez du texte en Base64 ou décodez-le, en variante standard ou URL-safe."
+        },
+        "ui": "auto",
+        "universe": "code",
+        "version": "1.0.0",
+        "viral_priority": 2
+      },
+      "variants": [
+        {
+          "id": "encode",
+          "name": {
+            "en": "Base64 Encoder",
+            "fr": "Encoder en Base64"
+          },
+          "preset": {
+            "direction": "encode"
+          },
+          "slug": {
+            "en": "base64-encoder",
+            "fr": "encoder-base64"
+          }
+        },
+        {
+          "id": "decode",
+          "name": {
+            "en": "Base64 Decoder",
+            "fr": "Décoder du Base64"
+          },
+          "preset": {
+            "direction": "decode"
+          },
+          "slug": {
+            "en": "base64-decoder",
+            "fr": "decoder-base64"
+          }
+        }
+      ]
+    },
+    {
+      "inputs": [
+        {
+          "id": "text",
+          "label": {
+            "en": "JSON",
+            "fr": "JSON"
+          },
+          "max_len": 5000000,
+          "multiline": true,
+          "required": true,
+          "type": "text"
+        }
+      ],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 10
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "result",
+          "type": "text"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "status",
+          "type": "text"
+        }
+      ],
+      "params": [
+        {
+          "default": "format",
+          "id": "action",
+          "label": {
+            "en": "Action",
+            "fr": "Action"
+          },
+          "level": "simple",
+          "options": [
+            "format",
+            "minify",
+            "validate"
+          ],
+          "range": null,
+          "type": "enum"
+        },
+        {
+          "default": 2,
+          "id": "indent",
+          "label": {
+            "en": "Indent (spaces)",
+            "fr": "Indentation (espaces)"
+          },
+          "level": "medium",
+          "options": null,
+          "range": [
+            1.0,
+            8.0
+          ],
+          "type": "integer"
+        },
+        {
+          "default": false,
+          "id": "sort_keys",
+          "label": {
+            "en": "Sort keys alphabetically",
+            "fr": "Trier les clés par ordre alphabétique"
+          },
+          "level": "pro",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "pretty print some json",
+            "check if my json is valid"
+          ],
+          "fr": [
+            "mettre en forme du json",
+            "vérifier si mon json est valide"
+          ]
+        },
+        "keywords": {
+          "en": [
+            "json",
+            "format json",
+            "validate json",
+            "minify json",
+            "pretty print",
+            "beautify"
+          ],
+          "fr": [
+            "json",
+            "formater json",
+            "valider json",
+            "minifier json",
+            "embellir json",
+            "indenter"
+          ]
+        },
+        "related": []
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "code.json-formatter",
+        "name": {
+          "en": "JSON Formatter and Validator",
+          "fr": "Formateur et validateur JSON"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "json-formatter",
+          "fr": "formateur-json"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Pretty-print, minify and validate JSON, with the line and column of the error.",
+          "fr": "Embellissez, minifiez et validez du JSON, avec la ligne et la colonne de l'erreur."
+        },
+        "ui": "auto",
+        "universe": "code",
+        "version": "1.0.0",
+        "viral_priority": 1
+      },
+      "variants": [
+        {
+          "id": "minify",
+          "name": {
+            "en": "JSON Minifier",
+            "fr": "Minifier du JSON"
+          },
+          "preset": {
+            "action": "minify"
+          },
+          "slug": {
+            "en": "json-minifier",
+            "fr": "minifier-json"
+          }
+        },
+        {
+          "id": "validate",
+          "name": {
+            "en": "JSON Validator",
+            "fr": "Valider du JSON"
+          },
+          "preset": {
+            "action": "validate"
+          },
+          "slug": {
+            "en": "json-validator",
+            "fr": "valider-json"
+          }
+        }
+      ]
+    },
+    {
+      "inputs": [
+        {
+          "id": "text",
+          "label": {
+            "en": "Text or URL",
+            "fr": "Texte ou URL"
+          },
+          "max_len": 2000000,
+          "multiline": true,
+          "required": true,
+          "type": "text"
+        }
+      ],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 10
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "text",
+          "type": "text"
+        }
+      ],
+      "params": [
+        {
+          "default": "encode",
+          "id": "direction",
+          "label": {
+            "en": "Direction",
+            "fr": "Sens"
+          },
+          "level": "simple",
+          "options": [
+            "encode",
+            "decode"
+          ],
+          "range": null,
+          "type": "enum"
+        },
+        {
+          "default": "component",
+          "id": "scope",
+          "label": {
+            "en": "Encoding scope",
+            "fr": "Portée de l'encodage"
+          },
+          "level": "medium",
+          "options": [
+            "component",
+            "uri"
+          ],
+          "range": null,
+          "type": "enum"
+        },
+        {
+          "default": false,
+          "id": "plus_as_space",
+          "label": {
+            "en": "Read “+” as a space (form data)",
+            "fr": "Lire « + » comme une espace (formulaires)"
+          },
+          "level": "pro",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "decode a url with %20",
+            "encode a url parameter"
+          ],
+          "fr": [
+            "décoder une url avec des %20",
+            "encoder un paramètre d'url"
+          ]
+        },
+        "keywords": {
+          "en": [
+            "url encode",
+            "url decode",
+            "percent encoding",
+            "encodeuricomponent",
+            "%20"
+          ],
+          "fr": [
+            "encoder url",
+            "décoder url",
+            "percent encoding",
+            "encodeuricomponent",
+            "%20"
+          ]
+        },
+        "related": []
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "code.url-encoder",
+        "name": {
+          "en": "URL Encoder and Decoder",
+          "fr": "Encodeur et décodeur d'URL"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "url-encoder-decoder",
+          "fr": "encodeur-url"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Encode or decode URLs and parameters (percent-encoding), like encodeURIComponent.",
+          "fr": "Encodez ou décodez des URL et des paramètres (pourcentage), comme encodeURIComponent."
+        },
+        "ui": "auto",
+        "universe": "code",
+        "version": "1.0.0",
+        "viral_priority": 2
+      },
+      "variants": [
+        {
+          "id": "encode",
+          "name": {
+            "en": "URL Encoder",
+            "fr": "Encoder une URL"
+          },
+          "preset": {
+            "direction": "encode"
+          },
+          "slug": {
+            "en": "url-encoder",
+            "fr": "encoder-url"
+          }
+        },
+        {
+          "id": "decode",
+          "name": {
+            "en": "URL Decoder",
+            "fr": "Décoder une URL"
+          },
+          "preset": {
+            "direction": "decode"
+          },
+          "slug": {
+            "en": "url-decoder",
+            "fr": "decoder-url"
+          }
+        }
+      ]
+    },
+    {
+      "inputs": [],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 10
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "uuids",
+          "type": "text"
+        }
+      ],
+      "params": [
+        {
+          "default": "v4",
+          "id": "version",
+          "label": {
+            "en": "Version",
+            "fr": "Version"
+          },
+          "level": "simple",
+          "options": [
+            "v4",
+            "v7"
+          ],
+          "range": null,
+          "type": "enum"
+        },
+        {
+          "default": 1,
+          "id": "count",
+          "label": {
+            "en": "Count",
+            "fr": "Quantité"
+          },
+          "level": "simple",
+          "options": null,
+          "range": [
+            1.0,
+            500.0
+          ],
+          "type": "integer"
+        },
+        {
+          "default": false,
+          "id": "uppercase",
+          "label": {
+            "en": "UPPERCASE",
+            "fr": "MAJUSCULES"
+          },
+          "level": "medium",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        },
+        {
+          "default": true,
+          "id": "hyphens",
+          "label": {
+            "en": "With hyphens",
+            "fr": "Avec tirets"
+          },
+          "level": "medium",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "generate a uuid",
+            "create 100 unique identifiers"
+          ],
+          "fr": [
+            "générer un uuid",
+            "créer 100 identifiants uniques"
+          ]
+        },
+        "keywords": {
+          "en": [
+            "uuid",
+            "guid",
+            "unique identifier",
+            "uuid v4",
+            "uuid v7",
+            "uuid generator"
+          ],
+          "fr": [
+            "uuid",
+            "guid",
+            "identifiant unique",
+            "uuid v4",
+            "uuid v7",
+            "générateur uuid"
+          ]
+        },
+        "related": []
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "code.uuid-generator",
+        "name": {
+          "en": "UUID Generator",
+          "fr": "Générateur d'UUID"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "uuid-generator",
+          "fr": "generateur-uuid"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Generate UUID v4 (random) or v7 (time-sortable), in bulk.",
+          "fr": "Générez des UUID v4 (aléatoires) ou v7 (triables par date), en lot."
+        },
+        "ui": "auto",
+        "universe": "code",
+        "version": "1.0.0",
+        "viral_priority": 2
+      },
+      "variants": [
+        {
+          "id": "v4",
+          "name": {
+            "en": "UUID v4 Generator",
+            "fr": "Générateur d'UUID v4"
+          },
+          "preset": {
+            "version": "v4"
+          },
+          "slug": {
+            "en": "uuid-v4-generator",
+            "fr": "generateur-uuid-v4"
+          }
+        },
+        {
+          "id": "v7",
+          "name": {
+            "en": "UUID v7 Generator",
+            "fr": "Générateur d'UUID v7"
+          },
+          "preset": {
+            "version": "v7"
+          },
+          "slug": {
+            "en": "uuid-v7-generator",
+            "fr": "generateur-uuid-v7"
+          }
+        },
+        {
+          "id": "bulk",
+          "name": {
+            "en": "Bulk UUID Generator",
+            "fr": "Générer plusieurs UUID"
+          },
+          "preset": {
+            "count": 50
+          },
+          "slug": {
+            "en": "bulk-uuid-generator",
+            "fr": "generer-plusieurs-uuid"
+          }
+        }
+      ]
+    },
+    {
+      "inputs": [
+        {
           "id": "images",
           "label": {
             "en": "Images",
             "fr": "Images"
           },
           "max_len": null,
+          "multiline": false,
           "required": true,
           "type": "files<image/*>"
         }
@@ -499,6 +1184,7 @@
             "fr": "Fichiers PDF"
           },
           "max_len": null,
+          "multiline": false,
           "required": true,
           "type": "files<application/pdf>"
         }
@@ -608,6 +1294,7 @@
             "fr": "Contenu (lien, texte…)"
           },
           "max_len": 2048,
+          "multiline": false,
           "required": true,
           "type": "text"
         }
@@ -822,6 +1509,7 @@
             "fr": "Fichier"
           },
           "max_len": null,
+          "multiline": false,
           "required": false,
           "type": "file<*/*>"
         },
@@ -832,6 +1520,7 @@
             "fr": "Texte (si aucun fichier)"
           },
           "max_len": 1000000,
+          "multiline": false,
           "required": false,
           "type": "text"
         }
@@ -1184,6 +1873,533 @@
           "slug": {
             "en": "random-pin",
             "fr": "code-pin-aleatoire"
+          }
+        }
+      ]
+    },
+    {
+      "inputs": [
+        {
+          "id": "text",
+          "label": {
+            "en": "Text to convert",
+            "fr": "Texte à convertir"
+          },
+          "max_len": 1000000,
+          "multiline": true,
+          "required": true,
+          "type": "text"
+        }
+      ],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 10
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "text",
+          "type": "text"
+        }
+      ],
+      "params": [
+        {
+          "default": "upper",
+          "id": "case",
+          "label": {
+            "en": "Case",
+            "fr": "Casse"
+          },
+          "level": "simple",
+          "options": [
+            "upper",
+            "lower",
+            "title",
+            "sentence",
+            "camel",
+            "pascal",
+            "snake",
+            "kebab",
+            "constant"
+          ],
+          "range": null,
+          "type": "enum"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "make a text uppercase",
+            "convert to snake_case"
+          ],
+          "fr": [
+            "mettre un texte en majuscules",
+            "transformer en snake_case"
+          ]
+        },
+        "keywords": {
+          "en": [
+            "uppercase",
+            "lowercase",
+            "case converter",
+            "camelcase",
+            "snake case",
+            "title case"
+          ],
+          "fr": [
+            "majuscules",
+            "minuscules",
+            "casse",
+            "camelcase",
+            "snake case",
+            "titre"
+          ]
+        },
+        "related": []
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "text.case-converter",
+        "name": {
+          "en": "Case Converter",
+          "fr": "Convertisseur de casse"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "case-converter",
+          "fr": "convertisseur-de-casse"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "UPPERCASE, lowercase, Title Case, camelCase, snake_case, kebab-case and more.",
+          "fr": "MAJUSCULES, minuscules, Titre, camelCase, snake_case, kebab-case et plus."
+        },
+        "ui": "auto",
+        "universe": "text",
+        "version": "1.0.0",
+        "viral_priority": 1
+      },
+      "variants": [
+        {
+          "id": "uppercase",
+          "name": {
+            "en": "Uppercase Converter",
+            "fr": "Texte en majuscules"
+          },
+          "preset": {
+            "case": "upper"
+          },
+          "slug": {
+            "en": "uppercase-converter",
+            "fr": "texte-en-majuscules"
+          }
+        },
+        {
+          "id": "snake",
+          "name": {
+            "en": "snake_case Converter",
+            "fr": "Convertisseur snake_case"
+          },
+          "preset": {
+            "case": "snake"
+          },
+          "slug": {
+            "en": "snake-case-converter",
+            "fr": "convertisseur-snake-case"
+          }
+        },
+        {
+          "id": "camel",
+          "name": {
+            "en": "camelCase Converter",
+            "fr": "Convertisseur camelCase"
+          },
+          "preset": {
+            "case": "camel"
+          },
+          "slug": {
+            "en": "camel-case-converter",
+            "fr": "convertisseur-camel-case"
+          }
+        }
+      ]
+    },
+    {
+      "inputs": [
+        {
+          "id": "text",
+          "label": {
+            "en": "One entry per line",
+            "fr": "Une entrée par ligne"
+          },
+          "max_len": 5000000,
+          "multiline": true,
+          "required": true,
+          "type": "text"
+        }
+      ],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 10
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "text",
+          "type": "text"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "lines",
+          "type": "integer"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "removed",
+          "type": "integer"
+        }
+      ],
+      "params": [
+        {
+          "default": "asc",
+          "id": "sort",
+          "label": {
+            "en": "Sort",
+            "fr": "Tri"
+          },
+          "level": "simple",
+          "options": [
+            "none",
+            "asc",
+            "desc",
+            "length",
+            "reverse"
+          ],
+          "range": null,
+          "type": "enum"
+        },
+        {
+          "default": true,
+          "id": "dedupe",
+          "label": {
+            "en": "Remove duplicates",
+            "fr": "Supprimer les doublons"
+          },
+          "level": "simple",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        },
+        {
+          "default": false,
+          "id": "ignore_case",
+          "label": {
+            "en": "Ignore case",
+            "fr": "Ignorer la casse"
+          },
+          "level": "medium",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        },
+        {
+          "default": true,
+          "id": "trim",
+          "label": {
+            "en": "Trim spaces around lines",
+            "fr": "Retirer les espaces autour des lignes"
+          },
+          "level": "medium",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        },
+        {
+          "default": true,
+          "id": "remove_empty",
+          "label": {
+            "en": "Remove empty lines",
+            "fr": "Supprimer les lignes vides"
+          },
+          "level": "medium",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "remove duplicates from a list",
+            "sort a list alphabetically"
+          ],
+          "fr": [
+            "supprimer les doublons d'une liste",
+            "trier une liste par ordre alphabétique"
+          ]
+        },
+        "keywords": {
+          "en": [
+            "sort lines",
+            "remove duplicates",
+            "alphabetical order",
+            "list",
+            "deduplicate"
+          ],
+          "fr": [
+            "trier des lignes",
+            "supprimer les doublons",
+            "ordre alphabétique",
+            "liste",
+            "dédoublonner"
+          ]
+        },
+        "related": []
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "text.sort-lines",
+        "name": {
+          "en": "Sort and Deduplicate Lines",
+          "fr": "Trier et dédupliquer des lignes"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "sort-lines",
+          "fr": "trier-lignes"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Sort, reverse and remove duplicates from a list, line by line.",
+          "fr": "Triez, inversez et supprimez les doublons d'une liste, ligne par ligne."
+        },
+        "ui": "auto",
+        "universe": "text",
+        "version": "1.0.0",
+        "viral_priority": 2
+      },
+      "variants": [
+        {
+          "id": "dedupe",
+          "name": {
+            "en": "Remove Duplicate Lines",
+            "fr": "Supprimer les doublons d'une liste"
+          },
+          "preset": {
+            "dedupe": true,
+            "sort": "none"
+          },
+          "slug": {
+            "en": "remove-duplicate-lines",
+            "fr": "supprimer-doublons-liste"
+          }
+        },
+        {
+          "id": "alphabetical",
+          "name": {
+            "en": "Alphabetical Sorter",
+            "fr": "Trier par ordre alphabétique"
+          },
+          "preset": {
+            "dedupe": false,
+            "sort": "asc"
+          },
+          "slug": {
+            "en": "alphabetical-sorter",
+            "fr": "trier-par-ordre-alphabetique"
+          }
+        }
+      ]
+    },
+    {
+      "inputs": [
+        {
+          "id": "text",
+          "label": {
+            "en": "Your text",
+            "fr": "Votre texte"
+          },
+          "max_len": 2000000,
+          "multiline": true,
+          "required": true,
+          "type": "text"
+        }
+      ],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 10
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "words",
+          "type": "integer"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "characters",
+          "type": "integer"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "characters_no_spaces",
+          "type": "integer"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "sentences",
+          "type": "integer"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "paragraphs",
+          "type": "integer"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "lines",
+          "type": "integer"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "reading_minutes",
+          "type": "number"
+        }
+      ],
+      "params": [
+        {
+          "default": 230,
+          "id": "wpm",
+          "label": {
+            "en": "Reading speed (words per minute)",
+            "fr": "Vitesse de lecture (mots par minute)"
+          },
+          "level": "medium",
+          "options": null,
+          "range": [
+            50.0,
+            1000.0
+          ],
+          "type": "integer"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "count the words in a text",
+            "how many characters in my text"
+          ],
+          "fr": [
+            "compter les mots d'un texte",
+            "savoir combien de caractères dans mon texte"
+          ]
+        },
+        "keywords": {
+          "en": [
+            "word counter",
+            "character count",
+            "count words",
+            "reading time",
+            "text"
+          ],
+          "fr": [
+            "compteur de mots",
+            "nombre de caractères",
+            "compter les mots",
+            "temps de lecture",
+            "texte"
+          ]
+        },
+        "related": []
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "text.word-counter",
+        "name": {
+          "en": "Word and Character Counter",
+          "fr": "Compteur de mots et de caractères"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "word-counter",
+          "fr": "compteur-de-mots"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Words, characters, sentences, paragraphs and reading time, right on your device.",
+          "fr": "Mots, caractères, phrases, paragraphes et temps de lecture, en direct sur votre appareil."
+        },
+        "ui": "auto",
+        "universe": "text",
+        "version": "1.0.0",
+        "viral_priority": 1
+      },
+      "variants": [
+        {
+          "id": "characters",
+          "name": {
+            "en": "Character Counter",
+            "fr": "Compteur de caractères"
+          },
+          "preset": {
+            "wpm": 230
+          },
+          "slug": {
+            "en": "character-counter",
+            "fr": "compteur-de-caracteres"
           }
         }
       ]

@@ -7,7 +7,9 @@ use kortex_contract::{Localized, PortType, ToolContract};
 use kortex_i18n::Catalog;
 use kortex_runtime::{FileData, ToolError, Value, ValueMap};
 
-use crate::components::{Button, Card, DropZone, ModeSwitch, Progress, Select, Switch, TextField};
+use crate::components::{
+    Button, Card, ColorField, DropZone, ModeSwitch, Progress, Select, Switch, TextArea, TextField,
+};
 use crate::{Mode, visible_params};
 
 /// Current param values keyed by param id (stringly typed at the UI boundary).
@@ -444,14 +446,27 @@ pub fn AutoTool(
                     let label = i.label.as_ref().map_or_else(|| i.id.clone(), |l| tr(l, &lang, &i.id).to_owned());
                     let id = i.id.clone();
                     let current = text_inputs.read().get(&i.id).cloned().unwrap_or_default();
-                    rsx! {
-                        TextField {
-                            key: "in-{i.id}",
-                            label,
-                            value: current,
-                            oninput: move |v: String| {
-                                text_inputs.write().insert(id.clone(), v);
-                            },
+                    if i.multiline {
+                        rsx! {
+                            TextArea {
+                                key: "in-{i.id}",
+                                label,
+                                value: current,
+                                oninput: move |v: String| {
+                                    text_inputs.write().insert(id.clone(), v);
+                                },
+                            }
+                        }
+                    } else {
+                        rsx! {
+                            TextField {
+                                key: "in-{i.id}",
+                                label,
+                                value: current,
+                                oninput: move |v: String| {
+                                    text_inputs.write().insert(id.clone(), v);
+                                },
+                            }
                         }
                     }
                 }
@@ -467,7 +482,19 @@ pub fn AutoTool(
                                 key: "{p.id}",
                                 label,
                                 value: current,
-                                options: p.options.clone().unwrap_or_default(),
+                                options: p
+                                    .options
+                                    .clone()
+                                    .unwrap_or_default()
+                                    .into_iter()
+                                    .map(|o| {
+                                        // Tools may translate an option with `[options] <param>_<option> = "Label"`.
+                                        let key = format!("options.{}_{o}", p.id);
+                                        let t = locale.t(&key);
+                                        let label = if t == key { o.clone() } else { t.to_owned() };
+                                        (o, label)
+                                    })
+                                    .collect(),
                                 onchange: move |v: String| {
                                     values.write().insert(id.clone(), v);
                                 },
@@ -481,6 +508,17 @@ pub fn AutoTool(
                                 checked: current == "true",
                                 onchange: move |v: bool| {
                                     values.write().insert(id.clone(), v.to_string());
+                                },
+                            }
+                        }
+                    } else if p.ty == PortType::Color {
+                        rsx! {
+                            ColorField {
+                                key: "{p.id}",
+                                label,
+                                value: current,
+                                oninput: move |v: String| {
+                                    values.write().insert(id.clone(), v);
                                 },
                             }
                         }
@@ -547,6 +585,49 @@ pub fn AutoTool(
                                     }
                                 }
                             }
+                            if let Value::Table(t) = &v {
+                                {
+                                    let csv = std::iter::once(t.columns.join(",")).chain(t.rows.iter().map(|r| r.join(","))).collect::<Vec<_>>().join("\n");
+                                    let label_key = format!("outputs.{id}");
+                                    let label = locale.t(&label_key);
+                                    let label = (label != label_key).then(|| label.to_owned());
+                                    rsx! {
+                                        div { key: "{id}", class: "k-output-group",
+                                            if let Some(label) = label {
+                                                span { class: "k-muted", "{label}" }
+                                            }
+                                            div { class: "k-tablewrap",
+                                                table { class: "k-table",
+                                                    thead {
+                                                        tr {
+                                                            for c in t.columns.clone() {
+                                                                th { key: "{c}", "{c}" }
+                                                            }
+                                                        }
+                                                    }
+                                                    tbody {
+                                                        for (n , row) in t.rows.clone().into_iter().enumerate() {
+                                                            tr { key: "{n}",
+                                                                for (m , cell) in row.into_iter().enumerate() {
+                                                                    td { key: "{m}", "{cell}" }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            Button {
+                                                ghost: true,
+                                                onclick: move |_| {
+                                                    let js = format!("navigator.clipboard.writeText({csv:?})");
+                                                    document::eval(&js);
+                                                },
+                                                "{copy_label}"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                             if let Some((label, text, raw)) = present(&locale, &id, &v) {
                                 div { key: "{id}", class: "k-output-group",
                                     if let Some(label) = label {
@@ -570,7 +651,10 @@ pub fn AutoTool(
                     }
                 }
                 Some(Err(e)) => {
-                    let message = error_text(&locale, &lang, e.code);
+                    let mut message = error_text(&locale, &lang, e.code);
+                    if let Some(d) = &e.detail {
+                        message = format!("{message} ({d})");
+                    }
                     rsx! {
                         p { class: "k-error", role: "alert", "{message}" }
                     }

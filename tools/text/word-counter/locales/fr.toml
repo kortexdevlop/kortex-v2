@@ -1,0 +1,14 @@
+[ui]
+title = "Compteur de mots et de caractères"
+[errors]
+cancelled = "Annulé."
+invalid_param = "Valeur invalide."
+missing_input = "Saisissez d'abord un contenu."
+[outputs]
+words = "Mots"
+characters = "Caractères"
+characters_no_spaces = "Caractères sans espaces"
+sentences = "Phrases"
+paragraphs = "Paragraphes"
+lines = "Lignes"
+reading_minutes = "Temps de lecture (minutes)"

@@ -1,0 +1,86 @@
+schema = 1
+
+[tool]
+id = "code.url-encoder"
+version = "1.0.0"
+universe = "code"
+status = "beta"
+ui = "auto"
+platforms = ["web", "desktop"]
+offline = true
+ai = false
+viral_priority = 2
+
+[tool.name]
+fr = "Encodeur et décodeur d'URL"
+en = "URL Encoder and Decoder"
+[tool.tagline]
+fr = "Encodez ou décodez des URL et des paramètres (pourcentage), comme encodeURIComponent."
+en = "Encode or decode URLs and parameters (percent-encoding), like encodeURIComponent."
+[tool.slug]
+fr = "encodeur-url"
+en = "url-encoder-decoder"
+
+[search]
+keywords.fr = ["encoder url", "décoder url", "percent encoding", "encodeuricomponent", "%20"]
+keywords.en = ["url encode", "url decode", "percent encoding", "encodeuricomponent", "%20"]
+intents.fr = ["décoder une url avec des %20", "encoder un paramètre d'url"]
+intents.en = ["decode a url with %20", "encode a url parameter"]
+related = []
+
+[limits]
+timeout_s = 10
+
+[[inputs]]
+id = "text"
+type = "text"
+required = true
+max_len = 2000000
+multiline = true
+label = { fr = "Texte ou URL", en = "Text or URL" }
+
+[[params]]
+id = "direction"
+type = "enum"
+options = ["encode", "decode"]
+default = "encode"
+level = "simple"
+label = { fr = "Sens", en = "Direction" }
+
+[[params]]
+id = "scope"
+type = "enum"
+options = ["component", "uri"]
+default = "component"
+level = "medium"
+label = { fr = "Portée de l'encodage", en = "Encoding scope" }
+
+[[params]]
+id = "plus_as_space"
+type = "bool"
+default = false
+level = "pro"
+label = { fr = "Lire « + » comme une espace (formulaires)", en = "Read “+” as a space (form data)" }
+
+[[outputs]]
+id = "text"
+type = "text"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "write"
+sensitive = false
+privacy = "local"
+
+[[variants]]
+id = "encode"
+slug = { fr = "encoder-url", en = "url-encoder" }
+name = { fr = "Encoder une URL", en = "URL Encoder" }
+preset = { direction = "encode" }
+
+[[variants]]
+id = "decode"
+slug = { fr = "decoder-url", en = "url-decoder" }
+name = { fr = "Décoder une URL", en = "URL Decoder" }
+preset = { direction = "decode" }

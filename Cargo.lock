@@ -1593,6 +1593,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3f9eec918d3f24069decb9af1554cad7c880e2da24a9afd88aca000531ab82c1"
 
 [[package]]
+name = "foldhash"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "77ce24cb58228fbb8aa041425bb1050850ac19177686ea6e0f41a70416f56fdb"
+
+[[package]]
 name = "font-types"
 version = "0.12.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2572,11 +2578,18 @@ dependencies = [
  "serde_json",
  "tar",
  "tool-calc-gross-net-salary",
+ "tool-code-base64",
+ "tool-code-json-formatter",
+ "tool-code-url-encoder",
+ "tool-code-uuid-generator",
  "tool-image-convert",
  "tool-pdf-merge",
  "tool-qr-generator",
  "tool-secure-hash-calculator",
  "tool-secure-password-generator",
+ "tool-text-case-converter",
+ "tool-text-sort-lines",
+ "tool-text-word-counter",
 ]
 
 [[package]]
@@ -2626,6 +2639,7 @@ name = "kortex-runtime"
 version = "0.1.0"
 dependencies = [
  "getrandom 0.3.4",
+ "js-sys",
 ]
 
 [[package]]
@@ -4478,6 +4492,8 @@ version = "1.0.154"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e7e9cc8b1b85264074fbcc02a88680c4096b1e47df8f739dceb03bf482f04bd6"
 dependencies = [
+ "foldhash",
+ "indexmap",
  "itoa",
  "memchr",
  "serde",
@@ -5252,6 +5268,36 @@ dependencies = [
 ]
 
 [[package]]
+name = "tool-code-base64"
+version = "0.1.0"
+dependencies = [
+ "kortex",
+]
+
+[[package]]
+name = "tool-code-json-formatter"
+version = "0.1.0"
+dependencies = [
+ "kortex",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "tool-code-url-encoder"
+version = "0.1.0"
+dependencies = [
+ "kortex",
+]
+
+[[package]]
+name = "tool-code-uuid-generator"
+version = "0.1.0"
+dependencies = [
+ "kortex",
+]
+
+[[package]]
 name = "tool-image-convert"
 version = "0.1.0"
 dependencies = [
@@ -5288,6 +5334,27 @@ dependencies = [
 
 [[package]]
 name = "tool-secure-password-generator"
+version = "0.1.0"
+dependencies = [
+ "kortex",
+]
+
+[[package]]
+name = "tool-text-case-converter"
+version = "0.1.0"
+dependencies = [
+ "kortex",
+]
+
+[[package]]
+name = "tool-text-sort-lines"
+version = "0.1.0"
+dependencies = [
+ "kortex",
+]
+
+[[package]]
+name = "tool-text-word-counter"
 version = "0.1.0"
 dependencies = [
  "kortex",

@@ -1,0 +1,14 @@
+[ui]
+title = "Word and Character Counter"
+[errors]
+cancelled = "Cancelled."
+invalid_param = "Invalid value."
+missing_input = "Enter some content first."
+[outputs]
+words = "Words"
+characters = "Characters"
+characters_no_spaces = "Characters without spaces"
+sentences = "Sentences"
+paragraphs = "Paragraphs"
+lines = "Lines"
+reading_minutes = "Reading time (minutes)"

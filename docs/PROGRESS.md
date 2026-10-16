@@ -111,3 +111,9 @@ Phase 0 — Cadrage, spikes, nettoyage (≈ 100 % des pilotes) — Phase 1 quasi
 
 ## Catalogue stats
 stable: 0 · beta: 6 · draft: 0 — password-generator, hash-calculator (secure) · generator (qr) · merge (pdf) · convert (image) · gross-net-salary (calc)
+
+## Session 2026-10-16 — catalogue, vague 1 (13 outils)
+- 7 nouveaux outils : text.word-counter, text.case-converter, text.sort-lines, code.json-formatter, code.base64, code.url-encoder, code.uuid-generator (tests verts, gate OK).
+- Infra ajoutée : champ `multiline` (TextArea), ColorField, Select avec libellés localisés, sortie Table, détail d'erreur (ligne:col), `Cx::now_ms`/`with_clock`.
+- Vérif navigateur de json-formatter et case-converter : commencée, non terminée (à refaire : textarea, selects, erreur JSON).
+- Prochaine étape : vague 2 (color.converter, color.contrast-checker, calc.percentage, calc.loan, calc.vat, text.slug-generator, text.lorem-ipsum), puis dates/unités/diff vers >=150 outils. Rien n'est déployé.

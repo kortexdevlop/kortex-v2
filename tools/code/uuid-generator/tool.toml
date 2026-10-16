@@ -1,0 +1,91 @@
+schema = 1
+
+[tool]
+id = "code.uuid-generator"
+version = "1.0.0"
+universe = "code"
+status = "beta"
+ui = "auto"
+platforms = ["web", "desktop"]
+offline = true
+ai = false
+viral_priority = 2
+
+[tool.name]
+fr = "Générateur d'UUID"
+en = "UUID Generator"
+[tool.tagline]
+fr = "Générez des UUID v4 (aléatoires) ou v7 (triables par date), en lot."
+en = "Generate UUID v4 (random) or v7 (time-sortable), in bulk."
+[tool.slug]
+fr = "generateur-uuid"
+en = "uuid-generator"
+
+[search]
+keywords.fr = ["uuid", "guid", "identifiant unique", "uuid v4", "uuid v7", "générateur uuid"]
+keywords.en = ["uuid", "guid", "unique identifier", "uuid v4", "uuid v7", "uuid generator"]
+intents.fr = ["générer un uuid", "créer 100 identifiants uniques"]
+intents.en = ["generate a uuid", "create 100 unique identifiers"]
+related = []
+
+[limits]
+timeout_s = 10
+
+[[params]]
+id = "version"
+type = "enum"
+options = ["v4", "v7"]
+default = "v4"
+level = "simple"
+label = { fr = "Version", en = "Version" }
+
+[[params]]
+id = "count"
+type = "integer"
+range = [1, 500]
+default = 1
+level = "simple"
+label = { fr = "Quantité", en = "Count" }
+
+[[params]]
+id = "uppercase"
+type = "bool"
+default = false
+level = "medium"
+label = { fr = "MAJUSCULES", en = "UPPERCASE" }
+
+[[params]]
+id = "hyphens"
+type = "bool"
+default = true
+level = "medium"
+label = { fr = "Avec tirets", en = "With hyphens" }
+
+[[outputs]]
+id = "uuids"
+type = "text"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "write"
+sensitive = false
+privacy = "local"
+
+[[variants]]
+id = "v4"
+slug = { fr = "generateur-uuid-v4", en = "uuid-v4-generator" }
+name = { fr = "Générateur d'UUID v4", en = "UUID v4 Generator" }
+preset = { version = "v4" }
+
+[[variants]]
+id = "v7"
+slug = { fr = "generateur-uuid-v7", en = "uuid-v7-generator" }
+name = { fr = "Générateur d'UUID v7", en = "UUID v7 Generator" }
+preset = { version = "v7" }
+
+[[variants]]
+id = "bulk"
+slug = { fr = "generer-plusieurs-uuid", en = "bulk-uuid-generator" }
+name = { fr = "Générer plusieurs UUID", en = "Bulk UUID Generator" }
+preset = { count = 50 }

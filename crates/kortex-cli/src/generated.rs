@@ -7,30 +7,65 @@ fn run_0<'a>(i: &'a ValueMap, p: &'a ValueMap, cx: &'a mut Cx) -> RunFut<'a> {
 }
 
 fn run_1<'a>(i: &'a ValueMap, p: &'a ValueMap, cx: &'a mut Cx) -> RunFut<'a> {
-    Box::pin(tool_image_convert::run_map(i, p, cx))
+    Box::pin(tool_code_base64::run_map(i, p, cx))
 }
 
 fn run_2<'a>(i: &'a ValueMap, p: &'a ValueMap, cx: &'a mut Cx) -> RunFut<'a> {
-    Box::pin(tool_pdf_merge::run_map(i, p, cx))
+    Box::pin(tool_code_json_formatter::run_map(i, p, cx))
 }
 
 fn run_3<'a>(i: &'a ValueMap, p: &'a ValueMap, cx: &'a mut Cx) -> RunFut<'a> {
-    Box::pin(tool_qr_generator::run_map(i, p, cx))
+    Box::pin(tool_code_url_encoder::run_map(i, p, cx))
 }
 
 fn run_4<'a>(i: &'a ValueMap, p: &'a ValueMap, cx: &'a mut Cx) -> RunFut<'a> {
-    Box::pin(tool_secure_hash_calculator::run_map(i, p, cx))
+    Box::pin(tool_code_uuid_generator::run_map(i, p, cx))
 }
 
 fn run_5<'a>(i: &'a ValueMap, p: &'a ValueMap, cx: &'a mut Cx) -> RunFut<'a> {
+    Box::pin(tool_image_convert::run_map(i, p, cx))
+}
+
+fn run_6<'a>(i: &'a ValueMap, p: &'a ValueMap, cx: &'a mut Cx) -> RunFut<'a> {
+    Box::pin(tool_pdf_merge::run_map(i, p, cx))
+}
+
+fn run_7<'a>(i: &'a ValueMap, p: &'a ValueMap, cx: &'a mut Cx) -> RunFut<'a> {
+    Box::pin(tool_qr_generator::run_map(i, p, cx))
+}
+
+fn run_8<'a>(i: &'a ValueMap, p: &'a ValueMap, cx: &'a mut Cx) -> RunFut<'a> {
+    Box::pin(tool_secure_hash_calculator::run_map(i, p, cx))
+}
+
+fn run_9<'a>(i: &'a ValueMap, p: &'a ValueMap, cx: &'a mut Cx) -> RunFut<'a> {
     Box::pin(tool_secure_password_generator::run_map(i, p, cx))
+}
+
+fn run_10<'a>(i: &'a ValueMap, p: &'a ValueMap, cx: &'a mut Cx) -> RunFut<'a> {
+    Box::pin(tool_text_case_converter::run_map(i, p, cx))
+}
+
+fn run_11<'a>(i: &'a ValueMap, p: &'a ValueMap, cx: &'a mut Cx) -> RunFut<'a> {
+    Box::pin(tool_text_sort_lines::run_map(i, p, cx))
+}
+
+fn run_12<'a>(i: &'a ValueMap, p: &'a ValueMap, cx: &'a mut Cx) -> RunFut<'a> {
+    Box::pin(tool_text_word_counter::run_map(i, p, cx))
 }
 
 pub static TOOLS: &[ToolEntry] = &[
     ToolEntry { id: "calc.gross-net-salary", contract: tool_calc_gross_net_salary::CONTRACT, run: run_0 },
-    ToolEntry { id: "image.convert", contract: tool_image_convert::CONTRACT, run: run_1 },
-    ToolEntry { id: "pdf.merge", contract: tool_pdf_merge::CONTRACT, run: run_2 },
-    ToolEntry { id: "qr.generator", contract: tool_qr_generator::CONTRACT, run: run_3 },
-    ToolEntry { id: "secure.hash-calculator", contract: tool_secure_hash_calculator::CONTRACT, run: run_4 },
-    ToolEntry { id: "secure.password-generator", contract: tool_secure_password_generator::CONTRACT, run: run_5 },
+    ToolEntry { id: "code.base64", contract: tool_code_base64::CONTRACT, run: run_1 },
+    ToolEntry { id: "code.json-formatter", contract: tool_code_json_formatter::CONTRACT, run: run_2 },
+    ToolEntry { id: "code.url-encoder", contract: tool_code_url_encoder::CONTRACT, run: run_3 },
+    ToolEntry { id: "code.uuid-generator", contract: tool_code_uuid_generator::CONTRACT, run: run_4 },
+    ToolEntry { id: "image.convert", contract: tool_image_convert::CONTRACT, run: run_5 },
+    ToolEntry { id: "pdf.merge", contract: tool_pdf_merge::CONTRACT, run: run_6 },
+    ToolEntry { id: "qr.generator", contract: tool_qr_generator::CONTRACT, run: run_7 },
+    ToolEntry { id: "secure.hash-calculator", contract: tool_secure_hash_calculator::CONTRACT, run: run_8 },
+    ToolEntry { id: "secure.password-generator", contract: tool_secure_password_generator::CONTRACT, run: run_9 },
+    ToolEntry { id: "text.case-converter", contract: tool_text_case_converter::CONTRACT, run: run_10 },
+    ToolEntry { id: "text.sort-lines", contract: tool_text_sort_lines::CONTRACT, run: run_11 },
+    ToolEntry { id: "text.word-counter", contract: tool_text_word_counter::CONTRACT, run: run_12 },
 ];

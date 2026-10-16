@@ -1,0 +1,19 @@
+[ui]
+title = "Case Converter"
+[errors]
+empty_input = "Enter a text to convert."
+cancelled = "Cancelled."
+invalid_param = "Invalid value."
+missing_input = "Enter some content first."
+[outputs]
+text = "Result"
+[options]
+case_upper = "UPPERCASE"
+case_lower = "lowercase"
+case_title = "Title Case"
+case_sentence = "Sentence case"
+case_camel = "camelCase"
+case_pascal = "PascalCase"
+case_snake = "snake_case"
+case_kebab = "kebab-case"
+case_constant = "CONSTANT_CASE"

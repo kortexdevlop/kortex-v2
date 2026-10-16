@@ -1,0 +1,107 @@
+schema = 1
+
+[tool]
+id = "text.sort-lines"
+version = "1.0.0"
+universe = "text"
+status = "beta"
+ui = "auto"
+platforms = ["web", "desktop"]
+offline = true
+ai = false
+viral_priority = 2
+
+[tool.name]
+fr = "Trier et dédupliquer des lignes"
+en = "Sort and Deduplicate Lines"
+[tool.tagline]
+fr = "Triez, inversez et supprimez les doublons d'une liste, ligne par ligne."
+en = "Sort, reverse and remove duplicates from a list, line by line."
+[tool.slug]
+fr = "trier-lignes"
+en = "sort-lines"
+
+[search]
+keywords.fr = ["trier des lignes", "supprimer les doublons", "ordre alphabétique", "liste", "dédoublonner"]
+keywords.en = ["sort lines", "remove duplicates", "alphabetical order", "list", "deduplicate"]
+intents.fr = ["supprimer les doublons d'une liste", "trier une liste par ordre alphabétique"]
+intents.en = ["remove duplicates from a list", "sort a list alphabetically"]
+related = []
+
+[limits]
+timeout_s = 10
+
+[[inputs]]
+id = "text"
+type = "text"
+required = true
+max_len = 5000000
+multiline = true
+label = { fr = "Une entrée par ligne", en = "One entry per line" }
+
+[[params]]
+id = "sort"
+type = "enum"
+options = ["none", "asc", "desc", "length", "reverse"]
+default = "asc"
+level = "simple"
+label = { fr = "Tri", en = "Sort" }
+
+[[params]]
+id = "dedupe"
+type = "bool"
+default = true
+level = "simple"
+label = { fr = "Supprimer les doublons", en = "Remove duplicates" }
+
+[[params]]
+id = "ignore_case"
+type = "bool"
+default = false
+level = "medium"
+label = { fr = "Ignorer la casse", en = "Ignore case" }
+
+[[params]]
+id = "trim"
+type = "bool"
+default = true
+level = "medium"
+label = { fr = "Retirer les espaces autour des lignes", en = "Trim spaces around lines" }
+
+[[params]]
+id = "remove_empty"
+type = "bool"
+default = true
+level = "medium"
+label = { fr = "Supprimer les lignes vides", en = "Remove empty lines" }
+
+[[outputs]]
+id = "text"
+type = "text"
+
+[[outputs]]
+id = "lines"
+type = "integer"
+
+[[outputs]]
+id = "removed"
+type = "integer"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "write"
+sensitive = false
+privacy = "local"
+
+[[variants]]
+id = "dedupe"
+slug = { fr = "supprimer-doublons-liste", en = "remove-duplicate-lines" }
+name = { fr = "Supprimer les doublons d'une liste", en = "Remove Duplicate Lines" }
+preset = { sort = "none", dedupe = true }
+
+[[variants]]
+id = "alphabetical"
+slug = { fr = "trier-par-ordre-alphabetique", en = "alphabetical-sorter" }
+name = { fr = "Trier par ordre alphabétique", en = "Alphabetical Sorter" }
+preset = { sort = "asc", dedupe = false }

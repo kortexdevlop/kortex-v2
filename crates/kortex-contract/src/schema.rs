@@ -81,6 +81,9 @@ pub struct Input {
     #[serde(default)]
     pub required: bool,
     pub max_len: Option<u32>,
+    /// Show a multi-line text area (documents, JSON, lists) instead of a single-line field.
+    #[serde(default)]
+    pub multiline: bool,
     pub label: Option<Localized>,
 }
 

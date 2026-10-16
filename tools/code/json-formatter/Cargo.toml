@@ -1,0 +1,11 @@
+[package]
+name = "tool-code-json-formatter"
+version = "0.1.0"
+edition.workspace = true
+publish.workspace = true
+license.workspace = true
+
+[dependencies]
+kortex = { path = "../../../crates/kortex" }
+serde = "1"
+serde_json = { version = "1", features = ["preserve_order", "arbitrary_precision"] }

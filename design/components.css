@@ -34,7 +34,15 @@
   .k-actions { margin-top: var(--k-space-5); }
   .k-result { margin-top: var(--k-space-5); display: grid; gap: var(--k-space-3); }
   .k-output { display: flex; align-items: center; justify-content: space-between; gap: var(--k-space-3); padding: var(--k-space-4); border-radius: var(--k-radius-field); background: var(--k-surface-2); }
-  .k-output code { font-family: var(--k-type-mono); overflow-wrap: anywhere; user-select: all; }
+  .k-output code { font-family: var(--k-type-mono); overflow-wrap: anywhere; user-select: all; white-space: pre-wrap; }
+  .k-textarea { min-height: 160px; padding: var(--k-space-3) var(--k-space-4); resize: vertical; font-family: var(--k-type-mono); font-size: 0.92rem; line-height: 1.5; }
+  .k-colorrow { display: flex; gap: var(--k-space-3); align-items: center; }
+  .k-color { width: 44px; height: 44px; padding: 0; border: 1px solid var(--k-border); border-radius: var(--k-radius-control); background: none; cursor: pointer; flex-shrink: 0; }
+  .k-tablewrap { overflow-x: auto; border: 1px solid var(--k-border); border-radius: var(--k-radius-field); }
+  .k-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  .k-table th, .k-table td { padding: var(--k-space-2) var(--k-space-3); text-align: right; white-space: nowrap; }
+  .k-table th { background: var(--k-surface-2); font-weight: 600; }
+  .k-table tr + tr td { border-top: 1px solid var(--k-border); }
   .k-error { color: var(--k-danger); }
   select.k-input { appearance: auto; }
   .k-stack { display: grid; gap: var(--k-space-4); }

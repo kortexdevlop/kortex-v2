@@ -1,0 +1,89 @@
+schema = 1
+
+[tool]
+id = "text.word-counter"
+version = "1.0.0"
+universe = "text"
+status = "beta"
+ui = "auto"
+platforms = ["web", "desktop"]
+offline = true
+ai = false
+viral_priority = 1
+
+[tool.name]
+fr = "Compteur de mots et de caractères"
+en = "Word and Character Counter"
+[tool.tagline]
+fr = "Mots, caractères, phrases, paragraphes et temps de lecture, en direct sur votre appareil."
+en = "Words, characters, sentences, paragraphs and reading time, right on your device."
+[tool.slug]
+fr = "compteur-de-mots"
+en = "word-counter"
+
+[search]
+keywords.fr = ["compteur de mots", "nombre de caractères", "compter les mots", "temps de lecture", "texte"]
+keywords.en = ["word counter", "character count", "count words", "reading time", "text"]
+intents.fr = ["compter les mots d'un texte", "savoir combien de caractères dans mon texte"]
+intents.en = ["count the words in a text", "how many characters in my text"]
+related = []
+
+[limits]
+timeout_s = 10
+
+[[inputs]]
+id = "text"
+type = "text"
+required = true
+max_len = 2000000
+multiline = true
+label = { fr = "Votre texte", en = "Your text" }
+
+[[params]]
+id = "wpm"
+type = "integer"
+range = [50, 1000]
+default = 230
+level = "medium"
+label = { fr = "Vitesse de lecture (mots par minute)", en = "Reading speed (words per minute)" }
+
+[[outputs]]
+id = "words"
+type = "integer"
+
+[[outputs]]
+id = "characters"
+type = "integer"
+
+[[outputs]]
+id = "characters_no_spaces"
+type = "integer"
+
+[[outputs]]
+id = "sentences"
+type = "integer"
+
+[[outputs]]
+id = "paragraphs"
+type = "integer"
+
+[[outputs]]
+id = "lines"
+type = "integer"
+
+[[outputs]]
+id = "reading_minutes"
+type = "number"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "write"
+sensitive = false
+privacy = "local"
+
+[[variants]]
+id = "characters"
+slug = { fr = "compteur-de-caracteres", en = "character-counter" }
+name = { fr = "Compteur de caractères", en = "Character Counter" }
+preset = { wpm = 230 }

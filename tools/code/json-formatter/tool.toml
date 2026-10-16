@@ -1,0 +1,90 @@
+schema = 1
+
+[tool]
+id = "code.json-formatter"
+version = "1.0.0"
+universe = "code"
+status = "beta"
+ui = "auto"
+platforms = ["web", "desktop"]
+offline = true
+ai = false
+viral_priority = 1
+
+[tool.name]
+fr = "Formateur et validateur JSON"
+en = "JSON Formatter and Validator"
+[tool.tagline]
+fr = "Embellissez, minifiez et validez du JSON, avec la ligne et la colonne de l'erreur."
+en = "Pretty-print, minify and validate JSON, with the line and column of the error."
+[tool.slug]
+fr = "formateur-json"
+en = "json-formatter"
+
+[search]
+keywords.fr = ["json", "formater json", "valider json", "minifier json", "embellir json", "indenter"]
+keywords.en = ["json", "format json", "validate json", "minify json", "pretty print", "beautify"]
+intents.fr = ["mettre en forme du json", "vérifier si mon json est valide"]
+intents.en = ["pretty print some json", "check if my json is valid"]
+related = []
+
+[limits]
+timeout_s = 10
+
+[[inputs]]
+id = "text"
+type = "text"
+required = true
+max_len = 5000000
+multiline = true
+label = { fr = "JSON", en = "JSON" }
+
+[[params]]
+id = "action"
+type = "enum"
+options = ["format", "minify", "validate"]
+default = "format"
+level = "simple"
+label = { fr = "Action", en = "Action" }
+
+[[params]]
+id = "indent"
+type = "integer"
+range = [1, 8]
+default = 2
+level = "medium"
+label = { fr = "Indentation (espaces)", en = "Indent (spaces)" }
+
+[[params]]
+id = "sort_keys"
+type = "bool"
+default = false
+level = "pro"
+label = { fr = "Trier les clés par ordre alphabétique", en = "Sort keys alphabetically" }
+
+[[outputs]]
+id = "result"
+type = "text"
+
+[[outputs]]
+id = "status"
+type = "text"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "write"
+sensitive = false
+privacy = "local"
+
+[[variants]]
+id = "minify"
+slug = { fr = "minifier-json", en = "json-minifier" }
+name = { fr = "Minifier du JSON", en = "JSON Minifier" }
+preset = { action = "minify" }
+
+[[variants]]
+id = "validate"
+slug = { fr = "valider-json", en = "json-validator" }
+name = { fr = "Valider du JSON", en = "JSON Validator" }
+preset = { action = "validate" }

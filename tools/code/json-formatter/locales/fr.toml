@@ -1,0 +1,17 @@
+[ui]
+title = "Formateur et validateur JSON"
+[errors]
+empty_input = "Collez du JSON."
+invalid_json = "JSON invalide"
+cancelled = "Annulé."
+invalid_param = "Valeur invalide."
+missing_input = "Saisissez d'abord un contenu."
+[outputs]
+result = "Résultat"
+status = "Validité"
+[values]
+status_valid = "✓ JSON valide"
+[options]
+action_format = "Formater"
+action_minify = "Minifier"
+action_validate = "Valider seulement"

@@ -1,0 +1,17 @@
+[ui]
+title = "Trier et dédupliquer des lignes"
+[errors]
+empty_input = "Collez une liste, une entrée par ligne."
+cancelled = "Annulé."
+invalid_param = "Valeur invalide."
+missing_input = "Saisissez d'abord un contenu."
+[outputs]
+text = "Résultat"
+lines = "Lignes conservées"
+removed = "Lignes supprimées"
+[options]
+sort_none = "Ne pas trier"
+sort_asc = "A → Z"
+sort_desc = "Z → A"
+sort_length = "Par longueur"
+sort_reverse = "Inverser l'ordre"

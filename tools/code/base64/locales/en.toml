@@ -1,0 +1,14 @@
+[ui]
+title = "Base64 Encoder and Decoder"
+[errors]
+empty_input = "Enter some text."
+invalid_base64 = "This is not valid Base64."
+not_text = "The decoded content is not UTF-8 text."
+cancelled = "Cancelled."
+invalid_param = "Invalid value."
+missing_input = "Enter some content first."
+[outputs]
+text = "Result"
+[options]
+direction_encode = "Encode (text → Base64)"
+direction_decode = "Decode (Base64 → text)"

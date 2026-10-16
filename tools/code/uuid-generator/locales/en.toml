@@ -1,0 +1,12 @@
+[ui]
+title = "UUID Generator"
+[errors]
+entropy_unavailable = "System randomness unavailable."
+cancelled = "Cancelled."
+invalid_param = "Invalid value."
+missing_input = "Enter some content first."
+[outputs]
+uuids = "Generated UUIDs"
+[options]
+version_v4 = "v4 — random"
+version_v7 = "v7 — sortable by creation time"
