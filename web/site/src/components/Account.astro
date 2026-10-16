@@ -11,6 +11,7 @@ const T = {
     switchToRegister: 'Pas encore de compte ? Créer un compte', switchToLogin: 'Déjà un compte ? Se connecter',
     note: 'Votre mot de passe est transformé sur votre appareil avant l’envoi : nous ne le recevons jamais.',
     signedAs: 'Connecté en tant que', logout: 'Se déconnecter', credits: 'Crédits IA', creditsHint: 'Se rechargent progressivement toutes les 3 heures.',
+    devices: 'Appareils connectés', devicesEmpty: 'Aucun appareil. Installe la CLI puis lance « kortex login ».', revoke: 'Révoquer', thisDevice: 'cet appareil', installs: 'Outils installés', installsEmpty: 'Aucun outil installé via la CLI ou le Store.', confirmInstall: 'Demander mon mot de passe à chaque installation', confirmHint: 'Recommandé : empêche une installation à ton insu depuis un terminal ouvert.',
     paused: 'IA en pause, elle revient vers', empty: 'Crédits épuisés, prochaine recharge dans', min: 'min', h: 'h',
     data: 'Vos données', export: 'Exporter mes données', del: 'Supprimer mon compte', delConfirm: 'Saisissez votre mot de passe pour confirmer la suppression définitive.',
     delBtn: 'Supprimer définitivement', cancel: 'Annuler', working: 'Un instant…', deleted: 'Compte supprimé.',
@@ -28,6 +29,7 @@ const T = {
     switchToRegister: 'No account yet? Create one', switchToLogin: 'Already have an account? Sign in',
     note: 'Your password is transformed on your device before it is sent: we never receive it.',
     signedAs: 'Signed in as', logout: 'Sign out', credits: 'AI credits', creditsHint: 'Gradually refill every 3 hours.',
+    devices: 'Connected devices', devicesEmpty: 'No device. Install the CLI, then run “kortex login”.', revoke: 'Revoke', thisDevice: 'this device', installs: 'Installed tools', installsEmpty: 'No tool installed through the CLI or the Store.', confirmInstall: 'Ask for my password on every install', confirmHint: 'Recommended: stops an install you did not intend from an open terminal.',
     paused: 'AI is paused, back around', empty: 'Credits used up, next refill in', min: 'min', h: 'h',
     data: 'Your data', export: 'Export my data', del: 'Delete my account', delConfirm: 'Enter your password to confirm permanent deletion.',
     delBtn: 'Delete permanently', cancel: 'Cancel', working: 'One moment…', deleted: 'Account deleted.',
@@ -61,6 +63,14 @@ const T = {
         <h2>{T.credits}</h2>
         <div class="k-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" data-gauge><div class="k-progress-bar" data-bar style="width:0"></div></div>
         <p class="k-muted" data-credits-text></p>
+      </div>
+      <div class="k-stack" data-devices-box>
+        <h2>{T.devices}</h2>
+        <ul class="k-files" data-devices></ul>
+        <h2>{T.installs}</h2>
+        <ul class="k-files" data-installs></ul>
+        <label class="k-switch"><input type="checkbox" role="switch" data-confirm-install /><span>{T.confirmInstall}</span></label>
+        <p class="k-muted acct-note">{T.confirmHint}</p>
       </div>
       <h2>{T.data}</h2>
       <div class="acct-actions">
@@ -115,12 +125,47 @@ const T = {
       : status === 'empty' ? `${T.empty} ${when(s)}` : `${percent} % — ${T.creditsHint}`;
   };
 
+  const textNode = (tag: string, text: string, cls = '') => Object.assign(document.createElement(tag), { textContent: text, className: cls });
+
+  const renderDevices = async () => {
+    const [d, i] = await Promise.all([request('GET', '/v1/devices'), request('GET', '/v1/installs')]);
+    const list = $('[data-devices]'), inst = $('[data-installs]');
+    list.replaceChildren();
+    inst.replaceChildren();
+    const devices = d.ok ? d.data.devices : [];
+    if (devices.length === 0) list.append(textNode('li', T.devicesEmpty, 'k-muted'));
+    for (const dev of devices) {
+      const li = textNode('li', '', 'k-file-row');
+      li.append(textNode('span', `${dev.name} · ${dev.platform || ''} · ${new Date(dev.last_seen).toLocaleDateString()}`));
+      const btn = Object.assign(document.createElement('button'), { type: 'button', className: 'k-btn', textContent: T.revoke });
+      btn.dataset.variant = 'ghost';
+      btn.addEventListener('click', async () => { await request('DELETE', `/v1/devices/${dev.id}`); void renderDevices(); });
+      li.append(btn);
+      list.append(li);
+    }
+    const items = i.ok ? i.data.items : [];
+    if (items.length === 0) inst.append(textNode('li', T.installsEmpty, 'k-muted'));
+    for (const it of items) inst.append(textNode('li', `${it.tool} ${it.version} — ${it.device_name}`, 'k-file-row'));
+    const settings = await request('GET', '/v1/settings');
+    const box = $<HTMLInputElement>('[data-confirm-install]');
+    box.checked = settings.ok ? settings.data.data.confirm_install !== false : true;
+  };
+
+  // Settings are one JSON blob: read-modify-write so other keys (theme, mode…) are never lost.
+  $<HTMLInputElement>('[data-confirm-install]').addEventListener('change', async (e) => {
+    const box = e.currentTarget as HTMLInputElement;
+    const cur = await request('GET', '/v1/settings');
+    const r = await request('PUT', '/v1/settings', { data: { ...(cur.ok ? cur.data.data : {}), confirm_install: box.checked } });
+    if (!r.ok) box.checked = !box.checked;
+  });
+
   const refresh = async () => {
     const r = await request('GET', '/v1/me');
     if (r.ok) {
       $('[data-email]').textContent = r.data.email;
       authView.hidden = true; meView.hidden = false;
       void renderCredits();
+      void renderDevices();
     } else { authView.hidden = false; meView.hidden = true; }
   };
 
