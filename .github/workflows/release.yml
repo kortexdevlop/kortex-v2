@@ -1,0 +1,134 @@
+name: release
+
+# Builds the CLI, the Store and the desktop apps on Linux, macOS and Windows, signs the release index
+# and (when RELEASES_TOKEN is set) publishes everything to the public binaries-only repo.
+#
+# Minutes are scarce on a private repository (macOS counts x10, Windows x2): this workflow only runs
+# on `release/*` tags or by hand, never on push. See docs/guides/release.md.
+on:
+  workflow_dispatch:
+    inputs:
+      tools:
+        description: 'Tool ids to build (space separated) or "all"'
+        default: 'secure.password-generator'
+      intel_mac:
+        description: 'Also build macOS x86_64 (costs more minutes)'
+        type: boolean
+        default: false
+      publish:
+        description: 'Publish to kortex-releases (needs the RELEASES_TOKEN secret)'
+        type: boolean
+        default: false
+  push:
+    tags: ['release/*']
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  TOOLS: ${{ github.event_name == 'workflow_dispatch' && inputs.tools || 'all' }}
+  INTEL_MAC: ${{ github.event_name == 'workflow_dispatch' && inputs.intel_mac || 'true' }}
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest, name: linux, targets: 'x86_64-unknown-linux-gnu' }
+          - { os: macos-latest, name: macos, targets: 'aarch64-apple-darwin' }
+          - { os: windows-latest, name: windows, targets: 'x86_64-pc-windows-msvc' }
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup show
+      - name: Linux system libraries (webview and tray)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libgtk-3-dev libxdo-dev libayatana-appindicator3-dev
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            .
+            .kortex/desktop/* -> .kortex/target-desktop
+      - name: Extra macOS target
+        if: runner.os == 'macOS' && env.INTEL_MAC == 'true'
+        run: |
+          rustup target add x86_64-apple-darwin
+          echo "EXTRA_TARGETS=x86_64-apple-darwin" >> "$GITHUB_ENV"
+      - name: Design tokens (embedded in every app)
+        run: cargo xtask tokens
+      - name: Build, sign (macOS ad hoc) and package
+        run: |
+          set -euo pipefail
+          if [ "$TOOLS" = "all" ]; then TOOL_LIST=$(cargo xtask list-tools); else TOOL_LIST="$TOOLS"; fi
+          for target in ${{ matrix.targets }} ${EXTRA_TARGETS:-}; do
+            cargo xtask build-cli --target "$target"
+            cargo xtask build-app apps.store --target "$target"
+            for id in $TOOL_LIST; do cargo xtask build-desktop "$id" --target "$target"; done
+            if [ "$RUNNER_OS" = "macOS" ]; then
+              # Free ad hoc signature: required to run on Apple Silicon. Gatekeeper still warns on browser
+              # downloads; installs through the CLI/Store carry no quarantine flag. Paid signing can be
+              # added here later without touching anything else.
+              find "dist/desktop/$target" -type f -perm -u+x -exec codesign --force --sign - {} \;
+            fi
+            cargo xtask package cli --target "$target"
+            cargo xtask package apps.store --target "$target"
+            for id in $TOOL_LIST; do cargo xtask package "$id" --target "$target"; done
+          done
+          ls -la dist/release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: packages-${{ matrix.name }}
+          path: dist/release/*.tar.gz
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup show
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: packages-*
+          merge-multiple: true
+          path: dist/release
+      - name: Release name
+        id: rel
+        run: |
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then echo "tag=${GITHUB_REF_NAME//\//-}" >> "$GITHUB_OUTPUT"; else echo "tag=manual-${GITHUB_RUN_ID}" >> "$GITHUB_OUTPUT"; fi
+      - name: Signed index (Ed25519)
+        env:
+          KORTEX_SIGNING_KEY: ${{ secrets.KORTEX_SIGNING_KEY }}
+        run: |
+          test -n "$KORTEX_SIGNING_KEY" || { echo "::error::secret KORTEX_SIGNING_KEY missing"; exit 1; }
+          cargo xtask release-index --base-url "https://github.com/kortexdevlop/kortex-releases/releases/download/${{ steps.rel.outputs.tag }}"
+          ls -la dist/release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: signed-release
+          path: dist/release/*
+          retention-days: 14
+      - name: Publish to kortex-releases
+        if: (github.event_name == 'push' || inputs.publish) && env.RELEASES_TOKEN != ''
+        env:
+          RELEASES_TOKEN: ${{ secrets.RELEASES_TOKEN }}
+          GH_TOKEN: ${{ secrets.RELEASES_TOKEN }}
+        run: |
+          gh release create "${{ steps.rel.outputs.tag }}" dist/release/* \
+            --repo kortexdevlop/kortex-releases \
+            --title "${{ steps.rel.outputs.tag }}" \
+            --notes "Binaries and signed index. Source code is private; verify with the Kortex public key."

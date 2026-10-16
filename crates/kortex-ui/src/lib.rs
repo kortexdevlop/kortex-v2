@@ -4,6 +4,6 @@ mod auto;
 mod components;
 mod mode;
 
-pub use auto::{AutoTool, ParamValues, RunFuture, Runner, to_values};
+pub use auto::{AutoTool, ParamValues, RunFuture, Runner, SaveFile, to_values};
 pub use components::{Button, Card, DropZone, ModeSwitch, Progress, Select, Switch, TextField};
 pub use mode::{Mode, visible_params};

@@ -1,0 +1,18 @@
+# Kortex Store — installs, updates and removes Kortex tools on this computer.
+# Apps follow the same contract-first approach as tools; the full app contract (permissions,
+# Desk/Flow integration) arrives with Desk (docs/MASTER_PROMPT.md §9).
+[app]
+id = "apps.store"
+version = "0.1.0"
+universe = "apps"
+
+[app.name]
+fr = "Kortex Store"
+en = "Kortex Store"
+[app.tagline]
+fr = "Installez et mettez à jour vos outils Kortex."
+en = "Install and update your Kortex tools."
+
+[permissions]
+network = true       # downloads the signed release index and tool packages
+filesystem = "write" # only ~/.kortex (tools) and launchers

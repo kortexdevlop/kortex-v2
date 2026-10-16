@@ -72,7 +72,7 @@ privacy = "local"
     #[derive(Clone, PartialEq)]
     struct P(kortex_contract::ToolContract);
     fn app(p: P) -> Element {
-        rsx! { AutoTool { contract: p.0, lang: "fr".to_owned(), locale: kortex_i18n::Catalog::default(), runner: Runner(noop_runner), variant: None, host_mode: None } }
+        rsx! { AutoTool { contract: p.0, lang: "fr".to_owned(), locale: kortex_i18n::Catalog::default(), runner: Runner(noop_runner), variant: None, host_mode: None, save_file: None } }
     }
     let html = render(app, P(c));
     assert!(html.contains("Mon outil"), "{html}");

@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["xtask", "crates/*", "tools/*/*"]
+members = ["xtask", "crates/*", "tools/*/*", "apps/*"]
 exclude = ["tools/_template"]
 
 [workspace.package]

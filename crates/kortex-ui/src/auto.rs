@@ -14,6 +14,17 @@ use crate::{Mode, visible_params};
 pub type ParamValues = BTreeMap<String, String>;
 
 pub type RunFuture = Pin<Box<dyn Future<Output = Result<ValueMap, ToolError>>>>;
+/// Native "save this file" hook for desktop hosts: returns where the file was written.
+/// All savers compare equal (the host never swaps it while the UI is mounted).
+#[derive(Clone, Copy)]
+pub struct SaveFile(pub fn(&FileData) -> Result<String, String>);
+
+impl PartialEq for SaveFile {
+    fn eq(&self, _: &Self) -> bool {
+        true
+    }
+}
+
 /// Host-provided entry: `(inputs, params) -> outputs`, usually `run_map(&i, &p, &mut Cx::new())`.
 /// All runners compare equal: a host never swaps its runner while the UI is mounted.
 #[derive(Clone, Copy)]
@@ -51,6 +62,7 @@ fn s(lang: &str, key: &str) -> &'static str {
         ("fr", "drop_hint") => "ou cliquer pour choisir",
         ("fr", "result") => "Résultat",
         ("fr", "download") => "Télécharger",
+        ("fr", "saved") => "Enregistré :",
         ("fr", "up") => "Monter",
         ("fr", "down") => "Descendre",
         ("fr", "remove") => "Retirer",
@@ -64,6 +76,7 @@ fn s(lang: &str, key: &str) -> &'static str {
         (_, "drop_hint") => "or click to choose",
         (_, "result") => "Result",
         (_, "download") => "Download",
+        (_, "saved") => "Saved:",
         (_, "up") => "Move up",
         (_, "down") => "Move down",
         (_, "remove") => "Remove",
@@ -235,6 +248,8 @@ pub fn AutoTool(
     variant: Option<String>,
     /// Global mode chosen by the host (site header, Desk); the user can still override per tool.
     host_mode: Option<String>,
+    /// Desktop hosts save files natively (no browser download); `None` = browser download.
+    save_file: Option<SaveFile>,
 ) -> Element {
     let mut mode = use_signal(|| {
         host_mode
@@ -268,6 +283,7 @@ pub fn AutoTool(
     let mut files = use_signal(BTreeMap::<String, Vec<FileData>>::new);
     let mut running = use_signal(|| false);
     let mut result = use_signal(|| None::<Result<ValueMap, ToolError>>);
+    let mut saved_note = use_signal(|| None::<String>);
 
     let file_inputs: Vec<_> = contract
         .inputs
@@ -287,6 +303,7 @@ pub fn AutoTool(
         .cloned()
         .collect();
 
+    let saved_label = s(&lang, "saved");
     let (move_up_label, move_down_label, remove_label) =
         (s(&lang, "up"), s(&lang, "down"), s(&lang, "remove"));
     let (run_label, running_label, copy_label, result_label, download_label) = (
@@ -509,13 +526,20 @@ pub fn AutoTool(
                                             src: "data:{file.mime};base64,{base64(&file.bytes)}",
                                         }
                                     }
+                                    if let Some(note) = saved_note() {
+                                        p { class: "k-muted", role: "status", "{note}" }
+                                    }
                                     div { class: "k-output",
                                         code { "{file.name}" }
                                         Button {
                                             onclick: {
                                                 let js = download_js(&file);
-                                                move |_| {
-                                                    document::eval(&js);
+                                                let file = file.clone();
+                                                move |_| match save_file {
+                                                    Some(save) => saved_note.set(Some((save.0)(&file).map_or_else(|e| e, |p| format!("{} {p}", saved_label)))),
+                                                    None => {
+                                                        document::eval(&js);
+                                                    }
                                                 }
                                             },
                                             "{download_label}"

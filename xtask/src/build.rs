@@ -186,7 +186,7 @@ fn App() -> Element {{
     rsx! {{
         document::Stylesheet {{ href: CSS }}
         main {{ style: "padding: var(--k-space-4); max-width: 720px; margin: 0 auto;",
-            AutoTool {{ contract, lang, locale, runner: Runner(runner), variant, host_mode: host_mode().or(initial_mode) }}
+            AutoTool {{ contract, lang, locale, runner: Runner(runner), variant, host_mode: host_mode().or(initial_mode), save_file: None }}
         }}
     }}
 }}

@@ -13,6 +13,18 @@ for (const dir of ['icons', 'og']) {
   if (existsSync(from)) cpSync(from, join(out, 'public', dir), { recursive: true });
 }
 
+// Installers (served as kortex.site/install.sh and /install.ps1) and, when a release was built, the
+// signed index with the CLI pointer file used by the installers.
+for (const f of ['install.sh', 'install.ps1']) {
+  const src = join(root, 'installers', f);
+  if (existsSync(src)) cpSync(src, join(out, 'public', f));
+}
+const rel = join(root, 'dist/release');
+if (existsSync(join(rel, 'index.json'))) {
+  mkdirSync(join(out, 'public/registry'), { recursive: true });
+  for (const f of ['index.json', 'index.json.sig', 'cli-latest.txt']) if (existsSync(join(rel, f))) cpSync(join(rel, f), join(out, 'public/registry', f));
+}
+
 const registry = JSON.parse(readFileSync(join(root, 'registry/index.json'), 'utf8'));
 const read = (p) => (existsSync(p) ? readFileSync(p, 'utf8') : '');
 

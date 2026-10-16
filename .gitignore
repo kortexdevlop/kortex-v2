@@ -15,3 +15,6 @@ dist/
 web/site/public/icons/
 web/site/public/og/
 .wrangler/
+web/site/public/install.sh
+web/site/public/install.ps1
+web/site/public/registry/
