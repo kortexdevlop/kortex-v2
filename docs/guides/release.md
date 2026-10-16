@@ -5,6 +5,8 @@
 
 Coût en minutes (dépôt privé : macOS ×10, Windows ×2) : une validation « 1 outil » ≈ 250 min ; une release complète est plus lourde. Le workflow ne tourne **jamais sur push** : uniquement sur tag `release/AAAA-MM-JJ` ou à la main (Actions → release → Run workflow).
 
+Validée sur GitHub Actions (Linux, macOS arm64, Windows) le 2026-10-16. Pour ne relancer qu'un système : Run workflow → `only`.
+
 ## Prérequis (une fois)
 1. Clé de signature : `cargo xtask keygen --out ~/.kortex-signing-key` (clé publique → `crates/kortex-pkg/release.pub`, à committer ; **ne jamais committer la clé privée**).
 2. Secret GitHub `KORTEX_SIGNING_KEY` = contenu du fichier de clé privée.

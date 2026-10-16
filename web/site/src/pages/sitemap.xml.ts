@@ -10,6 +10,7 @@ export const GET: APIRoute = ({ site }) => {
   const pairs: [string, string][] = [
     ['/', '/en'],
     ['/outils', '/en/tools'],
+    ['/telecharger', '/en/download'],
     ...legal.map((p): [string, string] => [`/${p.slug.fr}`, `/en/${p.slug.en}`]),
     ...tools.flatMap((t): [string, string][] => [
       [toolPath(t, 'fr'), toolPath(t, 'en')],

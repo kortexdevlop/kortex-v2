@@ -1,0 +1,91 @@
+---
+import Base from '../layouts/Base.astro';
+import type { Lang } from '../lib/data';
+const { lang } = Astro.props as { lang: Lang };
+const T = {
+  fr: {
+    title: 'Télécharger Kortex', h1: 'Installer Kortex sur votre ordinateur',
+    intro: 'Les outils fonctionnent aussi directement dans le navigateur. Installez-les pour les utiliser hors ligne, avec de vrais fichiers sur votre disque.',
+    step1: '1. Installer la commande kortex', step2: '2. Installer les outils que vous voulez',
+    mac: 'macOS ou Linux (Terminal)', win: 'Windows (PowerShell)', detected: 'Détecté pour votre système',
+    step2text: 'Chaque outil est téléchargé, vérifié (signature Ed25519 et empreinte SHA-256) puis installé dans votre dossier personnel, sans droits administrateur.',
+    manualTitle: 'Téléchargement direct : avertissements du système',
+    manualIntro: 'Kortex n’achète pas de certificat de signature de code : c’est ce qui permet de rester gratuit. Votre système peut donc afficher un avertissement si vous ouvrez un fichier téléchargé depuis un navigateur. L’installation par la commande ci-dessus ne les déclenche pas.',
+    winH: 'Windows (SmartScreen)', winT: 'Cliquez sur « Informations complémentaires », puis « Exécuter quand même ».',
+    macH: 'macOS (Gatekeeper)', macT: 'Clic droit sur l’application, « Ouvrir », puis confirmez. Une seule fois suffit.',
+    linH: 'Linux', linT: 'Rendez le fichier exécutable : chmod +x kortex-… puis lancez-le.',
+    verifyTitle: 'Vérifier l’installation', verifyT: 'La commande suivante contrôle le dossier, chaque outil installé (empreinte du binaire), la signature du catalogue et votre compte.',
+    removeTitle: 'Désinstaller', removeT: 'Un outil : kortex remove <outil>. Tout Kortex : supprimez le dossier ~/.kortex (et la ligne PATH ajoutée à votre profil).',
+    commands: 'Commandes utiles',
+  },
+  en: {
+    title: 'Download Kortex', h1: 'Install Kortex on your computer',
+    intro: 'Tools also work right in the browser. Install them to use them offline, with real files on your disk.',
+    step1: '1. Install the kortex command', step2: '2. Install the tools you want',
+    mac: 'macOS or Linux (Terminal)', win: 'Windows (PowerShell)', detected: 'Detected for your system',
+    step2text: 'Each tool is downloaded, verified (Ed25519 signature and SHA-256 checksum) and installed in your home folder, with no administrator rights.',
+    manualTitle: 'Direct download: system warnings',
+    manualIntro: 'Kortex does not buy a code-signing certificate: that is what keeps it free. Your system may therefore show a warning if you open a file downloaded through a browser. Installing with the command above does not trigger them.',
+    winH: 'Windows (SmartScreen)', winT: 'Click “More info”, then “Run anyway”.',
+    macH: 'macOS (Gatekeeper)', macT: 'Right-click the app, choose “Open”, then confirm. Once is enough.',
+    linH: 'Linux', linT: 'Make the file executable: chmod +x kortex-… then run it.',
+    verifyTitle: 'Check the installation', verifyT: 'This command checks the folder, every installed tool (binary checksum), the catalogue signature and your account.',
+    removeTitle: 'Uninstall', removeT: 'One tool: kortex remove <tool>. All of Kortex: delete the ~/.kortex folder (and the PATH line added to your profile).',
+    commands: 'Useful commands',
+  },
+}[lang];
+const unix = 'curl -fsSL https://kortex.site/install.sh | sh';
+const win = 'irm https://kortex.site/install.ps1 | iex';
+---
+<Base title={`${T.title} — Kortex`} description={T.intro} lang={lang} alt={{ fr: '/telecharger', en: '/en/download' }}>
+  <h1>{T.h1}</h1>
+  <p class="k-muted">{T.intro}</p>
+
+  <h2>{T.step1}</h2>
+  <div class="dl-grid">
+    <section class="k-card k-stack" data-os="unix"><h3>{T.mac}</h3><pre class="dl-cmd"><code>{unix}</code></pre><button class="k-btn" data-variant="ghost" type="button" data-copy={unix}>Copier / Copy</button></section>
+    <section class="k-card k-stack" data-os="win"><h3>{T.win}</h3><pre class="dl-cmd"><code>{win}</code></pre><button class="k-btn" data-variant="ghost" type="button" data-copy={win}>Copier / Copy</button></section>
+  </div>
+
+  <h2>{T.step2}</h2>
+  <p class="k-muted">{T.step2text}</p>
+  <pre class="dl-cmd"><code>kortex available
+kortex install secure.password-generator
+kortex install --all</code></pre>
+
+  <h2>{T.commands}</h2>
+  <pre class="dl-cmd"><code>kortex installed          kortex update --all
+kortex update --self      kortex open &lt;tool&gt;
+kortex login              kortex doctor</code></pre>
+
+  <h2>{T.verifyTitle}</h2>
+  <p class="k-muted">{T.verifyT}</p>
+  <pre class="dl-cmd"><code>kortex doctor</code></pre>
+
+  <h2>{T.manualTitle}</h2>
+  <p class="k-muted">{T.manualIntro}</p>
+  <div class="grid">
+    <div class="k-card"><strong>{T.winH}</strong><p class="k-muted">{T.winT}</p></div>
+    <div class="k-card"><strong>{T.macH}</strong><p class="k-muted">{T.macT}</p></div>
+    <div class="k-card"><strong>{T.linH}</strong><p class="k-muted">{T.linT}</p></div>
+  </div>
+
+  <h2>{T.removeTitle}</h2>
+  <p class="k-muted">{T.removeT}</p>
+</Base>
+<style is:global>
+  .dl-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--k-space-4); }
+  .dl-cmd { margin: 0; padding: var(--k-space-4); border-radius: var(--k-radius-field); background: var(--k-surface-2); overflow-x: auto; font-family: var(--k-type-mono); font-size: 0.9rem; }
+  [data-os][data-detected] { border-color: var(--k-accent); box-shadow: var(--k-shadow-3); }
+</style>
+<script>
+  // Highlight the command for the visitor's system and make the buttons copy it.
+  const ua = navigator.userAgent;
+  const os = /Windows/.test(ua) ? 'win' : /Mac|Linux|X11/.test(ua) ? 'unix' : null;
+  if (os) document.querySelector(`[data-os="${os}"]`)?.setAttribute('data-detected', '');
+  document.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach((b) =>
+    b.addEventListener('click', async () => {
+      try { await navigator.clipboard.writeText(b.dataset.copy!); b.textContent = '✓'; } catch { /* selection is still possible by hand */ }
+    }),
+  );
+</script>
