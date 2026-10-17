@@ -17,9 +17,9 @@ Chaque cible comporte 38 outils, trois apps (Store, Hub, Desk) et la CLI : **168
 
 ## Workflow GitHub
 
-`release.yml` compile les mêmes sources Rust/Dioxus pour Linux, macOS ARM/Intel et Windows, ainsi que les 38 outils et trois apps web. Les apps sont découvertes depuis leurs contrats. Les paramètres manuels sont `tools=all`, `only=all|linux|macos|windows`, `intel_mac` et `publish=false` par défaut.
+`release.yml` compile les mêmes sources Rust/Dioxus pour Linux, macOS ARM/Intel et Windows, ainsi que les 38 outils et trois apps web. Les apps sont découvertes depuis leurs contrats. Les paramètres manuels sont `tools=all`, `only=all|linux|macos|windows|web`, `intel_mac` et `publish=false` par défaut.
 
-La release desktop ne tourne pas à chaque push : uniquement manuellement ou sur un tag `release/*`. Conserver les résultats réussis de chaque cible pour éviter les reconstructions inutiles ; une relance par OS exécute aussi le job web, dont les caches sont réutilisés. Les artefacts privés sont conservés sept jours : les récupérer avant expiration.
+La release desktop ne tourne pas à chaque push : uniquement manuellement ou sur un tag `release/*`. Conserver les résultats réussis de chaque cible pour éviter les reconstructions inutiles ; une relance par OS exécute aussi le job web, dont les caches sont réutilisés. `only=web` compile uniquement les bundles outils/apps et ignore les jobs desktop/signature ; utiliser cette option pour obtenir des reçus compatibles après un changement partagé sans recompilation native inutile. Les artefacts privés sont conservés sept jours : les récupérer avant expiration.
 
 Le vérificateur impose l’inventaire sélectionné, deux fichiers réguliers par archive (manifeste et binaire), versions/cibles et empreintes. Les métadonnées JSON sont lues explicitement en UTF-8 sur tous les OS. Le job de signature génère ensuite l’index Ed25519 à partir des paquets du run. Un run Windows seul ne produit pas un index multiplateforme complet.
 
