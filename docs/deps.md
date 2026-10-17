@@ -38,3 +38,6 @@
 
 ### Store common application (2026-10-17)
 Store reuses the existing internal `kortex-shell` and existing workspace Serde. Native package access is target-gated; no package manager, system HTTP backend or native filesystem is linked into its browser build. No new external dependency is introduced.
+
+### Static deployment CI (2026-10-17)
+The deployment workflow reuses the existing pinned Wrangler 4.151.0 through npm exec on its temporary GitHub runner only. The receipt verifier uses Node.js built-ins and the existing Rust compiler/std library; no product dependency or additional catalogue tool is introduced. Cloudflare credentials remain GitHub Actions secrets, never artifacts.

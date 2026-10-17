@@ -82,3 +82,13 @@ node scripts/publish.mjs --static-only
 ```
 
 `--static-only` checks API health and publishes static targets without applying migrations or deploying the account Worker. The run CSP permits the configured site/Desk/Hub ancestors; app CSP permits only the configured run frame origin. No source maps, Rust/config sources or credentials enter static assets. Desktop binaries are local compilation evidence, not a public download release. Windows/Linux and interactive native acceptance remain separate requirements.
+
+## GitHub static publication workflow
+
+`deploy.yml` is manual and accepts a completed `release.yml` run number. Its web job must have succeeded even if an unrelated desktop job failed. Preparation downloads only that run's web artifact, requires an exact 38-tool/app inventory and unchanged compiled sources, verifies output fingerprints and app SHA-256 manifests, then builds the independent Astro site. It never recompiles the desktop catalogue.
+
+The default `publish=false` prepares an artifact only: `prepared-static-publication`, retained seven days, contains the public assets, generated static Worker configurations and build provenance. This is not a public preview or a deployment. Rust/Node build-only receipt checks add no product dependency. A source difference in crates/tools/apps/xtask/design/contracts fails closed; build a new release web artifact first.
+
+With `publish=true`, a separate job requires `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` GitHub secrets. Provision a scoped static Worker deployment token; do not copy a local OAuth session or place tokens in workflow inputs. These secrets are currently absent. The publisher checks the existing account API, publishes run/apps/site without D1 migrations or API changes, verifies all 41 public entry hashes, and uploads `static-publication-result` with source/publication commits and deployed version IDs. Desktop downloads stay controlled by the existing feature flag.
+
+Pull requests changing the deployment workflow/verifier also run preparation against the actual published build recorded in `.github/web-build.json`. This verifies the workflow before merge without any production secret. Such PR runs cannot enter the publication job. Update the build reference only after a new release web job has completed and its artifacts are available.

@@ -2,7 +2,7 @@
 _Last update: 2026-10-17 — sauvegarde manuelle Rust et confidentialité publiées, preuves consolidées_
 
 ## Current phase
-Store 0.2 Rust/Dioxus commun publié sur https://store.kortex.site/ et lié au site. Catalogue 38 outils, recherche, univers, fiches/permissions et ouverture web ; détection native des installations réelles. Web et macOS Intel compilés avec mêmes empreintes source ; recettes locale/publique FR/EN/mobile et gate complet réussis. Lot 10.3/11.2/10.1/10.7/17.4 : sources privées poussées dans la PR #1, commit 7ed41ae47a71056d980519537a7237044d00ec3a ; run GitHub 39031294481 lancé pour les 38 outils + trois apps + CLI sur quatre cibles bureau et WebAssembly. Résultats CI non encore validés. Installation publique fermée tant que trousseau, confirmations et recettes OS restent ouverts. Hub/Desk 0.2 et sauvegardes manuelles précédentes conservés.
+Store 0.2 Rust/Dioxus commun publié sur https://store.kortex.site/ : catalogue gelé 38 outils, recherche, univers, fiches/permissions et ouverture web ; détection native des installations réelles. Les 38 outils web et les trois apps compilés sur GitHub (39032642157) ont été récupérés, vérifiés et publiés ; recettes publiques Store et Hub/Desk réussies. Linux + macOS ARM/Intel : 126 paquets vérifiés, dont 84 signatures macOS. Windows a compilé/paqueté les 42 exécutables mais le contrôle CP1252 a échoué ; correctif UTF-8 et cache au commit ca3d62342a6cbbacf493628ddfb0cdbfdb1e1ec1, relance ciblée 39049702070 en cours. Gate local complet vert ; CI qualité c95bf87 (39048924068) verte. PR privée #1. Installation publique fermée : trousseau, confirmations, bundles et recettes OS restent ouverts ; aucune app déclarée fonctionnellement complète.
 
 ## Journal historique — ne vaut pas validation de l’état actuel
 - Master prompt copié dans `docs/MASTER_PROMPT.md`; `CLAUDE.md`/`AGENTS.md` créés.
@@ -346,3 +346,12 @@ stable: 0 · beta: 38 · draft: 0 — calc 13, code 8, color 2, convert 2, image
 - Quality CI 39048924068 (c95bf87) completed successfully: Rust, site and services. All tests retained; reduced debug artifacts resolved runner disk exhaustion. Linux 42 archives/binaries and architectures verified locally; CI web 38 tools/three apps verified against receipts plus SHA-256 manifests, publication in progress.
 
 - GitHub web artifacts published: run b930b1b1-51c2-4727-8536-1e5499a39e9f, Desk bf40f204-c8e6-4f17-9ef0-ecb07da0e0ce, Hub 4003679e-e813-4704-b1cc-a9aeb585804f, Store 9365e6f5-7274-4952-aaa5-f50b60e7a999, site 7206b12d-5e7c-442a-9f02-d8cef6e09132. Public HTTPS recipes passed: Store 38/search/detail/permissions/filter/FR-EN/mobile, Hub favourites/widgets/search, Desk real SHA-256 tool and layout restoration, denied storage warning; zero page errors.
+
+- Final Windows-only retry: 39049702070, commit ca3d62342a6cbbacf493628ddfb0cdbfdb1e1ec1. Verifier also passed against all 42 real Linux packages with UTF-8 mode disabled and C locale. Full local gate passed after proxy bypass for localhost test servers.
+
+### Static deployment preparation — 2026-10-17
+- 17.5: added manual deploy workflow and build-only receipt verifier. Reuses completed release web artifacts, checks exact catalogue, source compatibility, receipt fingerprints and SHA-256 app manifests, builds the site, packages public assets/configs/provenance. Publication defaults off; an explicit publish request requires the currently absent scoped Cloudflare secrets. No local OAuth token is transferred.
+- 8.5 audit reconfirmed the legacy plaintext credentials file; keychain migration remains open and no native installation readiness is claimed.
+- Verified Linux/macOS packages extracted without execution under `.kortex/binaries/<target>/<id>/`, with each written binary SHA-256 checked. 126 executables currently available there.
+
+- Deployment verifier accepted all 41 real bundles and rejected corrupted HTML, an incomplete catalogue and compiled-source drift. Workflow YAML/shell parsed; standalone Rust helper compiled and formatted; full repository gate passed. New workflow preparation is tested on PR changes, with publication disabled for PRs.
