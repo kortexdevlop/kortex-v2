@@ -2,8 +2,11 @@
 mod apps;
 mod build;
 mod check;
+mod ci_budget;
 mod cli_gen;
+mod dev;
 mod icons;
+mod new_app;
 mod new_tool;
 mod platform_check;
 mod registry;
@@ -15,7 +18,7 @@ mod worker;
 
 use std::process::ExitCode;
 
-const USAGE: &str = "Commandes : tokens | registry | check [id] | stats | icons | cli-gen | keygen | build-desktop | build-cli | build-app | list-tools | package | release-index | build <id…|all> | new-tool --universe U --name N";
+const USAGE: &str = "Commandes : tokens | registry | check [id] | stats | icons | cli-gen | keygen | build-desktop | build-cli | build-app | list-tools | package | release-index | build <id…|all> | new-tool --universe U --name N | new-app --name N | dev <id> [--desktop] | ci-budget";
 
 /// Path for embedding in generated TOML/Rust source: forward slashes work on every OS, while
 /// Windows backslashes would be read as (invalid) escape sequences.
@@ -47,6 +50,9 @@ fn main() -> ExitCode {
         Some("icons") => icons::run(),
         Some("stats") => stats::run(),
         Some("new-tool") => new_tool::run(&args[1..]),
+        Some("new-app") => new_app::run(&args[1..]),
+        Some("dev") => dev::run(&args[1..]),
+        Some("ci-budget") => ci_budget::run(),
         Some(other) => Err(format!("commande inconnue : {other}\n{USAGE}")),
         None => Err(format!("usage : cargo xtask <commande>\n{USAGE}")),
     };
