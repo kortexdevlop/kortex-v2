@@ -184,6 +184,25 @@ pub fn run(filter: Option<&str>) -> Result<(), String> {
     }
 
     if filter.is_none() {
+        let current: Vec<_> = all.iter().filter_map(|t| t.contract.clone().ok()).collect();
+        match crate::compat::baseline_registry() {
+            Some((reference, registry)) => {
+                match crate::compat::compare_registry(&registry, &current) {
+                    Ok(issues) => errors.extend(
+                        issues
+                            .into_iter()
+                            .map(|i| format!("✗ {i} (référence {reference})")),
+                    ),
+                    Err(e) => errors.push(format!("✗ référence {reference} : {e}")),
+                }
+            }
+            None => println!(
+                "· compatibilité des contrats ignorée : aucune référence git (définir KORTEX_BASELINE_REF)"
+            ),
+        }
+    }
+
+    if filter.is_none() {
         for app in crate::apps::discover()? {
             let dir = app.dir.display().to_string();
             for name in [

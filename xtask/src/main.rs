@@ -5,6 +5,7 @@ mod changed;
 mod check;
 mod ci_budget;
 mod cli_gen;
+mod compat;
 mod dev;
 mod icons;
 mod new_app;

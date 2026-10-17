@@ -16,6 +16,8 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # contract compatibility compares with the base branch
       - run: rustup show
       - name: Linux system libraries (desktop webview crates are part of the workspace)
         run: |
@@ -26,7 +28,10 @@ jobs:
         run: cargo xtask tokens
       - run: cargo fmt --all --check
       - run: cargo clippy --workspace --all-targets -- -D warnings
-      - run: cargo xtask check
+      - name: Contract structure and compatibility with the base branch
+        env:
+          KORTEX_BASELINE_REF: origin/${{ github.base_ref || 'main' }}
+        run: cargo xtask check
       - run: cargo test --workspace
       - name: Runner disk budget
         if: always()
