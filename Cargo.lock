@@ -3335,6 +3335,7 @@ checksum = "a4933f3f57a8e9d9da04db23fb153356ecaf00cbd14aee46279c33dc80925c37"
 name = "kortex"
 version = "0.1.0"
 dependencies = [
+ "kortex-io",
  "kortex-macros",
  "kortex-runtime",
 ]
@@ -3460,6 +3461,10 @@ version = "0.1.0"
 dependencies = [
  "toml 0.9.12+spec-1.1.0",
 ]
+
+[[package]]
+name = "kortex-io"
+version = "0.1.0"
 
 [[package]]
 name = "kortex-macros"

@@ -22,7 +22,7 @@ Référence : MASTER_PROMPT.md + RULES.md. Complète PLAN.md (qui reste le suivi
 | V3 | Mode `--engine` JSON-RPC **réalisé** (lot 3, binaire macOS Intel exécuté) ; reste `engine.wasm` headless pour 35 outils sur 38 | §7.1, §7.3 | Partiel |
 | V4 | Exécuteur natif sur thread avec annulation, délai et panique contenue **réalisé** (lot 3) ; recette en fenêtre native non faite | §6.3, RULES 4.4 | Partiel |
 | V5 | ~~`ui = "custom"` non branché~~ **Capacité ajoutée (lot 2)** : aucun des 38 outils n'était en `custom` ; mécanisme prouvé web (rendu) et desktop (compilé, lancé) sur un outil jetable. Reste : rendu desktop inspecté, 7.6 (UI QR) | §6.4 | Partiel |
-| V6 | **Crates manquantes** : `kortex-io`, `kortex-media`, `kortex-ai` (le client IA, ex. conversion/adapters IO) | §5.2 | Moyenne (créer quand usage réel) |
+| V6 | Crate `kortex-io` **créée avec un usage réel** (validation par signature, lot 5) ; `kortex-media` et `kortex-ai` restent à créer quand un usage existe | §5.2 | Partiel |
 | V7 | xtask : `new-app`, `dev`, `ci-budget` **ajoutés (lot A)** ; restent `og-images` et `deploy` | §13, §11 | Partiel |
 | V8 | **Workers prévus absents** : `ai-gateway`, `proxy`, `oauth-broker` (l'IA est dans `api`, ADR 0006 — compatible mais écart de structure à acter) | §8.7, §10 | Basse/Moyenne |
 | V9 | ~~`services/{desk,hub,run,site,store}` ne contiennent qu'un `wrangler.jsonc`~~ **Non-violation** : Workers Static Assets de §8.7 ; documenté dans ARCHITECTURE.md | §8.7 | Résolu |

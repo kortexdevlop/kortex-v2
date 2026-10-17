@@ -151,3 +151,22 @@ fn errors_on_no_input_garbage_bad_color_and_bad_quality() {
         Err("invalid_param")
     );
 }
+
+#[test]
+fn dynamic_entry_rejects_a_file_that_is_not_an_image_by_content() {
+    use kortex::runtime::{ToolError, Value, ValueMap};
+    let fake = FileData {
+        name: "photo.png".into(),
+        mime: "image/png".into(),
+        bytes: b"not really a png".to_vec(),
+    };
+    let rejected = block_on(tool_image_convert::run_map(
+        &ValueMap::from([("images".to_owned(), Value::Files(vec![fake]))]),
+        &ValueMap::new(),
+        &mut Cx::new(),
+    ));
+    assert_eq!(
+        rejected,
+        Err(ToolError::with_detail("file_type_mismatch", "photo.png"))
+    );
+}

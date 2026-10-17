@@ -86,6 +86,9 @@ fn s(lang: &str, key: &str) -> &'static str {
         ("fr", "err_missing_input") => "Ajoutez d'abord le contenu à traiter.",
         ("fr", "err_invalid_param") => "Valeur invalide.",
         ("fr", "err_cancelled") => "Annulé.",
+        ("fr", "err_file_type_mismatch") => {
+            "Le contenu d'un fichier ne correspond pas au type attendu (vérifié sur le contenu, pas sur l'extension)."
+        }
         (_, "run") => "Run",
         (_, "running") => "Running…",
         (_, "cancel") => "Cancel",
@@ -109,6 +112,9 @@ fn s(lang: &str, key: &str) -> &'static str {
         (_, "err_missing_input") => "Add the content to process first.",
         (_, "err_invalid_param") => "Invalid value.",
         (_, "err_cancelled") => "Cancelled.",
+        (_, "err_file_type_mismatch") => {
+            "A file's content does not match the expected type (checked on its content, not its extension)."
+        }
         _ => "",
     }
 }
@@ -423,6 +429,10 @@ pub fn AutoTool(
                 {
                     let id = i.id.clone();
                     let multiple = matches!(i.ty, PortType::Files(_));
+                    let accept = match &i.ty {
+                        PortType::File(m) | PortType::Files(m) if m != "*/*" => Some(m.clone()),
+                        _ => None,
+                    };
                     let names: Vec<String> = files
                         .read()
                         .get(&i.id)
@@ -436,6 +446,7 @@ pub fn AutoTool(
                                 label: s(&lang, "drop").to_owned(),
                                 hint: s(&lang, "drop_hint").to_owned(),
                                 multiple,
+                                accept,
                                 onfiles: move |picked: Vec<dioxus::html::FileData>| {
                                     let id = id.clone();
                                     spawn(async move {
