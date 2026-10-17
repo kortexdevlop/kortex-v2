@@ -37,5 +37,14 @@
     "Cloudflare deployment secrets absent; publication job skipped",
     "Prepared artifact is not a public preview",
     "Native keychain and OS installation acceptance remain open"
-  ]
+  ],
+  "followup": {
+    "commit": "d947c826e32af0b7200e5a343050dcd1180fa61c",
+    "quality_run_id": 39053627953,
+    "quality_conclusion": "success",
+    "preparation_run_id": 39053628000,
+    "preparation_conclusion": "success",
+    "publication_conclusion": "skipped",
+    "compiled_brand_sources_guard": true
+  }
 }
