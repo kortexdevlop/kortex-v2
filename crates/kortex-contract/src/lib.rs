@@ -1,10 +1,12 @@
 //! Tool contract (`tool.toml`): schema, port types, validation.
 //! Site, Desk, Flow, Mind, Seek, Store and CLI read contracts only.
 
+mod json_schema;
 mod port;
 mod schema;
 mod validate;
 
+pub use json_schema::{port_schema, tool_definition};
 pub use port::{PortType, PortTypeError};
 pub use schema::{
     AppContract, Input, Limits, Localized, Output, Param, ParamLevel, Permissions, Search, Status,

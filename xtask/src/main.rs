@@ -12,6 +12,7 @@ mod new_tool;
 mod platform_check;
 mod registry;
 mod release;
+mod schema;
 mod stats;
 mod tokens;
 mod tools;
@@ -19,7 +20,7 @@ mod worker;
 
 use std::process::ExitCode;
 
-const USAGE: &str = "Commandes : tokens | registry | check [id] | stats | icons | cli-gen | keygen | build-desktop | build-cli | build-app | list-tools | package | release-index | build <id…|all> | new-tool --universe U --name N [--custom] | new-app --name N | dev <id> [--desktop] | ci-budget | changed --base REF";
+const USAGE: &str = "Commandes : tokens | registry | check [id] | stats | icons | cli-gen | keygen | build-desktop | build-cli | build-app | list-tools | package | release-index | build <id…|all> | new-tool --universe U --name N [--custom] | new-app --name N | dev <id> [--desktop] | ci-budget | changed --base REF | schema <id|all> [--lang fr|en]";
 
 /// Path for embedding in generated TOML/Rust source: forward slashes work on every OS, while
 /// Windows backslashes would be read as (invalid) escape sequences.
@@ -53,6 +54,7 @@ fn main() -> ExitCode {
         Some("new-tool") => new_tool::run(&args[1..]),
         Some("new-app") => new_app::run(&args[1..]),
         Some("changed") => changed::run(&args[1..]),
+        Some("schema") => schema::run(&args[1..]),
         Some("dev") => dev::run(&args[1..]),
         Some("ci-budget") => ci_budget::run(),
         Some(other) => Err(format!("commande inconnue : {other}\n{USAGE}")),
