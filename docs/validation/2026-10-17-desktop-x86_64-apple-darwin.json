@@ -1,0 +1,271 @@
+{
+  "schema": 1,
+  "commit": "7ed41ae47a71056d980519537a7237044d00ec3a",
+  "run_id": "39031294481",
+  "target": "x86_64-apple-darwin",
+  "tool_count": 38,
+  "packages": {
+    "apps.desk": {
+      "file": "apps.desk-0.2.0-x86_64-apple-darwin.tar.gz",
+      "version": "0.2.0",
+      "sha256": "ae676b385aac9b373dc318e0ff7d1af76fb005d15727a311eece5236b0da64c2",
+      "sha256_binary": "c573430d06020d0e9319084b56720289679dc6f8a59519fb913e2d36674da9bd"
+    },
+    "apps.hub": {
+      "file": "apps.hub-0.2.0-x86_64-apple-darwin.tar.gz",
+      "version": "0.2.0",
+      "sha256": "5eafd3a0d8972a73527a8129c3417d68c73538621ad625f4870bd1e6e1707fd0",
+      "sha256_binary": "8dbfb7ebecd2334b6ef2a1463f5dc203a2bc3e4b5abf4e257c027ec1e19fb284"
+    },
+    "apps.store": {
+      "file": "apps.store-0.2.0-x86_64-apple-darwin.tar.gz",
+      "version": "0.2.0",
+      "sha256": "ae80d6a5ffc169f7b59b1266f3029702db5986aed171007c1e9d2c58b514c4ee",
+      "sha256_binary": "e053707d60bc59203b5987abc43fbd93b71748b4527128ff9b0f83cb5648fb33"
+    },
+    "calc.age": {
+      "file": "calc.age-1.0.0-x86_64-apple-darwin.tar.gz",
+      "version": "1.0.0",
+      "sha256": "cc02743cac757ffb436da8d81ddb0c22d445079deabbdfe5f863c3b581ba0ac2",
+      "sha256_binary": "0eda8410040c1f7a5624d0e4b724842eaebae5a5034a2a9be5099a3a1f89d2ed"
+    },
+    "calc.average": {
+      "file": "calc.average-1.0.0-x86_64-apple-darwin.tar.gz",
+      "version": "1.0.0",
+      "sha256": "5ac142c1b27043e94329908f7caa029b027cf3a55e7409f4a03b9a79f458dff8",
+      "sha256_binary": "3024ca849a25e304259c3ff31293c346f7527638b53f140a35a2319697067e9c"
+    },
+    "calc.compound-interest": {
+      "file": "calc.compound-interest-1.0.0-x86_64-apple-darwin.tar.gz",
+      "version": "1.0.0",
+      "sha256": "62e12e8f5f5bc6b1cb72c9abf2f873556238f5eb2269ba9fbfda54b02c2c8e09",
+      "sha256_binary": "798db86bc5a3c7112984729101facff9179a21258dfb1e6bb5462e28c411b86a"
+    },
+    "calc.date-add": {
+      "file": "calc.date-add-1.0.0-x86_64-apple-darwin.tar.gz",
+      "version": "1.0.0",
+      "sha256": "ef315e15e036f8df19179e7c483deb5b9186987c9d5b91b931c216a07d8324a5",
+      "sha256_binary": "42facb33bf4099267d2be3a3db8f04c41f2f54f3a1899975780c00508ddc552e"
+    },
+    "calc.date-difference": {
+      "file": "calc.date-difference-1.0.0-x86_64-apple-darwin.tar.gz",
+      "version": "1.0.0",
+      "sha256": "b01a1bd81f299e76e8d5e733947a1eaa8a2025122fa21c88bd3748cfd5ff0a19",
+      "sha256_binary": "2f655bedbbcfda7e8c2cab772a4e3cf06c03a3324d3b8718bf8e94661e1ffa21"
+    },
+    "calc.fuel-cost": {
+      "file": "calc.fuel-cost-1.0.0-x86_64-apple-darwin.tar.gz",
+      "version": "1.0.0",
+      "sha256": "bb38dfb7acff81900887e2eac0e6e862f85081a74cc19498328fc0a75cbbf507",
+      "sha256_binary": "a1ece0cac472ccf3512638eea9daa603b158f6001e60ed9d244081692f18fd28"
+    },
+    "calc.gross-net-salary": {
+      "file": "calc.gross-net-salary-1.0.0-x86_64-apple-darwin.tar.gz",
+      "version": "1.0.0",
+      "sha256": "dd3481fe8b03d5a949979d391f82b0189999868f9411414e439957fdea72758f",
+      "sha256_binary": "834d4a8596f4efce6b47f83c29442494ef4a986a4708e1720b84fdd10c9f455e"
+    },
+    "calc.loan": {
+      "file": "calc.loan-1.0.0-x86_64-apple-darwin.tar.gz",
+      "version": "1.0.0",
+      "sha256": "eec66aa5914688c4e298e6acf81e6e1bcb72767eb5e066253106748f774ed01f",
+      "sha256_binary": "e70fc089e4608ac2256182390b66ecf03db11975376588f265993dc722725ef3"
+    },
+    "calc.percentage": {
+      "file": "calc.percentage-1.0.0-x86_64-apple-darwin.tar.gz",
+      "version": "1.0.0",
+      "sha256": "8e53faaf79e341dad433a85d86870dd7f9b6c3d417c7c5cbdef948a871f7eeda",
+      "sha256_binary": "1cd965664f3a51fa9a6129f1ffca4d3db306b0b00d76aec04e797ccbf4e2437d"
+    },
+    "calc.rule-of-three": {
+      "file": "calc.rule-of-three-1.0.0-x86_64-apple-darwin.tar.gz",
+      "version": "1.0.0",
+      "sha256": "e43c6a66a723d9feb9784a286ad77602555d977e38986b1da88ce5daf08d9607",
+      "sha256_binary": "4984b3c1c9781bb582072e8ea8466e6fd76bcef497f14a8f131537327e51bac2"
+    },
+    "calc.tip": {
+      "file": "calc.tip-1.0.0-x86_64-apple-darwin.tar.gz",
+      "version": "1.0.0",
+      "sha256": "368a58b7acc6f9d1264a4b14d7a3f4e7b4f87bef1a0564b81c28cd01e0d5b3fd",
+      "sha256_binary": "c9cee96102c2f0d7acd5610f8802c7cdb093fc4d1cb2ff3498e7e8194c6202c5"
+    },
+    "calc.unit-price": {
+      "file": "calc.unit-price-1.0.0-x86_64-apple-darwin.tar.gz",
+      "version": "1.0.0",
+      "sha256": "52aef71ab76daffb6d8075d52fd140fcdbe8909176afa8f51b7d6987511f54cb",
+      "sha256_binary": "7cabb81128d51717ce13504bfae7caa56e3a4c2d075ef776755e9d7542166af1"
+    },
+    "calc.vat": {
+      "file": "calc.vat-1.0.0-x86_64-apple-darwin.tar.gz",
+      "version": "1.0.0",
+      "sha256": "c8e69d564e34fc6f5a78e89706db322658469692eabd57f02bfa02d29e4ffcde",
+      "sha256_binary": "f9144315e0e098c471a06c8be0fc1b9ff7ace730756bd37e8c23e9a78ad51c2c"
+    },
+    "cli": {
+      "file": "cli-0.1.0-x86_64-apple-darwin.tar.gz",
+      "version": "0.1.0",
+      "sha256": "a62012ec6c3dd179c23c8cd06bbf683d833bc0eb0eef7f21e1c49e6d2d0d7070",
+      "sha256_binary": "d5bd7954c28015b8dd9f6f4e53a5d135c66076b17ea962b49a18572e35ce17d2"
+    },
+    "code.base64": {
+      "file": "code.base64-1.0.0-x86_64-apple-darwin.tar.gz",
+      "version": "1.0.0",
+      "sha256": "89edd6fa82e301fac7e8424c214a64bb3c1f6f680108a22bffeabc75feee931a",
+      "sha256_binary": "9d181998590aa44326aeae3ddb6a84456f83ba889c83e6db8f9c3d82919d4957"
+    },
+    "code.chmod": {
+      "file": "code.chmod-1.0.0-x86_64-apple-darwin.tar.gz",
+      "version": "1.0.0",
+      "sha256": "4807c8bab970d834607809abbb2e136cd6d098ddcc7c651bb7c502e257f59b47",
+      "sha256_binary": "7b95feefc38ecbf3e6d8b1895c1c731fe975ef4feefaf08a444a4d41cb865ae6"
+    },
+    "code.html-entities": {
+      "file": "code.html-entities-1.0.0-x86_64-apple-darwin.tar.gz",
+      "version": "1.0.0",
+      "sha256": "8e47a341863b3c5b3b2627b070cc09cec939a6ec515050fab0c17afceada5776",
+      "sha256_binary": "1fa8d1e73125294c09268cbc1dd1b73c3694c311aef7ef4afde7a3d0e4dee15a"
+    },
+    "code.json-formatter": {
+      "file": "code.json-formatter-1.0.0-x86_64-apple-darwin.tar.gz",
+      "version": "1.0.0",
+      "sha256": "829bcda25d5078a6a0fb14f06e7eac360b0d1e12c9b5770122fdce67214fdc57",
+      "sha256_binary": "a9baf72c8a38b4882caecf98772fd964d264007594592d21062701a71931cc88"
+    },
+    "code.markdown-table": {
+      "file": "code.markdown-table-1.0.0-x86_64-apple-darwin.tar.gz",
+      "version": "1.0.0",
+      "sha256": "c5dab2a4c4518a0675d8e4d56a8df18da15e743528aec59efb3c84f3da71d269",
+      "sha256_binary": "32c78eec88d1ba449171af4b5012d3ca2fe91b266220043a0a6f2446f7edd79a"
+    },
+    "code.number-base": {
+      "file": "code.number-base-1.0.0-x86_64-apple-darwin.tar.gz",
+      "version": "1.0.0",
+      "sha256": "a1b9a96ce32cdd3baf5c294eb9b08b73146a26d5aff35cd8eae63d4cecfb2070",
+      "sha256_binary": "b397f615c1c4f3feda31ebb72bff078ce30edfd2dae25f236d2e7dc91e0bf289"
+    },
+    "code.url-encoder": {
+      "file": "code.url-encoder-1.0.0-x86_64-apple-darwin.tar.gz",
+      "version": "1.0.0",
+      "sha256": "140d4ac12e99f361939ac0246a72865057d20ea79fe8827329571eb1f3c679fe",
+      "sha256_binary": "af5e33da6cc50087bc9ad64aec4c0b0a04f33c890648b0dec294824217279591"
+    },
+    "code.uuid-generator": {
+      "file": "code.uuid-generator-1.0.0-x86_64-apple-darwin.tar.gz",
+      "version": "1.0.0",
+      "sha256": "2620e6e015d36454f6944227ec4bda664fc6b50d9a9844b27ccf912b1ac170aa",
+      "sha256_binary": "d6c5ea26ca55a00db2d8d1da7b0a52db0c1bd572a76d42628b6343eed1bde783"
+    },
+    "color.contrast-checker": {
+      "file": "color.contrast-checker-1.0.0-x86_64-apple-darwin.tar.gz",
+      "version": "1.0.0",
+      "sha256": "958d0c21b0d58c9bc037b5a57cd98701cf9344d577ad6cf7a045304201802cc9",
+      "sha256_binary": "afd1f9c7c0a381c4d76ddbca541eadc51000e4c5ed660a6e1659e93b483900a6"
+    },
+    "color.converter": {
+      "file": "color.converter-1.0.0-x86_64-apple-darwin.tar.gz",
+      "version": "1.0.0",
+      "sha256": "5c6c51cb5ae10d439443c01f9ffda51b48eaaeea14ba80d48cc6d757aabadf09",
+      "sha256_binary": "8ad36d728550986e5db724e81cfb3f8676c97d47ecb380f6726a1440314cd72f"
+    },
+    "convert.timestamp": {
+      "file": "convert.timestamp-1.0.0-x86_64-apple-darwin.tar.gz",
+      "version": "1.0.0",
+      "sha256": "e6e0fe7726d286e2d7a0fc05c22a57a43684fb2c5ecb47f053f11ff9b56e54a4",
+      "sha256_binary": "8b084d99960365192acbfe21a611881e51b445720472af25fe0e2daaea7089ca"
+    },
+    "convert.units": {
+      "file": "convert.units-1.0.0-x86_64-apple-darwin.tar.gz",
+      "version": "1.0.0",
+      "sha256": "b91a198de8b2738c0e7dc90a7b517f15bb74dff556eb92fded974fce9efaaad6",
+      "sha256_binary": "d725418c1977a71fc3a9bdc4054ea86bba762c924a52faf718f3aa1553c37dc9"
+    },
+    "image.convert": {
+      "file": "image.convert-1.0.0-x86_64-apple-darwin.tar.gz",
+      "version": "1.0.0",
+      "sha256": "2442a69c4dfc217a8b2721706e9504f10998d4015fdd7d356f2ce4d6e5ddb0c2",
+      "sha256_binary": "9bee35297f13aaaa4fd7e877e6eca29673068d80bcc8b2ae18bee292a4867f4a"
+    },
+    "pdf.merge": {
+      "file": "pdf.merge-1.0.0-x86_64-apple-darwin.tar.gz",
+      "version": "1.0.0",
+      "sha256": "3200b0833b057a289d68faeb2ccd03dec621f30d0567e61c46be423f7a154db2",
+      "sha256_binary": "d654b8382691242134c681e912b2b21533b63524ca5bb83ecf969777b705774f"
+    },
+    "qr.generator": {
+      "file": "qr.generator-1.0.0-x86_64-apple-darwin.tar.gz",
+      "version": "1.0.0",
+      "sha256": "3df4d66da2a1835af4c8007baa57851ce82be38ce27d3682338a7dd2f3a5c504",
+      "sha256_binary": "f5e170c6ae683385a4d08e110f295e5f901c4ef4a7db6a2ecfc1c0f77be0fc64"
+    },
+    "secure.hash-calculator": {
+      "file": "secure.hash-calculator-1.0.0-x86_64-apple-darwin.tar.gz",
+      "version": "1.0.0",
+      "sha256": "46c5c170a5653f683a2da9236f6cc35b1f3700255aff52442382be7c180a97cd",
+      "sha256_binary": "36556e60a0580e66dce85851a06c8322359eb59af142eadbdb935a390f0ca5e7"
+    },
+    "secure.password-generator": {
+      "file": "secure.password-generator-1.0.0-x86_64-apple-darwin.tar.gz",
+      "version": "1.0.0",
+      "sha256": "e94a64aeb410da2112ece1c1db67c3da8446080727fe045abbfdb66a241a0c99",
+      "sha256_binary": "e076598df2224c7cf9489d50c83dc2b80b16e3a085b6a43fab7bcd7623494e8e"
+    },
+    "text.case-converter": {
+      "file": "text.case-converter-1.0.0-x86_64-apple-darwin.tar.gz",
+      "version": "1.0.0",
+      "sha256": "724c9688c15b356e8f03def22bdcd192f27a7205f7eaac5f0f116c9217e0c89c",
+      "sha256_binary": "1b3bbf5f88aa062aa239cc4b3513fbc46f31e12839e4b630affbeb2508e9c6b2"
+    },
+    "text.cleaner": {
+      "file": "text.cleaner-1.0.0-x86_64-apple-darwin.tar.gz",
+      "version": "1.0.0",
+      "sha256": "8fe5a200787563bd256eae1ea34774d73051352d800f25d7ced0f77df01618bb",
+      "sha256_binary": "16cf1e2ebc9158d006fde9e938a9dd13de85d88b785fdd22613920fc2aa3687e"
+    },
+    "text.deduplicate": {
+      "file": "text.deduplicate-1.0.0-x86_64-apple-darwin.tar.gz",
+      "version": "1.0.0",
+      "sha256": "6587abe88b67735fcd8dc6b19be8d90c4dc0db2748b68cbfaf0c7aaf3113366e",
+      "sha256_binary": "a243500473fe75e72310ca85d60a00ffb793518147f2eea57ad98721a1d8184e"
+    },
+    "text.find-replace": {
+      "file": "text.find-replace-1.0.0-x86_64-apple-darwin.tar.gz",
+      "version": "1.0.0",
+      "sha256": "dd0175aac6f5e19d4cc91b3c127d79bef21cc3eaefcb83d541c2e5dabbe04899",
+      "sha256_binary": "b73465afbbcc71307d92347ea970e6e1da0fbc5d5e72b2ce9612f86140596f9a"
+    },
+    "text.lorem-ipsum": {
+      "file": "text.lorem-ipsum-1.0.0-x86_64-apple-darwin.tar.gz",
+      "version": "1.0.0",
+      "sha256": "affafd3a49681a154a7f7c37b0861d8cc289a1628aa72178959f9c5f28a12d99",
+      "sha256_binary": "11d5e27d69ceaac7070aefd56727b8a6a4f1332ea57c980528cef74b657353c7"
+    },
+    "text.slug-generator": {
+      "file": "text.slug-generator-1.0.0-x86_64-apple-darwin.tar.gz",
+      "version": "1.0.0",
+      "sha256": "103c9bc5daf1bbc379b6139c8547ab7aed1e497b4741365a97d2a3c490df2149",
+      "sha256_binary": "e83416e1687f6bf289fdd640e94d53de6d27619132caf4574741b7e22ace70dd"
+    },
+    "text.sort-lines": {
+      "file": "text.sort-lines-1.0.0-x86_64-apple-darwin.tar.gz",
+      "version": "1.0.0",
+      "sha256": "1eca7ae682eda85b7aa93c6e1b106c4ccec0fbf0ff270277bd60c282889845fa",
+      "sha256_binary": "51118e2324965e29b58365b22a179d7b42bf8b456d318c31c14d2a6916fcbd43"
+    },
+    "text.word-counter": {
+      "file": "text.word-counter-1.0.0-x86_64-apple-darwin.tar.gz",
+      "version": "1.0.0",
+      "sha256": "0b5f1ae8256152e4c6e322b0bef628cd64ca181a4ade1a5ca93ac5d478949045",
+      "sha256_binary": "e480a32d01af96777046c496b951357a958a427458ec8c6079637b0158e36412"
+    }
+  },
+  "profile": {
+    "lto": "thin",
+    "codegen_units": "8"
+  },
+  "verification": {
+    "archive_hashes": true,
+    "binary_hashes": true,
+    "versions_and_target": true,
+    "signatures": true
+  }
+}

@@ -8,6 +8,10 @@ concurrency:
   cancel-in-progress: true
 jobs:
   rust:
+    env:
+      CARGO_PROFILE_DEV_DEBUG: '0'
+      CARGO_PROFILE_TEST_DEBUG: '0'
+      CARGO_BUILD_JOBS: '2'
     runs-on: ubuntu-latest   # Linux only: cheapest minutes (private repo budget, see MASTER_PROMPT §11)
     timeout-minutes: 20
     steps:
@@ -24,6 +28,9 @@ jobs:
       - run: cargo clippy --workspace --all-targets -- -D warnings
       - run: cargo xtask check
       - run: cargo test --workspace
+      - name: Runner disk budget
+        if: always()
+        run: df -h "$GITHUB_WORKSPACE"
   site:
     runs-on: ubuntu-latest
     timeout-minutes: 10
