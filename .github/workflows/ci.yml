@@ -33,7 +33,7 @@ jobs:
         run: df -h "$GITHUB_WORKSPACE"
   site:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -49,6 +49,10 @@ jobs:
       - run: node --test scripts/tests/offline-routing.test.mjs scripts/tests/host-fallback.test.mjs
       - run: pnpm --filter @kortex/site test
       - run: pnpm site:build
+      - name: Chromium for the e2e smoke test (ephemeral runner)
+        run: pnpm exec playwright install --with-deps chromium
+      - name: E2E smoke on three key pages of the built site
+        run: pnpm e2e
   services:
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -63,3 +67,64 @@ jobs:
       - run: pnpm --filter @kortex/shared test
       - run: pnpm --filter @kortex/api typecheck
       - run: pnpm --filter @kortex/api test
+  # Pull requests only: compile just the web bundles the change can affect (MASTER_PROMPT §11).
+  # Selection comes from `cargo xtask changed` (crate dependency closure; toolchain, lockfile,
+  # design tokens and bundle generators select everything). Linux only; releases stay on tags.
+  web-changed:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      DX_CLI_TELEMETRY: 'false'
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: rustup show
+      - uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+          cache-directories: |
+            .kortex/target
+            .kortex/target-worker
+            .kortex/target-apps
+            ~/.cache/dioxus
+      - name: Select affected bundles
+        id: changed
+        run: |
+          set -euo pipefail
+          cargo xtask changed --base "origin/${{ github.base_ref }}" | tee -a "$GITHUB_OUTPUT"
+      - name: Existing Dioxus compiler (official pinned binary)
+        if: steps.changed.outputs.tools != '' || steps.changed.outputs.apps != ''
+        run: |
+          mkdir -p "$RUNNER_TEMP/dioxus"
+          gh release download v0.7.10 --repo DioxusLabs/dioxus --pattern 'dx-x86_64-unknown-linux-gnu.tar.gz' --pattern 'dx-x86_64-unknown-linux-gnu.sha256' --dir "$RUNNER_TEMP/dioxus"
+          cd "$RUNNER_TEMP/dioxus"
+          sha256sum --check --ignore-missing dx-x86_64-unknown-linux-gnu.sha256
+          tar -xzf dx-x86_64-unknown-linux-gnu.tar.gz
+          find "$RUNNER_TEMP/dioxus" -type f -name dx -exec chmod +x {} \;
+          find "$RUNNER_TEMP/dioxus" -type f -name dx -printf '%h\n' >> "$GITHUB_PATH"
+      - name: Existing wasm-bindgen compiler (pinned to the worker contract)
+        if: steps.changed.outputs.tools != ''
+        run: |
+          mkdir -p "$RUNNER_TEMP/wasm-bindgen"
+          gh release download 0.2.129 --repo wasm-bindgen/wasm-bindgen --pattern 'wasm-bindgen-0.2.129-x86_64-unknown-linux-musl.tar.gz' --dir "$RUNNER_TEMP/wasm-bindgen"
+          cd "$RUNNER_TEMP/wasm-bindgen"
+          echo '82d12bb940e2d4e72e0d5605387fc1b8ca179044e012b620f0ce4e7440e8320e  wasm-bindgen-0.2.129-x86_64-unknown-linux-musl.tar.gz' | sha256sum --check
+          tar -xzf wasm-bindgen-0.2.129-x86_64-unknown-linux-musl.tar.gz
+          find "$RUNNER_TEMP/wasm-bindgen" -type f -name wasm-bindgen -printf '%h\n' >> "$GITHUB_PATH"
+      - name: Compile affected web bundles
+        if: steps.changed.outputs.tools != '' || steps.changed.outputs.apps != ''
+        env:
+          TOOLS: ${{ steps.changed.outputs.tools }}
+          APPS: ${{ steps.changed.outputs.apps }}
+          ALL: ${{ steps.changed.outputs.all }}
+        run: |
+          set -euo pipefail
+          cargo xtask tokens
+          if [ "$ALL" = "true" ]; then cargo xtask build all; elif [ -n "$TOOLS" ]; then cargo xtask build $TOOLS; fi
+          for id in $APPS; do cargo xtask build-app "$id" --web; done
+      - name: Nothing to compile
+        if: steps.changed.outputs.tools == '' && steps.changed.outputs.apps == ''
+        run: echo "No web bundle is affected by this change."

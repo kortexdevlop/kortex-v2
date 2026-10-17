@@ -20,6 +20,16 @@ cargo test -p tool-<univers>-<nom>
 ```
 Vérifier l'outil en ligne de commande : `cargo run -p kortex-cli -- run <univers>.<nom> --input … --param …`.
 
+## UI sur mesure (`ui = "custom"`)
+
+```bash
+cargo xtask new-tool --universe qr --name generator --custom   # ajoute feature `ui`, src/ui.rs, clés locales
+```
+- `src/ui.rs` exporte `#[component] pub fn Ui() -> Element` et lit l'hôte avec `kortex_ui::use_tool()` : `lang()`, `t(clé)`, `mode()`, `visible_param_ids()`, `run(inputs, params)`, `running()`, `result()`, `cancel()`, `save(fichier)`.
+- Le module est derrière la feature `ui` (`#[cfg(feature = "ui")] pub mod ui;`) : CLI et moteur Worker ne lient jamais Dioxus. Le moteur reste pur.
+- Les wrappers web et desktop générés rendent `ToolHost { tool::ui::Ui {} }` (mode, langue, exécuteur, annulation et sauvegarde natives fournis par l'hôte). Aucune couleur/rayon/ombre en dur : tokens `k-*` uniquement.
+- `cargo xtask check` exige `ui.rs`, la feature `ui` et la porte `cfg` pour un outil `custom`, et refuse un `ui.rs` orphelin sur un outil `auto`.
+
 Ne jamais modifier `web/site` : l'outil apparaît automatiquement partout via le registre.
 
 Pour un moteur lourd (image, PDF, hash de gros fichiers), déclarer `web_worker = true` dans `[tool]`. `cargo xtask build <id>` compile automatiquement le moteur headless et son Worker ; `wasm-bindgen` doit correspondre à la version verrouillée du dépôt. Le délai de `[limits].timeout_s` inclut le chargement du moteur. L'UI propose alors une annulation immédiate ; les codes d'erreur doivent figurer dans les locales FR/EN. Voir ADR 0008.

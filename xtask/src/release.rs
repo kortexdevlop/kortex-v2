@@ -165,6 +165,17 @@ fn build_desktop_one(id: &str, target: &str) -> Result<(), String> {
     let work = root.join(".kortex/desktop").join(id);
     fs::create_dir_all(work.join("src")).map_err(|e| e.to_string())?;
     let pkg = format!("run-desktop-{universe}-{name}");
+    let custom_ui = c.tool.ui == kortex_contract::UiKind::Custom;
+    let tool_features = if custom_ui {
+        ", features = [\"ui\"]"
+    } else {
+        ""
+    };
+    let view = if custom_ui {
+        "kortex_ui::ToolHost { contract, lang, locale, runner: Runner(runner), variant: None::<String>, host_mode: mode, save_file: Some(SaveFile(save)), tool::ui::Ui {} }"
+    } else {
+        "AutoTool { contract, lang, locale, runner: Runner(runner), variant: None::<String>, host_mode: mode, save_file: Some(SaveFile(save)) }"
+    };
     fs::write(
         work.join("Cargo.toml"),
         format!(
@@ -175,7 +186,7 @@ edition = "2024"
 
 [dependencies]
 dioxus = {{ version = "0.7.10", features = ["desktop"] }}
-{crate_name} = {{ path = "{tool}" }}
+{crate_name} = {{ path = "{tool}"{tool_features} }}
 kortex-ui = {{ path = "{root}/crates/kortex-ui" }}
 kortex-platform = {{ path = "{root}/crates/kortex-platform" }}
 kortex-runtime = {{ path = "{root}/crates/kortex-runtime" }}
@@ -243,7 +254,7 @@ fn App() -> Element {{
     rsx! {{
         style {{ "{{CSS}}" }}
         main {{ style: "padding: var(--k-space-4); max-width: 720px; margin: 0 auto;",
-            AutoTool {{ contract, lang, locale, runner: Runner(runner), variant: None::<String>, host_mode: mode, save_file: Some(SaveFile(save)) }}
+            {view}
         }}
     }}
 }}

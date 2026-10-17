@@ -85,6 +85,14 @@ pub fn run(filter: Option<&str>) -> Result<(), String> {
                 ));
             }
         }
+        for issue in custom_ui_issues(
+            contract.tool.ui == kortex_contract::UiKind::Custom,
+            &fs::read_to_string(t.dir.join("Cargo.toml")).unwrap_or_default(),
+            &fs::read_to_string(t.dir.join("src/lib.rs")).unwrap_or_default(),
+            t.dir.join("src/ui.rs").is_file(),
+        ) {
+            errors.push(format!("✗ {dir} : {issue}"));
+        }
         if let Ok(svg) = fs::read_to_string(t.dir.join("glyph.svg"))
             && !svg.contains("viewBox=\"0 0 24 24\"")
         {
@@ -325,5 +333,55 @@ pub fn run(filter: Option<&str>) -> Result<(), String> {
             errors.join("\n"),
             errors.len()
         ))
+    }
+}
+
+/// Rules linking `ui = "custom"` to the crate layout: the UI lives in `src/ui.rs` behind an
+/// optional `ui` feature so headless builds (CLI, Worker engine) never link Dioxus.
+fn custom_ui_issues(custom: bool, cargo: &str, lib: &str, has_ui_rs: bool) -> Vec<String> {
+    let mut issues = Vec::new();
+    if custom {
+        if !has_ui_rs {
+            issues.push(
+                "ui = \"custom\" exige src/ui.rs (composant `Ui`, voir docs/guides/add-tool.md)"
+                    .to_owned(),
+            );
+        }
+        if !cargo.contains("\nui = [") {
+            issues.push("ui = \"custom\" exige une feature `ui` dans Cargo.toml (dioxus et kortex-ui optionnels)".to_owned());
+        }
+        if !lib.contains("#[cfg(feature = \"ui\")]") || !lib.contains("pub mod ui;") {
+            issues
+                .push("src/lib.rs doit déclarer `#[cfg(feature = \"ui\")] pub mod ui;`".to_owned());
+        }
+    } else if has_ui_rs {
+        issues.push(
+            "src/ui.rs présent mais ui = \"auto\" : le déclarer custom ou le supprimer".to_owned(),
+        );
+    }
+    issues
+}
+
+#[cfg(test)]
+mod tests {
+    use super::custom_ui_issues;
+
+    const CARGO: &str = "[features]\nui = [\"dep:dioxus\"]\n";
+    const LIB: &str = "#[cfg(feature = \"ui\")]\npub mod ui;\n";
+
+    #[test]
+    fn complete_custom_layout_passes() {
+        assert!(custom_ui_issues(true, CARGO, LIB, true).is_empty());
+    }
+
+    #[test]
+    fn custom_without_ui_file_feature_or_gate_is_rejected() {
+        assert_eq!(custom_ui_issues(true, "", "", false).len(), 3);
+    }
+
+    #[test]
+    fn auto_tool_must_not_carry_an_unused_ui_file() {
+        assert_eq!(custom_ui_issues(false, "", "", true).len(), 1);
+        assert!(custom_ui_issues(false, "", "", false).is_empty());
     }
 }

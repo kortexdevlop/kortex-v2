@@ -29,6 +29,19 @@ fn copy_dir(from: &Path, to: &Path) -> Result<(), String> {
     Ok(())
 }
 
+/// The element the generated host renders: the contract-driven `AutoTool`, or the tool's own
+/// `ui::Ui` inside a `ToolHost` that carries mode, language, runner and cancellation.
+pub(crate) fn tool_view(custom_ui: bool, cancel_prop: &str) -> String {
+    let props = format!(
+        "contract, lang, locale, runner: Runner(runner), variant, host_mode: host_mode().or(initial_mode), save_file: None, {cancel_prop}"
+    );
+    if custom_ui {
+        format!("kortex_ui::ToolHost {{ {props} tool::ui::Ui {{}} }}")
+    } else {
+        format!("AutoTool {{ {props} }}")
+    }
+}
+
 pub fn run(args: &[String]) -> Result<(), String> {
     let ids: Vec<_> = args.iter().filter(|arg| arg.as_str() != "--web").collect();
     if ids.is_empty() {
@@ -109,12 +122,19 @@ fn build_one(id: &str) -> Result<(), String> {
         "let mut cx = kortex_runtime::Cx::new(); tool::run_map(&inputs, &params, &mut cx).await"
             .to_owned()
     };
+    let custom_ui = contract.tool.ui == kortex_contract::UiKind::Custom;
+    let tool_features = if custom_ui {
+        ", features = [\"ui\"]"
+    } else {
+        ""
+    };
     let cancel_prop = if worker.is_some() {
         "on_cancel: move |_| kortex_platform::worker::cancel(),"
     } else {
         ""
     };
 
+    let view = tool_view(custom_ui, cancel_prop);
     fs::write(
         work.join("Cargo.toml"),
         format!(
@@ -125,7 +145,7 @@ edition = "2024"
 
 [dependencies]
 dioxus = {{ version = "0.7.10", features = ["web"] }}
-{crate_name} = {{ path = "{tool}" }}
+{crate_name} = {{ path = "{tool}"{tool_features} }}
 kortex-ui = {{ path = "{root}/crates/kortex-ui" }}
 kortex-runtime = {{ path = "{root}/crates/kortex-runtime" }}
 kortex-platform = {{ path = "{root}/crates/kortex-platform", features = ["document"] }}
@@ -205,7 +225,7 @@ fn App() -> Element {{
     rsx! {{
         document::Stylesheet {{ href: CSS }}
         main {{ style: "padding: var(--k-space-4); max-width: 720px; margin: 0 auto;",
-            AutoTool {{ contract, lang, locale, runner: Runner(runner), variant, host_mode: host_mode().or(initial_mode), save_file: None, {cancel_prop} }}
+            {view}
         }}
     }}
 }}
