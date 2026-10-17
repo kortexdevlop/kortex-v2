@@ -49,7 +49,7 @@
   },
   "public_installation": false,
   "github": {
-    "status": "first run: windows/web failed, linux/macos in progress",
+    "status": "Linux/macOS packages verified; all web bundles verified; Windows compiled but UTF-8 verification retry required",
     "tools": 38,
     "targets": [
       "x86_64-unknown-linux-gnu",
@@ -68,6 +68,24 @@
       "windows": "Path separator and checkout CRLF mismatches in structural gate",
       "web": "Worker forced offline with missing byteorder-lite on fresh CI",
       "quality": "PlatformError unused on Linux with document feature"
+    },
+    "verified_native_packages": 126,
+    "verified_native_targets": [
+      "x86_64-unknown-linux-gnu",
+      "aarch64-apple-darwin",
+      "x86_64-apple-darwin"
+    ],
+    "web_verified": {
+      "run_id": 39032642157,
+      "commit": "26051d4bb72b79401a38cd014802cc7cec515957",
+      "tools": 38,
+      "apps": 3,
+      "proof": "2026-10-17-github-web.json"
+    },
+    "quality": {
+      "run_id": 39048924068,
+      "commit": "c95bf87b0f37e50c0526f13955d6f66d6266d861",
+      "conclusion": "success"
     }
   },
   "limits": [
@@ -153,6 +171,39 @@
       },
       "packages_verified": 84,
       "signatures_verified": 84
+    }
+  },
+  "ci_publication": {
+    "artifact_run": 39032642157,
+    "commit": "26051d4bb72b79401a38cd014802cc7cec515957",
+    "versions": {
+      "run": "b930b1b1-51c2-4727-8536-1e5499a39e9f",
+      "desk": "bf40f204-c8e6-4f17-9ef0-ecb07da0e0ce",
+      "hub": "4003679e-e813-4704-b1cc-a9aeb585804f",
+      "store": "9365e6f5-7274-4952-aaa5-f50b60e7a999",
+      "site": "7206b12d-5e7c-442a-9f02-d8cef6e09132"
+    },
+    "store_recipe": {
+      "url": "https://store.kortex.site",
+      "checks": [
+        "38 real tools",
+        "search, detail and real web link",
+        "universe filter",
+        "unready installation closed",
+        "English and theme",
+        "mobile layout"
+      ],
+      "errors": []
+    },
+    "hub_desk_recipe": {
+      "mode": "public HTTPS",
+      "date": "2026-10-17T16:27:42.643Z",
+      "results": [
+        "Hub: real catalogue, favourites and widget layout survive reload; search and launch work.",
+        "Desk: Rust hash, minimize/restore, arrangement/maximize, theme/language/mode, spaces retain iframe content; layout restores.",
+        "Blocked browser storage shows a clear warning; in-memory favourites remain usable."
+      ],
+      "errors": []
     }
   }
 }

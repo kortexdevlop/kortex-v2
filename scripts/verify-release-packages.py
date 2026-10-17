@@ -11,8 +11,8 @@ parser.add_argument('--tools', required=True)
 parser.add_argument('--targets', required=True)
 args = parser.parse_args()
 root = Path(__file__).resolve().parent.parent
-catalogue = json.loads((root / 'registry/index.json').read_text())['tools']
-apps = json.loads((root / 'registry/apps.json').read_text())['apps']
+catalogue = json.loads((root / 'registry/index.json').read_text(encoding="utf-8"))['tools']
+apps = json.loads((root / 'registry/apps.json').read_text(encoding="utf-8"))['apps']
 versions = {entry['tool']['id']: entry['tool']['version'] for entry in catalogue}
 requested = set(versions) if args.tools == 'all' else set(args.tools.split())
 if not requested or requested - versions.keys():
@@ -51,5 +51,5 @@ for target in args.targets.split():
              'tool_count': len(requested), 'packages': packages,
              'profile': {'lto': os.environ.get('CARGO_PROFILE_RELEASE_LTO', 'workspace'),
                          'codegen_units': os.environ.get('CARGO_PROFILE_RELEASE_CODEGEN_UNITS', 'workspace')}}
-    (root / f'dist/release/build-proof-{target}.json').write_text(json.dumps(proof, indent=2) + '\n')
+    (root / f'dist/release/build-proof-{target}.json').write_text(json.dumps(proof, indent=2) + '\n', encoding='utf-8')
     print(f'Verified {target}: {len(requested)} tools, {len(expected) - len(requested) - 1} apps, CLI')

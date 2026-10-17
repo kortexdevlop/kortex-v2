@@ -294,14 +294,14 @@ Référence : §11.
 
 | Étape | Livrable / action | État | Validée ? | Preuve actuelle ou condition de validation |
 |---|---|---|---|---|
-| 17.1 | Conserver qualité Rust et tests services/site en CI | Présent | Oui — inspection des workflows | ci.yml contient fmt, clippy, tests, check et tests TS ; dernier état distant actuel non interrogé pendant cet audit. |
-| 17.2 | Compiler les bundles web modifiés dans CI | Écart important | Non | Job site actuel compile Astro mais pas les wasm outils ; ajouter détection et build Rust web effectifs, avec artefacts/reçus. |
-| 17.3 | Valider les apps dans la même CI et les garde-fous | À faire | Non | Check doit couvrir app.toml, UI custom, fichiers obligatoires, accès plateforme et builds applicatifs. |
-| 17.4 | Compiler/recetter le desktop lors des releases groupées | Matrice actuelle lancée | Non — résultats et recette OS attendus | Run GitHub 39031294481, commit privé 7ed41ae : tools=all, Linux/Windows/macOS ARM+Intel, trois apps et CLI, inventaires/hashes puis index signé. Compilation et recette OS restent distinctes. |
+| 17.1 | Conserver qualité Rust et tests services/site en CI | Validé sur GitHub | Oui — run 39048924068 | Commit c95bf87 : fmt, Clippy, tests workspace, contrôle structurel, build/test site et services tous verts ; debug CI réduit pour respecter le disque du runner gratuit. |
+| 17.2 | Compiler les bundles web modifiés dans CI | Release complète réussie | Partiel — détection PR ouverte | Run 39032642157 : 38 outils + trois apps WebAssembly, reçus et sorties vérifiés. Preuve validation/2026-10-17-github-web.json ; filtrage automatique des modifications en PR encore ouvert. |
+| 17.3 | Valider les apps dans la même CI et les garde-fous | Réalisé — contrôles et builds | Oui — périmètre compilation | Check couvre contrats app, UI/fichiers/plateforme ; release compile les trois apps depuis le registre pour web et desktop. Recette native fonctionnelle distincte. |
+| 17.4 | Compiler/recetter le desktop lors des releases groupées | Trois cibles vérifiées ; Windows à reprendre | Non — vérification Windows et recette OS ouvertes | Run 39031294481 : Linux et macOS ARM/Intel, 126 paquets vérifiés (38 outils + trois apps + CLI par cible), 84 signatures Mac vérifiées. Windows run 39032642157 : 42 paquets construits, vérificateur bloqué par encodage CP1252 ; correctif UTF-8 et relance ciblée. Preuves par cible dans validation/2026-10-17-desktop-*.json. |
 | 17.5 | Finaliser déploiement reproductible et preview | Partiel | Non | Scripts locaux présents ; workflow deploy dédié et correspondance commit/source/artefacts/versions manquants. |
 | 17.6 | Documenter publication locale comme secours autorisé | Clarifié | Oui — règle consolidée | RULES.md §8 et MASTER réconciliés : CI nominale, secours local reproductible autorisé, publication des lots déjà autorisée. La CI/CD elle-même reste incomplète (17.5). |
 | 17.7 | Optimiser filtres, caches et budget CI réel | Partiel — équivalence ponctuelle prouvée | Non | CI Linux et cache source/sortie ; après correction des seules traductions Hub, réutilisation prouvée par ancien/nouveau hash et entrées .d du compilateur excluant kortex-shell. Invalidation générale encore trop large ; détection ciblée par dépendances et budget CI restent à finaliser. |
-| 17.8 | Créer une preuve par lot avant statut validé | À imposer | Non | ID des exigences, sources, cibles compilées, tests utiles groupés, recette, version publiée et limites. Pas de “fini” sans ce reçu. |
+| 17.8 | Créer une preuve par lot avant statut validé | Appliqué aux lots actuels | Oui — périmètre documenté | Preuves datées Store, Hub/Desk, frontières plateforme, web CI et cibles desktop ; commit/run, empreintes, recette, publication et limites explicités. Aucune fermeture globale du projet. |
 
 ### 18. Finition, audit et lancement
 

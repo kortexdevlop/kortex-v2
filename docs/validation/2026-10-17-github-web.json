@@ -1,0 +1,559 @@
+{
+  "run_id": 39032642157,
+  "commit": "26051d4bb72b79401a38cd014802cc7cec515957",
+  "tools": {
+    "calc.age": {
+      "receipt": {
+        "output": "7f1c49ba8a84854f",
+        "source": "f555097cd43a9f1b"
+      },
+      "files": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-calc-age-dxh9125ae167baad842.js": "bf3cb278a63bc52cac5c139ebd6ebe9c6a81f01f4e89451e693ddfb1e88e25fb",
+        "assets/run-calc-age_bg-dxh36c1208541b176e3.wasm": "411c7c2f596774511cc696f4d4d03e9b6390bd1afaab9f7a74296c258f149a50",
+        "index.html": "593f5f11f67fe0fb4647402a7d0a21bae4c3370b88eb6c61a64d1ef28c5092c6",
+        "sw.js": "dbb6cc594898371f86347cbf28bbff7d646684341aa3a744bd9e62527a012fa1"
+      }
+    },
+    "calc.average": {
+      "receipt": {
+        "output": "215861e5b21999a2",
+        "source": "1840898409228c92"
+      },
+      "files": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-calc-average-dxhb42c4043749921cb.js": "8e4d15cf73458a468a427b814ef0741a944306ccf5efa9b104400c3fa9d58e30",
+        "assets/run-calc-average_bg-dxhbf9710d273578439.wasm": "69cf4da3c02942487a2a5afdd5d619e9d4703b80b46c0f5cc34a30db23ba77ca",
+        "index.html": "7084aafc4e5b0e80fdd11fe5d263bf0053448eb7ba49f4f3c46abdc1400c8d3a",
+        "sw.js": "14965390dff8456b942eaa812117021c39f465ede07cf615b75a9baa9878615c"
+      }
+    },
+    "calc.compound-interest": {
+      "receipt": {
+        "output": "baa218cb0e8faa49",
+        "source": "52c3a308ef2f5d85"
+      },
+      "files": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-calc-compound-interest-dxh88cb76dc09355e3.js": "bbb81e3c82c703783e5aa0b4b12de8d9bc5c6b1a54904661eb339d272ee4592d",
+        "assets/run-calc-compound-interest_bg-dxha051c6f30bc4161.wasm": "7582743e5fc4225c9c85b20a0800facf4a77e28a20c5e9f22efa6da1e0f7a4b0",
+        "index.html": "5ff732c20337eeb12c4284e53f479741a3709a4b2ff7438184430c25d08b658f",
+        "sw.js": "afc84cc083b177383fb7feb9c984c6b65ee992e34aed31e3f3a634d4a782e4a6"
+      }
+    },
+    "calc.date-add": {
+      "receipt": {
+        "output": "9c02a54c5eab9af8",
+        "source": "e98cd2d30fe2899f"
+      },
+      "files": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-calc-date-add-dxhd429d11bfbf9ebf.js": "b3923c63db79b1e55c0807f6d1bae5b7e9c96cd22d732d90bbf099d19993b60c",
+        "assets/run-calc-date-add_bg-dxh4cce13417e41ed46.wasm": "536c73889bf2b77c6e339eaffb4163f08efca825a23b74ec4af5bb4666790d6d",
+        "index.html": "adbc189eae92855fafe9f851fe0b90df418c300a1e914e555a98301d27570aaa",
+        "sw.js": "a56b56b82efea27544268e296b2939c8f8876d6534e2d9a9ea56d58a78d1cd9e"
+      }
+    },
+    "calc.date-difference": {
+      "receipt": {
+        "output": "5d1f6393faf71b70",
+        "source": "f11a238ff56ebb22"
+      },
+      "files": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-calc-date-difference-dxh1e4c8c4273abb10.js": "5f13520ce5a666519d11d50fcbe9bed48d1ff694347ca8ee279a9b86b4f8094c",
+        "assets/run-calc-date-difference_bg-dxhe3b17263c3b98cce.wasm": "2c0910fb20a76da733cc406b18542b8a42eb7b677e1815d3aebc4a28213fbbaa",
+        "index.html": "1ee782fe8a958f8b6b347f565d1bc5dbb41e723727befa2447fa1c2feaef8f87",
+        "sw.js": "5bb4f49e19aeaff31b4da6ac3d754486d3631c1ae9f035fab65ca9c63d2a6eb6"
+      }
+    },
+    "calc.fuel-cost": {
+      "receipt": {
+        "output": "ad5bbed1582de545",
+        "source": "52cdf5aa02ec93f6"
+      },
+      "files": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-calc-fuel-cost-dxhd9c2918577cdcd.js": "52a3e85a33f14687b3318f4e595e6edbba9e844e2658a5aeee26b72358d23cdf",
+        "assets/run-calc-fuel-cost_bg-dxh438b35ae7146f076.wasm": "d2007d3b1da7fa76446d6a479c77b398e5b82e5298855782739e4143c652b52b",
+        "index.html": "87ba2372d62ac16b199a5b24676921cf70011a6b96daa5570f68d3d8fbc2e19c",
+        "sw.js": "121da32be2952c596a194c8c4a16bd9317262ffb709a97ba4085155e3ab517b7"
+      }
+    },
+    "calc.gross-net-salary": {
+      "receipt": {
+        "output": "70c5a5972a6ef41a",
+        "source": "39b6670766e4b3d1"
+      },
+      "files": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-calc-gross-net-salary-dxh648098d71967aa1.js": "70c95393405e9e7db5c1201676a67082da2a8b0af2063ca2a43fc3e7b9d8134c",
+        "assets/run-calc-gross-net-salary_bg-dxhb859361667a2d2e.wasm": "9a953a6339e8e3c74b1dc84a97bda36df5ee4858439c1a874090c7159040231a",
+        "index.html": "2717a0e6ab559eb162d076dafb97b01157efc07527c2783db0fd8027cd67fad2",
+        "sw.js": "31cf5713b06abbc4fac02afd37b14b9d2c122de6fb5fbccce4182e462bed297a"
+      }
+    },
+    "calc.loan": {
+      "receipt": {
+        "output": "27f1cc438d5f6b37",
+        "source": "7c962cbada729958"
+      },
+      "files": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-calc-loan-dxha441d4b139fc247e.js": "ac0cd73aa04a62e5d3ecf6a67c618336950c5c8fa6e28d66611860fc98c93bf5",
+        "assets/run-calc-loan_bg-dxheaca67b8bd6d9c84.wasm": "d3b6c74b600437b3c08451212291788db5f5a57c4a703ceedbb37872392c81c4",
+        "index.html": "b0f3d298c462924ba4654afd1d9ac5630ba6f53a30cac66c4cb783f800889ae9",
+        "sw.js": "98487d604d315a36f55445aa3ec691a2fe55e8ee7dfd9b8b96561c2c2814f5f1"
+      }
+    },
+    "calc.percentage": {
+      "receipt": {
+        "output": "883572062569aaf1",
+        "source": "12cde215f740a39b"
+      },
+      "files": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-calc-percentage-dxhe322d6b0a16f6938.js": "f0b657bbbe55fb9593a7528e2308cba65e6c5b0246802a194450a5ddbd94768f",
+        "assets/run-calc-percentage_bg-dxhd96bfc2d8cc23c7a.wasm": "5d3909146f0b003218d474d559e0e00254782d772362a3e84c54a431084cf2b5",
+        "index.html": "a8ffa7ab8ee3071d477828c6ba9de3e6638a1220d1df4609364141d4f8ff40d7",
+        "sw.js": "59759ec07e7877795266712f2ae96a6b4219a889bd836fe9d43fd5268b94a193"
+      }
+    },
+    "calc.rule-of-three": {
+      "receipt": {
+        "output": "1dadbc3d7abe318f",
+        "source": "304593a363dbc172"
+      },
+      "files": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-calc-rule-of-three-dxhb04151604d5365e0.js": "a30568266319e426a361d170b879ffe381f69605d970489eeb0f20981e7be8d3",
+        "assets/run-calc-rule-of-three_bg-dxhb01d94e31b61939.wasm": "632ccab983d40a29f6a56407a2232eb060462dad4895f4caee385ce5d0fd0326",
+        "index.html": "81108cb334c30995f604cae1c36b35c69b5d21be786bafd8a8f654dab072c8c7",
+        "sw.js": "0013a150da6d7e7efc74d0fb4aec033a5b69a05f135e0e758accaf3fd62f06db"
+      }
+    },
+    "calc.tip": {
+      "receipt": {
+        "output": "01a4fc78a28aa1b3",
+        "source": "5f73e639f22ade59"
+      },
+      "files": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-calc-tip-dxh51265f6759dd34d8.js": "a06039315a259564b9fa045972439f3800b64f128af240e225c37e2b85883b81",
+        "assets/run-calc-tip_bg-dxhdc9060839f3b1ee3.wasm": "535fec6e3e7c6c06af7e22ebee2b3e079ccf01221c02f9ce215aa4c3d38894b4",
+        "index.html": "9e81b02756dc3f551c31593beb603e394fd55317cca541afb6e97e19474797a5",
+        "sw.js": "32d2123ecb033d87b28c651b1867dfb51795d20d45df82dc669079d425f6f76b"
+      }
+    },
+    "calc.unit-price": {
+      "receipt": {
+        "output": "0dec77a4b2ff2327",
+        "source": "abb85eb8146dd7b5"
+      },
+      "files": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-calc-unit-price-dxha4cda01e168335b3.js": "5d380610bb0f4cb498f358550229c99d87b09e7a96a47f5d19b5ddc7d1da5ee9",
+        "assets/run-calc-unit-price_bg-dxh41afc4671b774252.wasm": "b2900e308e0f7eacf1538adb03b7c039280128dcde21e051001a061e16d61b72",
+        "index.html": "998ae2808e581441aab946dc633f3756cc811ceeddcbcdab56ea1af6d6242632",
+        "sw.js": "9d30a2ed38221dbc79da7922a9c627655a3b99bc94ab508a4676e0c1c637983d"
+      }
+    },
+    "calc.vat": {
+      "receipt": {
+        "output": "89f7813f48a9285a",
+        "source": "57f438b959f1714e"
+      },
+      "files": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-calc-vat-dxh286799994a8eeae6.js": "8b2a3a967521e08f1373e96a85a931752f8c98b3e03c5a159f039fa017085b8b",
+        "assets/run-calc-vat_bg-dxh1e5a20ad312b723e.wasm": "ec41ca241e0102a94eb56046fea7d8ac6c8d6a28a182afca5892e92818a5d619",
+        "index.html": "94c398a846df33a3580da9d27d3ec7777a02614f1e5cb41ce2c62ba0b569bfbb",
+        "sw.js": "cab3bdf9fde8d8a232254f0dac6764690227edde2056494127490197a9af5b0c"
+      }
+    },
+    "code.base64": {
+      "receipt": {
+        "output": "f8eb89488b614f4d",
+        "source": "ceffd96877891ba2"
+      },
+      "files": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-code-base64-dxha132346817c312e.js": "9cf6619906231cb32995686c42fedceea0f5352e06ece527505be66fa284b367",
+        "assets/run-code-base64_bg-dxh64b7535b38625311.wasm": "8aa57b2364d8425340eb641417c8ee16d79b9dbce2344af725b1d26211c61dca",
+        "index.html": "bfac58309bf4fdc0bb344e7d103d4608f91ec091af9bbf79be7a24d29bcd2c94",
+        "sw.js": "4ac7de1224ab14331769286ded4a0571b3599a8aa15fd0460bab3f4c5124252a"
+      }
+    },
+    "code.chmod": {
+      "receipt": {
+        "output": "841ce958435ad875",
+        "source": "310be971112989fa"
+      },
+      "files": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-code-chmod-dxh54b64c7d79564425.js": "fb31516ee32d11dcfd654cfdfcac2c0bf2debca5967151971c4911291fc1743f",
+        "assets/run-code-chmod_bg-dxh2b42a7f33c19703a.wasm": "eeb86d85ee8c75a8fe7f7bcafdf82dd570e9a6ad60dd2e8fa7948a436243589d",
+        "index.html": "b97ea4cbb7e1098ae5c18f4e91ef20eb798d67c0f5248b93627979b2613aa131",
+        "sw.js": "74ad0041c17f1d3b798542dcbb8282cbd9422f452c1aac14b72ead045b03b58d"
+      }
+    },
+    "code.html-entities": {
+      "receipt": {
+        "output": "9431924cf5c2b10e",
+        "source": "7dbb2d033b8af6a4"
+      },
+      "files": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-code-html-entities-dxh6262437e65b1929.js": "5aab6d3fabaa73da8fecd99ecaf3abf60f3bac134292e10d3e86e9403b4e1660",
+        "assets/run-code-html-entities_bg-dxhfda1e343be16271d.wasm": "be81280cadd2b63b3ec6ab3c97a465066eab9b6b545d00a7cac5432749f1478f",
+        "index.html": "c550e0bda70cb0d2595199b87f28bf0deea446a969c46b38943a57e78bdb1235",
+        "sw.js": "af0b5cfa4b443b25176e1596654fbbbee97d5a2117920ace459d9232ce98fdc9"
+      }
+    },
+    "code.json-formatter": {
+      "receipt": {
+        "output": "4e878d68c258ccb5",
+        "source": "b5764866396015e9"
+      },
+      "files": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-code-json-formatter-dxh3131d1573f3f4f0.js": "a14344ed82c292a1f976b4466ae1106c394f4fb718b00b9e1be7794d4fe1f21f",
+        "assets/run-code-json-formatter_bg-dxheaf483c793413090.wasm": "a8ff7798ce743dc4c52ceab1eae28c5847bedcd92c0a550c0bdb14c5cd846fa2",
+        "index.html": "a8738591c52ee787689c000f0c9bab431fed47009e75a5650e8607f09582e6f3",
+        "sw.js": "56089991057a3f5cf67d7365f90806867cf81f3af0dd75810b21fd7d1027e67b"
+      }
+    },
+    "code.markdown-table": {
+      "receipt": {
+        "output": "1e204acbf02fa1b6",
+        "source": "2abea6ac3017e693"
+      },
+      "files": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-code-markdown-table-dxhbafad71fa4eea79b.js": "1b242dab6bc4cd6a3753acd65e42a37d3e6e639a167cf4bb6f4d1ec135c7d3ac",
+        "assets/run-code-markdown-table_bg-dxh515067e7a3ec2894.wasm": "cfb9d9d2ac3d08dd723510f6f17a90a3202ada8d044a91fb193961c73791f522",
+        "index.html": "568063b8cfac14a2ae0ebaae7b7af32bce74565b89df0ee9cc8ef194daba6664",
+        "sw.js": "cc8d3aa497c3093b1625bc8111cb3d7cf5fe6a14a7303259e8465e06a7bbd2f6"
+      }
+    },
+    "code.number-base": {
+      "receipt": {
+        "output": "9f162ed08b14eff4",
+        "source": "6c8be7a5b317ff37"
+      },
+      "files": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-code-number-base-dxhe9a0c64dfc8ad61.js": "48ed56d46faa633c3b7d6322b7b531f744613934a87a0a10257285533804d24b",
+        "assets/run-code-number-base_bg-dxh4822d6875b8b37d1.wasm": "bc81382ebe086637ed3c164af747e5e7d20f56155c957a762c169130522e43ba",
+        "index.html": "7f9ae166513ca2a02c367af7f4940d41603393879159aa614fab43277b7cbda3",
+        "sw.js": "6a00caa2f401f686465674d134e1adaa9f6d70594893cb29a87055da52ad9891"
+      }
+    },
+    "code.url-encoder": {
+      "receipt": {
+        "output": "42c381e28ddb54dc",
+        "source": "436534d2354cbe19"
+      },
+      "files": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-code-url-encoder-dxh811f12911a425294.js": "0372b20515944fa34e850f096c5439a14ffcb7e4f3a5848f354bb1bfbbd0f6ee",
+        "assets/run-code-url-encoder_bg-dxh846996f1db401622.wasm": "565320893c241c3b69db18c376ae86906971acdbb020e5802fc81f7ac931cea5",
+        "index.html": "fc212c3e7aad3566ab4e99edad5dfa387ee6b3f369b5e2ba3d9fbdacb57e5abf",
+        "sw.js": "394b5cf8bbbd80b05e17d620ec4cdbab9d015642f0136f4accfa724da17b88be"
+      }
+    },
+    "code.uuid-generator": {
+      "receipt": {
+        "output": "35a9fb4cc6ab24b8",
+        "source": "0d179edc98e46d55"
+      },
+      "files": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-code-uuid-generator-dxhb23b90e5a85fc63a.js": "b4733aebd02e9f9a92009673bfb1b624733442d4d47a3e0c5018be389e2282b0",
+        "assets/run-code-uuid-generator_bg-dxh226bf5f81dacbf85.wasm": "a6280b0a308f44c1521c6908f2b7738b63a72f0608121f1faea329532b07219c",
+        "index.html": "84e852fbf00a767c3e081f03f2a32e35b375a8303b12abb02aca025a87e370f1",
+        "sw.js": "133801a7cc62cbd38e7ccc2a55bc8166fe894c990f102e7007ad7d52687982e3"
+      }
+    },
+    "color.contrast-checker": {
+      "receipt": {
+        "output": "6fb37146ec626cf3",
+        "source": "687c4c10f0df517a"
+      },
+      "files": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-color-contrast-checker-dxh13e3a878be4a86c0.js": "aabb1464231c540b3f26db689a367ef04e8a8ceef5998b552fbb5f994e1c49e9",
+        "assets/run-color-contrast-checker_bg-dxh5b9674f2f1992f24.wasm": "9822d2d83dd5f91dfcbad747a42522a2fc34205992c063be1dad1336f5ca53ef",
+        "index.html": "164058cedd06dbd81d5f9b0d1c00d2bde5cbef3511396970466b1f201d6ef4d2",
+        "sw.js": "0c81d103f7594ec595213a98adf7bd43db4bbebe664ee6060778209c30d63a1f"
+      }
+    },
+    "color.converter": {
+      "receipt": {
+        "output": "142603850c99c946",
+        "source": "5f968d6085426e09"
+      },
+      "files": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-color-converter-dxh10ad21a165f51ede.js": "5756e060669ae5ab3d48ca76127383a45c480524e63f57994c8f6392cf454308",
+        "assets/run-color-converter_bg-dxh3debf8a4089c9e8.wasm": "6492b9fbe9d81aeebff5541b5a0e34aa960c396a73c82725920473d10138c94e",
+        "index.html": "9f328b8c7157dde2482cb1b259202e41d5a27ca26eb8ee865b2bb88b78a633f7",
+        "sw.js": "2e9cacbcf5311c7a52595733e0e3c5e32b1fa0f15bc48bed4bc07d9f8495c077"
+      }
+    },
+    "convert.timestamp": {
+      "receipt": {
+        "output": "71f174095d772161",
+        "source": "e15764b73d15b292"
+      },
+      "files": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-convert-timestamp-dxh7773c76b3ba58650.js": "4744f3a176300b6c5c6b5ac403f10154009ce720aefefe440c24948f2e5cda04",
+        "assets/run-convert-timestamp_bg-dxhe089c8e5ed8bca2b.wasm": "372d3b47469732b587ae0093c6164941fd263f9ae0e184de69a440b2b5123fc9",
+        "index.html": "0f8a8c70f952b94c0f7675bb8a9006a0f7cf190d35987a54459a8db27e065d4d",
+        "sw.js": "872eac0ed84a667bc94f1d751c67489111d6e4fd9a2476e05f4fa67ec1d22113"
+      }
+    },
+    "convert.units": {
+      "receipt": {
+        "output": "9530c32d8c2f1ac7",
+        "source": "894c6b77ffe35b27"
+      },
+      "files": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-convert-units-dxh92b4192e278e1b91.js": "d3b4ce8f4308e65c210ddfd854a46abdbc4be75239d9bc558ab40291a7850cb6",
+        "assets/run-convert-units_bg-dxh443a72d6b6c9f528.wasm": "85143be2562bc6399e991bdb22d910afabe74bb364773329d73a8eae45f58dfa",
+        "index.html": "f3107ba1b9a52775ba3a0268eb7eba07a1e5d69687777ae6f0c9ad616cf4873e",
+        "sw.js": "11c62ae8c37d71a4603b6566b6988a1e5d5fdfdb17aac2aa671555e21b98e5ae"
+      }
+    },
+    "image.convert": {
+      "receipt": {
+        "output": "59f3a28588e67fff",
+        "source": "a9aefee50cfbcb88"
+      },
+      "files": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-image-convert-dxh6e637faa45863cc4.js": "583b879eaf27c8c2d034a3b552a8194758280e446df47310351c7d97fe7bd6e7",
+        "assets/run-image-convert_bg-dxhfdf0489effc14d64.wasm": "4bfcba878a9f86d5d7c2cc40b0bed01cef7195202953e24a31a0826c89d98367",
+        "engine-842e980ca7c44673/engine.d.ts": "d114020af9732f46326c9ddbd364e0bc4b050cbc5b981eb006ffc0a062b03c67",
+        "engine-842e980ca7c44673/engine.js": "a6b549ce318f9a992de745384c37ff431ad46a606f1aa576fa04104447378d88",
+        "engine-842e980ca7c44673/engine_bg.wasm": "53f5411830a86da6ee006f092954591c5d589c2231bb744250f3f692b048a30f",
+        "engine-842e980ca7c44673/engine_bg.wasm.d.ts": "2da05e4f068a9c95d13c5514bb60f0da18f25b26b2069eff06ccc49da893d234",
+        "engine-842e980ca7c44673/snippets/kortex-platform-1522588929894d19/inline0.js": "76bd9b9646d04bbe3b3970a9cfb8f0118e3fcfd9d15a1e709662b8dfff82b3e1",
+        "engine-842e980ca7c44673/snippets/kortex-platform-1522588929894d19/inline1.js": "fa7f4829b246a5b75e36bc4905d1f51aeaac5040d8b527cedb51ab4ebddb152f",
+        "engine-842e980ca7c44673/worker.js": "762922d5cc65361a440475782b1b2648e046cfac5b8b1a32c9ac7a879af7bcce",
+        "index.html": "1b2931adca1b3adf33c70f9514228c7eb471fe6382556ecddc65ae20f0c6b7fa",
+        "sw.js": "cc34988ff9137518b4caff6b77a95cfb86d019e43ec62384b1a91f908b5ec47a"
+      }
+    },
+    "pdf.merge": {
+      "receipt": {
+        "output": "6caf9104b1dee760",
+        "source": "38106232b4e7a61e"
+      },
+      "files": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-pdf-merge-dxhbccb6acdc5db796.js": "b4c6a332bf9d651f413197cf1a64a834285cb231a28a87d9e1e75d186c7d0870",
+        "assets/run-pdf-merge_bg-dxha337357ffbb0a8ef.wasm": "43703db882b6db5e59a1f16cb0c91fa3528e34a7dbb08239aef65e9b1003c11f",
+        "engine-6f039a039706ab97/engine.d.ts": "d114020af9732f46326c9ddbd364e0bc4b050cbc5b981eb006ffc0a062b03c67",
+        "engine-6f039a039706ab97/engine.js": "9a3c23b9f2b3f61347a4f9c627f953bb12b122f0cbc7799eae4a52e51e2f5b11",
+        "engine-6f039a039706ab97/engine_bg.wasm": "507a06d85e7d47cfa121459e0908ad4c874394b06416d0a246d274a7581db42e",
+        "engine-6f039a039706ab97/engine_bg.wasm.d.ts": "2da05e4f068a9c95d13c5514bb60f0da18f25b26b2069eff06ccc49da893d234",
+        "engine-6f039a039706ab97/snippets/kortex-platform-1522588929894d19/inline0.js": "76bd9b9646d04bbe3b3970a9cfb8f0118e3fcfd9d15a1e709662b8dfff82b3e1",
+        "engine-6f039a039706ab97/snippets/kortex-platform-1522588929894d19/inline1.js": "fa7f4829b246a5b75e36bc4905d1f51aeaac5040d8b527cedb51ab4ebddb152f",
+        "engine-6f039a039706ab97/worker.js": "762922d5cc65361a440475782b1b2648e046cfac5b8b1a32c9ac7a879af7bcce",
+        "index.html": "29e76cfe7a9ba7cb78a4ff95b782437ea16d3b9c1454ded9b75b6b03fa449c5c",
+        "sw.js": "6ad9ebb49df8d12b1d4b2b23f37e7c1592a1b764f5f762191736ee3d741ce037"
+      }
+    },
+    "qr.generator": {
+      "receipt": {
+        "output": "7686c3c41810d940",
+        "source": "c22b2e0ca50dd13a"
+      },
+      "files": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-qr-generator-dxha7f3cdcb313cf558.js": "6a2fcce4a9d98d74d8c80f3970f087eea68374f894475e4fd759da24a71bcfa1",
+        "assets/run-qr-generator_bg-dxh7ced48a2b9aba852.wasm": "8c14e19149b9ca46f2328f3e98e0a8c016a3d24103e1dcad2dfe4136125b88a3",
+        "index.html": "31eabf66956edfef416f34742d3bc1df3438a3b5be909bbc513792214d826b40",
+        "sw.js": "9c49eb31cfa2c2e9a2f60131707d5989ad749714d7a102e5bad4712f52d8b344"
+      }
+    },
+    "secure.hash-calculator": {
+      "receipt": {
+        "output": "e1a31b614b7f6812",
+        "source": "1c10e883fb6f0c24"
+      },
+      "files": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-secure-hash-calculator-dxhfd168119fdd6697a.js": "eec109ade993b85e89c2c3650f08e8e2a6d945b2cdb81a6894a1e8ea96819a41",
+        "assets/run-secure-hash-calculator_bg-dxh7777fc9d97b0225f.wasm": "4b9d858a2fcf30b8e95e300bbd5087d77ba1440608ec5dbfd5f21f1239b6ce5a",
+        "engine-63dfc82b3330ebdd/engine.d.ts": "d114020af9732f46326c9ddbd364e0bc4b050cbc5b981eb006ffc0a062b03c67",
+        "engine-63dfc82b3330ebdd/engine.js": "a6b549ce318f9a992de745384c37ff431ad46a606f1aa576fa04104447378d88",
+        "engine-63dfc82b3330ebdd/engine_bg.wasm": "9cbb13889ba628b82ab55c42cbd92b438a6a97241beffa890d5ef3d4e705eea9",
+        "engine-63dfc82b3330ebdd/engine_bg.wasm.d.ts": "2da05e4f068a9c95d13c5514bb60f0da18f25b26b2069eff06ccc49da893d234",
+        "engine-63dfc82b3330ebdd/snippets/kortex-platform-1522588929894d19/inline0.js": "76bd9b9646d04bbe3b3970a9cfb8f0118e3fcfd9d15a1e709662b8dfff82b3e1",
+        "engine-63dfc82b3330ebdd/snippets/kortex-platform-1522588929894d19/inline1.js": "fa7f4829b246a5b75e36bc4905d1f51aeaac5040d8b527cedb51ab4ebddb152f",
+        "engine-63dfc82b3330ebdd/worker.js": "762922d5cc65361a440475782b1b2648e046cfac5b8b1a32c9ac7a879af7bcce",
+        "index.html": "800107f1400d00b45cf2495f20057698e84635234259b75f0313431a728d99d0",
+        "sw.js": "a92196a4116bd04cda4b6ef7c8af0208b150b494e463dd1d4b312bfb64c55cec"
+      }
+    },
+    "secure.password-generator": {
+      "receipt": {
+        "output": "31189928afb62708",
+        "source": "96b87eac29793996"
+      },
+      "files": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-secure-password-generator-dxh52e54be2be964a1.js": "4eaf7b6d142b046c3e583833c90338f8d1c9ba9171b408c1be6f8bf7f2175fca",
+        "assets/run-secure-password-generator_bg-dxh155d7a456dd794f1.wasm": "1f6e5e807e083ae47fdf6fd13e54def123e7700a52ee787cadfb0069188f620f",
+        "index.html": "f84bd93f08bf754a60ee8eaee3642303d053c79fc1dac98f20cef81b420521f0",
+        "sw.js": "ec488ac42c250ed927efe4e93fe9d32a80d33d94f24b48fefeeff86089220e90"
+      }
+    },
+    "text.case-converter": {
+      "receipt": {
+        "output": "1cb0558e4b081bde",
+        "source": "b9329256158f5d03"
+      },
+      "files": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-text-case-converter-dxh534a98b3944bc924.js": "5c140948b156ed2414cfc36b08e6f119d29e5af245129936311d83f4034957b8",
+        "assets/run-text-case-converter_bg-dxhee13206b9af7261.wasm": "d0bf30e1a2e6fc5a04d8c29bd72618b6259cb3a5c570b50519f1dd25acf07e28",
+        "index.html": "27e126190a96df2429b130b90ba2912f112c439b768633f2c46cc738382f05f1",
+        "sw.js": "4b7faa36d55033762e8b828fd5ec9fcf46c40e75067932ebb00292776e38c8e3"
+      }
+    },
+    "text.cleaner": {
+      "receipt": {
+        "output": "bba501d0c8afb515",
+        "source": "e8469d3e1b196a23"
+      },
+      "files": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-text-cleaner-dxhe752db7233cc19f9.js": "1103cab5db31e1d13179ba608132f8f8de395f1237312721b1f52063f7065add",
+        "assets/run-text-cleaner_bg-dxhcf6f2f50492b7655.wasm": "ae3d51272a34fcf8cffdccf5cd225648459107af907ee296de5a24fbed0f34a6",
+        "index.html": "d16092483200e7a473af68723b64a419007ef5ed418df189e8ceb14eadb81d26",
+        "sw.js": "ff24d8c619357510b0e38d652f4c889af69144c525c331b431ae59513533c839"
+      }
+    },
+    "text.deduplicate": {
+      "receipt": {
+        "output": "c88e226d93df1834",
+        "source": "ddb799f339ab43f6"
+      },
+      "files": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-text-deduplicate-dxhf918d876932396dc.js": "74122d4fc0ff8730db983a5080838279ddf51c53115768ad292886a384da20d4",
+        "assets/run-text-deduplicate_bg-dxhf88dd48f3d3fee9f.wasm": "cb6b59fe59e160243f66bc2a61c0684c386612d211b0bf30123605dd9dfb2f12",
+        "index.html": "3dd9eb48dd862372570f0b0064313192c6462ca307bafbec1f116bc68c13ce4e",
+        "sw.js": "6d80ac8ff522ffd3f92dddebcf5dc32e033abe3664e6091b18cd16cf51e1e867"
+      }
+    },
+    "text.find-replace": {
+      "receipt": {
+        "output": "1a44b65223c6e1d6",
+        "source": "77597beec40520e9"
+      },
+      "files": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-text-find-replace-dxh735cb185a9b8653e.js": "0ee5f5856cfc7375688d5acc27774c5cee7fdf20e4d90a1e15033673105b85b4",
+        "assets/run-text-find-replace_bg-dxh66fa20cf97ed7ed.wasm": "ddd27103aa2b7bbeb2898b479304667cfda8e9ec494f449453b2a96bf1412063",
+        "index.html": "3ff58f7ccdffa943e90ca22129a8e5c23146a092afda6de4727add1a66877d76",
+        "sw.js": "95d8f783b6ef4879e438becd9c20c2d27e59853e13a862557a456598a75102b8"
+      }
+    },
+    "text.lorem-ipsum": {
+      "receipt": {
+        "output": "3f49ae1e2833b0ad",
+        "source": "d5ce9d0882222659"
+      },
+      "files": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-text-lorem-ipsum-dxh59828f53d4fbcaf5.js": "bc45e8b4aa1542fee432a37d2fc031129028016e3cea8d899b1b5ebb58568e15",
+        "assets/run-text-lorem-ipsum_bg-dxh3b439b03e475f86.wasm": "08384671b2d9d7d51b92c1710499a8b3f1268c6b5436e40a6e99700724fc12c7",
+        "index.html": "6f02158526b177bf751b4c60050c125ada565f731491f802216ba240927a359e",
+        "sw.js": "e4b09eed64df6aa2626593565ec3605864de068a60cf300de4cbb80bf77a99ca"
+      }
+    },
+    "text.slug-generator": {
+      "receipt": {
+        "output": "ee7f875b995efcf6",
+        "source": "a1c8571bc1abe200"
+      },
+      "files": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-text-slug-generator-dxh54199cdab954cbaf.js": "a3ba01caf87937abdffd56597f6a591733c621683f8070c074f3434654afff01",
+        "assets/run-text-slug-generator_bg-dxh6b52e5532589486e.wasm": "1e872cbe514912be3317733f609f1f8adc3c9ac08d65ef21b8481a2327e1c44a",
+        "index.html": "33fd0ff13f738152992c02f04e93a435e1f80fe219cfee6441b1cd1202c04108",
+        "sw.js": "b5bc16f5d35af4a6d864b09935f3596da7940ec02a66e9a54faa83f06fb5dfcc"
+      }
+    },
+    "text.sort-lines": {
+      "receipt": {
+        "output": "e4fbd583132997b1",
+        "source": "60996236e63fa85b"
+      },
+      "files": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-text-sort-lines-dxheb8861244a5d66e7.js": "1ec19cf356d77e2e438008790cb8ca41da4546e955d1f819f18a486dbf1bdf09",
+        "assets/run-text-sort-lines_bg-dxhed5cc970f2151be6.wasm": "8d7ebe434114f5ac342d522783211f2275282bf2dfd4e7dd6b4a3238d5356234",
+        "index.html": "c47d3b14b3b44b855ca7b70ae87a97f0287ea11a78f5402ea24226d37f4a2b4a",
+        "sw.js": "25f9c0db4ded5a17d583b0099e8661edef941ab19b3ce341706ba7c2c462ee1d"
+      }
+    },
+    "text.word-counter": {
+      "receipt": {
+        "output": "b7040ba2c00ffc9f",
+        "source": "20c8a4883ad03fdd"
+      },
+      "files": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-text-word-counter-dxhd16d76462e64c6a.js": "d6315035460a7fd6a88617b8c9bc185f61d7da4844a0ab15701697ea44eb286f",
+        "assets/run-text-word-counter_bg-dxh6f892b88705aad97.wasm": "f0ddc68078ceb12772d11d5b283f416d76341997dee0d09a6633ff4b7513f729",
+        "index.html": "b1eb2adb18e27c0a56cb695da6592bcb31944599c1d63c8d73bb3647314e5a81",
+        "sw.js": "2de826121ccabdf2f244e48974f11c6d045dbea7c87008b05a7764185cdad0db"
+      }
+    }
+  },
+  "apps": {
+    "apps.store": {
+      "files": {
+        "assets/kortex-store-dxh8f830ce74290ff.js": "1edca5878921a05f68ebb9d30443b11d701a6182fd9d446d4e7a2fb579c38457",
+        "assets/kortex-store_bg-dxhb97efee4bf487f9.wasm": "d26da03b1e85e66274e4c67454a3730001c5929013262ab3008235723527a6eb",
+        "en/index.html": "4f003abb0c3fd9def10d110eaa3a909237a0d24de989a34bba182bc5a13d7cba",
+        "index.html": "4f003abb0c3fd9def10d110eaa3a909237a0d24de989a34bba182bc5a13d7cba"
+      },
+      "output": "cab2287552ddd8ce",
+      "path": "/home/runner/work/kortex-v2/kortex-v2/dist/apps/apps.store",
+      "source": "6083a66c76977cef:edf1c97a04ddcaf8:a6c9ba2eefcb8112:650c11c672fda530",
+      "target": "web"
+    },
+    "apps.desk": {
+      "files": {
+        "assets/kortex-desk-dxh629c1d4c13011e6.js": "a87c8d8c12584012d6245e59f6066c1dd0ad43927f5e9c79413d60fd0bc5f64f",
+        "assets/kortex-desk_bg-dxhec1ffc2b49695c1e.wasm": "45623f167ae07fee5d4cb76c2a291067f68487048435d77813f591879e28b3b6",
+        "en/index.html": "82e09c5582d57a0d08b2a60ba6adf1b8dbba8f0a9fea040e7b210430cd50193a",
+        "index.html": "82e09c5582d57a0d08b2a60ba6adf1b8dbba8f0a9fea040e7b210430cd50193a"
+      },
+      "output": "50b4aa3c1da6263c",
+      "path": "/home/runner/work/kortex-v2/kortex-v2/dist/apps/apps.desk",
+      "source": "550d14bae9503a39:edf1c97a04ddcaf8:a6c9ba2eefcb8112:650c11c672fda530",
+      "target": "web"
+    },
+    "apps.hub": {
+      "files": {
+        "assets/kortex-hub-dxh6bdc8cd1b9ee91d.js": "a0600481830a79c6f28debf3b9bf4bc08018d60169e2db566e2a70027c1d8916",
+        "assets/kortex-hub_bg-dxhec103a7f3af328b.wasm": "86086cff2bd10ed26a9c5170644a554c80d9cba7b0ebacd6be943bf9ea8f9050",
+        "en/index.html": "381d9e413cd60c359ada50953dac40b2cb01d4611cc80fc1ef33c64e0275cd2e",
+        "index.html": "381d9e413cd60c359ada50953dac40b2cb01d4611cc80fc1ef33c64e0275cd2e"
+      },
+      "output": "2070d52689a6afb9",
+      "path": "/home/runner/work/kortex-v2/kortex-v2/dist/apps/apps.hub",
+      "source": "a9d6d9650c8e9900:edf1c97a04ddcaf8:a6c9ba2eefcb8112:650c11c672fda530",
+      "target": "web"
+    }
+  }
+}

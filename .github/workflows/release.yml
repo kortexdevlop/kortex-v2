@@ -79,7 +79,6 @@ jobs:
           cache-on-failure: true
           workspaces: |
             .
-            .kortex/desktop/* -> .kortex/target-desktop
           cache-directories: |
             .kortex/target-desktop
       - name: Extra macOS target
@@ -95,7 +94,7 @@ jobs:
         run: |
           set -euo pipefail
           if [ "$TOOLS" = "all" ]; then TOOL_LIST=$(cargo xtask list-tools); else TOOL_LIST="$TOOLS"; fi
-          APP_LIST=$(python -c 'import json; print(" ".join(a["app"]["id"] for a in json.load(open("registry/apps.json"))["apps"] if a["app"]["status"] in ["beta", "stable"]))')
+          APP_LIST=$(python -c 'import json; print(" ".join(a["app"]["id"] for a in json.load(open("registry/apps.json", encoding="utf-8"))["apps"] if a["app"]["status"] in ["beta", "stable"]))')
           for target in ${{ matrix.targets }} ${EXTRA_TARGETS:-}; do
             cargo xtask build-cli --target "$target"
             for id in $APP_LIST; do cargo xtask build-app "$id" --target "$target"; done
@@ -135,7 +134,6 @@ jobs:
           cache-on-failure: true
           workspaces: |
             .
-            .kortex/build/* -> .kortex/target
           cache-directories: |
             .kortex/target
             .kortex/target-worker
@@ -170,7 +168,7 @@ jobs:
           cargo xtask tokens
           cargo xtask check
           if [ "$TOOLS" = "all" ]; then cargo xtask build all; else cargo xtask build $TOOLS; fi
-          APP_LIST=$(python -c 'import json; print(" ".join(a["app"]["id"] for a in json.load(open("registry/apps.json"))["apps"] if a["app"]["status"] in ["beta", "stable"]))')
+          APP_LIST=$(python -c 'import json; print(" ".join(a["app"]["id"] for a in json.load(open("registry/apps.json", encoding="utf-8"))["apps"] if a["app"]["status"] in ["beta", "stable"]))')
           for id in $APP_LIST; do cargo xtask build-app "$id" --web; done
       - uses: actions/upload-artifact@v4
         with:

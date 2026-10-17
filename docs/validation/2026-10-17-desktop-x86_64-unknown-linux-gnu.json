@@ -1,0 +1,271 @@
+{
+  "schema": 1,
+  "commit": "7ed41ae47a71056d980519537a7237044d00ec3a",
+  "run_id": "39031294481",
+  "target": "x86_64-unknown-linux-gnu",
+  "tool_count": 38,
+  "packages": {
+    "apps.desk": {
+      "file": "apps.desk-0.2.0-x86_64-unknown-linux-gnu.tar.gz",
+      "version": "0.2.0",
+      "sha256": "24571a8bde9e43aa325d137f0277359cc0ca0a4aa5aa6bf0825930fe6957d45f",
+      "sha256_binary": "fef48a045c93e68303c6a7faf8f951589a453e58057664469e5a8b18d8d5a22a"
+    },
+    "apps.hub": {
+      "file": "apps.hub-0.2.0-x86_64-unknown-linux-gnu.tar.gz",
+      "version": "0.2.0",
+      "sha256": "5e449613e39bbca025a41884c9f72ebc6be5d645b6490c288549b9436a735393",
+      "sha256_binary": "98093932c625968a6199248c7d56d3b2bf51c61fd098fa877f817b6d8f1ea485"
+    },
+    "apps.store": {
+      "file": "apps.store-0.2.0-x86_64-unknown-linux-gnu.tar.gz",
+      "version": "0.2.0",
+      "sha256": "77d747451d956ecb5dc41d5d89c353cf07146dc915a7f0618fab6d45ecfa499c",
+      "sha256_binary": "2d88d56b59c8d334eeab19925e80ff520b8da624c69803c8af42b9630273919c"
+    },
+    "calc.age": {
+      "file": "calc.age-1.0.0-x86_64-unknown-linux-gnu.tar.gz",
+      "version": "1.0.0",
+      "sha256": "ff44ace892e9b4a4e73dd34e70480a04749bf0e381f0c35bf5f8be7effcd2fef",
+      "sha256_binary": "d53b4d231ab26d2ddb32a0c0aa6babc6530178ffc93913bea31bd79076a3cfd6"
+    },
+    "calc.average": {
+      "file": "calc.average-1.0.0-x86_64-unknown-linux-gnu.tar.gz",
+      "version": "1.0.0",
+      "sha256": "36937e6e24ab017394faf5a275fc7a690e94f51c1681e2ae6b7e2e6f48fcc980",
+      "sha256_binary": "460698f9bd24673372955f48b7c4ca62b3d3de9a5ebbc6cfe6d3f2d9232d1efd"
+    },
+    "calc.compound-interest": {
+      "file": "calc.compound-interest-1.0.0-x86_64-unknown-linux-gnu.tar.gz",
+      "version": "1.0.0",
+      "sha256": "6809228625846a71666de0e973f559d1dc35ae654c99712bd3a52e05c9b67711",
+      "sha256_binary": "41a9738f6adc4d9acf27d2279971334a55006a7d9bee4fe9f94d1b2bb1b3c98d"
+    },
+    "calc.date-add": {
+      "file": "calc.date-add-1.0.0-x86_64-unknown-linux-gnu.tar.gz",
+      "version": "1.0.0",
+      "sha256": "9dcce379ff896477151627e63344a7d444abae89a0033e20ee28b293b7046d3f",
+      "sha256_binary": "1c375fac645e243087d581eeec929ff0bbce2bb93fbdb1da1f46705806d09277"
+    },
+    "calc.date-difference": {
+      "file": "calc.date-difference-1.0.0-x86_64-unknown-linux-gnu.tar.gz",
+      "version": "1.0.0",
+      "sha256": "74468df1b97cba86e749779e621a7076fc8c319a92c592b7aedfd063376a1578",
+      "sha256_binary": "e033ef245b0ac279d722612803c21c5c0107e3bfb4ea093a7e298c30d1fae49c"
+    },
+    "calc.fuel-cost": {
+      "file": "calc.fuel-cost-1.0.0-x86_64-unknown-linux-gnu.tar.gz",
+      "version": "1.0.0",
+      "sha256": "3a48cd9c3e6fde756e9da6f8cdc63c4a080eedb65713babbf65a8c708c9b18f7",
+      "sha256_binary": "25814626d2d26f46464cc46e89f08ed171f5f6f36ad57875c8618c64876323ec"
+    },
+    "calc.gross-net-salary": {
+      "file": "calc.gross-net-salary-1.0.0-x86_64-unknown-linux-gnu.tar.gz",
+      "version": "1.0.0",
+      "sha256": "8fcce4859d8d0f6dd30824573ef42ea9fcb68b54526da8fa89eaf880a01e793b",
+      "sha256_binary": "5990e1523bf68bb9a521f19755d8b3095913c0cba3ce3f32780d7880430336be"
+    },
+    "calc.loan": {
+      "file": "calc.loan-1.0.0-x86_64-unknown-linux-gnu.tar.gz",
+      "version": "1.0.0",
+      "sha256": "22f89ca7cc06b95f5ecf7c3d4cbf071b8a41cd534d68c743afcf3f9cfd56faa5",
+      "sha256_binary": "6ef31f4602abb1a1055966cf988727bf2a6993e0a413360a2b22daa96222a319"
+    },
+    "calc.percentage": {
+      "file": "calc.percentage-1.0.0-x86_64-unknown-linux-gnu.tar.gz",
+      "version": "1.0.0",
+      "sha256": "52b01f285068befa742b7d2c4635d5b159ddfbf3cc357a5c8f6e72e1aaf3b879",
+      "sha256_binary": "8730ce9370c17fe4977563a84a0a8a7ebdaaace7c6d1f31bb2ba43ebe03cd0d5"
+    },
+    "calc.rule-of-three": {
+      "file": "calc.rule-of-three-1.0.0-x86_64-unknown-linux-gnu.tar.gz",
+      "version": "1.0.0",
+      "sha256": "d68892f86ef144a777cb8a1e20c3d10011b21deeee978c2bfaf5646b94e1231c",
+      "sha256_binary": "27ace6d6c84237e0a60dc76aac94e7e06a684aa7746db691da0b0eb90cc17745"
+    },
+    "calc.tip": {
+      "file": "calc.tip-1.0.0-x86_64-unknown-linux-gnu.tar.gz",
+      "version": "1.0.0",
+      "sha256": "48e3b0877a5da8a3140ad6ffea8888fa40d88f8311eb4f98160299e227077cbc",
+      "sha256_binary": "34477798280015da843d143de869a481609d369611d3dec8518e92da813861a9"
+    },
+    "calc.unit-price": {
+      "file": "calc.unit-price-1.0.0-x86_64-unknown-linux-gnu.tar.gz",
+      "version": "1.0.0",
+      "sha256": "9497b523f8a42b83f0e4e54e35bf84ffc03ca1a10b67aeb4d276e8f36074509b",
+      "sha256_binary": "bf06a3c302c65ddfc3ddc7d00f2ed6e8f6e0f4f8c0391aedb29907862d3d1cc6"
+    },
+    "calc.vat": {
+      "file": "calc.vat-1.0.0-x86_64-unknown-linux-gnu.tar.gz",
+      "version": "1.0.0",
+      "sha256": "d9018df324f11d07c63f27a71af7753a110056f00595e0beabbfda4a920783fd",
+      "sha256_binary": "e5c0bde12cff8d6d64e5cb8b6de5e2d8684b33968e44b4da5189a1ceaa063ab1"
+    },
+    "cli": {
+      "file": "cli-0.1.0-x86_64-unknown-linux-gnu.tar.gz",
+      "version": "0.1.0",
+      "sha256": "14ee202b7be9c44f6046f070fd9ce8158f5594cc87d88f1127208ff29b3dea88",
+      "sha256_binary": "e59cac7f521dc691f42918dcdd19c98ee9210bed97c895a8b863313998e767a7"
+    },
+    "code.base64": {
+      "file": "code.base64-1.0.0-x86_64-unknown-linux-gnu.tar.gz",
+      "version": "1.0.0",
+      "sha256": "b5253f13f7c62e7e788a0dbee77ab05fad3efc8d736d93fe48fdbda5679f8499",
+      "sha256_binary": "b494c8bdf732a57b81ad5fc4637eba9439f09db0e415bcbf938fc46d2012f0e6"
+    },
+    "code.chmod": {
+      "file": "code.chmod-1.0.0-x86_64-unknown-linux-gnu.tar.gz",
+      "version": "1.0.0",
+      "sha256": "516fb0cf2ff26a326c3bb21d645604624ba82f96aa80f6c188dfbf13fdd8028a",
+      "sha256_binary": "77bff2ed8a46e024dfe4bba6ff33152ebc43a2b8bac3d582efe4b2d9de1aa2c2"
+    },
+    "code.html-entities": {
+      "file": "code.html-entities-1.0.0-x86_64-unknown-linux-gnu.tar.gz",
+      "version": "1.0.0",
+      "sha256": "46f47302dc179dda932489794fcad84c07758ef3370778e33cd9102cecc00786",
+      "sha256_binary": "62e8398cfa603b5257ce3a1b2a49e7dc650bb25afa75b63d65d8c77762dfe442"
+    },
+    "code.json-formatter": {
+      "file": "code.json-formatter-1.0.0-x86_64-unknown-linux-gnu.tar.gz",
+      "version": "1.0.0",
+      "sha256": "03816eda522fe07a77c11efec6f429143cd8dea2f4f75d141b8afbccdbaaf119",
+      "sha256_binary": "6d476f6c9f92c99fe512966aac2e8b61623d86c825ed40356876c7bf2c1523c8"
+    },
+    "code.markdown-table": {
+      "file": "code.markdown-table-1.0.0-x86_64-unknown-linux-gnu.tar.gz",
+      "version": "1.0.0",
+      "sha256": "e34ac175dc90c7a1fe7ffaeffc7cac8a0e12bcd44d2dc5db54e189ed80533ee6",
+      "sha256_binary": "4b18097547820f21578e3c241d267afc10637b9ab557ceb193619942230df12b"
+    },
+    "code.number-base": {
+      "file": "code.number-base-1.0.0-x86_64-unknown-linux-gnu.tar.gz",
+      "version": "1.0.0",
+      "sha256": "56a7c9fe1a21924ea5d28be4a1b788e2527c85ada793af54353171263bed7756",
+      "sha256_binary": "da72d80dd737061138cc02cb13e16457c83a165091b56ca34316cd4d249ea23a"
+    },
+    "code.url-encoder": {
+      "file": "code.url-encoder-1.0.0-x86_64-unknown-linux-gnu.tar.gz",
+      "version": "1.0.0",
+      "sha256": "0af88920845ab5b34f72f7c235b9ed77fa0d7eeae3e65652872f545308ac3b6c",
+      "sha256_binary": "c7a23ca677faa85ce7e3cf73b68c9bb3b27e59375ad4b1848a60ce7eb0bbf2c9"
+    },
+    "code.uuid-generator": {
+      "file": "code.uuid-generator-1.0.0-x86_64-unknown-linux-gnu.tar.gz",
+      "version": "1.0.0",
+      "sha256": "0b36eab7aea019b1d388c0b6f7fb3214939adc22e315b54d15cc2a356b38ad89",
+      "sha256_binary": "070ad7cd0f278314ba09d5c5165193ec8d32436b560f9178a81967f766da8cff"
+    },
+    "color.contrast-checker": {
+      "file": "color.contrast-checker-1.0.0-x86_64-unknown-linux-gnu.tar.gz",
+      "version": "1.0.0",
+      "sha256": "943c3a3441895148fa535a5bd235c3bb25a4fffd4d85fa7e7eb8064d04b885f4",
+      "sha256_binary": "606c1a93e38d0b3702ea029d5291cdd3f55c115b30ad15fb11951159da7d890b"
+    },
+    "color.converter": {
+      "file": "color.converter-1.0.0-x86_64-unknown-linux-gnu.tar.gz",
+      "version": "1.0.0",
+      "sha256": "288d5859b4a9e66b09357264ca2bfa1a63c42ae01f60b9573e51402be3153771",
+      "sha256_binary": "61cb301513b85e82fb1decf7b127ea75add9b9c208367cc842a60de1386e4beb"
+    },
+    "convert.timestamp": {
+      "file": "convert.timestamp-1.0.0-x86_64-unknown-linux-gnu.tar.gz",
+      "version": "1.0.0",
+      "sha256": "0422f778bd3a3505c223ff3f5505d7570a828d8db1689b7e8d32f83a7c4e9965",
+      "sha256_binary": "409a751fa9a0ff1b828a9c9e25086b38065032af7ab5eb6d73900a2909b846f3"
+    },
+    "convert.units": {
+      "file": "convert.units-1.0.0-x86_64-unknown-linux-gnu.tar.gz",
+      "version": "1.0.0",
+      "sha256": "eda3500b1166430f0c7980431d2a4ba33f86bd761e481cb78aa71c846235ef0e",
+      "sha256_binary": "bb9329550af7d903a7c69e796ceeca75c060f5180edc1b05116625e086d53f30"
+    },
+    "image.convert": {
+      "file": "image.convert-1.0.0-x86_64-unknown-linux-gnu.tar.gz",
+      "version": "1.0.0",
+      "sha256": "7675eca6428d3647cea0b16ca1d0f93aa9ed11acd8ceb63a893feb25638bb37e",
+      "sha256_binary": "c221130774e5cb9d7d696b16a2719796aeec19d1459f26a60a853800c2dd104e"
+    },
+    "pdf.merge": {
+      "file": "pdf.merge-1.0.0-x86_64-unknown-linux-gnu.tar.gz",
+      "version": "1.0.0",
+      "sha256": "716bec703cc5f682b92287e7405fb034f4974256a12c5f8bdea0283b31712b54",
+      "sha256_binary": "cab7aacd2f9ede80e080b7994c637d3696692eacb2c32846a1029ea55a181ce1"
+    },
+    "qr.generator": {
+      "file": "qr.generator-1.0.0-x86_64-unknown-linux-gnu.tar.gz",
+      "version": "1.0.0",
+      "sha256": "d85844978c12ef8928ad2d9bdaeab7ea4b4db7ad4b2ac2ddd452935e0bb959f2",
+      "sha256_binary": "63860e5cc6dbbbc4c1d751a441ee3bb7e186b059895dcc39b787c7418f3921ec"
+    },
+    "secure.hash-calculator": {
+      "file": "secure.hash-calculator-1.0.0-x86_64-unknown-linux-gnu.tar.gz",
+      "version": "1.0.0",
+      "sha256": "4088f12ebe9d7cb5d82d2659db945a183c7d9e4932a8ffbcf3f8a60620557845",
+      "sha256_binary": "fd8466d3df5dfed32627e143427f30cfeef450ef673adb033a222b6a5f600933"
+    },
+    "secure.password-generator": {
+      "file": "secure.password-generator-1.0.0-x86_64-unknown-linux-gnu.tar.gz",
+      "version": "1.0.0",
+      "sha256": "a5aad43d7e2a4687beb8b07dc64f3b5a00dc0bcf83a62aa53a6d8373c17487aa",
+      "sha256_binary": "6ecb0c037239fd3bfe3c14f0befd15fe853cd4e24353c41c4fca304f0b1eb3b3"
+    },
+    "text.case-converter": {
+      "file": "text.case-converter-1.0.0-x86_64-unknown-linux-gnu.tar.gz",
+      "version": "1.0.0",
+      "sha256": "965b685daf51d6d768623adb1c1bca9252630a18a615f78a7277bf14fa1f700e",
+      "sha256_binary": "845152767ffca8d7baf883b05fd6eb0a4673c8a381a492ee48a60d58adaa0e84"
+    },
+    "text.cleaner": {
+      "file": "text.cleaner-1.0.0-x86_64-unknown-linux-gnu.tar.gz",
+      "version": "1.0.0",
+      "sha256": "0c9fc07f45e11455faed530ec857b9e690b501033d2b180103d7105e1f615af6",
+      "sha256_binary": "45c5053e6d324ce86440faa04105281a026e598b288d1cdc729fc4d912b56f3c"
+    },
+    "text.deduplicate": {
+      "file": "text.deduplicate-1.0.0-x86_64-unknown-linux-gnu.tar.gz",
+      "version": "1.0.0",
+      "sha256": "2196fb70b179201206b9cc27d32200d38a552a101a2fbefceafaac2dd2bab74d",
+      "sha256_binary": "acb5efe1f59c04dd46f482d2a15b981539ed94199ac5a698a53b8ff247fc37a8"
+    },
+    "text.find-replace": {
+      "file": "text.find-replace-1.0.0-x86_64-unknown-linux-gnu.tar.gz",
+      "version": "1.0.0",
+      "sha256": "716ea7a93fa73df9b26c25d92e038d02041e2032e6d89fc909d3451ff6e94b6b",
+      "sha256_binary": "40b79bf4f4c7169e76e41f193cf1fa3276ecc837454245eedcb4de158f253f37"
+    },
+    "text.lorem-ipsum": {
+      "file": "text.lorem-ipsum-1.0.0-x86_64-unknown-linux-gnu.tar.gz",
+      "version": "1.0.0",
+      "sha256": "f60b32c6488196ca86f65780db0239d47bd558c31e860400a4b828fff6105811",
+      "sha256_binary": "21b0566ddd1c2423104be2836fb46aaea29c606298b4b15e6d4711357fda66c2"
+    },
+    "text.slug-generator": {
+      "file": "text.slug-generator-1.0.0-x86_64-unknown-linux-gnu.tar.gz",
+      "version": "1.0.0",
+      "sha256": "0ff992f40e674cdbc209e4c1685e42f47202af0891790ecd2586643a31de0606",
+      "sha256_binary": "e0daad6641b0e95d568afe853591b624fe0f04f595b63bf69359a5c76ffe272c"
+    },
+    "text.sort-lines": {
+      "file": "text.sort-lines-1.0.0-x86_64-unknown-linux-gnu.tar.gz",
+      "version": "1.0.0",
+      "sha256": "41e306e776b4212397ecf0ad80da59e61704246cb64167bd4e24629be88fdb50",
+      "sha256_binary": "ba860716814ec63fc677e7f0e6ff16c98c7a68a1136200a467a4e79dac86af0d"
+    },
+    "text.word-counter": {
+      "file": "text.word-counter-1.0.0-x86_64-unknown-linux-gnu.tar.gz",
+      "version": "1.0.0",
+      "sha256": "7fa9bdcb5b9213e23573dc1100b2ae81553222e073d1440d4b92d77ffbcccefc",
+      "sha256_binary": "9a0ce24eecddc02629c546202861ceaa10ae1b692b2d35dc3ea13470da30b1f6"
+    }
+  },
+  "profile": {
+    "lto": "thin",
+    "codegen_units": "8"
+  },
+  "verification": {
+    "archive_hashes": true,
+    "binary_hashes": true,
+    "versions_and_target": true,
+    "signatures": false
+  }
+}

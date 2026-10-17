@@ -339,3 +339,10 @@ stable: 0 · beta: 38 · draft: 0 — calc 13, code 8, color 2, convert 2, image
 - Mac réussi sur GitHub (job 117392127663, run initial 39031294481, 20m48s). 84 paquets récupérés : 38 outils + trois apps + CLI pour ARM et Intel. Les 84 archives/binaires ont leurs SHA-256 vérifiés, versions/cibles contrôlées, architectures Mach-O vérifiées, et les 84 signatures ad hoc passent codesign --verify --strict sans exécution. Preuves par cible ajoutées dans docs/validation/2026-10-17-desktop-*.json.
 
 - CI de revue 39032572001 : Clippy corrigé passe ; l’édition des liens de tests plante lorsque le runner n’a plus que **93 Mo** de disque (avertissement GitHub confirmé), pas sur une assertion moteur. Correctif 17.7 : symboles debug désactivés uniquement dans le job de contrôle CI et parallélisme limité à deux, sans retirer de test/Clippy. Gate local obligatoire relancé avant commit.
+
+### Release verification follow-up — 2026-10-17
+- Linux and both macOS targets completed; corrected web job completed all 38 tools and three apps. Windows compiled and packaged all 42 binaries, then verification failed on the Windows CP1252 default. Explicit UTF-8 reads/writes correct this build-script issue. Removed unsupported wildcard workspace cache entries; explicit target directory caches remain. Windows-only retry follows the full gate, with no runtime source changes.
+
+- Quality CI 39048924068 (c95bf87) completed successfully: Rust, site and services. All tests retained; reduced debug artifacts resolved runner disk exhaustion. Linux 42 archives/binaries and architectures verified locally; CI web 38 tools/three apps verified against receipts plus SHA-256 manifests, publication in progress.
+
+- GitHub web artifacts published: run b930b1b1-51c2-4727-8536-1e5499a39e9f, Desk bf40f204-c8e6-4f17-9ef0-ecb07da0e0ce, Hub 4003679e-e813-4704-b1cc-a9aeb585804f, Store 9365e6f5-7274-4952-aaa5-f50b60e7a999, site 7206b12d-5e7c-442a-9f02-d8cef6e09132. Public HTTPS recipes passed: Store 38/search/detail/permissions/filter/FR-EN/mobile, Hub favourites/widgets/search, Desk real SHA-256 tool and layout restoration, denied storage warning; zero page errors.
