@@ -75,3 +75,20 @@ test('usage: counters aggregate per day and tool, with validation', async () => 
   assert.equal((await call(env, 'POST', '/v1/usage', { tool: 'pdf.merge', count: 0 }, { cookie })).status, 400);
   assert.equal((await call(env, 'POST', '/v1/usage', { tool: 'pdf.merge', count: 5000 }, { cookie })).status, 400);
 });
+
+test('sync: expected account rejects a cookie switch before reading or writing data', async () => {
+  const { env } = makeEnv();
+  const a = await signup(env, 'expected-a@example.com');
+  const b = await signup(env, 'expected-b@example.com');
+  const aid = (await call(env, 'GET', '/v1/me', undefined, { cookie: a.cookie })).data.id as string;
+  const bid = (await call(env, 'GET', '/v1/me', undefined, { cookie: b.cookie })).data.id as string;
+  const payload = {version: 0, data: {owner: 'a'}};
+  assert.equal((await call(env, 'PUT', '/v1/sync/hub.layout.v1', payload, {cookie: a.cookie,headers:{'X-Kortex-User':aid}})).status,201);
+  for(const method of ['GET','PUT']) {
+    const changed=await call(env,method,'/v1/sync/hub.layout.v1',method==='PUT'?payload:undefined,{cookie:b.cookie,headers:{'X-Kortex-User':aid}});
+    assert.deepEqual([changed.status,changed.data.error],[409,'session_changed']);
+  }
+  assert.equal((await call(env,'GET','/v1/sync/hub.layout.v1',undefined,{cookie:b.cookie,headers:{'X-Kortex-User':bid}})).status,404);
+  const preflight=await call(env,'OPTIONS','/v1/sync/hub.layout.v1',undefined,{origin:'https://workspace.kortex.site'});
+  assert.match(preflight.headers.get('access-control-allow-headers')??'',/X-Kortex-User/);
+});

@@ -1,4 +1,7 @@
 ---
 import Account from '../../components/Account.astro';
+import Unavailable from '../../components/Unavailable.astro';
+import { publicFeatures } from '../../lib/data';
+const enabled = import.meta.env.DEV || publicFeatures.account;
 ---
-<Account lang="en" />
+{enabled ? <Account lang="en" /> : <Unavailable lang="en" kind="account" />}

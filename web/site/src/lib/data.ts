@@ -11,11 +11,15 @@ export interface ToolEntry {
 }
 export interface Universe { id: string; name: string; hue: number }
 
+export const publicFeatures = data.features as {account: boolean; desktop: boolean};
+export const domains = data.domains as Record<string, string>;
+export const appNames = data.appNames as Record<string, string>;
 export const tools = data.tools as unknown as ToolEntry[];
 export const universes = data.universes as Universe[];
 export const langs: Lang[] = ['fr', 'en'];
 
 export const prefix = (lang: Lang) => (lang === 'fr' ? '' : '/en');
+export const universePath = (u: Universe, lang: Lang) => `${prefix(lang)}/${u.id}`;
 export const toolPath = (t: ToolEntry, lang: Lang) => `${prefix(lang)}/${t.tool.slug[lang]}`;
 export const variantPath = (t: ToolEntry, v: ToolEntry['variants'][number], lang: Lang) => `${toolPath(t, lang)}/${v.slug[lang]}`;
 export const byPriority = (a: ToolEntry, b: ToolEntry) => a.tool.viral_priority - b.tool.viral_priority;

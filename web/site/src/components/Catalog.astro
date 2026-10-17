@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import ToolCard from './ToolCard.astro';
-import { tools, universes, ui, byPriority, type Lang } from '../lib/data';
+import { tools, universes, ui, byPriority, universePath, type Lang } from '../lib/data';
 const { lang } = Astro.props as { lang: Lang };
 const t = ui[lang];
 const groups = universes.map((u) => ({ u, items: tools.filter((x) => x.tool.universe === u.id).sort(byPriority) })).filter((g) => g.items.length);
@@ -11,7 +11,7 @@ const groups = universes.map((u) => ({ u, items: tools.filter((x) => x.tool.univ
   {groups.length === 0 && <p class="k-muted">{t.empty}</p>}
   {groups.map((g) => (
     <section>
-      <h2>{g.u.name}</h2>
+      <h2><a href={universePath(g.u,lang)}>{g.u.name}</a></h2>
       <div class="grid">{g.items.map((x) => <ToolCard t={x} lang={lang} />)}</div>
     </section>
   ))}

@@ -1,0 +1,69 @@
+schema = 1
+[tool]
+id = "color.contrast-checker"
+version = "1.0.0"
+universe = "color"
+status = "beta"
+ui = "auto"
+platforms = ["web", "desktop"]
+offline = true
+ai = false
+viral_priority = 1
+[tool.name]
+fr = "Vérificateur de contraste WCAG"
+en = "WCAG Contrast Checker"
+[tool.tagline]
+fr = "Vérifiez le rapport de contraste et les seuils WCAG AA et AAA pour du texte opaque."
+en = "Check contrast ratios and WCAG AA and AAA thresholds for opaque text."
+[tool.slug]
+fr = "contraste-couleurs"
+en = "color-contrast-checker"
+[search]
+keywords.fr = ["vérificateur de contraste wcag", "contraste couleurs"]
+keywords.en = ["wcag contrast checker", "color contrast checker"]
+intents.fr = ["Vérifiez le rapport de contraste et les seuils WCAG AA et AAA pour du texte opaque."]
+intents.en = ["Check contrast ratios and WCAG AA and AAA thresholds for opaque text."]
+related = []
+[limits]
+timeout_s = 10
+
+[[params]]
+id = "foreground"
+type = "color"
+default = "#000000"
+level = "simple"
+label = { fr = "Couleur du texte (HEX)", en = "Text color (HEX)" }
+
+[[params]]
+id = "background"
+type = "color"
+default = "#FFFFFF"
+level = "simple"
+label = { fr = "Couleur de fond (HEX)", en = "Background color (HEX)" }
+
+[[outputs]]
+id = "ratio"
+type = "text"
+
+[[outputs]]
+id = "aa_normal"
+type = "text"
+
+[[outputs]]
+id = "aa_large"
+type = "text"
+
+[[outputs]]
+id = "aaa_normal"
+type = "text"
+
+[[outputs]]
+id = "aaa_large"
+type = "text"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "write"
+sensitive = false
+privacy = "local"

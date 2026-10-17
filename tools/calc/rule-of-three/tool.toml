@@ -1,0 +1,63 @@
+schema = 1
+[tool]
+id = "calc.rule-of-three"
+version = "1.0.0"
+universe = "calc"
+status = "beta"
+ui = "auto"
+platforms = ["web", "desktop"]
+offline = true
+ai = false
+viral_priority = 1
+[tool.name]
+fr = "Règle de trois"
+en = "Rule of Three"
+[tool.tagline]
+fr = "Retrouvez une quatrième valeur par proportionnalité."
+en = "Find a fourth value using direct proportion."
+[tool.slug]
+fr = "regle-de-trois"
+en = "rule-of-three"
+[search]
+keywords.fr = ["règle de trois", "regle de trois"]
+keywords.en = ["rule of three", "rule of three"]
+intents.fr = ["Retrouvez une quatrième valeur par proportionnalité."]
+intents.en = ["Find a fourth value using direct proportion."]
+related = []
+[limits]
+timeout_s = 10
+
+[[params]]
+id = "a"
+type = "number"
+default = 2
+level = "simple"
+label = { fr = "Valeur A", en = "Value A" }
+range = [-1000000000000000.0, 1000000000000000.0]
+
+[[params]]
+id = "b"
+type = "number"
+default = 10
+level = "simple"
+label = { fr = "Valeur B associée", en = "Corresponding value B" }
+range = [-1000000000000000.0, 1000000000000000.0]
+
+[[params]]
+id = "c"
+type = "number"
+default = 5
+level = "simple"
+label = { fr = "Nouvelle valeur C", en = "New value C" }
+range = [-1000000000000000.0, 1000000000000000.0]
+
+[[outputs]]
+id = "result"
+type = "number"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "write"
+sensitive = false
+privacy = "local"

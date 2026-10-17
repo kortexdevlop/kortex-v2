@@ -6,7 +6,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::task::{Context, Poll, Waker};
 
 /// Dynamically typed value crossing the tool boundary (UI, bus, Flow, Mind, CLI).
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub enum Value {
     Text(String),
     Number(f64),
@@ -93,18 +93,59 @@ impl ToolError {
 }
 
 /// A file passed between tools.
-#[derive(Debug, Clone, Default, PartialEq, Eq)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct FileData {
     pub name: String,
     pub mime: String,
+    #[serde(with = "wire_bytes")]
     pub bytes: Vec<u8>,
 }
 
 /// Tabular data (`table` port type).
-#[derive(Debug, Clone, Default, PartialEq, Eq)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct Table {
     pub columns: Vec<String>,
     pub rows: Vec<Vec<String>>,
+}
+
+pub use kortex_platform::WorkerFailure;
+
+impl From<ToolError> for WorkerFailure {
+    fn from(error: ToolError) -> Self {
+        Self {
+            code: error.code.to_owned(),
+            detail: error.detail,
+        }
+    }
+}
+
+// Binary serialization produces Uint8Array in the browser instead of JSON arrays of numbers.
+mod wire_bytes {
+    use serde::{Deserialize, Deserializer, Serializer};
+
+    pub fn serialize<S: Serializer>(bytes: &[u8], serializer: S) -> Result<S::Ok, S::Error> {
+        serializer.serialize_bytes(bytes)
+    }
+
+    pub fn deserialize<'de, D: Deserializer<'de>>(deserializer: D) -> Result<Vec<u8>, D::Error> {
+        struct Bytes;
+        impl<'de> serde::de::Visitor<'de> for Bytes {
+            type Value = Vec<u8>;
+            fn expecting(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+                f.write_str("binary bytes")
+            }
+            fn visit_byte_buf<E: serde::de::Error>(self, bytes: Vec<u8>) -> Result<Vec<u8>, E> {
+                Ok(bytes)
+            }
+            fn visit_bytes<E: serde::de::Error>(self, bytes: &[u8]) -> Result<Vec<u8>, E> {
+                Ok(bytes.to_vec())
+            }
+            fn visit_seq<A: serde::de::SeqAccess<'de>>(self, seq: A) -> Result<Vec<u8>, A::Error> {
+                Deserialize::deserialize(serde::de::value::SeqAccessDeserializer::new(seq))
+            }
+        }
+        deserializer.deserialize_byte_buf(Bytes)
+    }
 }
 
 /// Cloneable handle to cancel a running engine from another place (UI, Flow, CLI).
@@ -190,16 +231,7 @@ impl Cx {
         if let Some(c) = &self.clock {
             return c();
         }
-        #[cfg(target_arch = "wasm32")]
-        {
-            js_sys::Date::now() as u64
-        }
-        #[cfg(not(target_arch = "wasm32"))]
-        {
-            std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .map_or(0, |d| d.as_millis() as u64)
-        }
+        kortex_platform::now_ms()
     }
 
     /// Fill `buf` with random bytes (OS CSPRNG unless an entropy source was injected).
@@ -211,7 +243,7 @@ impl Cx {
             src(buf);
             return Ok(());
         }
-        getrandom::fill(buf).map_err(|_| ToolError::new("entropy_unavailable"))
+        kortex_platform::fill_random(buf).map_err(|_| ToolError::new("entropy_unavailable"))
     }
 
     pub fn log(&mut self, line: impl Into<String>) {
@@ -233,7 +265,7 @@ pub fn block_on<F: Future>(fut: F) -> F::Output {
         if let Poll::Ready(v) = fut.as_mut().poll(&mut cx) {
             return v;
         }
-        std::thread::yield_now();
+        kortex_platform::yield_now();
     }
 }
 

@@ -10,7 +10,7 @@ on:
     inputs:
       tools:
         description: 'Tool ids to build (space separated) or "all"'
-        default: 'secure.password-generator'
+        default: 'all'
       only:
         description: 'Run a single OS only: linux, macos, windows or all'
         type: choice
@@ -19,7 +19,7 @@ on:
       intel_mac:
         description: 'Also build macOS x86_64 (costs more minutes)'
         type: boolean
-        default: false
+        default: true
       publish:
         description: 'Publish to kortex-releases (needs the RELEASES_TOKEN secret)'
         type: boolean
@@ -55,11 +55,14 @@ jobs:
 
   build:
     needs: plan
+    env:
+      CARGO_PROFILE_RELEASE_LTO: thin
+      CARGO_PROFILE_RELEASE_CODEGEN_UNITS: 8
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 90
+    timeout-minutes: 120
     defaults:
       run:
         shell: bash
@@ -76,6 +79,8 @@ jobs:
           workspaces: |
             .
             .kortex/desktop/* -> .kortex/target-desktop
+          cache-directories: |
+            .kortex/target-desktop
       - name: Extra macOS target
         if: runner.os == 'macOS' && env.INTEL_MAC == 'true'
         run: |
@@ -83,13 +88,16 @@ jobs:
           echo "EXTRA_TARGETS=x86_64-apple-darwin" >> "$GITHUB_ENV"
       - name: Design tokens (embedded in every app)
         run: cargo xtask tokens
+      - name: Validate contracts and catalogue
+        run: cargo xtask check
       - name: Build, sign (macOS ad hoc) and package
         run: |
           set -euo pipefail
           if [ "$TOOLS" = "all" ]; then TOOL_LIST=$(cargo xtask list-tools); else TOOL_LIST="$TOOLS"; fi
+          APP_LIST=$(python -c 'import json; print(" ".join(a["app"]["id"] for a in json.load(open("registry/apps.json"))["apps"] if a["app"]["status"] in ["beta", "stable"]))')
           for target in ${{ matrix.targets }} ${EXTRA_TARGETS:-}; do
             cargo xtask build-cli --target "$target"
-            cargo xtask build-app apps.store --target "$target"
+            for id in $APP_LIST; do cargo xtask build-app "$id" --target "$target"; done
             for id in $TOOL_LIST; do cargo xtask build-desktop "$id" --target "$target"; done
             if [ "$RUNNER_OS" = "macOS" ]; then
               # Free ad hoc signature: required to run on Apple Silicon. Gatekeeper still warns on browser
@@ -98,19 +106,69 @@ jobs:
               find "dist/desktop/$target" -type f -perm -u+x -exec codesign --force --sign - {} \;
             fi
             cargo xtask package cli --target "$target"
-            cargo xtask package apps.store --target "$target"
+            for id in $APP_LIST; do cargo xtask package "$id" --target "$target"; done
             for id in $TOOL_LIST; do cargo xtask package "$id" --target "$target"; done
           done
+          python scripts/verify-release-packages.py --tools "$TOOLS" --targets "${{ matrix.targets }} ${EXTRA_TARGETS:-}"
           ls -la dist/release
       - uses: actions/upload-artifact@v4
         with:
           name: packages-${{ matrix.name }}
-          path: dist/release/*.tar.gz
+          path: |
+            dist/release/*.tar.gz
+            dist/release/build-proof-*.json
           if-no-files-found: error
           retention-days: 7
 
+  web:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup show
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            .
+            .kortex/build/* -> .kortex/target
+          cache-directories: |
+            ~/.cache/dioxus
+      - name: Existing Dioxus compiler (official pinned binary)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/dioxus"
+          gh release download v0.7.10 --repo DioxusLabs/dioxus --pattern 'dx-x86_64-unknown-linux-gnu.tar.gz' --pattern 'dx-x86_64-unknown-linux-gnu.sha256' --dir "$RUNNER_TEMP/dioxus"
+          cd "$RUNNER_TEMP/dioxus"
+          sha256sum --check --ignore-missing dx-x86_64-unknown-linux-gnu.sha256
+          tar -xzf dx-x86_64-unknown-linux-gnu.tar.gz
+          find "$RUNNER_TEMP/dioxus" -type f -name dx -exec chmod +x {} \;
+          find "$RUNNER_TEMP/dioxus" -type f -name dx -printf '%h\n' >> "$GITHUB_PATH"
+      - name: Compile all requested tools and released apps for WebAssembly
+        env:
+          DX_CLI_TELEMETRY: 'false'
+        run: |
+          set -euo pipefail
+          cargo xtask tokens
+          cargo xtask check
+          if [ "$TOOLS" = "all" ]; then cargo xtask build all; else cargo xtask build $TOOLS; fi
+          APP_LIST=$(python -c 'import json; print(" ".join(a["app"]["id"] for a in json.load(open("registry/apps.json"))["apps"] if a["app"]["status"] in ["beta", "stable"]))')
+          for id in $APP_LIST; do cargo xtask build-app "$id" --web; done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: web-bundles-and-receipts
+          path: |
+            dist/run/
+            dist/apps/
+            .kortex/build/*/build-receipt.json
+            .kortex/app-receipts/*-web.json
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 7
+
+
   publish:
-    needs: build
+    needs: [build, web]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -135,9 +193,14 @@ jobs:
           ls -la dist/release
       - uses: actions/upload-artifact@v4
         with:
-          name: signed-release
-          path: dist/release/*
-          retention-days: 14
+          name: signed-release-index
+          path: |
+            dist/release/index.json
+            dist/release/index.json.sig
+            dist/release/cli-latest.txt
+            dist/release/build-proof-*.json
+          if-no-files-found: error
+          retention-days: 7
       - name: Publish to kortex-releases
         if: (github.event_name == 'push' || inputs.publish) && env.RELEASES_TOKEN != ''
         env:

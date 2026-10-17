@@ -1,0 +1,20 @@
+---
+import Base from '../layouts/Base.astro';
+import type { Lang } from '../lib/data';
+const {lang, kind} = Astro.props as {lang: Lang; kind: 'account' | 'download'};
+const fr = lang === 'fr';
+const account = kind === 'account';
+const title = account ? (fr ? 'Le compte arrive bientôt' : 'Accounts are coming soon') : (fr ? 'La version bureau est en préparation' : 'The desktop version is being prepared');
+const description = account
+  ? (fr ? 'La création de compte et la synchronisation ne sont pas encore ouvertes. Les outils web restent accessibles gratuitement et sans inscription.' : 'Account creation and synchronization are not open yet. Web tools remain available for free without signing up.')
+  : (fr ? 'Les téléchargements publics ne sont pas encore disponibles. Vous pouvez déjà utiliser les outils dans votre navigateur : vos fichiers restent sur votre appareil.' : 'Public downloads are not available yet. You can already use the tools in your browser: your files stay on your device.');
+---
+<Base lang={lang} title={`${title} — Kortex`} description={description} noindex={account}
+  alt={account ? {fr:'/compte',en:'/en/account'} : {fr:'/telecharger',en:'/en/download'}}>
+  <section class="k-card k-stack">
+    <p class="k-muted">{fr ? 'En préparation' : 'In preparation'}</p>
+    <h1>{title}</h1><p>{description}</p>
+    <p><a class="k-btn" href={fr ? '/outils' : '/en/tools'}>{fr ? 'Utiliser les outils web' : 'Use the web tools'}</a></p>
+    <p><a href={fr ? '/applications' : '/en/apps'}>{fr ? 'Voir l’état des applications' : 'See app availability'}</a></p>
+  </section>
+</Base>

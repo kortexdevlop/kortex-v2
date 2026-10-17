@@ -1,0 +1,72 @@
+schema = 1
+[tool]
+id = "text.deduplicate"
+version = "1.0.0"
+universe = "text"
+status = "beta"
+ui = "auto"
+platforms = ["web", "desktop"]
+offline = true
+ai = false
+viral_priority = 1
+[tool.name]
+fr = "Supprimer les lignes en double"
+en = "Remove Duplicate Lines"
+[tool.tagline]
+fr = "Gardez la première occurrence de chaque ligne, dans son ordre initial."
+en = "Keep the first occurrence of each line in its original order."
+[tool.slug]
+fr = "supprimer-doublons-lignes"
+en = "remove-duplicate-lines"
+[search]
+keywords.fr = ["supprimer les lignes en double", "supprimer doublons lignes"]
+keywords.en = ["remove duplicate lines", "remove duplicate lines"]
+intents.fr = ["Gardez la première occurrence de chaque ligne, dans son ordre initial."]
+intents.en = ["Keep the first occurrence of each line in its original order."]
+related = []
+[limits]
+timeout_s = 10
+
+[[inputs]]
+id = "text"
+type = "text"
+required = true
+max_len = 100000
+multiline = true
+label = { fr = "Texte", en = "Text" }
+
+[[params]]
+id = "case_sensitive"
+type = "bool"
+default = true
+level = "medium"
+label = { fr = "Respecter la casse", en = "Case sensitive" }
+
+[[params]]
+id = "trim"
+type = "bool"
+default = false
+level = "medium"
+label = { fr = "Ignorer les espaces aux extrémités", en = "Ignore surrounding whitespace" }
+
+[[params]]
+id = "remove_empty"
+type = "bool"
+default = false
+level = "medium"
+label = { fr = "Supprimer les lignes vides", en = "Remove empty lines" }
+
+[[outputs]]
+id = "text"
+type = "text"
+
+[[outputs]]
+id = "removed"
+type = "integer"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "write"
+sensitive = false
+privacy = "local"

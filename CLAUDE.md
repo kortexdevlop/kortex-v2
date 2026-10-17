@@ -1,24 +1,30 @@
-# Kortex — règles du projet (condensé)
+# Kortex — règles du projet
 
-Autorité : `docs/MASTER_PROMPT.md` (lire en entier au début d'une nouvelle phase). Mémoire : `docs/PROGRESS.md` (à mettre à jour à CHAQUE fin de session). Décisions : `docs/adr/`.
+Autorité : instructions utilisateur récentes, puis `docs/RULES.md` et périmètre fonctionnel de `docs/MASTER_PROMPT.md` (à lire intégralement au début d’une phase). Plan : `docs/PLAN.md`. Journal : `docs/PROGRESS.md`. ADR : décisions compatibles, jamais dérogations unilatérales.
 
-## Langue
-- Échanges avec l'utilisateur : français. Code, identifiants, commits, commentaires techniques : anglais. Site : FR (racine) + EN (`/en/`).
+## Périmètre
+- Catalogue gelé à 38 outils. Corriger l’existant ; aucun outil supplémentaire.
+- Budget zéro, Cloudflare gratuit, dépôt privé et licence propriétaire. Aucun secret dans Git.
+- Aucune action irréversible hors autorisation explicite et inventaire préalable.
 
-## Interdits
-- Aucune action destructive/irréversible (suppression repo/Workers/DNS/DB, force-push, dépense) sans accord explicite dans le chat + inventaire préalable.
-- Aucun secret dans git (`wrangler secret`, GitHub Secrets, `.dev.vars` ignoré).
-- Budget zéro : Cloudflare plan gratuit uniquement, aucun service payant.
-- Dépôt privé, licence propriétaire. Pas d'argon2/bcrypt dans les Workers ; pas de KV pour écritures utilisateur.
-- Pas de couleur/rayon/ombre en dur (tokens), pas d'accès plateforme hors `kortex-platform`, pas d'import d'un outil par un autre, pas de dépendance hors `docs/deps.md`.
-- Pas d'`unwrap()`/`panic!` dans les moteurs.
+## Architecture
+- Outils : `tools/<univers>/<nom>/`, contrat `tool.toml`, moteur Rust pur, UI Dioxus commune web/desktop, glyph/locales/content/tests.
+- Apps installables : `apps/<nom>/`, `app.toml` validé et mêmes sources Rust/Dioxus compilées web/desktop. Une app Astro/TS distincte est interdite comme substitut.
+- Site Astro/TS : vitrine, SEO et intégration (navigation, palette site, Stage, compte existant). Workers : TypeScript strict conformément au prompt.
+- Accès runtime plateforme uniquement via `kortex-platform` ; scripts de build et fixtures peuvent gérer leurs artefacts, jamais générer un contournement runtime.
+- Aucun import d’un outil par un autre. Contrats/registre/bus pour la coopération. Pas d’unwrap/panic dans les moteurs.
+- Couleurs/rayons/ombres via tokens ; dépendances justifiées dans `docs/deps.md` avant installation.
+- Pas de fichiers utilisateur côté serveur ; consentement précis avant contenu vers IA. Métadonnées seules pour Sync, jetons desktop dans le trousseau.
 
-## Structure
-`tools/<univers>/<nom>/` (outils uniquement) · `apps/` · `crates/kortex-*` · `web/site` (Astro) · `services/` (Workers TS) · `registry/` (généré) · `xtask/` · `brand/` · `design/tokens` · `docs/`.
-Un outil = `tool.toml` (contrat) + `engine.rs` + glyph + locales + content + tests. Ajouter un outil ne modifie jamais `web/site`.
+## Exécution du plan
+- Avant toute modification de chaque lot, annoncer exactement les étapes N.M, fichiers/couches concernés, changements prévus, contrôles indispensables et publication attendue ; ne pas se limiter à « je continue ».
+- Choisir les étapes N.M avant chaque lot. Signaler immédiatement tout écart ; ne pas changer d’architecture pour gagner du temps.
+- Contrôles utiles groupés ; compiler le Rust modifié et ses dépendants pour les cibles concernées. Réutiliser seulement les artefacts dont le reçu valide les sources/sorties.
+- Distinguer présence, tests, compilation web, compilation native, recette et publication. Ne pas déclarer une app achevée avant preuves web + desktop.
+- Publier chaque lot terminé après contrôles : autorisation persistante de l’utilisateur. CI voie nominale, secours local reproductible autorisé. Pas de fonction fictivement ouverte.
+- Gate complet avant commit. Aucune recompilation générale inutile après changement Astro seul.
 
-## Commandes (cibles, à créer en Phase 1)
-`cargo xtask new-tool|check|registry|tokens|icons|dev|build|stats` · `cargo fmt --check` · `cargo clippy -D warnings` · `cargo test`.
-
-## Fin de session
-Résumé ≤ 5 lignes + ce que l'utilisateur doit tester + prochaine étape ; PROGRESS.md à jour.
+## Communication et mémoire
+- Utilisateur : français. Code/identifiants/commits/commentaires techniques : anglais. Produit FR + EN.
+- Mettre à jour PLAN.md et PROGRESS.md à chaque session ; AGENTS.md et CLAUDE.md restent identiques.
+- Fin : résumé ≤5 lignes, résultat/limites, fichier ou URL à tester et prochaine étape.

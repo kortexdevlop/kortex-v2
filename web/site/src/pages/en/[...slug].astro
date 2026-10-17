@@ -1,14 +1,17 @@
 ---
 // One template generates every tool and variant page from registry data.
 import ToolPage from '../../components/ToolPage.astro';
-import { tools } from '../../lib/data';
+import Universe from '../../components/Universe.astro';
+import { tools, universes } from '../../lib/data';
+import AppPage from '../../components/AppPage.astro';
+import { apps } from '../../lib/apps';
 const lang = 'en' as const;
 export function getStaticPaths() {
-  return tools.flatMap((t) => [
+  return [...apps.map(app => ({ params: { slug: app.id }, props: { app } })), ...universes.map(universe => ({ params: { slug: universe.id }, props: { universe } })), ...tools.flatMap((t) => [
     { params: { slug: t.tool.slug.en }, props: { t } },
     ...t.variants.map((v) => ({ params: { slug: `${t.tool.slug.en}/${v.slug.en}` }, props: { t, variant: v } })),
-  ]);
+  ])];
 }
-const { t, variant } = Astro.props;
+const { t, variant, universe, app } = Astro.props;
 ---
-<ToolPage t={t} lang={lang} variant={variant} />
+{app ? <AppPage app={app} lang={lang} /> : universe ? <Universe universe={universe} lang={lang} /> : <ToolPage t={t} lang={lang} variant={variant} />}

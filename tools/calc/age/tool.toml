@@ -1,0 +1,57 @@
+schema = 1
+[tool]
+id = "calc.age"
+version = "1.0.0"
+universe = "calc"
+status = "beta"
+ui = "auto"
+platforms = ["web", "desktop"]
+offline = true
+ai = false
+viral_priority = 1
+[tool.name]
+fr = "Calculateur d’âge"
+en = "Age Calculator"
+[tool.tagline]
+fr = "Calculez un âge révolu et le nombre de jours vécus à une date choisie."
+en = "Calculate completed years and days lived on a date you choose."
+[tool.slug]
+fr = "calculateur-age"
+en = "age-calculator"
+[search]
+keywords.fr = ["calculateur d’âge", "calculateur age"]
+keywords.en = ["age calculator", "age calculator"]
+intents.fr = ["Calculez un âge révolu et le nombre de jours vécus à une date choisie."]
+intents.en = ["Calculate completed years and days lived on a date you choose."]
+related = []
+[limits]
+timeout_s = 10
+
+[[params]]
+id = "birth"
+type = "text"
+default = "2000-01-01"
+level = "simple"
+label = { fr = "Date de naissance (AAAA-MM-JJ)", en = "Birth date (YYYY-MM-DD)" }
+
+[[params]]
+id = "at"
+type = "text"
+default = "2024-01-01"
+level = "simple"
+label = { fr = "Date de référence (AAAA-MM-JJ)", en = "Reference date (YYYY-MM-DD)" }
+
+[[outputs]]
+id = "years"
+type = "integer"
+
+[[outputs]]
+id = "days"
+type = "integer"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "write"
+sensitive = false
+privacy = "local"

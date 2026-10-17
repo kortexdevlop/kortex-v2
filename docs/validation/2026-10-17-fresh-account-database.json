@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-17",
+  "request": "Recréer une base vide",
+  "active_database": {
+    "name": "kortex-accounts-fresh-20261017",
+    "id": "14db05e6-f667-4423-a289-946a0f18ebca",
+    "user_count_before_recipe": 0,
+    "user_count_after_recipe": 0,
+    "migrations": 5
+  },
+  "preserved_database": {
+    "name": "kortex-accounts",
+    "id": "a1e6c6b8-cc74-4497-bc9f-ee62c5a7d462",
+    "still_present": true,
+    "deleted": false,
+    "exported": false
+  },
+  "api_version": "be8f7808-b259-4d4a-9687-815d5a763c4f",
+  "checks": {
+    "production_recipe": "passed: HTTPS, signup, secure cookie, reload, settings, export, logout, password login, QA account deletion, site search and Rust Worker SHA-256",
+    "production_binding": "DB resolved to fresh database; no pending migrations",
+    "script_syntax": "passed",
+    "dns": "Current public DoH records supplied to test processes; TLS validation enabled"
+  },
+  "source_sha256": {
+    "services/api/wrangler.jsonc": "9a30bdf46fa798871daa694f81a51e0c8b5a0899d6f958d7f3818015526d6787",
+    "scripts/publish.mjs": "67ed837325be48e5e1701b8db8844c3073a30e56e22db6dd1a1c9ff352660294"
+  },
+  "previous_snapshot": "2026-10-17-platform-boundary.json is historical; this snapshot supersedes its production database binding and API version only",
+  "unchanged": "Site/tool deployments and catalogue (38 tools); no product source or tool build needed",
+  "logs": [
+    "/tmp/kortex-fresh-db-deploy.log",
+    "/tmp/kortex-fresh-db-public-test.log",
+    "/tmp/kortex-fresh-db-binding-check.log",
+    "/tmp/kortex-fresh-db-final-counts.json",
+    "/tmp/kortex-fresh-db-final-inventory.json"
+  ]
+}

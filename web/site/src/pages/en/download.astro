@@ -1,4 +1,7 @@
 ---
 import Download from '../../components/Download.astro';
+import Unavailable from '../../components/Unavailable.astro';
+import { publicFeatures } from '../../lib/data';
+const enabled = import.meta.env.DEV || publicFeatures.desktop;
 ---
-<Download lang="en" />
+{enabled ? <Download lang="en" /> : <Unavailable lang="en" kind="download" />}

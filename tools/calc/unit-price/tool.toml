@@ -1,0 +1,79 @@
+schema = 1
+[tool]
+id = "calc.unit-price"
+version = "1.0.0"
+universe = "calc"
+status = "beta"
+ui = "auto"
+platforms = ["web", "desktop"]
+offline = true
+ai = false
+viral_priority = 1
+[tool.name]
+fr = "Comparateur de prix au kilo"
+en = "Unit Price Calculator"
+[tool.tagline]
+fr = "Comparez deux produits au kilogramme ou au litre."
+en = "Compare two products per kilogram or litre."
+[tool.slug]
+fr = "comparateur-prix-kilo"
+en = "unit-price-calculator"
+[search]
+keywords.fr = ["comparateur de prix au kilo", "comparateur prix kilo"]
+keywords.en = ["unit price calculator", "unit price calculator"]
+intents.fr = ["Comparez deux produits au kilogramme ou au litre."]
+intents.en = ["Compare two products per kilogram or litre."]
+related = []
+[limits]
+timeout_s = 10
+
+[[params]]
+id = "price_a"
+type = "number"
+default = 3
+level = "simple"
+label = { fr = "Prix A", en = "Price A" }
+range = [0, 1000000000000.0]
+
+[[params]]
+id = "quantity_a"
+type = "number"
+default = 500
+level = "simple"
+label = { fr = "Quantité A (g ou ml)", en = "Quantity A (g or ml)" }
+range = [1e-06, 1000000000000.0]
+
+[[params]]
+id = "price_b"
+type = "number"
+default = 5
+level = "simple"
+label = { fr = "Prix B", en = "Price B" }
+range = [0, 1000000000000.0]
+
+[[params]]
+id = "quantity_b"
+type = "number"
+default = 1000
+level = "simple"
+label = { fr = "Quantité B (g ou ml)", en = "Quantity B (g or ml)" }
+range = [1e-06, 1000000000000.0]
+
+[[outputs]]
+id = "unit_a"
+type = "number"
+
+[[outputs]]
+id = "unit_b"
+type = "number"
+
+[[outputs]]
+id = "difference"
+type = "number"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "write"
+sensitive = false
+privacy = "local"

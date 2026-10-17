@@ -1,13 +1,13 @@
 ---
 import { prefix, type Lang } from '../lib/data';
-import Seek from '../components/Seek.astro';
+import SiteSearch from '../components/SiteSearch.astro';
 interface Props { title: string; description: string; lang: Lang; alt?: { fr: string; en: string }; noindex?: boolean; jsonLd?: object[]; ogImage?: string }
 const { title, description, lang, alt, noindex = false, jsonLd = [], ogImage } = Astro.props;
 const og = ogImage ?? `/og/${lang}/home.png`;
 const site = Astro.site?.origin ?? 'https://kortex.site';
 const nav = lang === 'fr'
-  ? { tools: 'Outils', all: '/outils', other: 'EN', account: 'Compte', accountHref: '/compte', dl: 'Télécharger', dlHref: '/telecharger' }
-  : { tools: 'Tools', all: '/en/tools', other: 'FR', account: 'Account', accountHref: '/en/account', dl: 'Download', dlHref: '/en/download' };
+  ? { apps: 'Applications', appsHref: '/applications', tools: 'Outils', all: '/outils', other: 'EN', account: 'Compte', accountHref: '/compte', dl: 'Télécharger', dlHref: '/telecharger' }
+  : { apps: 'Apps', appsHref: '/en/apps', tools: 'Tools', all: '/en/tools', other: 'FR', account: 'Account', accountHref: '/en/account', dl: 'Download', dlHref: '/en/download' };
 const otherHref = alt ? (lang === 'fr' ? alt.en : alt.fr) : (lang === 'fr' ? '/en' : '/');
 ---
 <!doctype html>
@@ -35,7 +35,7 @@ const otherHref = alt ? (lang === 'fr' ? alt.en : alt.fr) : (lang === 'fr' ? '/e
     <link rel="icon" href="/icons/kortex.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="/kortex.css" />
     <script is:inline>
-      try { const t = localStorage.getItem('k-theme'); if (t) document.documentElement.dataset.theme = t; } catch {}
+      try { localStorage.removeItem('kortex-desk-v1'); localStorage.removeItem('kortex-hub-v1'); const t = localStorage.getItem('k-theme'); if (t) document.documentElement.dataset.theme = t; } catch {}
     </script>
     {jsonLd.map((d) => <script type="application/ld+json" set:html={JSON.stringify(d)} />)}
   </head>
@@ -46,12 +46,13 @@ const otherHref = alt ? (lang === 'fr' ? alt.en : alt.fr) : (lang === 'fr' ? '/e
         <span>Kortex</span>
       </a>
       <nav>
-        <Seek lang={lang} />
+        <SiteSearch lang={lang} />
         <select class="mode-select" data-mode-select aria-label={lang === 'fr' ? 'Mode (Simple, Medium, Pro)' : 'Mode (Simple, Medium, Pro)'}>
           <option value="simple">Simple</option><option value="medium" selected>Medium</option><option value="pro">Pro</option>
         </select>
         <button class="theme-toggle" type="button" data-theme-toggle aria-label={lang === 'fr' ? 'Changer de thème' : 'Switch theme'}>◐</button>
         <a href={nav.all}>{nav.tools}</a>
+        <a href={nav.appsHref}>{nav.apps}</a>
         <a href={nav.dlHref}>{nav.dl}</a>
         <a href={nav.accountHref}>{nav.account}</a>
         <a href={otherHref} hreflang={lang === 'fr' ? 'en' : 'fr'}>{nav.other}</a>
@@ -99,6 +100,7 @@ const otherHref = alt ? (lang === 'fr' ? alt.en : alt.fr) : (lang === 'fr' ? '/e
   </body>
 </html>
 <style is:global>
+  [hidden] { display: none !important; }
   main { max-width: 1080px; margin: 0 auto; padding: var(--k-space-8) var(--k-space-4) var(--k-space-9); }
   .site-head { position: sticky; top: var(--k-space-3); z-index: 10; display: flex; justify-content: space-between; align-items: center; max-width: 1080px; margin: var(--k-space-3) auto 0; padding: var(--k-space-2) var(--k-space-4); border: 1px solid var(--k-border); border-radius: var(--k-radius-panel); background: var(--k-overlay); backdrop-filter: blur(20px) saturate(1.4); box-shadow: var(--k-shadow-2); }
   .site-head a { color: inherit; text-decoration: none; }

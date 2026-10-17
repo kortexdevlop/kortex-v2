@@ -1,0 +1,24 @@
+[ui]
+title = "Convertisseur de couleurs"
+[errors]
+empty_input = "Saisissez un texte."
+invalid_param = "Valeur invalide."
+missing_input = "Ajoutez le contenu à traiter."
+cancelled = "Annulé."
+division_by_zero = "Ce calcul exige une base non nulle."
+invalid_color = "Couleur invalide : vérifiez le format et les composantes."
+empty_slug = "Le texte ne contient aucun caractère utilisable pour ce slug."
+[outputs]
+hex = "HEX"
+rgb = "RGB"
+hsl = "HSL"
+oklch = "OKLCH"
+gamut = "Gamut sRGB"
+[options]
+format_hex = "HEX"
+format_rgb = "RGB"
+format_hsl = "HSL"
+format_oklch = "OKLCH"
+[values]
+gamut_inside = "Dans le gamut sRGB"
+gamut_clipped = "Hors gamut : RGB limité aux composantes 0–255"

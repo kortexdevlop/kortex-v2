@@ -1,0 +1,87 @@
+schema = 1
+[tool]
+id = "calc.loan"
+version = "1.0.0"
+universe = "calc"
+status = "beta"
+ui = "auto"
+platforms = ["web", "desktop"]
+offline = true
+ai = false
+viral_priority = 1
+[tool.name]
+fr = "Simulateur de prêt"
+en = "Loan Calculator"
+[tool.tagline]
+fr = "Estimez une mensualité à taux fixe et consultez le tableau d’amortissement."
+en = "Estimate fixed-rate loan payments and view an amortization schedule."
+[tool.slug]
+fr = "simulateur-pret"
+en = "loan-calculator"
+[search]
+keywords.fr = ["simulateur de prêt", "simulateur pret"]
+keywords.en = ["loan calculator", "loan calculator"]
+intents.fr = ["Estimez une mensualité à taux fixe et consultez le tableau d’amortissement."]
+intents.en = ["Estimate fixed-rate loan payments and view an amortization schedule."]
+related = []
+[limits]
+timeout_s = 10
+
+[[params]]
+id = "principal"
+type = "number"
+default = 100000
+level = "simple"
+label = { fr = "Capital emprunté", en = "Loan principal" }
+range = [1, 1000000000.0]
+
+[[params]]
+id = "annual_rate"
+type = "number"
+default = 3
+level = "simple"
+label = { fr = "Taux annuel nominal (%)", en = "Nominal annual rate (%)" }
+range = [0, 100]
+
+[[params]]
+id = "years"
+type = "integer"
+default = 20
+level = "simple"
+label = { fr = "Durée (années)", en = "Term (years)" }
+range = [1, 50]
+
+[[params]]
+id = "insurance_rate"
+type = "number"
+default = 0
+level = "pro"
+label = { fr = "Assurance annuelle sur capital initial (%)", en = "Annual insurance on initial principal (%)" }
+range = [0, 20]
+
+[[outputs]]
+id = "monthly"
+type = "number"
+
+[[outputs]]
+id = "interest"
+type = "number"
+
+[[outputs]]
+id = "insurance"
+type = "number"
+
+[[outputs]]
+id = "total"
+type = "number"
+
+[[outputs]]
+id = "schedule"
+type = "table"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "write"
+sensitive = false
+privacy = "local"

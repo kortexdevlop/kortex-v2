@@ -40,7 +40,7 @@ pub async fn run(input: Inputs, params: Params, cx: &mut Cx) -> Result<Outputs, 
         return Err(ToolError::new("empty_input"));
     }
     let mut value: Value = serde_json::from_str(&input.text).map_err(|e| {
-        ToolError::with_detail("invalid_json", format!("{}:{} — {e}", e.line(), e.column()))
+        ToolError::with_detail("invalid_json", format!("{}:{}", e.line(), e.column()))
     })?;
     if params.sort_keys {
         sort_keys(&mut value);

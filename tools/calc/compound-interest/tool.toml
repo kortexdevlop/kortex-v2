@@ -1,0 +1,79 @@
+schema = 1
+[tool]
+id = "calc.compound-interest"
+version = "1.0.0"
+universe = "calc"
+status = "beta"
+ui = "auto"
+platforms = ["web", "desktop"]
+offline = true
+ai = false
+viral_priority = 1
+[tool.name]
+fr = "Intérêts composés"
+en = "Compound Interest Calculator"
+[tool.tagline]
+fr = "Projetez un capital avec versements mensuels et taux constant."
+en = "Project savings with monthly contributions and a constant rate."
+[tool.slug]
+fr = "interets-composes"
+en = "compound-interest-calculator"
+[search]
+keywords.fr = ["intérêts composés", "interets composes"]
+keywords.en = ["compound interest calculator", "compound interest calculator"]
+intents.fr = ["Projetez un capital avec versements mensuels et taux constant."]
+intents.en = ["Project savings with monthly contributions and a constant rate."]
+related = []
+[limits]
+timeout_s = 10
+
+[[params]]
+id = "principal"
+type = "number"
+default = 1000
+level = "simple"
+label = { fr = "Capital initial", en = "Initial principal" }
+range = [0, 1000000000000.0]
+
+[[params]]
+id = "monthly"
+type = "number"
+default = 0
+level = "simple"
+label = { fr = "Versement mensuel", en = "Monthly contribution" }
+range = [0, 1000000000.0]
+
+[[params]]
+id = "annual_rate"
+type = "number"
+default = 5
+level = "simple"
+label = { fr = "Taux annuel nominal (%)", en = "Nominal annual rate (%)" }
+range = [-99, 100]
+
+[[params]]
+id = "years"
+type = "integer"
+default = 10
+level = "simple"
+label = { fr = "Durée (années)", en = "Term (years)" }
+range = [1, 100]
+
+[[outputs]]
+id = "final_value"
+type = "number"
+
+[[outputs]]
+id = "contributed"
+type = "number"
+
+[[outputs]]
+id = "interest"
+type = "number"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "write"
+sensitive = false
+privacy = "local"

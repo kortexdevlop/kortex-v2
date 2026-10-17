@@ -1,5 +1,9 @@
 export interface Env {
   DB: D1Database;
+  WEBAUTHN_RP_ID?: string;
+  WEBAUTHN_ORIGIN?: string;
+  TURNSTILE_SECRET_KEY?: string;
+  TURNSTILE_REQUIRED?: string;
   ALLOWED_ORIGINS: string;
   COOKIE_NAME?: string;
   COOKIE_SECURE?: string;

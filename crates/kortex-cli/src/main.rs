@@ -1,12 +1,3 @@
-use std::process::ExitCode;
-
-fn main() -> ExitCode {
-    let args: Vec<String> = std::env::args().skip(1).collect();
-    match kortex_cli::execute(&args, &mut std::io::stdout()) {
-        Ok(()) => ExitCode::SUCCESS,
-        Err(msg) => {
-            eprintln!("erreur : {msg}");
-            ExitCode::FAILURE
-        }
-    }
+fn main() -> std::process::ExitCode {
+    kortex_platform::native::run_cli(kortex_cli::execute)
 }

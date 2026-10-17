@@ -1,0 +1,68 @@
+schema = 1
+[tool]
+id = "text.cleaner"
+version = "1.0.0"
+universe = "text"
+status = "beta"
+ui = "auto"
+platforms = ["web", "desktop"]
+offline = true
+ai = false
+viral_priority = 1
+[tool.name]
+fr = "Nettoyeur de texte"
+en = "Text Cleaner"
+[tool.tagline]
+fr = "Nettoyez les espaces, tabulations et caractères invisibles courants."
+en = "Clean whitespace, tabs and common invisible characters."
+[tool.slug]
+fr = "nettoyer-texte"
+en = "text-cleaner"
+[search]
+keywords.fr = ["nettoyeur de texte", "nettoyer texte"]
+keywords.en = ["text cleaner", "text cleaner"]
+intents.fr = ["Nettoyez les espaces, tabulations et caractères invisibles courants."]
+intents.en = ["Clean whitespace, tabs and common invisible characters."]
+related = []
+[limits]
+timeout_s = 10
+
+[[inputs]]
+id = "text"
+type = "text"
+required = true
+max_len = 100000
+multiline = true
+label = { fr = "Texte", en = "Text" }
+
+[[params]]
+id = "collapse_spaces"
+type = "bool"
+default = true
+level = "medium"
+label = { fr = "Réduire les espaces multiples", en = "Collapse repeated spaces" }
+
+[[params]]
+id = "remove_empty"
+type = "bool"
+default = false
+level = "medium"
+label = { fr = "Supprimer les lignes vides", en = "Remove blank lines" }
+
+[[params]]
+id = "remove_invisible"
+type = "bool"
+default = true
+level = "pro"
+label = { fr = "Retirer les caractères invisibles courants", en = "Remove common invisible characters" }
+
+[[outputs]]
+id = "text"
+type = "text"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "write"
+sensitive = false
+privacy = "local"

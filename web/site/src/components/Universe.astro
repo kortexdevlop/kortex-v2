@@ -1,0 +1,26 @@
+---
+import Base from '../layouts/Base.astro';
+import ToolCard from './ToolCard.astro';
+import { tools, universes, byPriority, universePath, type Lang, type Universe } from '../lib/data';
+const { lang, universe } = Astro.props as { lang: Lang; universe: Universe };
+const items = tools.filter(t => t.tool.universe === universe.id && t.tool.status !== 'draft').sort(byPriority);
+const fr = lang === 'fr';
+const description = fr
+  ? `${universe.name} : ${items.length} outils gratuits à utiliser sur votre appareil, en français et sans envoyer vos fichiers.`
+  : `${universe.name}: ${items.length} free tools running on your device without uploading your files.`;
+const active = universes.filter(u => tools.some(t => t.tool.universe === u.id && t.tool.status !== 'draft'));
+---
+<Base title={`${universe.name} — Kortex`} description={description} lang={lang}
+  alt={{ fr: universePath(universe, 'fr'), en: universePath(universe, 'en') }} noindex={!items.length}>
+  <nav aria-label={fr ? 'Fil d’Ariane' : 'Breadcrumb'}><a href={fr ? '/outils' : '/en/tools'}>{fr ? 'Tous les outils' : 'All tools'}</a> / <span>{universe.name}</span></nav>
+  <h1>{universe.name}</h1>
+  <p class="k-muted">{description}</p>
+  {items.length ? <div class="grid">{items.map(t => <ToolCard t={t} lang={lang} />)}</div>
+    : <p>{fr ? 'Les outils de cet univers sont en préparation. Découvrez les univers déjà disponibles.' : 'Tools for this universe are being prepared. Explore the available universes.'}</p>}
+  <section>
+    <h2>{fr ? 'Explorer les autres univers' : 'Explore other universes'}</h2>
+    <div class="universe-links">{active.filter(u => u.id !== universe.id).map(u => <a class="k-btn" data-variant="ghost" href={universePath(u,lang)}>{u.name}</a>)}</div>
+    <p class="k-muted">{fr ? 'Un calcul ou une conversion s’exécute localement. Les outils IA demandent un consentement avant tout envoi.' : 'Calculations and conversions run locally. AI tools ask for consent before sending content.'}</p>
+  </section>
+</Base>
+<style>.universe-links { display:flex; flex-wrap:wrap; gap:var(--k-space-2); } section { margin-top:var(--k-space-8); }</style>

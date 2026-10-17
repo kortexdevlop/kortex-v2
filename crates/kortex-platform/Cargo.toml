@@ -3,3 +3,27 @@ name = "kortex-platform"
 version = "0.1.0"
 edition.workspace = true
 publish.workspace = true
+
+[features]
+document = ["dep:dioxus", "dep:serde_json"]
+
+[dependencies]
+getrandom = "0.3"
+dioxus = { version = "0.7.10", default-features = false, features = ["document", "html"], optional = true }
+serde_json = { version = "1", optional = true }
+serde = { version = "1", features = ["derive"] }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+getrandom = { version = "0.3", features = ["wasm_js"] }
+wasm-bindgen = "0.2.129"
+wasm-bindgen-futures = "0.4"
+serde-wasm-bindgen = "0.6"
+js-sys = "0.3"
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+rpassword = "7"
+ureq = { version = "3", default-features = false, features = ["rustls", "gzip"] }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+objc2-app-kit = { version = "0.3.2", default-features = false, features = ["std", "NSPasteboard"] }
+objc2-foundation = { version = "0.3.2", default-features = false, features = ["std", "NSString"] }

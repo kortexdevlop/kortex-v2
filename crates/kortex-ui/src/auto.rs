@@ -59,7 +59,22 @@ fn s(lang: &str, key: &str) -> &'static str {
     match (lang, key) {
         ("fr", "run") => "Lancer",
         ("fr", "running") => "En cours…",
+        ("fr", "cancel") => "Annuler",
+        ("fr", "err_worker_timeout") => {
+            "Le traitement a dépassé le délai autorisé. Réessayez avec un fichier plus petit."
+        }
+        ("fr", "err_worker_failed") => {
+            "Le moteur n'a pas pu terminer le traitement. Vous pouvez réessayer."
+        }
+        ("fr", "err_worker_protocol") => {
+            "La réponse du moteur est invalide. Rechargez l'outil et réessayez."
+        }
         ("fr", "copy") => "Copier",
+        ("fr", "copying") => "Copie…",
+        ("fr", "copied") => "Copié.",
+        ("fr", "copy_failed") => {
+            "Copie impossible. Sélectionnez le résultat pour le copier manuellement."
+        }
         ("fr", "drop") => "Déposer un fichier",
         ("fr", "drop_hint") => "ou cliquer pour choisir",
         ("fr", "result") => "Résultat",
@@ -73,7 +88,16 @@ fn s(lang: &str, key: &str) -> &'static str {
         ("fr", "err_cancelled") => "Annulé.",
         (_, "run") => "Run",
         (_, "running") => "Running…",
+        (_, "cancel") => "Cancel",
+        (_, "err_worker_timeout") => "Processing exceeded the time limit. Try a smaller file.",
+        (_, "err_worker_failed") => "The engine could not finish processing. You can try again.",
+        (_, "err_worker_protocol") => {
+            "The engine returned an invalid response. Reload the tool and try again."
+        }
         (_, "copy") => "Copy",
+        (_, "copying") => "Copying…",
+        (_, "copied") => "Copied.",
+        (_, "copy_failed") => "Copy failed. Select the result to copy it manually.",
         (_, "drop") => "Drop a file",
         (_, "drop_hint") => "or click to choose",
         (_, "result") => "Result",
@@ -86,6 +110,50 @@ fn s(lang: &str, key: &str) -> &'static str {
         (_, "err_invalid_param") => "Invalid value.",
         (_, "err_cancelled") => "Cancelled.",
         _ => "",
+    }
+}
+
+/// Each output owns its copy feedback; never display success before OS/browser confirmation.
+#[component]
+fn CopyButton(value: String, lang: String) -> Element {
+    let mut pending = use_signal(|| false);
+    let mut note = use_signal(|| None::<(String, bool)>);
+    let feedback = note()
+        .filter(|(copied, _)| copied == &value)
+        .map(|(_, success)| {
+            (
+                success,
+                s(&lang, if success { "copied" } else { "copy_failed" }),
+            )
+        });
+    let label = s(&lang, if pending() { "copying" } else { "copy" });
+    rsx! {
+        div {
+            Button {
+                ghost: true,
+                disabled: pending(),
+                onclick: move |_| {
+                    if pending() { return; }
+                    pending.set(true);
+                    note.set(None);
+                    let copied = value.clone();
+                    let operation = kortex_platform::clipboard::write_text(&copied);
+                    spawn(async move {
+                        let success = operation.await.is_ok();
+                        note.set(Some((copied, success)));
+                        pending.set(false);
+                    });
+                },
+                "{label}"
+            }
+            if let Some((success, message)) = feedback {
+                p {
+                    class: if success { "k-muted" } else { "k-error" },
+                    role: if success { "status" } else { "alert" },
+                    "{message}"
+                }
+            }
+        }
     }
 }
 
@@ -111,6 +179,20 @@ pub fn to_values(c: &ToolContract, strings: &ParamValues) -> ValueMap {
         }
     }
     out
+}
+
+fn invalid_numeric_param<'a>(c: &'a ToolContract, strings: &ParamValues) -> Option<&'a str> {
+    c.params.iter().find_map(|p| {
+        let raw = strings.get(&p.id)?;
+        let invalid = match p.ty {
+            PortType::Integer => raw.trim().parse::<i64>().is_err(),
+            PortType::Number | PortType::Duration | PortType::Range => {
+                raw.trim().parse::<f64>().map_or(true, |n| !n.is_finite())
+            }
+            _ => false,
+        };
+        invalid.then_some(p.id.as_str())
+    })
 }
 
 /// Outputs in the order declared by the contract (then any extra keys), not alphabetical.
@@ -154,38 +236,7 @@ fn collect_inputs(
     inputs
 }
 
-/// Minimal base64 encoder (standard alphabet) for browser downloads.
-fn base64(bytes: &[u8]) -> String {
-    const T: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-    let mut out = String::with_capacity(bytes.len().div_ceil(3) * 4);
-    for chunk in bytes.chunks(3) {
-        let n = chunk
-            .iter()
-            .enumerate()
-            .fold(0_u32, |acc, (i, b)| acc | (u32::from(*b) << (16 - 8 * i)));
-        for i in 0..4 {
-            if i <= chunk.len() {
-                out.push(char::from(T[((n >> (18 - 6 * i)) & 63) as usize]));
-            } else {
-                out.push('=');
-            }
-        }
-    }
-    out
-}
-
-fn download_js(f: &FileData) -> String {
-    format!(
-        "(()=>{{const b=atob({data:?});const u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([u],{{type:{mime:?}}}));a.download={name:?};a.click();}})()",
-        data = base64(&f.bytes),
-        mime = if f.mime.is_empty() {
-            "application/octet-stream"
-        } else {
-            &f.mime
-        },
-        name = f.name,
-    )
-}
+use kortex_platform::document::base64;
 
 fn error_text(locale: &Catalog, lang: &str, code: &str) -> String {
     let key = format!("errors.{code}");
@@ -199,6 +250,21 @@ fn error_text(locale: &Catalog, lang: &str, code: &str) -> String {
     } else {
         fallback.to_owned()
     }
+}
+
+fn error_detail(lang: &str, code: &str, detail: &str) -> String {
+    if code == "invalid_json"
+        && let Some((line, column)) = detail.split_once(':')
+        && line.parse::<usize>().is_ok()
+        && column.parse::<usize>().is_ok()
+    {
+        return if lang == "fr" {
+            format!("ligne {line}, colonne {column}")
+        } else {
+            format!("line {line}, column {column}")
+        };
+    }
+    detail.to_owned()
 }
 
 /// Text output ready to display: `(label, shown text, raw text to copy)`.
@@ -252,6 +318,9 @@ pub fn AutoTool(
     host_mode: Option<String>,
     /// Desktop hosts save files natively (no browser download); `None` = browser download.
     save_file: Option<SaveFile>,
+    /// Hosts with an isolated executor can terminate CPU-bound work immediately.
+    #[props(default)]
+    on_cancel: Option<EventHandler<()>>,
 ) -> Element {
     let mut mode = use_signal(|| {
         host_mode
@@ -306,12 +375,12 @@ pub fn AutoTool(
         .collect();
 
     let saved_label = s(&lang, "saved");
+    let cancel_label = s(&lang, "cancel");
     let (move_up_label, move_down_label, remove_label) =
         (s(&lang, "up"), s(&lang, "down"), s(&lang, "remove"));
-    let (run_label, running_label, copy_label, result_label, download_label) = (
+    let (run_label, running_label, result_label, download_label) = (
         s(&lang, "run"),
         s(&lang, "running"),
-        s(&lang, "copy"),
         s(&lang, "result"),
         s(&lang, "download"),
     );
@@ -321,9 +390,18 @@ pub fn AutoTool(
         if running() {
             return;
         }
+        if let Some(id) = invalid_numeric_param(&run_contract, &values.read()) {
+            result.set(Some(Err(ToolError::with_detail(
+                ToolError::INVALID_PARAM,
+                id,
+            ))));
+            return;
+        }
         let params = to_values(&run_contract, &values.read());
         let inputs = collect_inputs(&run_contract, &text_inputs.read(), &files.read());
         running.set(true);
+        result.set(None);
+        saved_note.set(None);
         spawn(async move {
             let r = (runner.0)(inputs, params).await;
             result.set(Some(r));
@@ -363,11 +441,11 @@ pub fn AutoTool(
                                     spawn(async move {
                                         let mut read = Vec::new();
                                         for f in picked {
-                                            if let Ok(bytes) = f.read_bytes().await {
+                                            if let Ok(file) = kortex_platform::document::read_selected(&f).await {
                                                 read.push(FileData {
-                                                    name: f.name(),
-                                                    mime: f.content_type().unwrap_or_default(),
-                                                    bytes: bytes.to_vec(),
+                                                    name: file.name,
+                                                    mime: file.mime,
+                                                    bytes: file.bytes,
                                                 });
                                             }
                                         }
@@ -544,9 +622,14 @@ pub fn AutoTool(
                         "{run_label}"
                     }
                 }
+                if running() {
+                    if let Some(cancel) = on_cancel {
+                        Button { ghost: true, onclick: move |_| cancel.call(()), "{cancel_label}" }
+                    }
+                }
             }
             if running() {
-                Progress { value: 0.5 }
+                Progress { value: 0.5, indeterminate: true }
             }
             match result() {
                 Some(Ok(map)) => {
@@ -571,12 +654,11 @@ pub fn AutoTool(
                                         code { "{file.name}" }
                                         Button {
                                             onclick: {
-                                                let js = download_js(&file);
                                                 let file = file.clone();
                                                 move |_| match save_file {
                                                     Some(save) => saved_note.set(Some((save.0)(&file).map_or_else(|e| e, |p| format!("{} {p}", saved_label)))),
                                                     None => {
-                                                        document::eval(&js);
+                                                        kortex_platform::document::download(&file.name, &file.mime, &file.bytes);
                                                     }
                                                 }
                                             },
@@ -587,7 +669,12 @@ pub fn AutoTool(
                             }
                             if let Value::Table(t) = &v {
                                 {
-                                    let csv = std::iter::once(t.columns.join(",")).chain(t.rows.iter().map(|r| r.join(","))).collect::<Vec<_>>().join("\n");
+                                    let headings: Vec<String> = t.columns.iter().map(|c| {
+                                        let key = format!("columns.{c}");
+                                        let translated = locale.t(&key);
+                                        if translated == key { c.clone() } else { translated.to_owned() }
+                                    }).collect();
+                                    let csv = std::iter::once(headings.join(",")).chain(t.rows.iter().map(|r| r.join(","))).collect::<Vec<_>>().join("\n");
                                     let label_key = format!("outputs.{id}");
                                     let label = locale.t(&label_key);
                                     let label = (label != label_key).then(|| label.to_owned());
@@ -600,7 +687,7 @@ pub fn AutoTool(
                                                 table { class: "k-table",
                                                     thead {
                                                         tr {
-                                                            for c in t.columns.clone() {
+                                                            for c in headings {
                                                                 th { key: "{c}", "{c}" }
                                                             }
                                                         }
@@ -616,14 +703,7 @@ pub fn AutoTool(
                                                     }
                                                 }
                                             }
-                                            Button {
-                                                ghost: true,
-                                                onclick: move |_| {
-                                                    let js = format!("navigator.clipboard.writeText({csv:?})");
-                                                    document::eval(&js);
-                                                },
-                                                "{copy_label}"
-                                            }
+                                            CopyButton { value: csv, lang: lang.clone() }
                                         }
                                     }
                                 }
@@ -635,14 +715,7 @@ pub fn AutoTool(
                                     }
                                     div { class: "k-output",
                                         code { "{text}" }
-                                        Button {
-                                            ghost: true,
-                                            onclick: move |_| {
-                                                let js = format!("navigator.clipboard.writeText({raw:?})");
-                                                document::eval(&js);
-                                            },
-                                            "{copy_label}"
-                                        }
+                                        CopyButton { value: raw, lang: lang.clone() }
                                     }
                                 }
                             }
@@ -653,7 +726,7 @@ pub fn AutoTool(
                 Some(Err(e)) => {
                     let mut message = error_text(&locale, &lang, e.code);
                     if let Some(d) = &e.detail {
-                        message = format!("{message} ({d})");
+                        message = format!("{message} ({})", error_detail(&lang, e.code, d));
                     }
                     rsx! {
                         p { class: "k-error", role: "alert", "{message}" }
@@ -667,7 +740,45 @@ pub fn AutoTool(
 
 #[cfg(test)]
 mod tests {
-    use super::{ParamValues, base64, collect_inputs, in_contract_order};
+    use super::{ParamValues, base64, collect_inputs, error_detail, in_contract_order};
+
+    #[test]
+    fn json_error_position_is_localized() {
+        assert_eq!(
+            error_detail("fr", "invalid_json", "3:8"),
+            "ligne 3, colonne 8"
+        );
+        assert_eq!(
+            error_detail("en", "invalid_json", "3:8"),
+            "line 3, column 8"
+        );
+    }
+    #[test]
+    fn invalid_numbers_do_not_silently_use_defaults() {
+        let mut c = contract();
+        c.params.push(kortex_contract::Param {
+            id: "n".into(),
+            ty: kortex_contract::PortType::Number,
+            level: None,
+            default: None,
+            range: None,
+            options: None,
+            label: None,
+        });
+        for raw in ["", "abc", "NaN", "inf"] {
+            let values = ParamValues::from([("n".into(), raw.into())]);
+            assert_eq!(super::invalid_numeric_param(&c, &values), Some("n"));
+        }
+        assert_eq!(
+            super::invalid_numeric_param(&c, &ParamValues::from([("n".into(), "3.5".into())])),
+            None
+        );
+        c.params[0].ty = kortex_contract::PortType::Integer;
+        assert_eq!(
+            super::invalid_numeric_param(&c, &ParamValues::from([("n".into(), "3.5".into())])),
+            Some("n")
+        );
+    }
     use kortex_runtime::{FileData, Value};
     use std::collections::BTreeMap;
 

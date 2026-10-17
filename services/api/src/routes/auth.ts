@@ -1,8 +1,10 @@
+import { passwordProof } from './security.ts';
+import { verifyRegistrationGuard } from '../turnstile.ts';
 import type { Ctx } from '../env.ts';
 import { burnVerification, hashPassword, verifyPassword } from '../crypto.ts';
 import { HttpError, cookie, errorBody, isRecord, json, readJson } from '../http.ts';
 import { rateLimit } from '../ratelimit.ts';
-import { SESSION_SECONDS, createSession, destroySession, requireSession, requireUser } from '../session.ts';
+import { SESSION_SECONDS, createSession, destroySession, requireUser } from '../session.ts';
 import { checkAuthKey, normalizeEmail } from '../validate.ts';
 
 const iterations = (ctx: Ctx): number => Number(ctx.env.PBKDF2_ITERATIONS ?? '5000');
@@ -16,14 +18,16 @@ async function body(ctx: Ctx): Promise<Record<string, unknown>> {
 export async function register(ctx: Ctx): Promise<Response> {
   await rateLimit(ctx, `register:${ctx.ip}`, 5, 600);
   const b = await body(ctx);
+  await verifyRegistrationGuard(ctx,b.turnstile_token);
   const email = normalizeEmail(b.email);
   const authKey = checkAuthKey(b.auth_key, b.kdf);
   const id = crypto.randomUUID();
   const hash = await hashPassword(authKey, iterations(ctx));
   try {
     await ctx.env.DB.prepare('INSERT INTO users (id, email, password_hash, created_at) VALUES (?1, ?2, ?3, ?4)').bind(id, email, hash, Date.now()).run();
-  } catch {
-    throw new HttpError(409, 'email_taken');
+  } catch (error) {
+    if (error instanceof Error && /UNIQUE constraint failed: users\.email/i.test(error.message)) throw new HttpError(409, 'email_taken');
+    throw error;
   }
   const token = await createSession(ctx.env, id, ctx.req.headers.get('user-agent'));
   return json({ id, email }, { status: 201, headers: { 'Set-Cookie': cookie(ctx.env, token, SESSION_SECONDS) } });
@@ -55,13 +59,7 @@ export async function me(ctx: Ctx): Promise<Response> {
 
 /** GDPR erasure: requires the credentials again, then deletes everything (cascade). */
 export async function deleteMe(ctx: Ctx): Promise<Response> {
-  const id = await requireSession(ctx); // a stolen device token must never be able to erase the account
-  const b = await body(ctx);
-  const row = await ctx.env.DB.prepare('SELECT password_hash FROM users WHERE id = ?1').bind(id).first<{ password_hash: string }>();
-  const authKey = checkAuthKey(b.auth_key, b.kdf);
-  if (!row || !(await verifyPassword(authKey, row.password_hash))) {
-    throw new HttpError(403, 'invalid_credentials');
-  }
+  const {id} = await passwordProof(ctx, await body(ctx));
   await ctx.env.DB.prepare('DELETE FROM users WHERE id = ?1').bind(id).run();
   return json({ ok: true }, { headers: { 'Set-Cookie': cookie(ctx.env, '', 0) } });
 }
@@ -70,13 +68,15 @@ export async function deleteMe(ctx: Ctx): Promise<Response> {
 export async function exportMe(ctx: Ctx): Promise<Response> {
   const id = await requireUser(ctx);
   const db = ctx.env.DB;
-  const [user, settings, sync, usage, devices, installs] = await Promise.all([
+  const [user, settings, sync, usage, devices, installs, passkeys, sessions] = await Promise.all([
     db.prepare('SELECT id, email, created_at FROM users WHERE id = ?1').bind(id).first(),
     db.prepare('SELECT data, updated_at FROM settings WHERE user_id = ?1').bind(id).first(),
     db.prepare('SELECT key, version, data, updated_at FROM sync_items WHERE user_id = ?1').bind(id).all(),
     db.prepare('SELECT day, tool, count FROM usage_daily WHERE user_id = ?1').bind(id).all(),
     db.prepare('SELECT id, name, platform, created_at, last_seen FROM devices WHERE user_id = ?1').bind(id).all(),
     db.prepare('SELECT device_id, tool, version, target, updated_at FROM installs WHERE user_id = ?1').bind(id).all(),
+    db.prepare('SELECT name,created_at,last_used FROM credentials WHERE user_id = ?1').bind(id).all(),
+    db.prepare('SELECT created_at,expires_at,user_agent FROM sessions WHERE user_id = ?1').bind(id).all(),
   ]);
-  return json({ user, settings, sync: sync.results, usage: usage.results, devices: devices.results, installs: installs.results }, { headers: { 'Content-Disposition': 'attachment; filename="kortex-export.json"' } });
+  return json({ user, settings, sync: sync.results, usage: usage.results, devices: devices.results, installs: installs.results, passkeys: passkeys.results, sessions: sessions.results }, { headers: { 'Content-Disposition': 'attachment; filename="kortex-export.json"' } });
 }

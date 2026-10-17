@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head><meta charset="utf-8"><title>Kortex Web Worker spike</title></head>
+  <body>
+    <h1>Rust engine in a Web Worker</h1>
+    <p id="status" role="status">Loading worker…</p>
+    <p>UI heartbeat: <output id="heartbeat">0</output></p>
+    <label>PNG file <input id="file" type="file" accept="image/png"></label>
+    <button id="convert" disabled>Convert to JPG</button>
+    <button id="stress" disabled>Run CPU stress</button>
+    <button id="cancel" disabled>Cancel worker</button>
+    <p>JPEG signature: <output id="signature">—</output></p>
+    <script type="module">
+      const status = document.querySelector('#status');
+      const signature = document.querySelector('#signature');
+      const convert = document.querySelector('#convert');
+      const stress = document.querySelector('#stress');
+      const cancel = document.querySelector('#cancel');
+      const heartbeat = document.querySelector('#heartbeat');
+      let worker;
+      let ticks = 0;
+      setInterval(() => { heartbeat.textContent = String(++ticks); }, 100);
+
+      function startWorker(message = 'Loading worker…') {
+        worker = new Worker('./worker.js', { type: 'module' });
+        convert.disabled = true;
+        stress.disabled = true;
+        cancel.disabled = true;
+        status.textContent = message;
+        worker.onmessage = ({ data }) => {
+          if (data.type === 'ready') {
+            status.textContent = data.offMainThread ? 'Worker ready, off main thread' : 'Wrong execution context';
+            convert.disabled = false;
+            stress.disabled = false;
+          } else if (data.type === 'started') {
+            status.textContent = 'CPU stress running';
+          } else if (data.type === 'converted') {
+            const bytes = new Uint8Array(data.bytes);
+            signature.textContent = [...bytes.slice(0, 3)].map(x => x.toString(16).padStart(2, '0')).join(' ');
+            status.textContent = `Converted ${bytes.length} JPEG bytes`;
+            cancel.disabled = true;
+          } else if (data.type === 'finished') {
+            status.textContent = `CPU stress finished (${data.checksum})`;
+            cancel.disabled = true;
+          } else if (data.type === 'error') {
+            status.textContent = `Worker error: ${data.message}`;
+            cancel.disabled = true;
+          }
+        };
+        worker.onerror = event => { status.textContent = `Worker failed: ${event.message}`; };
+      }
+      convert.onclick = async () => {
+        const file = document.querySelector('#file').files[0];
+        if (!file) { status.textContent = 'Choose a PNG file'; return; }
+        const bytes = await file.arrayBuffer();
+        status.textContent = 'Converting in worker';
+        cancel.disabled = false;
+        worker.postMessage({ type: 'convert', bytes }, [bytes]);
+      };
+      stress.onclick = () => {
+        cancel.disabled = false;
+        worker.postMessage({ type: 'stress', iterations: 3_000_000_000 });
+      };
+      cancel.onclick = () => {
+        worker.terminate();
+        startWorker('Worker cancelled; restarting…');
+      };
+      startWorker();
+    </script>
+  </body>
+</html>

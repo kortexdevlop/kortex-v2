@@ -1,0 +1,69 @@
+schema = 1
+[tool]
+id = "calc.percentage"
+version = "1.0.0"
+universe = "calc"
+status = "beta"
+ui = "auto"
+platforms = ["web", "desktop"]
+offline = true
+ai = false
+viral_priority = 1
+[tool.name]
+fr = "Calculateur de pourcentages"
+en = "Percentage Calculator"
+[tool.tagline]
+fr = "Part, proportion, évolution et réduction : calculez vos pourcentages localement."
+en = "Calculate percentages, shares, changes and discounts locally."
+[tool.slug]
+fr = "calcul-pourcentage"
+en = "percentage-calculator"
+[search]
+keywords.fr = ["calculateur de pourcentages", "calcul pourcentage"]
+keywords.en = ["percentage calculator", "percentage calculator"]
+intents.fr = ["Part, proportion, évolution et réduction : calculez vos pourcentages localement."]
+intents.en = ["Calculate percentages, shares, changes and discounts locally."]
+related = []
+[limits]
+timeout_s = 10
+
+[[params]]
+id = "a"
+type = "number"
+default = 100
+level = "simple"
+label = { fr = "Valeur A / valeur initiale", en = "Value A / initial value" }
+range = [-1000000000000000.0, 1000000000000000.0]
+
+[[params]]
+id = "b"
+type = "number"
+default = 20
+level = "simple"
+label = { fr = "Valeur B / pourcentage", en = "Value B / percentage" }
+range = [-1000000000000000.0, 1000000000000000.0]
+
+[[params]]
+id = "operation"
+type = "enum"
+default = "part"
+level = "simple"
+label = { fr = "Calcul", en = "Calculation" }
+options = ["part", "share", "change", "increase", "decrease"]
+
+[[outputs]]
+id = "result"
+type = "number"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "write"
+sensitive = false
+privacy = "local"
+
+[[variants]]
+id = "discount"
+slug = { fr = "discount", en = "discount" }
+name = { fr = "Calculer une réduction", en = "Calculate a Discount" }
+preset = { operation = "decrease" }

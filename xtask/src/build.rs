@@ -29,56 +29,27 @@ fn copy_dir(from: &Path, to: &Path) -> Result<(), String> {
     Ok(())
 }
 
-// Host <-> tool bus (see docs/adr/0004-host-tool-bus.md). Only the embedding window and its exact
-// origin are trusted; messages are plain JSON-like objects { type: "kortex:*", ... }.
-const BUS_JS: &str = r#"
-(() => {
-  if (window.__kortexBus) return;
-  window.__kortexBus = true;
-  const host = (location.ancestorOrigins && location.ancestorOrigins[0]) || (document.referrer ? new URL(document.referrer).origin : '');
-  if (!host || window.parent === window) return;
-  const send = (msg) => window.parent.postMessage(msg, host);
-  let pending = null;
-  const deliver = () => {
-    const input = document.querySelector('input[type=file]');
-    if (!pending || !input) return false;
-    const dt = new DataTransfer();
-    for (const f of pending) { if (f instanceof File) dt.items.add(f); }
-    pending = null;
-    input.files = dt.files;
-    input.dispatchEvent(new Event('change', { bubbles: true }));
-    return true;
-  };
-  window.addEventListener('message', (e) => {
-    if (e.source !== window.parent || e.origin !== host || !e.data || typeof e.data.type !== 'string') return;
-    if (e.data.type === 'kortex:init') {
-      if (e.data.theme === 'light' || e.data.theme === 'dark') document.documentElement.dataset.theme = e.data.theme;
-      else delete document.documentElement.dataset.theme;
-      if (['simple', 'medium', 'pro'].includes(e.data.mode) && typeof dioxus !== 'undefined') dioxus.send(e.data.mode);
-    } else if (e.data.type === 'kortex:files' && Array.isArray(e.data.files)) {
-      pending = e.data.files;
-      let tries = 0;
-      const t = setInterval(() => { if (deliver() || ++tries > 60) clearInterval(t); }, 100);
-    }
-  });
-  send({ type: 'kortex:ready' });
-})();
-"#;
-
 pub fn run(args: &[String]) -> Result<(), String> {
-    let id = args
-        .first()
-        .ok_or("usage : cargo xtask build <univers.nom | all>")?;
-    if id == "all" {
+    let ids: Vec<_> = args.iter().filter(|arg| arg.as_str() != "--web").collect();
+    if ids.is_empty() {
+        return Err("usage : cargo xtask build <univers.nom… | all> [--web]".to_owned());
+    }
+    if ids.iter().any(|id| id.as_str() == "all") {
+        if ids.len() != 1 {
+            return Err("utilise `all` seul ou fournis une liste d’identifiants".to_owned());
+        }
         for t in tools::discover()? {
             let c = t
                 .contract
                 .map_err(|e| format!("{} : {e}", t.dir.display()))?;
             build_one(&c.tool.id)?;
         }
-        return Ok(());
+    } else {
+        for id in ids {
+            build_one(id)?;
+        }
     }
-    build_one(id)
+    Ok(())
 }
 
 fn build_one(id: &str) -> Result<(), String> {
@@ -92,8 +63,57 @@ fn build_one(id: &str) -> Result<(), String> {
     let tool_dir = abs(&tool.dir.to_string_lossy())?;
     let root = abs(".")?;
     let work = root.join(".kortex/build").join(id);
+    let dest = root.join("dist/run").join(id);
+    let receipt = work.join("build-receipt.json");
+    let source = source_fingerprint(&root, &tool_dir)?;
+    if dest.is_dir()
+        && let Ok(previous) = fs::read_to_string(&receipt)
+    {
+        let current =
+            serde_json::json!({"source": source, "output": tree_fingerprint(&dest)?}).to_string();
+        if previous == current {
+            println!("✓ dist/run/{id}/ à jour (compilation évitée)");
+            return Ok(());
+        }
+    }
     fs::create_dir_all(work.join("src")).map_err(|e| e.to_string())?;
     fs::create_dir_all(work.join("assets")).map_err(|e| e.to_string())?;
+    let contract = tool.contract.as_ref().map_err(|e| e.to_string())?;
+    let worker = if contract.tool.web_worker {
+        Some(crate::worker::build(&root, &tool_dir, id)?)
+    } else {
+        None
+    };
+    let runner_body = if let Some((_, folder, codes)) = &worker {
+        let timeout = contract
+            .limits
+            .timeout_s
+            .unwrap_or(120)
+            .saturating_mul(1000);
+        format!(
+            r#"match kortex_platform::worker::run("/{id}/{folder}/worker.js", inputs, params, {timeout}).await {{
+            Ok(outputs) => Ok(outputs),
+            Err(error) => {{
+                let code = match error.code.as_str() {{
+                    {codes}
+                    "worker_timeout" => "worker_timeout",
+                    "worker_protocol" => "worker_protocol",
+                    "cancelled" => "cancelled",
+                    _ => "worker_failed",
+                }};
+                Err(kortex_runtime::ToolError {{ code, detail: error.detail }})
+            }}
+        }}"#
+        )
+    } else {
+        "let mut cx = kortex_runtime::Cx::new(); tool::run_map(&inputs, &params, &mut cx).await"
+            .to_owned()
+    };
+    let cancel_prop = if worker.is_some() {
+        "on_cancel: move |_| kortex_platform::worker::cancel(),"
+    } else {
+        ""
+    };
 
     fs::write(
         work.join("Cargo.toml"),
@@ -108,6 +128,7 @@ dioxus = {{ version = "0.7.10", features = ["web"] }}
 {crate_name} = {{ path = "{tool}" }}
 kortex-ui = {{ path = "{root}/crates/kortex-ui" }}
 kortex-runtime = {{ path = "{root}/crates/kortex-runtime" }}
+kortex-platform = {{ path = "{root}/crates/kortex-platform", features = ["document"] }}
 kortex-contract = {{ path = "{root}/crates/kortex-contract" }}
 kortex-i18n = {{ path = "{root}/crates/kortex-i18n" }}
 
@@ -134,27 +155,23 @@ panic = "abort"
     if !work.join("Cargo.lock").exists() {
         let _ = fs::copy("Cargo.lock", work.join("Cargo.lock"));
     }
-    fs::write(work.join("src/bus.js"), BUS_JS).map_err(|e| e.to_string())?;
-    fs::write(
-        work.join("src/main.rs"),
-        format!(
-            r#"// GENERATED by `cargo xtask build` — do not edit.
+    let web_source = format!(
+        r#"// GENERATED by `cargo xtask build` — do not edit.
 use dioxus::prelude::*;
-use kortex_runtime::{{Cx, ValueMap}};
+use kortex_runtime::ValueMap;
 use kortex_ui::{{AutoTool, RunFuture, Runner}};
 use {lib_name} as tool;
 
 const CSS: Asset = asset!("/assets/kortex.css");
-const BUS_JS: &str = include_str!("bus.js");
 
 fn runner(inputs: ValueMap, params: ValueMap) -> RunFuture {{
     Box::pin(async move {{
-        let mut cx = Cx::new();
-        tool::run_map(&inputs, &params, &mut cx).await
+        {runner_body}
     }})
 }}
 
 fn main() {{
+    kortex_platform::offline::register("/{id}/sw.js");
     dioxus::launch(App);
 }}
 
@@ -162,14 +179,15 @@ fn main() {{
 fn App() -> Element {{
     // The bus script lives for the whole session; mode changes from the host arrive on its channel.
     let mut host_mode = use_signal(|| None::<String>);
+    let mut host_lang = use_signal(|| None::<String>);
     use_future(move || async move {{
-        let mut bus = document::eval(BUS_JS);
+        let mut bus = kortex_platform::document::host_bus();
         while let Ok(mode) = bus.recv::<String>().await {{
-            host_mode.set(Some(mode));
+            if let Some(lang) = mode.strip_prefix("lang:").filter(|l| ["fr","en"].contains(l)) {{ host_lang.set(Some(lang.to_owned())); }} else {{ host_mode.set(Some(mode)); }}
         }}
     }});
     let query = use_resource(|| async {{
-        let mut ev = document::eval("const q = new URLSearchParams(location.search); dioxus.send((q.get('lang') || 'fr') + '|' + (q.get('variant') || '') + '|' + (q.get('mode') || ''))");
+        let mut ev = kortex_platform::document::launch_query();
         ev.recv::<String>().await.unwrap_or_else(|_| "fr||".to_owned())
     }});
     // Wait for the URL query: initial param values (variant presets) are computed once.
@@ -177,7 +195,8 @@ fn App() -> Element {{
         return rsx! {{}};
     }};
     let mut parts = query.split('|');
-    let lang = parts.next().unwrap_or("fr").to_owned();
+    let query_lang = parts.next().unwrap_or("fr").to_owned();
+    let lang = host_lang().unwrap_or(query_lang);
     let variant = parts.next().filter(|v| !v.is_empty()).map(str::to_owned);
     let initial_mode = parts.next().filter(|m| !m.is_empty()).map(str::to_owned);
     let contract = kortex_contract::parse(tool::CONTRACT).expect("contract");
@@ -186,15 +205,15 @@ fn App() -> Element {{
     rsx! {{
         document::Stylesheet {{ href: CSS }}
         main {{ style: "padding: var(--k-space-4); max-width: 720px; margin: 0 auto;",
-            AutoTool {{ contract, lang, locale, runner: Runner(runner), variant, host_mode: host_mode().or(initial_mode), save_file: None }}
+            AutoTool {{ contract, lang, locale, runner: Runner(runner), variant, host_mode: host_mode().or(initial_mode), save_file: None, {cancel_prop} }}
         }}
     }}
 }}
 "#,
-            tool_dir = fwd(&tool_dir)
-        ),
-    )
-    .map_err(|e| e.to_string())?;
+        tool_dir = fwd(&tool_dir)
+    );
+    crate::platform_check::check_source(&web_source)?;
+    fs::write(work.join("src/main.rs"), web_source).map_err(|e| e.to_string())?;
 
     let target = root.join(".kortex/target");
     // dx keeps stale hashed files from previous builds: start from a clean output dir.
@@ -213,9 +232,17 @@ fn App() -> Element {{
         .join("dx")
         .join(format!("run-{universe}-{name}"))
         .join("release/web/public");
-    let dest = root.join("dist/run").join(id);
     let _ = fs::remove_dir_all(&dest);
     copy_dir(&public, &dest)?;
+    if let Some((source, folder, _)) = worker {
+        copy_dir(&source, &dest.join(folder))?;
+    }
+    write_offline_cache(&dest, id)?;
+    fs::write(
+        &receipt,
+        serde_json::json!({"source": source, "output": tree_fingerprint(&dest)?}).to_string(),
+    )
+    .map_err(|e| e.to_string())?;
     let wasm: u64 = walk_size(&dest, "wasm");
     println!("✓ dist/run/{id}/ publié (wasm : {} Ko)", wasm / 1024);
     Ok(())
@@ -234,4 +261,118 @@ fn walk_size(dir: &Path, ext: &str) -> u64 {
         }
     }
     total
+}
+
+// Cache only the complete, immutable build inventory on the tool origin.
+fn write_offline_cache(dest: &Path, id: &str) -> Result<(), String> {
+    use std::hash::{Hash, Hasher};
+    fn collect(dir: &Path, files: &mut Vec<PathBuf>) -> Result<(), String> {
+        for entry in fs::read_dir(dir).map_err(|e| e.to_string())? {
+            let path = entry.map_err(|e| e.to_string())?.path();
+            if path.is_dir() {
+                collect(&path, files)?;
+            } else {
+                files.push(path);
+            }
+        }
+        Ok(())
+    }
+    let mut files = Vec::new();
+    collect(dest, &mut files)?;
+    files.sort();
+    let mut hash = std::collections::hash_map::DefaultHasher::new();
+    let template = include_str!("../../crates/kortex-platform/src/offline-worker.js");
+    template.hash(&mut hash);
+    let mut urls = Vec::new();
+    for path in files {
+        let relative = path.strip_prefix(dest).map_err(|e| e.to_string())?;
+        let relative = fwd(relative);
+        relative.hash(&mut hash);
+        fs::read(&path).map_err(|e| e.to_string())?.hash(&mut hash);
+        urls.push(format!("/{id}/{relative}"));
+    }
+    // Directory navigation carries language/mode parameters but uses the same shell.
+    urls.push(format!("/{id}/"));
+    let prefix = format!("kortex-tool:{id}:");
+    let cache = format!("{prefix}{:016x}", hash.finish());
+    let script = template
+        .replace(
+            "__CACHE__",
+            &serde_json::to_string(&cache).map_err(|e| e.to_string())?,
+        )
+        .replace(
+            "__PREFIX__",
+            &serde_json::to_string(&prefix).map_err(|e| e.to_string())?,
+        )
+        .replace(
+            "__ASSETS__",
+            &serde_json::to_string(&urls).map_err(|e| e.to_string())?,
+        );
+    fs::write(dest.join("sw.js"), script).map_err(|e| e.to_string())
+}
+
+// Local cache receipts include source and output content, so deleted/altered assets rebuild too.
+pub(crate) fn tree_fingerprint(path: &Path) -> Result<String, String> {
+    use std::hash::{Hash, Hasher};
+    fn visit(path: &Path, base: &Path, hash: &mut impl Hasher) -> Result<(), String> {
+        path.strip_prefix(base)
+            .map_err(|e| e.to_string())?
+            .hash(hash);
+        if path.is_dir() {
+            let mut entries = fs::read_dir(path)
+                .map_err(|e| e.to_string())?
+                .map(|e| e.map(|e| e.path()).map_err(|e| e.to_string()))
+                .collect::<Result<Vec<_>, _>>()?;
+            entries.sort();
+            for entry in entries {
+                visit(&entry, base, hash)?;
+            }
+        } else {
+            fs::read(path).map_err(|e| e.to_string())?.hash(hash);
+        }
+        Ok(())
+    }
+    let mut hash = std::collections::hash_map::DefaultHasher::new();
+    visit(path, path, &mut hash)?;
+    Ok(format!("{:016x}", hash.finish()))
+}
+
+pub(crate) fn source_fingerprint(root: &Path, tool: &Path) -> Result<String, String> {
+    use std::hash::{Hash, Hasher};
+    let mut hash = std::collections::hash_map::DefaultHasher::new();
+    tree_fingerprint(tool)?.hash(&mut hash);
+    for name in [
+        "Cargo.toml",
+        "Cargo.lock",
+        "rust-toolchain.toml",
+        ".cargo",
+        "design/dist/kortex.css",
+        "xtask/src",
+        "xtask/Cargo.toml",
+    ] {
+        name.hash(&mut hash);
+        tree_fingerprint(&root.join(name))?.hash(&mut hash);
+    }
+    // All internal libraries except unrelated CLI/package management. New shared libraries
+    // automatically participate without having to update this list.
+    let mut crates = fs::read_dir(root.join("crates"))
+        .map_err(|e| e.to_string())?
+        .map(|e| e.map(|e| e.path()).map_err(|e| e.to_string()))
+        .collect::<Result<Vec<_>, _>>()?;
+    crates.sort();
+    for path in crates {
+        if path.is_dir()
+            && !matches!(
+                path.file_name().and_then(|n| n.to_str()),
+                Some("kortex-cli" | "kortex-pkg")
+            )
+        {
+            path.file_name().hash(&mut hash);
+            tree_fingerprint(&path)?.hash(&mut hash);
+        }
+    }
+    for name in ["RUSTFLAGS", "CARGO_ENCODED_RUSTFLAGS", "RUSTUP_TOOLCHAIN"] {
+        std::env::var_os(name).hash(&mut hash);
+    }
+    Ok(format!("{:016x}", hash.finish()))
 }

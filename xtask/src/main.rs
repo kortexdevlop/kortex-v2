@@ -1,18 +1,21 @@
 //! Project tooling: `cargo xtask <command>`.
+mod apps;
 mod build;
 mod check;
 mod cli_gen;
 mod icons;
 mod new_tool;
+mod platform_check;
 mod registry;
 mod release;
 mod stats;
 mod tokens;
 mod tools;
+mod worker;
 
 use std::process::ExitCode;
 
-const USAGE: &str = "Commandes : tokens | registry | check [id] | stats | icons | cli-gen | keygen | build-desktop | build-cli | build-app | list-tools | package | release-index | build <id> | new-tool --universe U --name N";
+const USAGE: &str = "Commandes : tokens | registry | check [id] | stats | icons | cli-gen | keygen | build-desktop | build-cli | build-app | list-tools | package | release-index | build <id…|all> | new-tool --universe U --name N";
 
 /// Path for embedding in generated TOML/Rust source: forward slashes work on every OS, while
 /// Windows backslashes would be read as (invalid) escape sequences.

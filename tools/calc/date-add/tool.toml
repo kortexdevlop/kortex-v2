@@ -1,0 +1,61 @@
+schema = 1
+[tool]
+id = "calc.date-add"
+version = "1.0.0"
+universe = "calc"
+status = "beta"
+ui = "auto"
+platforms = ["web", "desktop"]
+offline = true
+ai = false
+viral_priority = 1
+[tool.name]
+fr = "Ajouter ou retirer des jours"
+en = "Add or Subtract Days"
+[tool.tagline]
+fr = "Décalez une date en jours calendaires ou du lundi au vendredi."
+en = "Shift a date by calendar days or Monday-to-Friday days."
+[tool.slug]
+fr = "ajouter-retirer-jours"
+en = "add-subtract-days"
+[search]
+keywords.fr = ["ajouter ou retirer des jours", "ajouter retirer jours"]
+keywords.en = ["add or subtract days", "add subtract days"]
+intents.fr = ["Décalez une date en jours calendaires ou du lundi au vendredi."]
+intents.en = ["Shift a date by calendar days or Monday-to-Friday days."]
+related = []
+[limits]
+timeout_s = 10
+
+[[params]]
+id = "date"
+type = "text"
+default = "2024-02-28"
+level = "simple"
+label = { fr = "Date (AAAA-MM-JJ)", en = "Date (YYYY-MM-DD)" }
+
+[[params]]
+id = "days"
+type = "integer"
+default = 1
+level = "simple"
+label = { fr = "Jours à ajouter (négatif pour retirer)", en = "Days to add (negative to subtract)" }
+range = [-36500, 36500]
+
+[[params]]
+id = "weekdays_only"
+type = "bool"
+default = false
+level = "medium"
+label = { fr = "Compter du lundi au vendredi uniquement", en = "Count Monday to Friday only" }
+
+[[outputs]]
+id = "date"
+type = "text"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "write"
+sensitive = false
+privacy = "local"

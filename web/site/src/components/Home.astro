@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import ToolCard from './ToolCard.astro';
-import { tools, universes, byPriority, type Lang } from '../lib/data';
+import { tools, universes, byPriority, universePath, type Lang } from '../lib/data';
 const { lang } = Astro.props as { lang: Lang };
 const T = {
   fr: {
@@ -61,11 +61,11 @@ const counts = (id: string) => tools.filter((x) => x.tool.universe === id).lengt
     <h2>{T.universes}</h2>
     <div class="grid home-universes">
       {universes.map((u) => (
-        <div class="k-card home-universe" style={`--hue:${u.hue}`}>
+        <a class="k-card home-universe" style={`--hue:${u.hue}`} href={universePath(u, lang)}>
           <span class="home-dot" aria-hidden="true"></span>
           <strong>{u.name}</strong>
           <span class="k-muted">{counts(u.id) ? `${counts(u.id)} ${counts(u.id) > 1 ? T.toolsN : T.tool}` : T.soon}</span>
-        </div>
+        </a>
       ))}
     </div>
   </section>

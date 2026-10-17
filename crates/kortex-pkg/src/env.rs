@@ -20,10 +20,12 @@ impl PkgEnv {
     pub fn from_process() -> Result<Self> {
         Ok(Self {
             home: Home::from_env()?,
-            index_src: std::env::var("KORTEX_INDEX").unwrap_or_else(|_| DEFAULT_INDEX.to_owned()),
+            index_src: kortex_platform::native::env::var("KORTEX_INDEX")
+                .unwrap_or_else(|_| DEFAULT_INDEX.to_owned()),
             public_key: crate::RELEASE_PUBLIC_KEY.trim().to_owned(),
             target: current_target().map(str::to_owned),
-            api: std::env::var("KORTEX_API").unwrap_or_else(|_| crate::DEFAULT_API.to_owned()),
+            api: kortex_platform::native::env::var("KORTEX_API")
+                .unwrap_or_else(|_| crate::DEFAULT_API.to_owned()),
         })
     }
 

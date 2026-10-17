@@ -75,7 +75,8 @@ fn mime_for(path: &Path) -> &'static str {
 
 fn read_file(spec: &str) -> Result<FileData, String> {
     let path = PathBuf::from(spec);
-    let bytes = std::fs::read(&path).map_err(|e| format!("lecture de {spec} impossible : {e}"))?;
+    let bytes = kortex_platform::native::fs::read(&path)
+        .map_err(|e| format!("lecture de {spec} impossible : {e}"))?;
     let name = path
         .file_name()
         .map_or_else(|| "file".to_owned(), |n| n.to_string_lossy().into_owned());
@@ -141,7 +142,7 @@ fn build_maps(
             }
             PortType::Text | PortType::RichText | PortType::Url | PortType::Secret => {
                 let text = match raw.strip_prefix('@') {
-                    Some(path) => std::fs::read_to_string(path)
+                    Some(path) => kortex_platform::native::fs::read_to_string(path)
                         .map_err(|e| format!("lecture de {path} impossible : {e}"))?,
                     None => raw.to_owned(),
                 };
@@ -175,7 +176,7 @@ fn lang_of(args: &mut Vec<String>) -> String {
         args.remove(i);
         return l;
     }
-    std::env::var("LANG")
+    kortex_platform::native::env::var("LANG")
         .ok()
         .filter(|l| l.starts_with("fr"))
         .map_or("en", |_| "fr")
@@ -286,26 +287,8 @@ fn json_escape(s: &str) -> String {
 
 /// Writes output files into `dir` (never overwriting: `name (2).ext`) and returns their paths.
 fn save(dir: &Path, f: &FileData) -> Result<PathBuf, String> {
-    std::fs::create_dir_all(dir)
-        .map_err(|e| format!("création de {} impossible : {e}", dir.display()))?;
-    // Output names come from tool logic and input names: keep only the final component.
-    let base = Path::new(&f.name)
-        .file_name()
-        .map_or_else(|| "output".to_owned(), |n| n.to_string_lossy().into_owned());
-    let (stem, ext) = base
-        .rsplit_once('.')
-        .map_or((base.as_str(), String::new()), |(s, e)| {
-            (s, format!(".{e}"))
-        });
-    let mut path = dir.join(&base);
-    let mut n = 2;
-    while path.exists() {
-        path = dir.join(format!("{stem} ({n}){ext}"));
-        n += 1;
-    }
-    std::fs::write(&path, &f.bytes)
-        .map_err(|e| format!("écriture de {} impossible : {e}", path.display()))?;
-    Ok(path)
+    kortex_platform::native::save_output(dir, &f.name, &f.bytes)
+        .map_err(|e| format!("écriture dans {} impossible : {e}", dir.display()))
 }
 
 /// Runs the CLI. `args` excludes the program name. Output goes to `out`; errors are returned.

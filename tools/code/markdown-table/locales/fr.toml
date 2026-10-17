@@ -1,0 +1,19 @@
+[ui]
+title = "Générateur de tableau Markdown"
+[errors]
+empty_input = "Saisissez un texte."
+invalid_param = "Valeur invalide."
+missing_input = "Ajoutez le contenu à traiter."
+cancelled = "Annulé."
+division_by_zero = "Ce calcul exige une base non nulle."
+invalid_color = "Couleur invalide : vérifiez le format et les composantes."
+empty_slug = "Le texte ne contient aucun caractère utilisable pour ce slug."
+[outputs]
+text = "Tableau Markdown"
+[options]
+delimiter_tab = "Tabulation"
+delimiter_semicolon = "Point-virgule"
+delimiter_comma = "Virgule"
+alignment_left = "Gauche"
+alignment_center = "Centre"
+alignment_right = "Droite"

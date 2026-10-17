@@ -1,0 +1,55 @@
+schema = 1
+[tool]
+id = "code.chmod"
+version = "1.0.0"
+universe = "code"
+status = "beta"
+ui = "auto"
+platforms = ["web", "desktop"]
+offline = true
+ai = false
+viral_priority = 1
+[tool.name]
+fr = "Calculateur chmod"
+en = "chmod Calculator"
+[tool.tagline]
+fr = "Convertissez des permissions Unix entre notation octale et symbolique."
+en = "Convert Unix permissions between octal and symbolic notation."
+[tool.slug]
+fr = "calculateur-chmod"
+en = "chmod-calculator"
+[search]
+keywords.fr = ["calculateur chmod", "calculateur chmod"]
+keywords.en = ["chmod calculator", "chmod calculator"]
+intents.fr = ["Convertissez des permissions Unix entre notation octale et symbolique."]
+intents.en = ["Convert Unix permissions between octal and symbolic notation."]
+related = []
+[limits]
+timeout_s = 10
+
+[[inputs]]
+id = "text"
+type = "text"
+required = true
+max_len = 100000
+multiline = true
+label = { fr = "Texte", en = "Text" }
+
+[[params]]
+id = "direction"
+type = "enum"
+default = "to_symbolic"
+level = "simple"
+label = { fr = "Conversion", en = "Conversion" }
+options = ["to_symbolic", "to_octal"]
+
+[[outputs]]
+id = "text"
+type = "text"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "write"
+sensitive = false
+privacy = "local"

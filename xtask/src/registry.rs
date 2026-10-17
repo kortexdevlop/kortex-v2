@@ -23,6 +23,7 @@ pub fn run() -> Result<(), String> {
     let json = build()?;
     fs::create_dir_all("registry").map_err(|e| e.to_string())?;
     fs::write("registry/index.json", &json).map_err(|e| e.to_string())?;
-    println!("✓ registry/index.json généré");
+    fs::write("registry/apps.json", crate::apps::registry()?).map_err(|e| e.to_string())?;
+    println!("✓ registry/index.json et registry/apps.json générés");
     Ok(())
 }

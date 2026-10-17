@@ -1,0 +1,47 @@
+import assert from 'node:assert/strict';
+import {createRequire} from 'node:module';
+import {readFileSync,existsSync,statSync,mkdirSync,writeFileSync} from 'node:fs';
+import {resolve,extname,sep} from 'node:path';
+const {chromium}=createRequire(import.meta.url)('playwright');
+const root=resolve(import.meta.dirname,'../..');
+const published=process.argv.includes('--public');
+const host=/^store\s*=\s*"([^"]+)"/m.exec(readFileSync(resolve(root,'brand/domains.toml'),'utf8'))[1];
+const browser=await chromium.launch({headless:true,executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',args:process.env.KORTEX_QA_HOST_RULES?[`--host-resolver-rules=${process.env.KORTEX_QA_HOST_RULES}`]:[]});
+const checks=[];
+try {
+ const context=await browser.newContext({viewport:{width:1440,height:1000}});
+ if(!published)await context.route(`https://${host}/**`,async route=>{
+  const base=resolve(root,'dist/apps/apps.store');
+  let path=resolve(base,'.'+decodeURIComponent(new URL(route.request().url()).pathname));
+  if(path!==base&&!path.startsWith(base+sep))return route.abort();
+  if(existsSync(path)&&statSync(path).isDirectory())path=resolve(path,'index.html');
+  if(!existsSync(path))return route.fulfill({status:404,body:'Not found'});
+  await route.fulfill({contentType:({'.html':'text/html','.js':'text/javascript','.wasm':'application/wasm','.css':'text/css'})[extname(path)]||'application/octet-stream',body:readFileSync(path)});
+ });
+ const page=await context.newPage(),errors=[];
+ page.on('pageerror',error=>errors.push(error.message));
+ await page.goto(`https://${host}/`,{waitUntil:'networkidle'});
+ await page.locator('[data-tool]').first().waitFor();
+ assert.equal(await page.locator('[data-tool]').count(),38);checks.push('38 real tools');
+ await page.getByRole('searchbox').fill('générateur mot');
+ await page.waitForTimeout(100);
+ assert.equal(await page.locator('[data-tool="secure.password-generator"]').count(),1);
+ await page.getByRole('searchbox').fill('hash');
+ await page.locator('[data-tool="secure.hash-calculator"]').getByRole('button',{name:'Voir la fiche'}).click();
+ await page.locator('[data-detail="secure.hash-calculator"]').getByRole('heading',{name:'Permissions déclarées'}).waitFor();
+ assert.ok((await page.locator('[data-detail] a').getAttribute('href')).includes('?open=1'));checks.push('search, detail and real web link');
+ await page.getByRole('button',{name:'Fermer la fiche'}).click();
+ await page.getByRole('searchbox').fill('');
+ await page.getByRole('combobox',{name:'Univers',exact:true}).selectOption('pdf');
+ assert.equal(await page.locator('[data-tool]').count(),1);checks.push('universe filter');
+ assert.equal(await page.getByRole('button',{name:'Installer',exact:true}).count(),0);checks.push('unready installation closed');
+ await page.getByRole('button',{name:'EN',exact:true}).click();
+ await page.getByRole('searchbox',{name:'Search tools'}).waitFor();
+ await page.getByRole('button',{name:'Theme',exact:true}).click();checks.push('English and theme');
+ await page.setViewportSize({width:390,height:844});
+ assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));checks.push('mobile layout');
+ assert.deepEqual(errors,[]);
+ mkdirSync(resolve(root,'.kortex/qa'),{recursive:true});
+ writeFileSync(resolve(root,`.kortex/qa/store-${published?'public':'local'}.json`),JSON.stringify({url:`https://${host}`,checks,errors},null,2));
+ console.log(JSON.stringify({checks,errors}));
+}finally{await browser.close();}

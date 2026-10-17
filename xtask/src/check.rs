@@ -24,6 +24,7 @@ fn has_hex_color(line: &str) -> bool {
 }
 
 pub fn run(filter: Option<&str>) -> Result<(), String> {
+    crate::platform_check::run()?;
     let universes = tools::universes()?;
     let mut errors: Vec<String> = Vec::new();
     let mut seen_ids = std::collections::HashSet::new();
@@ -172,6 +173,121 @@ pub fn run(filter: Option<&str>) -> Result<(), String> {
     }
 
     if filter.is_none() {
+        for app in crate::apps::discover()? {
+            let dir = app.dir.display().to_string();
+            for name in [
+                "Cargo.toml",
+                "app.toml",
+                "src/lib.rs",
+                "src/engine.rs",
+                "glyph.svg",
+                "locales/fr.toml",
+                "locales/en.toml",
+                "content/fr.md",
+                "content/en.md",
+                "CHANGELOG.md",
+            ] {
+                if !app.dir.join(name).is_file() {
+                    errors.push(format!("✗ {dir} : {name} manquant"));
+                }
+            }
+            if app.contract.app.ui == kortex_contract::UiKind::Custom
+                && !app.dir.join("src/ui.rs").is_file()
+            {
+                errors.push(format!("✗ {dir} : ui=custom exige src/ui.rs"));
+            }
+            let locale_keys = |lang: &str| -> Result<std::collections::BTreeSet<String>, String> {
+                let source = fs::read_to_string(app.dir.join(format!("locales/{lang}.toml")))
+                    .map_err(|e| e.to_string())?;
+                let table: toml::Table =
+                    source.parse::<toml::Table>().map_err(|e| e.to_string())?;
+                let mut keys = std::collections::BTreeSet::new();
+                for (section, value) in table {
+                    let values = value
+                        .as_table()
+                        .ok_or_else(|| format!("{section} doit être une section"))?;
+                    for (key, value) in values {
+                        if value.as_str().is_none_or(str::is_empty) {
+                            return Err(format!("{section}.{key} doit être un texte non vide"));
+                        }
+                        keys.insert(format!("{section}.{key}"));
+                    }
+                }
+                Ok(keys)
+            };
+            match (locale_keys("fr"), locale_keys("en")) {
+                (Ok(fr), Ok(en)) if !fr.is_empty() && fr == en => {}
+                _ => errors.push(format!(
+                    "✗ {dir} : locales FR/EN invalides ou clés différentes"
+                )),
+            }
+            if !app.dir.join("tests").is_dir() {
+                errors.push(format!("✗ {dir} : tests manquants"));
+            }
+            let source = fs::read_to_string(app.dir.join("src/engine.rs")).unwrap_or_default();
+            for forbidden in [
+                "dioxus::",
+                "web_sys",
+                "std::fs",
+                "std::process::Command",
+                ".unwrap()",
+                "panic!(",
+            ] {
+                if source.contains(forbidden) {
+                    errors.push(format!(
+                        "✗ {dir}/src/engine.rs : moteur non pur ({forbidden})"
+                    ));
+                }
+            }
+            fn reject_web_app(dir: &std::path::Path, errors: &mut Vec<String>) {
+                if let Ok(entries) = fs::read_dir(dir) {
+                    for entry in entries.flatten() {
+                        let path = entry.path();
+                        if path.is_dir() {
+                            reject_web_app(&path, errors);
+                        } else if path
+                            .extension()
+                            .and_then(|e| e.to_str())
+                            .is_some_and(|e| matches!(e, "ts" | "tsx" | "astro" | "jsx"))
+                        {
+                            errors.push(format!(
+                                "✗ {} : application produit hors Rust/Dioxus",
+                                path.display()
+                            ));
+                        }
+                    }
+                }
+            }
+            reject_web_app(&app.dir, &mut errors);
+        }
+        let brands: toml::Table = fs::read_to_string("brand/names.toml")
+            .map_err(|e| e.to_string())?
+            .parse::<toml::Table>()
+            .map_err(|e| e.to_string())?;
+        if let Some(names) = brands.get("apps").and_then(toml::Value::as_table) {
+            for name in names.keys() {
+                let mut letters = name.chars();
+                let component = format!(
+                    "{}{}.astro",
+                    letters
+                        .next()
+                        .map(|c| c.to_uppercase().to_string())
+                        .unwrap_or_default(),
+                    letters.as_str()
+                );
+                let path = std::path::Path::new("web/site/src/components").join(component);
+                if path.exists() {
+                    errors.push(format!("✗ {} : une application doit être dans apps/ en Rust/Dioxus ; utiliser une intégration site générique", path.display()));
+                }
+            }
+        }
+        let app_registry = crate::apps::registry()?;
+        if fs::read_to_string("registry/apps.json").unwrap_or_default() != app_registry {
+            errors.push("✗ registry/apps.json périmé — lance cargo xtask registry".into());
+        }
+    }
+
+    if filter.is_none() {
         let current = fs::read_to_string("registry/index.json").unwrap_or_default();
         let (cli_manifest, cli_code) = crate::cli_gen::build()?;
         if fs::read_to_string("crates/kortex-cli/Cargo.toml").unwrap_or_default() != cli_manifest
@@ -191,7 +307,14 @@ pub fn run(filter: Option<&str>) -> Result<(), String> {
     }
 
     if errors.is_empty() {
-        println!("✓ check OK ({count} outil(s))");
+        println!(
+            "✓ check OK ({count} outil(s), {} application(s))",
+            if filter.is_none() {
+                crate::apps::discover()?.len()
+            } else {
+                0
+            }
+        );
         Ok(())
     } else {
         Err(format!(

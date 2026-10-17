@@ -1,0 +1,1044 @@
+{
+  "date": "2026-10-17",
+  "scope": "Plan 3.3: confirmed clipboard results in shared Dioxus UI; Rust browser backend and native macOS AppKit; full platform step remains incomplete",
+  "source_sha256": {
+    ".cargo/config.toml": "c3d1df6b19d37947be66996c33882c80a0e2c662647bda2c55b0bf7c4b523465",
+    "Cargo.lock": "62352d2bb7232cfc86badbf371823ae912b9d9a36aa1e82f6bd7b54c84362ad4",
+    "Cargo.toml": "078347aa44151f952f6ec348f9753d41c45bb8ae6fae919cd16821d5a3d05bc9",
+    "apps/store/Cargo.toml": "15baeb6ca5ffb91e13a2e19cce092b2faa969785e9343a4aec44b4f2b1fa418e",
+    "apps/store/app.toml": "2250f929d588100e751da2ff145b9ad83b90c381095a8050d72ce000f2a53137",
+    "apps/store/locales/en.toml": "6548464299bce3ecdc797de204883a1c6a0ad30e168cdc0a687ae8fbd852256f",
+    "apps/store/locales/fr.toml": "6653bfc7a0211453eeb08d3bfde927f27309b547ae3142495a9e4e807eee39a5",
+    "apps/store/src/engine.rs": "5e8c82c361a92aac681ca85aae0e6106d6c9772e010bd0ae4e1ef80bf52e6321",
+    "apps/store/src/lib.rs": "a5e3fd43e37cdba8b4ff0221547f722481bfa2c34261df700456d788f31b01e0",
+    "apps/store/src/main.rs": "0524d701b136409b26b6c2d94e82e9c3a4f66c8ffba74a4dd494e09442e8edf3",
+    "apps/store/src/ui.rs": "cf232c51d09e28c6fdf971050331a9ec32f9e1d4a3e7847c5f749788e41d5828",
+    "apps/store/tests/store.rs": "7011f3f025c1127cacf4dd138b02a273f4dde13257e7f051ec73cf886ea99afa",
+    "brand/features.toml": "92b7716d3967dd683b887f30223d6221c42d34fbdbc90031668cec3ed0396964",
+    "crates/kortex/Cargo.toml": "cc58c16f6304e13fa82df2e464ea334d9543cd56d1f0257c83fade578e4502aa",
+    "crates/kortex/src/lib.rs": "7ba1d7a5d859c6b5c8bbb861f6aaca084de8f7a496560f8a4bb414aadd847c21",
+    "crates/kortex/tests/fixtures/demo.toml": "25c37f44dc07157545edd5180271ab511d09e16ab3b1748929cd8184cc72472c",
+    "crates/kortex/tests/macro.rs": "3d6c97f429ffcc84fb5cbeec64acd938f3760a3b864d51d48b1e0be8610f2d05",
+    "crates/kortex-cli/Cargo.toml": "6b30e09eb4613ded220ee2579506c83e84f5bac4014befc03d2244484e653cbe",
+    "crates/kortex-cli/src/generated.rs": "9e3b479051d3de754938bca2c8a8dffc93ecdda25033163baefb7e1c46395306",
+    "crates/kortex-cli/src/lib.rs": "0856e98c84ebe19a6a48b4ec401af73276808b442e7429c1cf35b3de1fac0d4f",
+    "crates/kortex-cli/src/main.rs": "fc3fd69c05270e4a984e1ac2ee061195736ba0fc942f2d8ff88742f72bda88c1",
+    "crates/kortex-cli/src/pkgcmd.rs": "65be661bc18a8856382d369754636c5e56156b710014df58c44141711296107d",
+    "crates/kortex-cli/tests/account.rs": "06df80d4599cd234afc3d7182211b6aa234a4d396522b93ac85f1e9fd18240a8",
+    "crates/kortex-cli/tests/cli.rs": "644d916baee45f4c20a5da5e6dde09a2bd53b0dc10b94e577e3b0dbe3f38b442",
+    "crates/kortex-cli/tests/pkgcmds.rs": "08f6a5fa9b9042cc69b31c906b07c64a0262794d3394abd1a050b0220a76bfcd",
+    "crates/kortex-color/Cargo.toml": "4de5174752da114354408bd1d471939dd70b8c96685d91a872bfd6df8ca2770a",
+    "crates/kortex-color/src/lib.rs": "b95a3ffdcd0aeb3a1c6ddcb36601219e4289e9965da00c0df1c729cda278794e",
+    "crates/kortex-contract/Cargo.toml": "a1eba14de9e6fa5044ab242f5c29a12bc46ec23661c4eb4e35dac494d83d4062",
+    "crates/kortex-contract/src/lib.rs": "3fabcab695065a058adeafaa118b386396bf06653e8e008de394b16d6b06dd52",
+    "crates/kortex-contract/src/port.rs": "ee19af247abefd6a4706bdf3e22bcaf68c8a4126b74b5790e9a1a68074ba5a0c",
+    "crates/kortex-contract/src/schema.rs": "2538f403a03e0eff10493c7ad6c64e498076f873191fa12b8310491242777f0f",
+    "crates/kortex-contract/src/validate.rs": "b5190629ba8a271a21548cd1937ab93a1ee0bf4f1cb51852a9c450e7b5876c74",
+    "crates/kortex-contract/tests/apps.rs": "5930a6653d216f3e12ef27b376f90d4de6133fdb265e86118cf886fb64a38694",
+    "crates/kortex-date/Cargo.toml": "e722e8ed8066eb209ceb4f84014ee4b13f4d00653e6c2ef8b9ab9a29d32116db",
+    "crates/kortex-date/src/lib.rs": "4bc73b1c8f14aa4cfdcc76837308c6b4174392a6f36e938a01dbac00e51c8f0f",
+    "crates/kortex-i18n/Cargo.toml": "60302de2057473a00a00ee78d8bc61ded7f5977cbbe98f0431b496a407726465",
+    "crates/kortex-i18n/src/lib.rs": "7ba9af44e16029d9cd1a86cd4a57d60a93b054c733419e0b33a146eb4ae1cd1d",
+    "crates/kortex-macros/Cargo.toml": "b7617d2424bf1aa73108409bc9994d79ddbbe27d001af070747af1d345e4f3a2",
+    "crates/kortex-macros/src/lib.rs": "5ea2301c61f4f2ca8b06a7fa5c24cb571f14350bbccd88e66a4f339707212a0d",
+    "crates/kortex-pkg/Cargo.toml": "30f6e53c589e01fe9dec915507f22c73dd25a9022dd85832b78a30a6a25152cd",
+    "crates/kortex-pkg/src/account.rs": "e1b59f9d11efa28d2c1d55be411ee0e7f593edf6a9fc4d9c872b145eec84f1b3",
+    "crates/kortex-pkg/src/env.rs": "c6abc99f0f7649cd41424f4465b2bc7e6ca5df12beab970159ef88496039097c",
+    "crates/kortex-pkg/src/error.rs": "7f8b6fabd3f8b6f04b1358af873853016cee75fca8052ba5e2d5250af3a0ce30",
+    "crates/kortex-pkg/src/home.rs": "c543f5d5f74348308177353d5478d87a224366f602bfd83ab40a2cda4a57778c",
+    "crates/kortex-pkg/src/index.rs": "b11a819054527c185272f7eb9272a7e49b4b1c3ab943cef7cdd37e37163264df",
+    "crates/kortex-pkg/src/install.rs": "efe23266b458235bc88f4c0fa463438298be8994c77e4b28e91988b2e2b9b3e6",
+    "crates/kortex-pkg/src/lib.rs": "7467c6ef223fb545faaf13bc6ef43ca1093eb9a39c824656fa3f4391590f6d1a",
+    "crates/kortex-pkg/src/net.rs": "c6ae1fef325125798b4acb69e2d2608aabb7902c2e2d59796f647ace89d23d48",
+    "crates/kortex-pkg/src/shortcuts.rs": "a5c3eb37d9049c89ff3b0d0eca9f73f3fab96323cf3268b99b56e3370aaa28d4",
+    "crates/kortex-pkg/src/version.rs": "b2507f4f135fdf37119da3d5a48956beb2e69ea7f7a2443d38b4166ecd6019fe",
+    "crates/kortex-pkg/tests/pkg.rs": "b8228da23e443266ac526a9f6a025cdcace1b4c313909b172c5528140b8f739c",
+    "crates/kortex-platform/Cargo.toml": "f97a905d9d85a8ae6869b9ae2b4e12731083228ae5ef93da6fad904444b2b605",
+    "crates/kortex-platform/src/document.rs": "fe361055f3a9d275b7716e6fb133e125f1d621be7241634c784f578de3713b55",
+    "crates/kortex-platform/src/download.js": "cc2f206c3e9400f5dc9eb71eb64a9200ac255412ee5624bca3973feb6a5a92d8",
+    "crates/kortex-platform/src/host-bus.js": "1c0b9bf84e8a51ff7e8f5959dc631bb173032f73e0b014acc4fa6a08fb02dbe1",
+    "crates/kortex-platform/src/lib.rs": "c7f9e6eeabe2b6244ba77e412694f8e338a2f654d13b6045f114628836254765",
+    "crates/kortex-platform/src/native.rs": "492e845ad2fefe8581898ecb9d33d7da3a7480715daae44446eddacb66dda360",
+    "crates/kortex-platform/src/offline-worker.js": "56bbaab3616276f9042cfa4aec848b8d77f98c4670ae7260329480b72cf33ee1",
+    "crates/kortex-platform/src/offline.rs": "184c8aa10d0ba60b6af1374e248a5a4bc89d78054abc0f6e34a6df5c4848cd63",
+    "crates/kortex-platform/src/worker.rs": "e45167184051d106bad432d8b0c03d8f09ea09acee6a223fc4fa68dd2bdc1197",
+    "crates/kortex-platform/tests/native.rs": "cbd18e5cc4f95bfc30c7e391ff7e2011e63e12f57cbcfad80f08dd1d24c2bfc1",
+    "crates/kortex-runtime/Cargo.toml": "901455483ab1460d898eb2e2346cee8c7322f9a691fae1ead6ac966a01ce2a20",
+    "crates/kortex-runtime/src/lib.rs": "34ad66513f34e1ae2b559a0c309cc350e826786e38628b291f8cfe83f7539ffe",
+    "crates/kortex-ui/Cargo.toml": "bb9eb7d7a0b4dfd0f91af91035b256bb4dd76cca645d96f51d1f2fa297da3e60",
+    "crates/kortex-ui/src/auto.rs": "0b68f1dceec733d7d2b8c38c6403f24b2d38d4b43769bda40c068e6970c75a38",
+    "crates/kortex-ui/src/components.rs": "bfc2fe793cfb1ece592d9fb9c7199c77884249ac598da7a2cb2c213f2bf8cde8",
+    "crates/kortex-ui/src/lib.rs": "2bcfea9ccc679729efb8cd87202913d60d6236c72d7bbbc8db43f8a68365e8a0",
+    "crates/kortex-ui/src/mode.rs": "3316f4de1d0bfac89ceea1cb921953a2470756104a33914532af246793af2043",
+    "crates/kortex-ui/tests/ssr.rs": "eadf42289d8bc6d8175833d91e998d32abbb1ea32ce0fe6564aa86d9b2f15238",
+    "pnpm-lock.yaml": "0fc078294567bab731031e56996355496c3468ae3382445ce89f25224c824b5a",
+    "rust-toolchain.toml": "fc756dd513542d2343a3f4ee7e3beade9316093f438dbeecca7c4debf4f3394b",
+    "scripts/prepare-publish.mjs": "5b3546f73921cd7536be7229dd114f4c373ae1f711138c1c32144d3f5229676c",
+    "scripts/public-features.mjs": "56894f0aa6ce43f5e65c1d1cc1f86301b1f775c3aaa6b07a7841ae55f34aa823",
+    "scripts/publish.mjs": "67ed837325be48e5e1701b8db8844c3073a30e56e22db6dd1a1c9ff352660294",
+    "scripts/tests/account-flow.mjs": "87465d38799ab85c57b8d30e3eb23051abfb526b931a7c91b96af43f507bffb0",
+    "scripts/tests/account-security.mjs": "54b97315d22f77a528d5e18462f788914bee47e0add30493f71e8d59711137c7",
+    "scripts/tests/host-fallback.test.mjs": "46a6423eb42af524af64d6e399aba25825ccf82fa30b8de5c19ce6de5c5e81c8",
+    "scripts/tests/offline-routing.test.mjs": "863a30583317f6f75ce2a7ceef7a388b20b4f5f0c026fda24f742f84ea9e3c51",
+    "scripts/tests/offline-smoke.mjs": "af67873d857a8ce0c8617e32ec85148612ee0d72d3e1fcfdd40718729beeb662",
+    "scripts/tests/platform-ui-smoke.mjs": "57bcb67408dd2cb54b69f630668f7d0336bc158e4204d08d7960bffcca86fb09",
+    "scripts/tests/published-smoke.mjs": "fc7ef6c0cb0266349081dc259458e125164cabe2936264816277902cca52254c",
+    "scripts/tests/worker-smoke.mjs": "9cf8f83156252089f4d99d35a2c729522a849aaf5f943f9362b0484134085b31",
+    "services/api/migrations/0001_init.sql": "9ee88dd3d478ceda77de6344e0b8edb7dfb6fd026dbf96d198645e85d97166b9",
+    "services/api/migrations/0002_ai.sql": "12dd13803abc11864f0cef679cff8a0bab62d7c3f692ee3c0c391a8b62ed2650",
+    "services/api/migrations/0003_devices.sql": "139bc5884e157ead4206d5a126b0fc024b20e82c0c3c6d7a2f4b5ce18ae9fa9b",
+    "services/api/migrations/0004_retention_indexes.sql": "f158468168e0f4a9b04bf79fe7cf914ec25978ea011ccee4ce1b8dd8a362199f",
+    "services/api/migrations/0005_account_security.sql": "34e4566291156a5fd616c55cbf931c48d9f3a5621f0d397e4dc7451ed2f30a08",
+    "services/api/src/ai-models.ts": "077c91660d96edcc22ffbdd17fd1e36362fe08407d4d4b5e8b2ef83e5a6c1c3e",
+    "services/api/src/credits.ts": "33d7dcf5048a9529cfca2213b632a36c1e9534d333e5433dc59c7dc6586e2aa7",
+    "services/api/src/crypto.ts": "ce32d96497d91b59e65c1c035e6742bd71b8795639e2c795e7334231cae69aea",
+    "services/api/src/env.ts": "a88d32e185b2bfd68e4978ae74596d4b75156e1613c3d050169641c1d9acc1d0",
+    "services/api/src/http.ts": "61f634307849a4e9e7f447e4bac97716d17c2f08161b6c1b238250b25734b1d6",
+    "services/api/src/index.ts": "ac3e7e1a48984fde4b791fc96133aa5c0419adf7f0869a8b714516abe39c2630",
+    "services/api/src/ratelimit.ts": "aa59a7a665a4bda8493959eff79f069377f5307d326ea6580862bf6434b53b7a",
+    "services/api/src/routes/ai.ts": "c4538c41ea2bbe9daacb9feb09fa9c5dcb4cad568f07e70172275c14902f81f4",
+    "services/api/src/routes/auth.ts": "f4b9d1c45c9e8b4977f672a1669dc4291b51413182a5b219550846101c4bdab6",
+    "services/api/src/routes/data.ts": "efcc20e77d9783227a174560b23dc5461f4845e647c87acb4e3908de6c3c83a4",
+    "services/api/src/routes/devices.ts": "11599d52aaaaa4023b315dec6f9b721c0752ba9204c474a2c34251e64b999628",
+    "services/api/src/routes/passkeys.ts": "8392e0efd89f59c66e73444bc2dec1e98d014e27edb7b8281b83cfe67d0d1f98",
+    "services/api/src/routes/security.ts": "d9798e1f9b1483517032f8ad6deca8cc2cd15c4d6991cf84ba5637a29d3c7972",
+    "services/api/src/session.ts": "774eb48ad3c3eea0fc5e20bcc6cc4705d57b20c7998675c1d9339233da3b3adf",
+    "services/api/src/turnstile.ts": "5c02d6bc651e2abeeca9cb1c630560d31cd524e4e6b7a01f4d365f08d6ac2731",
+    "services/api/src/validate.ts": "781ae6fbb079f52c8abbd7573b3541d87272fde69aa3d73adb938ecd0c31deed",
+    "services/api/wrangler.jsonc": "9a30bdf46fa798871daa694f81a51e0c8b5a0899d6f958d7f3818015526d6787",
+    "services/run/wrangler.jsonc": "e76a3fb05b2764c5721800a8d0a49f9a5e61e49eaff53229a87a55fa5c94b0b5",
+    "services/site/wrangler.jsonc": "0c828fbb1ee90c09ad2994076cbdf74c05d511b207918f2a31fa8c92673e47ef",
+    "tools/_template/Cargo.toml": "2b3a9d84b472411789f6782b5184ac5ae8d97626fd86acf838f7b33eb43f7ac4",
+    "tools/_template/locales/en.toml": "a8843c94325151ab4c70d5820baea2894a0d1d59a2d28a1500df128d73f18553",
+    "tools/_template/locales/fr.toml": "60fadf30c230315b8b6c6651c74dd37f6945b8de6598489f84274f897c06cb48",
+    "tools/_template/src/engine.rs": "66cc5524e1b42af555b5e1e6e8179bb06c07042ee872f726940ba8a70c044a89",
+    "tools/_template/src/lib.rs": "44ef79d70a77628afafb3d951253278d71ab5960dd24174cdd23d2536541fcdb",
+    "tools/_template/tests/engine.rs": "3498e40b19022d8ec2dbb46984be0949acb6bb7735584f558f0e2db18cf70ccb",
+    "tools/_template/tool.toml": "eeb5059a4757dee655fc9f86f1e59f9ee96a59a95f966a135aa0a93950d91e8e",
+    "tools/calc/age/Cargo.toml": "906633a042b61320865469b84b608d6cb1312616d4514c9977431026a82e50a2",
+    "tools/calc/age/locales/en.toml": "25ecd150c2a44a792d771175b9968791f5d0c4f530efb35723d4887959f3682f",
+    "tools/calc/age/locales/fr.toml": "7f46418ac4687c6d20536363774acee8336b27b9770a809af604cc6fb5df0695",
+    "tools/calc/age/src/engine.rs": "2fbbf80bb7fa62b0cfc082ac5d4a28f8b9ee455b36ad623ef4de4d7cc28e1d5e",
+    "tools/calc/age/src/lib.rs": "4de58cdbb0df8388b7da3dec1a0da4bf534fa62c4981acff1b796eb52b5fdedd",
+    "tools/calc/age/tests/engine.rs": "d8010f922b1c2a5d97196dbc23fa2c67e7bd653b46170dd1ea605fb84a1fb3e8",
+    "tools/calc/age/tool.toml": "0422772f58e2aa1e1e28a7dd6583ab984bcfbf9f9521a202c50ed0226c222dd2",
+    "tools/calc/average/Cargo.toml": "e46be4d86b50581539692937f8d430562c213d86c4feb6f65be0cb77848bf7c6",
+    "tools/calc/average/locales/en.toml": "39d5732a575c8ef46f855f8476e115d9c5563217f16d5a2183fc76ae4e318401",
+    "tools/calc/average/locales/fr.toml": "910ea9cb8bc17cb18b21793643f5a51551e07cccf43ddb85bbd8f7337851d9fe",
+    "tools/calc/average/src/engine.rs": "49dc1b4a74171f6e292096b19697b696aaa12f2d244747ef1923353af1d21283",
+    "tools/calc/average/src/lib.rs": "719f7371774c8f894fb1cb180468fd602b0dc09b02efedd0606c77eaccc72463",
+    "tools/calc/average/tests/engine.rs": "719434352c4218f31572ddf2fe38199fea16bbfbccd3eef4fad1a081418235fe",
+    "tools/calc/average/tool.toml": "8c5b4845f31768df374a558a8e850e8b9f7d0825bf4bbbc10c9c457e4843c879",
+    "tools/calc/compound-interest/Cargo.toml": "5d8b9ad3c016f6a6899f612ae447531981ffd678aa6bc713a395d7f588192cea",
+    "tools/calc/compound-interest/locales/en.toml": "acfca80b113f26039042a0189935b2d6ed6716a843b89ee12cbc6e022a4db2f3",
+    "tools/calc/compound-interest/locales/fr.toml": "0f80e639476461c2d5fb96aaaad3a7d6f52afed78353e401cb022b0df99776e8",
+    "tools/calc/compound-interest/src/engine.rs": "7fe6f008888547ca0a1b09bc1e401225872180cf9c9da4a25f5f065cd51aa012",
+    "tools/calc/compound-interest/src/lib.rs": "ad1dd1c9675b2ae0e1d621f0d99b40fdd9a88b486196b64a9c3a03bbfc93b025",
+    "tools/calc/compound-interest/tests/engine.rs": "c2ce2e704241e301129be6a1c4103699e812a2d8d183db3de825af3b630d8ec8",
+    "tools/calc/compound-interest/tool.toml": "0024fbc10ed6a066986a5492cca5a43d061175f13d3b15bcfd336cf3ff5fb404",
+    "tools/calc/date-add/Cargo.toml": "5c60455c30bd396a223deb37f2c042b50a9cbce16ca0fe308814ac6dbf5fef77",
+    "tools/calc/date-add/locales/en.toml": "a2fe198ba2d3863391020ba92b0d82eaa0914704378c27eb0c5a313948c9fcf7",
+    "tools/calc/date-add/locales/fr.toml": "a4f78ed1bdd05b1a2045992078dcff42286c6848aa208629f9c63d0c5e9fb83c",
+    "tools/calc/date-add/src/engine.rs": "fe9a492bea12d617e2b7c8f062c7246872f0e76183284857cd328a7996ec14ec",
+    "tools/calc/date-add/src/lib.rs": "a96c37d8c4f81e29dab18e2b77a3b45131348b70faef6e98ea5498e083392162",
+    "tools/calc/date-add/tests/engine.rs": "40fd34953921a5120baa3bd932fea8d2733092cb99e3201efa148c1e33b94fff",
+    "tools/calc/date-add/tool.toml": "b45c3915c9da5c3c3f4ba0cd89a2dc71b7eb34e55b60f3789aaf8133d34c1e45",
+    "tools/calc/date-difference/Cargo.toml": "0ffbd58cd2c5326f7b512158287364accc17b8f980044de4f69b23ecbe92bf59",
+    "tools/calc/date-difference/locales/en.toml": "626c6fca1777cf6d36b3fefdcaffaa729ce45696e4fdfe1fc0501dbc023105d6",
+    "tools/calc/date-difference/locales/fr.toml": "fe33a8be451a1111b3e967ad5fb25011c258b097ff34db9a972c0795d828fe78",
+    "tools/calc/date-difference/src/engine.rs": "c705e21f1528a86f45a16872645e3182cb01a9d5cdeb64f03fbaae4fcb459e68",
+    "tools/calc/date-difference/src/lib.rs": "d74c18dd3bcdf69e5bdcf4310b533f497f6f0ee4b5eb64858b02c164ca77cdb8",
+    "tools/calc/date-difference/tests/engine.rs": "7fbf10d9a42ea8565dcb92b66722fa0002eed4543d74fef9926d3b9c4b02a6c1",
+    "tools/calc/date-difference/tool.toml": "34062251c9e733e1cccd18aac9e7502b3a7adc3e0e7f37c3e2b95d0f75a9095b",
+    "tools/calc/fuel-cost/Cargo.toml": "3c248a4da04dbd6b6fb3c4db47a28deddd943d54efaed18cd8c0680fd1cf1612",
+    "tools/calc/fuel-cost/locales/en.toml": "ada26d61f11518a3303722890a0ff65d6698efb298d201f59a983ec5924dc0cb",
+    "tools/calc/fuel-cost/locales/fr.toml": "4798bfa6353450aca525fa793b0d6dc0ad367e37cc8ea595de05fb82956665aa",
+    "tools/calc/fuel-cost/src/engine.rs": "dd231a8d8a6a482b533ebcced709761d629d9e947f5c0ea099874814ffd6d2da",
+    "tools/calc/fuel-cost/src/lib.rs": "c4fdac7569c04eb7c43e98e9f12d0ceeb4796f786c393492d7f7314d3ef7d568",
+    "tools/calc/fuel-cost/tests/engine.rs": "5fa1f90c09a439fcea2cc862e097a5f9060ec51a991e59bd3e4726fbb8bc5529",
+    "tools/calc/fuel-cost/tool.toml": "8f879951596a3b514a269bbac43817633f9c631a704d3be975f4a9bd7408c470",
+    "tools/calc/gross-net-salary/Cargo.toml": "4856d28de2da2f177b0ed45c331f3bd151a60a9d7fdbf52715b5b2a1ffcc4969",
+    "tools/calc/gross-net-salary/locales/en.toml": "91e673cbb6614bd670cde5691aac234d2dee90bcf492e316444ef80651e4b9af",
+    "tools/calc/gross-net-salary/locales/fr.toml": "089fc0f5cf604024863e60fbb8975115dca5af701f3ac8d4bcd4055fc2cd847d",
+    "tools/calc/gross-net-salary/src/engine.rs": "a47bb75801dca7d20d4be65738bd91e4db06786efd1615b3f5880067bb9534f7",
+    "tools/calc/gross-net-salary/src/lib.rs": "eb88fb5c7c598ab6e72655fe076a76714895256597ae7814687f662a82f90310",
+    "tools/calc/gross-net-salary/tests/engine.rs": "d091e657ec0225a7e3be65503c3e449e74e817d54f451e503a29af0fed014bae",
+    "tools/calc/gross-net-salary/tool.toml": "0a7523c21005466627b70d72453a78d8b72d1ebe3ca140a38979125bdb15b81a",
+    "tools/calc/loan/Cargo.toml": "f847a227053c717126018dc0312373874d4808e3a0c348a2f6cf11470e316aba",
+    "tools/calc/loan/locales/en.toml": "997fb1e97719ef7c06e0fe26b6f0c008c8cfe836ba75f03bf305e8469a9315c8",
+    "tools/calc/loan/locales/fr.toml": "7569bfdc1860ec2eefdfceb8e491a6fcba633a6c8f8c66d3f56f9bde558b1449",
+    "tools/calc/loan/src/engine.rs": "0f4985400aec6171e43536a092f1c15b39ff1f2911937a61376e1722cc5b4d0a",
+    "tools/calc/loan/src/lib.rs": "99dda0eaf2f3d96eb6a1b713a4dec08eeb3077a3517b2e535b91b924d02a4b8a",
+    "tools/calc/loan/tests/engine.rs": "313b7870fe502c41e5cd22eda6ebdbc65acb976051a3d426ce72b3cc6d3a30a2",
+    "tools/calc/loan/tool.toml": "2cdd862e3bff80c2a4ba1f1bf3c6737cfaa8908d07d160c8d6c0bb289eab1e8e",
+    "tools/calc/percentage/Cargo.toml": "ffdb421127c32e8c554db116774c8d4b92207b1616ab3889f6043cf3864f7dcf",
+    "tools/calc/percentage/locales/en.toml": "e5021c34cf936c6b9e400588435367beb9c2502a62d10ea00833c495085ff64d",
+    "tools/calc/percentage/locales/fr.toml": "7351646039e564b952b0260e25c594a62be589c92d61fabafeda75baaf56e4b7",
+    "tools/calc/percentage/src/engine.rs": "476f4e7e5066727045f8135d5c4465bde84bf9339653b014d8dc3ed7488edbb7",
+    "tools/calc/percentage/src/lib.rs": "a9d9db4fa7466e707964f07d09b7efb0cb58ae03e8a54745b9487cc81e88c052",
+    "tools/calc/percentage/tests/engine.rs": "cfe1b1d97705cb6db3e7cf19d62551421c5b516f27b9aea28a8ffda651221a04",
+    "tools/calc/percentage/tool.toml": "d1a8a0c2044803ce7eb97c99c7fc067d2d50600129b353353235005cb1aa5883",
+    "tools/calc/rule-of-three/Cargo.toml": "4207edb22c3d08ee3a0c8ad36082def4b5120a1315e474be3d57bd857df579dd",
+    "tools/calc/rule-of-three/locales/en.toml": "ce242f6abf2585ea446e73635912eed4f2bdc26ee53d7df9dbb70f5d1e4543b2",
+    "tools/calc/rule-of-three/locales/fr.toml": "6a31cb23e5a04816deb3294797be58e699bbf31e6d8983b98c7c0d7e2821f92b",
+    "tools/calc/rule-of-three/src/engine.rs": "7f2e8c93c109b94dc114faa9a1b1eca69760b3d90c0f5ff2ea28fba8228858d1",
+    "tools/calc/rule-of-three/src/lib.rs": "8ef46c9d1321670c0fe3f5e05ffdc55a50216847ad938ffd6edb2000f359020c",
+    "tools/calc/rule-of-three/tests/engine.rs": "11f8ba945612913071e3c206944874c3837517aa464e685eaa467213905e9c17",
+    "tools/calc/rule-of-three/tool.toml": "4bcf7ca566e43c4b2de56891bafc9e0121e9679b220b9ab2baf0f66f66de2083",
+    "tools/calc/tip/Cargo.toml": "61a40033fc66bd1489ede31e6537ee404af7671e3238376e8b92ad8c4e1ecf00",
+    "tools/calc/tip/locales/en.toml": "01c722fc7ff7f9fa662026f976a778a340f16c4d37e4e0523d08e5c774ce89b8",
+    "tools/calc/tip/locales/fr.toml": "f915bad4f81e0b91bc7fa695846082b1c001b72b2f9ffdff4e80515a77cda284",
+    "tools/calc/tip/src/engine.rs": "e3469ecb98c66964cb95e23b1c7fbdabf5e663637dccb714e1dfb61d19889e72",
+    "tools/calc/tip/src/lib.rs": "ec079ba455726664c88749b175232d1ca8bc5c9ec9486d688f2c069946d35815",
+    "tools/calc/tip/tests/engine.rs": "61de923ad8c5fb39a329a6c9464fc42a0d3f7f806e4fd29fc02ddb9f673df412",
+    "tools/calc/tip/tool.toml": "1c88de86b01d4b985a62d5012ed6910d176f97602a74aa18e3f670abdf5ded12",
+    "tools/calc/unit-price/Cargo.toml": "b359c55054af9425a37210b2743cb3e64d342f509435f35bd3290557729717f0",
+    "tools/calc/unit-price/locales/en.toml": "e01790d42a88142df5dbbc8746f502b148a1545a70a571d1f49b0bffec98503e",
+    "tools/calc/unit-price/locales/fr.toml": "2c029aa4208b58e625a526db682a6fb429ef4b8ae5765342ccc8d0e8bdd9530c",
+    "tools/calc/unit-price/src/engine.rs": "dfebac6e6e7a0fd5745a15f06688adc1891bcd7117527bb7c85af3ebe2b42cd7",
+    "tools/calc/unit-price/src/lib.rs": "f444a03acaae274426c78ba2bcf3f38c4686bb6591ab937cbcf9117631998a22",
+    "tools/calc/unit-price/tests/engine.rs": "060dab0a41432b5c089e29a65742a4416dd799cdf28e6bc33cd2061c6ce7ef57",
+    "tools/calc/unit-price/tool.toml": "497a7da156fb1f9e08c111d24994f50a5f1bfc498adaf62dbe0640db69709da5",
+    "tools/calc/vat/Cargo.toml": "99d59746e3712947cc1480388dd13d8b2874cc666cfe2790348ad6405759bde9",
+    "tools/calc/vat/locales/en.toml": "b7fb6adbbed7da26704c3f38c1cde08ec513823164f7e32aa28d3b073e572b0a",
+    "tools/calc/vat/locales/fr.toml": "51e281f20763b793e58bfbe8d8ba27b38d926c50f2360d7b3f1c2c1b4402e8af",
+    "tools/calc/vat/src/engine.rs": "ff72571758373b1fcfe75f884120649675e7ee548295c959cd80ea61441e081d",
+    "tools/calc/vat/src/lib.rs": "672bc5cf9bdc362ca8545a2ce841f68089eac6cb8e78616df0b21d79df3a0360",
+    "tools/calc/vat/tests/engine.rs": "c6c4a73b1875b795e15be878ee3609717a18dde79471959a221275a3b6bf942e",
+    "tools/calc/vat/tool.toml": "f236f670f1b087d6b7c75d606050dc74b5d4fcaca8e27df8ea2cb1be448d08bd",
+    "tools/code/base64/Cargo.toml": "4143897afcbb058c474dd680b6e7e1bea0479f867d9864248568027efddf91ad",
+    "tools/code/base64/locales/en.toml": "be1158e8c9511926a275dedb410fc0f3e7175a7f13718839b158a15aaf80b3be",
+    "tools/code/base64/locales/fr.toml": "10e6e4d04015213d99e8ebb1deb673ab320d161e3c67915df2f1bf577ae7ac95",
+    "tools/code/base64/src/engine.rs": "022af3a66bcba2d3fc9a0839a97bf33fd02c029bc26cd2df7b27d392f3572b6b",
+    "tools/code/base64/src/lib.rs": "118a0cabf78b4765507b0dbded6580b6442907bb19f82cedcdf60333b1dcbd69",
+    "tools/code/base64/tests/engine.rs": "ac25e5088bd96b32b644fcd9a84c572a128b05d530331f44e656adac22d4bf57",
+    "tools/code/base64/tool.toml": "c38bd824aa2547fc7732a9c2bf80a0bad9ff498d35e8d2e5e8feae2c831a1118",
+    "tools/code/chmod/Cargo.toml": "4510fb19e3945c63b52230de8b7e000b5ed8b02e052e0a7783d0d383d90311f5",
+    "tools/code/chmod/locales/en.toml": "23aef022337d4b05f350fea66a61a16f2ef7803d08c1aa4bfe714279864fd07d",
+    "tools/code/chmod/locales/fr.toml": "3a0595e38805a4bc1d590eeac97fa3a979f1065445f990b16bbeef36d8b05034",
+    "tools/code/chmod/src/engine.rs": "be319424388bc2865220079738bb6402daf3995e8fe38b8b829e9794000c2757",
+    "tools/code/chmod/src/lib.rs": "9de26a73b8c52f15da789e619f72b3af36048ed5eb71d3c0b154d4af54deac2d",
+    "tools/code/chmod/tests/engine.rs": "1ef532cb10c3ed68ca7ff0657ffc50eb525195ffcb8065a212da55fd3c8b9c4e",
+    "tools/code/chmod/tool.toml": "49862425860b011c69cebbee62ba0c31d0cb44582a41ec15ae27e28b6b54e24c",
+    "tools/code/html-entities/Cargo.toml": "862a1d2e23845d501c3400a14af919b3c83b9329ae180be5857c7ec63e73e9bc",
+    "tools/code/html-entities/locales/en.toml": "047808223583f903205af03708a95df2a77e46837d2232549a17d14ddee26ede",
+    "tools/code/html-entities/locales/fr.toml": "84947baecdb6c483faa0e89bb05746c870ff86ec4a0850d6303ecdd3efdba48f",
+    "tools/code/html-entities/src/engine.rs": "c6edc40f22a6e762283c2414fa272757c84845a7cb9edaa8a0249cb53b32e083",
+    "tools/code/html-entities/src/lib.rs": "c13cc64195849744dfd13adff8b53ee128cb9ad6b0654d211da659a94b943b3a",
+    "tools/code/html-entities/tests/engine.rs": "4bc2e831efb84bee03ddf1b2e7d3787746ae3bfc27e986b3c337e99839dda160",
+    "tools/code/html-entities/tool.toml": "18da0f365b50dbc6780a316d3ec3671dcfadccd8036dbe6851e8335131f0775b",
+    "tools/code/json-formatter/Cargo.toml": "3ca7aabcb7c57be0bd1ded036ec09d73e9ef743f5b28f8a82e290fb18a41f1e0",
+    "tools/code/json-formatter/locales/en.toml": "163fde142a2037013126beaa151b17149ea3decbc736511a6bee9f7789bcafa1",
+    "tools/code/json-formatter/locales/fr.toml": "015c23f4bdd12d2d15f6437ea3130d057ff9e886cbb58281ba88ad64961d33ac",
+    "tools/code/json-formatter/src/engine.rs": "f75f480e8a0b539d9c43275bbfc011fca3b5fbead5d88506a1586d09f0aa1d95",
+    "tools/code/json-formatter/src/lib.rs": "f7e0349239ae4455822b8b6ba3594524a677a49fafdf7f81a62128dd58f69746",
+    "tools/code/json-formatter/tests/engine.rs": "d0b4bc1a16b9aa1169b0a304466aadac612c8e96404319cf307b8c6d6d70d183",
+    "tools/code/json-formatter/tool.toml": "f580fbcdd6eee13f3f8e86222d32926beed4ea59241d355f4f19ab13ef44ca7d",
+    "tools/code/markdown-table/Cargo.toml": "230f144496df737f0274ecd54cf9604e15b14b3589179fcc039c7535596962a8",
+    "tools/code/markdown-table/locales/en.toml": "7f6aadb82fc7c69c6bfdcea06c0e4db717829c58f96ff1121ef016cfcaddd8dc",
+    "tools/code/markdown-table/locales/fr.toml": "0304f359f28d7c2792c92f8cc9090e22a31fea8493b5a85294089c8e3c130489",
+    "tools/code/markdown-table/src/engine.rs": "fcf395cf7f34b9a70823543a173544f2a130050915a1926dadf1c0a60f1fea89",
+    "tools/code/markdown-table/src/lib.rs": "0ca3237780505eafc96b813e73512932b5a8a77f85c90ee51492d435fda21467",
+    "tools/code/markdown-table/tests/engine.rs": "bc9646bfe2a2348c9ad05213ea06c216e2a2b3389d263c6db89e026f3cd037ce",
+    "tools/code/markdown-table/tool.toml": "74de0522a087bfc443916070f6ce39603522f169cfc81b960f436a90d17a1bcd",
+    "tools/code/number-base/Cargo.toml": "59fffd588c0e72520fe682107a08971d1fdc1a4b9fac4c535bacae6e81bd5723",
+    "tools/code/number-base/locales/en.toml": "3784ddce2a1a466cd351ea0b0be232059543b39f23fb731925097de88d951e8f",
+    "tools/code/number-base/locales/fr.toml": "c8fc546928b4a20844f0dde69b74c1391f520dbdf23b86b451b6e29b289b1977",
+    "tools/code/number-base/src/engine.rs": "222c5c5430d87ca9018dd57ec61ab296e440720aec472e9ab1d7c26bcd31043e",
+    "tools/code/number-base/src/lib.rs": "fd567f5b26ae0f4d11bef1e67d9f49f4127a91b0bb18a9e4217ecfbc2054baf9",
+    "tools/code/number-base/tests/engine.rs": "4213cebbafd2947f026d1f8d15842cdd27a901919f81cfe86d75498c78d22246",
+    "tools/code/number-base/tool.toml": "a9d2ecd8d2a6ffcf7b4c5d3570d3d996f0fa20fd676c18577e6df846f653d141",
+    "tools/code/url-encoder/Cargo.toml": "e2c55c785c1f71b29b2edd7182595d9576d996aecd1aee0d79a2acb5a8730004",
+    "tools/code/url-encoder/locales/en.toml": "2922d23ed358c2b79809d267ab15817595f5bd4eac995402faaa804fc4f630b2",
+    "tools/code/url-encoder/locales/fr.toml": "f9e5938dbd0f640023fefa1ac964c068f9e5c29733dda34fd9ffda114d1b11b6",
+    "tools/code/url-encoder/src/engine.rs": "57925f4e243b6fd3d7f30471dac3577a8780f7b5801f3a76c0ecd552846a3b02",
+    "tools/code/url-encoder/src/lib.rs": "4a57d17d8c9ea7a643fa43615a70e37fd13d56d458d898bffe1b49bc648268cf",
+    "tools/code/url-encoder/tests/engine.rs": "64b1e1b7bc42283489f6dd1a2a01dff3581d082153628c0d01a1c2167779743e",
+    "tools/code/url-encoder/tool.toml": "0e41d77b032e28b5ad6c358ec19bdf539217de27d2a20aed686d93aa8f9daaa0",
+    "tools/code/uuid-generator/Cargo.toml": "83fe9e8261d406bd2b8060894c05c52d216bdfa2dd7e1df3e27ba222780e701a",
+    "tools/code/uuid-generator/locales/en.toml": "917966201dd5c75bdf68a47d76a7afe7776f691c5e938e79e1487ce08e8c7770",
+    "tools/code/uuid-generator/locales/fr.toml": "0a0d7599a5ba512d7d80211fad117eb170c2cbde56e21a32829177771d8531ce",
+    "tools/code/uuid-generator/src/engine.rs": "882210787732d1967910867f9b777c721b441e1c9c19ecd7fda6c609dc7b7616",
+    "tools/code/uuid-generator/src/lib.rs": "e6f199685ba0bde01ebd2b68ca802ba3e5e2671b64dd79c40a2ebbd8d1ce5a29",
+    "tools/code/uuid-generator/tests/engine.rs": "997b5edfe53cf31529714b97d7bd4dba75950e975ad92efe49ae02ae6404fceb",
+    "tools/code/uuid-generator/tool.toml": "51e07235205453bad1a88524493d307c00045bbf64fc8d0dd6f214b4fed590f3",
+    "tools/color/contrast-checker/Cargo.toml": "eefe04c70f773ddd6edf1f81a7654081fb4a8169bac04665e2ee96a20644886c",
+    "tools/color/contrast-checker/locales/en.toml": "eb581790d5cffff9ec5c5524cb2c3d92af83aef341792f62926dc7549d6078d8",
+    "tools/color/contrast-checker/locales/fr.toml": "ec588ee148d29f2476e863800310a5bf56effb8697c5d802ded330a6306f5b5b",
+    "tools/color/contrast-checker/src/engine.rs": "d0d62dc28d1f9798d63f9f26ce23ffae8973222ab8bfdb7725f2a7d3b0a4a2eb",
+    "tools/color/contrast-checker/src/lib.rs": "72ec826300651217ad8dd5941f6a644658c41d8487457c7cffa322ff5f542b98",
+    "tools/color/contrast-checker/tests/engine.rs": "37ed78eef614e94f8fb7b5be2410171e96e99d4c92dd83507dccfdd2e76c835f",
+    "tools/color/contrast-checker/tool.toml": "3926910c6a2c5c7fe699b9262f70e0f9a4b484a1c219edc03e0d536e6b302665",
+    "tools/color/converter/Cargo.toml": "6f96b06e81b304a2af87dc83abd68e17b3af7773e1db1fc596d279c6b9b15f41",
+    "tools/color/converter/locales/en.toml": "f5cca69c9b1bb12308e4a2ba6626666e57b01185d89b2fe8542b04e19abecabd",
+    "tools/color/converter/locales/fr.toml": "0b759dc69efb49e0c9621d1e2bdd8754e7e9eab0a097d4afe7e195db33aea697",
+    "tools/color/converter/src/engine.rs": "94d5c61c5b661ffc935bdc2ad36277aaa05474c5e6dde3b7db4dc78cf0bbd73f",
+    "tools/color/converter/src/lib.rs": "0d284f693a8991c9a7a8a40045b660ac613f38760a5b979e56fc8f7c607502d4",
+    "tools/color/converter/tests/engine.rs": "7309ce1725d50c412a8aefca0b9660882615a2f78dbfd0fcae48448bd968bb37",
+    "tools/color/converter/tool.toml": "cdd5820401c7a6d63e6e19cd069e290a40ef40f9d633362f6b5791b98fb73f6c",
+    "tools/convert/timestamp/Cargo.toml": "c42aabad16a06303c7162c515b7a65ed163502c04704b1f39dc37be4075e2265",
+    "tools/convert/timestamp/locales/en.toml": "6c4f3ec76c1c9522329757acd5d1fdb73b9ac717a9c31f54171358778989fca3",
+    "tools/convert/timestamp/locales/fr.toml": "a91230db82e7c35e1419cbe2b00dd5600e9f744286a570ead0dedd6f97d1543d",
+    "tools/convert/timestamp/src/engine.rs": "cfcf898e2afc7c955381b0e4f8e73a9ac800c1b9bc546f6253e65f4831a1d9bc",
+    "tools/convert/timestamp/src/lib.rs": "4454f67226fd96d9ba04a079fa2e9ca1a705bcfd97ed4132df1312f9e10c3ce3",
+    "tools/convert/timestamp/tests/engine.rs": "17c5f53ff02031edb6088c4a3001da2a731e2e9c54475e54a7f32060650aaae9",
+    "tools/convert/timestamp/tool.toml": "0267819f7db1c13806ca2e668319cffa078be4feb2630f3781f8e08bb6b00e5b",
+    "tools/convert/units/Cargo.toml": "351630b3ca00e73a95997fe1a1f2de7d2551c2695ca84334a7b783739893b8fb",
+    "tools/convert/units/locales/en.toml": "a8ab515c26634c517f30d628ad2bb555b75773473e85efcba0988b759a8be869",
+    "tools/convert/units/locales/fr.toml": "445dc50fb4ae7ce6aa9b11b75e8a7010e729cdfd6d71bb421f7f275e8ddee13e",
+    "tools/convert/units/src/engine.rs": "8a7d24085901703c199f0c16299442fa8a17a5c2cab6579c68cd788cc9c49647",
+    "tools/convert/units/src/lib.rs": "e5444f416992447a7bba8c682070208e5d8a11a56524c0accaa9a29bbfd10407",
+    "tools/convert/units/tests/engine.rs": "5c15742f1566a13927adedc6ee94af194c93ab4e58c4f474296367bdd531df2f",
+    "tools/convert/units/tool.toml": "12370361a847d19c21131c17c179bafae1c09a9ae63a2145be7890bb0050478c",
+    "tools/image/convert/Cargo.toml": "eeee8f50c5c9c50854f6d98b01d66611b7f4d2aa64fbfaa2155c03b69248d01d",
+    "tools/image/convert/locales/en.toml": "839e42cad38d023023ea7f46b3c9a728198081e734395d3a62477166508c8dc9",
+    "tools/image/convert/locales/fr.toml": "5d5c9134aeb4546699aafd185c27a2ec9cbf02ec272610697ca168f1fbfd7fbb",
+    "tools/image/convert/src/engine.rs": "ede971075b0d17e90800daf0886affa9fba52fa8002426bba9d2990b562996c8",
+    "tools/image/convert/src/lib.rs": "5ad00a37abc4df1f2a1d17dffce17fb0484edd6260bc9f78f07c302d8f3e30da",
+    "tools/image/convert/tests/engine.rs": "c5f729a0c9cbc1c61eb7bb91acee11b4a3afbfe82d355b457b94d5a7f4f17a61",
+    "tools/image/convert/tool.toml": "fbd15af59b093aeeaa280be5bdaaeffff4098e9f75e7d636146751a1b6cbb13c",
+    "tools/pdf/merge/Cargo.toml": "d81cb2883f22d4f1bf50bbdab5d813eddcb8970ba8ba7a5b85732ddf5f71f77a",
+    "tools/pdf/merge/locales/en.toml": "9b52d6f7708a6b9cab2f21f77ad654343cbbf96044a92cd3cecada25d19c79e6",
+    "tools/pdf/merge/locales/fr.toml": "c2eb3d786d4973a5b6469abc0a90fa56944f257c2b95c339f0cb0e30c6dd8c4f",
+    "tools/pdf/merge/src/engine.rs": "d0e0e08f8cba8405c12c09cc1a447110f4cf479485fa5705960f3425fbe43fae",
+    "tools/pdf/merge/src/lib.rs": "82dc2da645c0eb85baedc5b31d777b2856dffd4c8ce5249f153318a948b7e975",
+    "tools/pdf/merge/tests/engine.rs": "aeb322d2e1a6507b5cd82247b00da4ccd39e97396cb1109d8eb4967fa58da544",
+    "tools/pdf/merge/tool.toml": "5ef0e12eebc6d9c237799aefe252a861f3885c6bc47b5cddfef2e9f26fe5648d",
+    "tools/qr/generator/Cargo.toml": "65a3b4c3a63522b51226f2b75d0adf85d1d6374acaa19a40bb28d387b0e45ffc",
+    "tools/qr/generator/locales/en.toml": "a3aaa6cb522b5b4e451b11d9fd6fb16ef83aef61fe91ba7a7dcd7ea287b882c9",
+    "tools/qr/generator/locales/fr.toml": "0ef6bf986036c8fa95c815860c856df65421fdea03c325caea2770c4544d2d57",
+    "tools/qr/generator/src/engine.rs": "1b0e6ccf794b6f797e73e7fc1a18ec931a871cfd991da2875341912dc7b3ad0e",
+    "tools/qr/generator/src/lib.rs": "10434031a23696ae39c46dc3c6ac498492cbc513f9a33a9a0f232d8ed9a9b988",
+    "tools/qr/generator/tests/engine.rs": "4307271abee5f63a90d16290a849acf0b7052c54e7286d9bf6d47e960ee640c9",
+    "tools/qr/generator/tool.toml": "a43051f5deb36deb5cb1aca2e499c447ffe6c4e7cb80b2797924ac8064d2a83d",
+    "tools/secure/hash-calculator/Cargo.toml": "ee5bae53660ae8d104882f7a9fec2a9fb0ab05f640d8f189311cee3b151657c5",
+    "tools/secure/hash-calculator/locales/en.toml": "63e20dde873a38ecbb47187cd25d0b09e6eb6b0c31896860a401a17b20368be5",
+    "tools/secure/hash-calculator/locales/fr.toml": "28631af5fba99ec3b7df9f690fd8201f589bac84dbce7ee084272f24cb77b5d0",
+    "tools/secure/hash-calculator/src/engine.rs": "2ca07b4711fef60f04ba65732a82e52b2acc14f886667cca6d6f50b4441532df",
+    "tools/secure/hash-calculator/src/lib.rs": "1f43a9aba338100647b0ff4db6a6856fcc7df121da0dc5d747b1af7d89f68d88",
+    "tools/secure/hash-calculator/tests/engine.rs": "c699c18f192c45e80414017964ef4595d6fa16b6aeb778979bd86447093e0025",
+    "tools/secure/hash-calculator/tool.toml": "733f14beb8f9bdefcfd4601ff10626a023d09258fb3a8e735c4eaca8723bf660",
+    "tools/secure/password-generator/Cargo.toml": "3860cdf0efe35a512f96a283af72235eb8aaee93bff5122ca34cd914e065934b",
+    "tools/secure/password-generator/locales/en.toml": "784880aa8a6f7c8535b1c4e2db0d75db833937f1d6281d3471d59d6f66f17ffc",
+    "tools/secure/password-generator/locales/fr.toml": "cb2930a8b8ec8e872043e0aaf68546c0675d97212762de1e07c1e913c6fde542",
+    "tools/secure/password-generator/src/engine.rs": "a1c8c595b69c02fded08dc53b2f17b053aaa6b9a0006b49593a4d757c38cd85c",
+    "tools/secure/password-generator/src/lib.rs": "644fb72b03a15709224863d59b190b85f7f9807711a38775d628445805f90006",
+    "tools/secure/password-generator/tests/engine.rs": "47eb4cf52b107f815af9103c6c7e8e5818063a6faba15deb87d48032bacb9ca9",
+    "tools/secure/password-generator/tool.toml": "62687a65b67081397d826b04cf330f3de81a87240fd20c3936888e65f2a316ff",
+    "tools/text/case-converter/Cargo.toml": "939b210fb103dae42291af87e76174f88b84463faa3123e975b01ed1a7cb0f3c",
+    "tools/text/case-converter/locales/en.toml": "b796767c1cd1af1bb5bf83320256b674ad83ce60274a1b659b74372e09248565",
+    "tools/text/case-converter/locales/fr.toml": "13f9a6de34244c0284897cd772ddd92e9a6298401860266472341b5ba9013f05",
+    "tools/text/case-converter/src/engine.rs": "0f4952b2149c0c940bd0d46bdab325f0a58d44c8e47721aa761a6a3cf9231acb",
+    "tools/text/case-converter/src/lib.rs": "fa7e613a617acabd33aada0dd7ec4b98ebd442623dad1317a1a22acdc2875947",
+    "tools/text/case-converter/tests/engine.rs": "5ee4d0175906bec475cabc938e0f876fbd7bdba5febbabe7767ef43a84ecc414",
+    "tools/text/case-converter/tool.toml": "e8d8cd97594e3fb0bf9e489d172478c2826cadbf7e3f64df0f52caedfaa6d419",
+    "tools/text/cleaner/Cargo.toml": "509476673eab01c58f25a8349d4f78fefd4cdd18e37e6103460a9b2222a5b596",
+    "tools/text/cleaner/locales/en.toml": "56666f4dd03d6a816d82d3db8c90ad7479edab9c00940075605a8d374ee021cf",
+    "tools/text/cleaner/locales/fr.toml": "1fa9ea114b88cd09f5e1c4bfab0bdb809ec6b2d9d301c8b50009f79d2b160a2b",
+    "tools/text/cleaner/src/engine.rs": "667051794020db2ba30e43469796221183c595be7da3ca8143684f7255f24ce2",
+    "tools/text/cleaner/src/lib.rs": "1fd4888c8cc59f485cef9c40d31cfe7a9b9f0855198ab3027e1e16b735a43b95",
+    "tools/text/cleaner/tests/engine.rs": "920dc0b0bbece8a436b712d373464b71a7cb345998a3381b049e06e344e4ec3f",
+    "tools/text/cleaner/tool.toml": "a0284730ee050a33eab97eedd27d809fae1b62da7060403da989b23e5057f301",
+    "tools/text/deduplicate/Cargo.toml": "54a4c1b635097539300eb170d35c1f1244ffe85593d80708ea71a4a8ecfbf286",
+    "tools/text/deduplicate/locales/en.toml": "42d65ab8c26a41518648cad8d969461b80c424c9a65db0c435dddcad71b22361",
+    "tools/text/deduplicate/locales/fr.toml": "0a29f59b507fdf59d1dba38559357b809511f5c0a9453ce31bcafc5af0dc6b59",
+    "tools/text/deduplicate/src/engine.rs": "21be91436111a0a72f0e55259acdde33a27fa3f92d517bc69fe349c96dc6f7db",
+    "tools/text/deduplicate/src/lib.rs": "a52c7d9ff6329f77503cfc4f8c718cd524c55f7601a9db62499fe904914ce71a",
+    "tools/text/deduplicate/tests/engine.rs": "5e8affddd7dff201730bfe00d1da9070689b812312c2f877df9460f77eac99a1",
+    "tools/text/deduplicate/tool.toml": "6086cf40ca8604ca56ce04c47403e48469173c5b0814cd1c93ff197d3b551ada",
+    "tools/text/find-replace/Cargo.toml": "b2af103791e1bcc264bd92a8949f12776bd9fd7f11608024a89dcdfc481de1b1",
+    "tools/text/find-replace/locales/en.toml": "9757a482f88197475c53f0c33a022ff132ecd7dcee33aca0fc0f506f39f47844",
+    "tools/text/find-replace/locales/fr.toml": "24ce6fd14a91f574f8236fe68037914e61a6cc665c2246aa3f3afa083d5caa79",
+    "tools/text/find-replace/src/engine.rs": "68ae212ee34b42dcca9c74fa178fe726d99e1763a18beeeb9fc22e529a6b4e1c",
+    "tools/text/find-replace/src/lib.rs": "34ff36a1ea101534b77ea08168f9c5f39669e977e95dc188e1b32bd3b98edef4",
+    "tools/text/find-replace/tests/engine.rs": "97b54dc0eb8fb49e55288debe417fdc3f769f443f95a1da924e907544e04e6f8",
+    "tools/text/find-replace/tool.toml": "3d204d466e0d22b6f238ec2623927ebbd0d798c54057112c0b07932e75529d25",
+    "tools/text/lorem-ipsum/Cargo.toml": "577d90cb603f202404649315cb188c4b97cf9672d20768c639a1b7214b575463",
+    "tools/text/lorem-ipsum/locales/en.toml": "934de9105370974e0d7eeaad22242d9252d4d5717b6ddeac79e480ba9c0ee135",
+    "tools/text/lorem-ipsum/locales/fr.toml": "43fc019da77a5f5805ccfda76701109db789df2fbd2838ad1153963cf387d39f",
+    "tools/text/lorem-ipsum/src/engine.rs": "58e401ad516183bdd903807ac62f28a040a6c44625b0f31a7345440868f56382",
+    "tools/text/lorem-ipsum/src/lib.rs": "08cdb0b376797bd163432fd3359f098e46be0a1bbab74d0b6214ba690a5a41d8",
+    "tools/text/lorem-ipsum/tests/engine.rs": "03b746c6c127f51ac6ece68f827bc8d75c21f4327f5e9729a69cb9e38898c723",
+    "tools/text/lorem-ipsum/tool.toml": "bde73a124f8ff08179aaacbed40f2f219d85fac390bead86eb5bb84ee31e26f5",
+    "tools/text/slug-generator/Cargo.toml": "0d2f31118135c0fc9ccc7d114fdd57b819f7d7c1505958d9067c4e4aff5813fa",
+    "tools/text/slug-generator/locales/en.toml": "3afb07758ddb03c512057685f3b6ca1b174ead810166eb8969e52f914cb9771e",
+    "tools/text/slug-generator/locales/fr.toml": "126283c4936b8dce4e83804e01dcbd128b536ad411c8458de74edf080dc11008",
+    "tools/text/slug-generator/src/engine.rs": "621091b419a79e725329630a9b316d2d85b1c4b99bf754e425ba640d4df1033a",
+    "tools/text/slug-generator/src/lib.rs": "0fa8e39f8c305d2f1f3b645ce253d84992f4ab22b26ddb35871c3f702c77cc72",
+    "tools/text/slug-generator/tests/engine.rs": "9e5c55aedd9a3d4eba18a785a38e388f15a407974b466d558c25ffca944a6706",
+    "tools/text/slug-generator/tool.toml": "7633969251070fee80e9c7ac265388b67784876d472b356417347a304c0b38f4",
+    "tools/text/sort-lines/Cargo.toml": "d2d8c03dc704b23592fc4b6653f29a7d87c8eb5f5543bfac25e819e0dbb6bb71",
+    "tools/text/sort-lines/locales/en.toml": "3d8dee19fb1ceea1839f4a13cce9ea9f6b1ae0dcf6d4fd0dfc336fb1f123b644",
+    "tools/text/sort-lines/locales/fr.toml": "0fc909468f16836fbe32c1e3a968207d4c9e2b4ea7d093bd180e0d7b0e7494e9",
+    "tools/text/sort-lines/src/engine.rs": "4d66c193ec094a940236f73c89628ccde7f4eb70a6a9072f0682902a9d731162",
+    "tools/text/sort-lines/src/lib.rs": "b894022fe72eed962b850ef3be277e183e6fb1329fc857aca646ffbf434c9361",
+    "tools/text/sort-lines/tests/engine.rs": "82adc74858754d58461642b85c810ed5f52ddc06f7cfd6b6f3ffbd2b579584af",
+    "tools/text/sort-lines/tool.toml": "9caa85d17c18038914cf8b7581841615ec7e5bb1fc7037e045b6d9910e16dc50",
+    "tools/text/word-counter/Cargo.toml": "5f1f69516968cf492817be8ee6a4c0a7e8d1285e3e93455c002415234dbdee31",
+    "tools/text/word-counter/locales/en.toml": "b2f2f44aee822c0ba1a2ae0037ba9d5684e95e5d895ac97fecccf2ea4e455a1e",
+    "tools/text/word-counter/locales/fr.toml": "359c98ffa85f4b00d2379477e8071b561407b586d67637267e0a395e7445c6cb",
+    "tools/text/word-counter/src/engine.rs": "ffa2a44e51fc46b38e74268737ff94bb5497b48c00c09c3c43cc13982ccf077a",
+    "tools/text/word-counter/src/lib.rs": "5dd0b262df5dbb5088948ea48ca9e83909d86924f5c6e39b22a47273485df87f",
+    "tools/text/word-counter/tests/engine.rs": "1b2b5f06d44e34a1f9a6e33e1c5a2696b4703a550c06a911efa21afa41906117",
+    "tools/text/word-counter/tool.toml": "82a76388724ad24ee94cf2facd1b972d3ec0b9563ae3333a4f49eb2ad1918a21",
+    "web/site/src/components/Account.astro": "7a2261e21b834bc19bcde41444b16c2851aec38177fcbbef03c618367e53d968",
+    "web/site/src/components/AccountSecurity.astro": "fd3e91918cce8eedf7d462b7b5e9725bcf2ca237ef7aa69b0c0630b8af58dfbe",
+    "web/site/src/components/AppPage.astro": "5fb10f66ca126eae83d6f2b580da18cdf16d71d93bc14604b9000484acf755c5",
+    "web/site/src/components/Catalog.astro": "be800d2295c359ba3a422fd714348bc2ffd46c55ea0d4a5b6ad8d74d1b591e7c",
+    "web/site/src/components/Download.astro": "a7420f1c7f63e66c4f9b05624a0937377e13c4c011d2f67e748b3d54f2271143",
+    "web/site/src/components/Home.astro": "afd73b18c4e894af9c3cd867278fb63472d978b297870f9f23c9dfdf9b703853",
+    "web/site/src/components/LegalPage.astro": "2213ce73f16699064b8ba4d60f5a87a27430bfa51f1b0f3bb995e5868d2faefb",
+    "web/site/src/components/SiteSearch.astro": "7caeb81c368463f76e3c3ddf2bcfa65c2de3a109a62a23b0583656ea56902836",
+    "web/site/src/components/Stage.astro": "c7c46d82749b8c953aec916c1bfdb55bc5854d5dde51f70294ca462355f65b00",
+    "web/site/src/components/ToolCard.astro": "007166e20c754f4092c24a9542d0ba13452656999cc56b73f3804088afab5b18",
+    "web/site/src/components/ToolPage.astro": "bc159d55aa096e18b0d3a9743cfbc9d16038208bd4480277defb6a384521b8d6",
+    "web/site/src/components/Unavailable.astro": "9c68c556893a768e34a4813bf298c262060de27da06fb373c38918c99ac55cf4",
+    "web/site/src/components/Universe.astro": "c5d14edbe0f8282d2083c57b9efd7b98e8286000cc2b073e1d109b263a3d9507",
+    "web/site/src/generated/site-data.json": "cc22067d3c2e72deebd190c0d78354c5b5787d526b468723c22c4eb7534fa025",
+    "web/site/src/layouts/Base.astro": "0f9fb06a5cdb5b3c3dc1160b478c3f0f71bf8a0d54a990417cc72b7a4010bd71",
+    "web/site/src/lib/account-security.ts": "1176f2baba7bc68b1fa42be3e0b57de2957c9f6150fdfa1c51235943b323e338",
+    "web/site/src/lib/account-turnstile.ts": "52a586ea7a9aea069a1c3ae1a405ee0b781e39031d56d86f546aca78223b1c7b",
+    "web/site/src/lib/apps.ts": "dfb656b1bec86973fde9eb5ae87690e264069854692a89f331869a51231abc77",
+    "web/site/src/lib/data.ts": "494bd6129199adc0f7b2fccf50f2e02fc2f453cd85c4120628e1def064a712e2",
+    "web/site/src/lib/legal.ts": "e364cfc3b2b0832828bd0f8c42f7a51f62ee8111d1971641cc61963d8ba05fda",
+    "web/site/src/lib/site-search.ts": "f216ed9c94c5594d8fe8b94d0f3cc83ab8f392d9bfd3d0db80413fec1594cede",
+    "web/site/src/pages/404.astro": "354a5bf8e897cd82f0c281eeeceba2004756612ccf0d75b5ede3c9461d6d27d7",
+    "web/site/src/pages/[...slug].astro": "49559261317bf75f806c6ab8f0ae176a1a78ebc51bd12490b9a96f8be4f79b46",
+    "web/site/src/pages/[legal].astro": "aefb484cfdd1225b956c6b56a81e42ce87a716d6bad793c723d8e710374ea133",
+    "web/site/src/pages/applications.astro": "256543668719e40b8e49d4b00cd4922d2c5ac82e2b1dfda28f8d4e710c56917b",
+    "web/site/src/pages/compte.astro": "827324316f69f16b40c185d4ed3ed9a65e0b61b55a894d8a3c2ea3742835b9ff",
+    "web/site/src/pages/design.astro": "4611faf6585246ee7a8b283effe330954ba92fae6ea384f89ddb5e0cb70a336b",
+    "web/site/src/pages/en/[...slug].astro": "9cded90c4f75d37634a629082dea66e87d7091fdec7dd135fd15a00e3238dd39",
+    "web/site/src/pages/en/[legal].astro": "e7f728107fb76f206ffbc6601e6cd9646523c76f1700a26efa775c61cc2df87f",
+    "web/site/src/pages/en/account.astro": "a3c1bd3f6ecd013418f4826f9ad323790094fa5cecbf1c3397d12cd9d1125cb0",
+    "web/site/src/pages/en/apps.astro": "2136134814c56ef7e83485053901c566370657527101abf9699f14d91bd51e07",
+    "web/site/src/pages/en/download.astro": "99b1c6a1a2186fb4c713353e3e3d6930a4bafde5a598bc9e779c605d96c0f9dd",
+    "web/site/src/pages/en/index.astro": "8016b949cc56448ba64c0fe691c802cb02d5370e626ff43b621158a6f5dce2d0",
+    "web/site/src/pages/en/tools.astro": "0a0fc58f083c3b3ae84cc2432661d1e9fbb2eeb9f9d38a17cf7ae4d3f8b83c37",
+    "web/site/src/pages/index.astro": "132066c144db27e01433ccb4fd7cfa61898076a81424eed36add7748aad41994",
+    "web/site/src/pages/outils.astro": "9fc5080e956c20df28769afb277b7317ec25d05c2501533d651475373d47ce3d",
+    "web/site/src/pages/sitemap.xml.ts": "8e0ad2aa0543804426cdef5f9c697c6acc3a131a1fa0e0f7ed73206c487e7365",
+    "web/site/src/pages/telecharger.astro": "0fd654195cda4fedf91f0ace10c8eefbac314cf3342ff15f9ae12dc55aa2bb81",
+    "xtask/Cargo.toml": "6f89f1b2fc50c0906569fe68d80f18c6b84b810fb77e2c16c23f260c66af7334",
+    "xtask/src/apps.rs": "6743685961eee04fbcbf39fbed9603a5a40f69b9e11fa9adf25ff3c755766713",
+    "xtask/src/build.rs": "08e290ab59ec9b31f15a2026b62da5a3223cb651dad239a21b93ddb7c47470f7",
+    "xtask/src/check.rs": "1eb9510b5a4ef053f4b212ada3d25ee41e5cad19f6e5b6337ea80b8ec73c9171",
+    "xtask/src/cli_gen.rs": "37bb0f0e98f3e1389d3229f34fce0522fc11248cdc1901efc350c75b7f49b041",
+    "xtask/src/icons.rs": "c85f01523ac922aebd448ba44e4c288c1d15b0bfa3a8f06637043bd81f847974",
+    "xtask/src/main.rs": "eefcaec329bb6dca1eaa3c555053973b057e39695e0ff7756bc2db7e19c31c47",
+    "xtask/src/new_tool.rs": "e43890a2b35271bcc729ed9c45ea2b0df3c3f237cfddb45c94bc1760836f6bae",
+    "xtask/src/platform_check.rs": "9cee6d63207430a9c406f6f9c349850e38be2e54ec693b0b895c639d7540f066",
+    "xtask/src/registry.rs": "621bef9b97af0f6d8e11462a5ca09e4378da6d8325a141a6538aa77f3f132a86",
+    "xtask/src/release.rs": "3254b6bba8d7593695a5ad90613e7141131814fc24ae1ee675824957485f5aa4",
+    "xtask/src/stats.rs": "ee459a7e66700001c810b77b6dd1d6fbaf6cb074905819f9d2afab892f49f848",
+    "xtask/src/tokens.rs": "ae79bd3642c1d32f644e40213efbf5d13b3c5af9e0e17714dcb8c731a170e332",
+    "xtask/src/tools.rs": "c8152b2248f7a6e4d5fe6791b0c4260495bfdeb333d5695c1357a02ff0d8c615",
+    "xtask/src/worker.rs": "17d1f28b642361f1a1612141a19292dd8bdc748b3368e18e73b99b7a9c70f8c5",
+    "crates/kortex-platform/src/storage.rs": "8150f3d044ba00f0191ab9cb0d9ad337ce7f583476c25f7bae0bb958f3e63512",
+    "crates/kortex-platform/tests/storage.rs": "9fcc14b2367c34d7ee5b223e40938350c549155c3771028d518b03358ed42796",
+    "scripts/tests/storage-backends.mjs": "6d54238586333a22a2a70c9dac3f43db3a3e153f0c91065be6526b95000a09c3",
+    "scripts/tests/fixtures/storage-probe/Cargo.toml": "b48c0de15db8b46c3e1e5a8c9f6e2e34a1adfe0b3853240019b345355ebe414e",
+    "scripts/tests/fixtures/storage-probe/Cargo.lock": "d657742eba4cd07ba68159ea567cbe9bcdc4a5a418bce77734c356290ceacdd9",
+    "scripts/tests/fixtures/storage-probe/src/lib.rs": "49f121175205b5129b7c8113bd81d3fc8bdb68132137e6ffecd6a30de40b3855",
+    "docs/adr/0017-preference-storage.md": "9cfc6860c273c599967e3df4892d2d43472aa7545dd1b151a158b675dd816c12",
+    "docs/guides/platform-boundary.md": "648309fccb6299739802bc606560e12bb8b8769aa34a623cf6e9f7cabe4d5625",
+    "AGENTS.md": "9e477a1e9ea1c49e204c05b930d6d941383badfacd62a5e8f45e8c660f4df17c",
+    "CLAUDE.md": "9e477a1e9ea1c49e204c05b930d6d941383badfacd62a5e8f45e8c660f4df17c",
+    "docs/RULES.md": "a10f3716ad8c863e7d1d7e7713fdd470de4c4d0746dd72b66e3ad327815233f8",
+    "crates/kortex-platform/src/clipboard.rs": "72eee83ebcbd10e9f484bafe5849a136a2f0182f42c97bcfab14989a0daccba2",
+    "docs/adr/0018-clipboard-results.md": "8e594034efce553f00062de89b67fb138b9d471514ef9461785c6a019e573c55",
+    "scripts/tests/clipboard-backends.mjs": "18b3b64e10c83cdf6e76f10808430cba8bb712607d175b868f3e73701ca0b959",
+    "scripts/tests/clipboard-public.mjs": "ef3d0983bf246c58790954840d56e6594e600a6113e266158f1f7c91df45f917",
+    "docs/deps.md": "4798a55b9e5f3a1a277f0683f885a3518bd37d86ab4f08de3c737c7962b08f66"
+  },
+  "checks": {
+    "targeted_platform_ui_tests": 19,
+    "browser": "Actual Rust wasm clipboard: real read/write, Unicode and empty text, rejected Promise, synchronous denial and unavailable API",
+    "native_release": "Single macOS x86_64 password-generator sample compiled; real private AppKit pasteboard roundtrip passed; not an interactive desktop or cross-platform release acceptance",
+    "clippy": "kortex-platform + kortex-ui --features kortex-platform/document --all-targets -D warnings",
+    "wasm": "kortex-ui (including platform) --target wasm32-unknown-unknown",
+    "structure": "38 tools + 1 draft app",
+    "site_pages": 206,
+    "production": "Clipboard FR/EN in real cross-origin Stage, successful copy and denial feedback; unchanged account API, no account created",
+    "limits": "Preference UI consumer, keychain, dialogs, notifications, native UI interaction, Windows/Linux/Safari and full platform acceptance remain open"
+  },
+  "web": [
+    {
+      "id": "calc.age",
+      "receipt": {
+        "output": "b52c30781c279b80",
+        "source": "6d4509e91c5c946e"
+      },
+      "assets_sha256": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-calc-age-dxhb2678bf38853ea2.js": "856c389b1f3a9da1724a6fb20151d7cd9a9fbb1670ae26a40a5eaff17700e9c3",
+        "assets/run-calc-age_bg-dxh83c9b6c869ac30dc.wasm": "6c727e3ff0d9296cc3ad034e0574c6203c2b120ee32facd9526b8555f5eb53ac",
+        "index.html": "3bd898e0681e5073394e5bf564b5eb82f869380c8796a096cfd5ea8e6d1e0619",
+        "sw.js": "93112ae37939d359a3488aba368c33a7d117c1d074af80a30c3e536ea1fcc098"
+      }
+    },
+    {
+      "id": "calc.average",
+      "receipt": {
+        "output": "05fe516166fd18e1",
+        "source": "c7b089fb23e36153"
+      },
+      "assets_sha256": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-calc-average-dxhc4ecce1712dbd33.js": "6eb9dec7d9180ed1ffc64a96cf372c6b003672c292a4c8ed87949c5516fbfefa",
+        "assets/run-calc-average_bg-dxh908e4c65d65e063.wasm": "eaef3e1de29f8d0a1499116e5c23255c94d172870600eb17e1fd94458623a3fa",
+        "index.html": "7a26172bf8f03d88f520d7e70699c83c40b0e284b905f12d7298d5cfcbcc68ce",
+        "sw.js": "9409b3d90137684f49fd1e2b253d0441b8163e2a8edff9d5acaad3d5b3af7448"
+      }
+    },
+    {
+      "id": "calc.compound-interest",
+      "receipt": {
+        "output": "360b57ad15cbda34",
+        "source": "87645a378a3b4220"
+      },
+      "assets_sha256": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-calc-compound-interest-dxh5755b21fffb6ef9.js": "536bde484759510d57c0f473bd0152547b52aebf99302f04ac949f6e746019ca",
+        "assets/run-calc-compound-interest_bg-dxhb16da5643fd780b4.wasm": "80e660834737c404efad86adc02091d74f5cc3bc9d949aaf6f71f171d0ea17fb",
+        "index.html": "53443cf321ed3d9344247dfe64d833d6cc5695d30c8f231619262070c5368fc2",
+        "sw.js": "948942ceac734eb23f26951ba63c413e050bc105c04a0edb2f105320db98adbb"
+      }
+    },
+    {
+      "id": "calc.date-add",
+      "receipt": {
+        "output": "706795afd12f4765",
+        "source": "a1825a04fe969fe9"
+      },
+      "assets_sha256": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-calc-date-add-dxh2dae37f13c18e069.js": "2ecf885306613bd405d0d93e57584056d20eaa0799f416f8cd20608ead959979",
+        "assets/run-calc-date-add_bg-dxh18e74a44623d0a0.wasm": "40512e139c837d99127c90036677baf95d2c47191323d11c3b6ad719b3f755a5",
+        "index.html": "3b2fb45dd35cab85bba69998c696ff5a72a179e0b8b9e395bd99d18b790c20f4",
+        "sw.js": "10e3cf17da3d7902138676bfa91705a0bcdfd96def6b356671cb55c0d93a5dbf"
+      }
+    },
+    {
+      "id": "calc.date-difference",
+      "receipt": {
+        "output": "e47e6cae9809f4cd",
+        "source": "0a49c131a7f28e16"
+      },
+      "assets_sha256": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-calc-date-difference-dxh681e4f3b302b6015.js": "96fc51e378548ee7883c7dab8000060f68efb5f50e13846e888f81f0d445474b",
+        "assets/run-calc-date-difference_bg-dxhb488ac92a32a5e.wasm": "681853afb20bea92686c4c31b4d1fe41d31f05e12e464fe856c8c8a10907000c",
+        "index.html": "c03d4975b12e890f6d65cbfc1ebee16d96f8537efcd8582965b1523ff93a95ab",
+        "sw.js": "63ca63743ca83517f3c3fe1722a9182ca491a9788bc92f9c28b7855d9a739fd6"
+      }
+    },
+    {
+      "id": "calc.fuel-cost",
+      "receipt": {
+        "output": "c5db9c379548157e",
+        "source": "0051652480a4f1a0"
+      },
+      "assets_sha256": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-calc-fuel-cost-dxh2727f93c8c731fb1.js": "2761030aa264b35fa54d948a2d644899027f8aa9fe1dcff3d46da43e6dd0e54c",
+        "assets/run-calc-fuel-cost_bg-dxh3372fcdd457f7f19.wasm": "de4a4782495407beed8f2450b755ae9b56af01f7595ad5aa7f7395512dcb7c2a",
+        "index.html": "2c067c4efe6881cf9448398ed0eaa99ccd00273fa4afd40a4c68628ba217a3f8",
+        "sw.js": "8ff992304b210ae64b7e0f5228ecd5559e6b35226ec96a9eb5de69499d528c15"
+      }
+    },
+    {
+      "id": "calc.gross-net-salary",
+      "receipt": {
+        "output": "834655934720c2d2",
+        "source": "79d38bf8e3e08c1a"
+      },
+      "assets_sha256": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-calc-gross-net-salary-dxh9a6f9bc0badf7367.js": "780edd9d38b4777678b6e01bdd92dfd41d9421fbf5688600a3a78e3864025071",
+        "assets/run-calc-gross-net-salary_bg-dxh674ab05c10d5a3b.wasm": "2ee2d2a09a54e9b768777f284c44ac5b6bd7278ba12e6c0477679bde9b2f3dd6",
+        "index.html": "395ad0cc967da37d36e6fd514d4cce28951c4d1b5f29700573fff9cbeea2d050",
+        "sw.js": "919cbc839cd6d67e2e28a13f2807198bf555a7fccf138318e7d556c2f7f7e374"
+      }
+    },
+    {
+      "id": "calc.loan",
+      "receipt": {
+        "output": "b975e4f203f44bae",
+        "source": "6cbec7853e7b7e37"
+      },
+      "assets_sha256": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-calc-loan-dxh822d44b2e483d449.js": "d8a61a778f01690ffcb50b4745ab06a774e67f3268d8ae522140829e08bf0626",
+        "assets/run-calc-loan_bg-dxh21b5413f5254ddc0.wasm": "8648087008ee55bcbd3f8a8beff45d36429f1bf6ed8ce8c8d3d0bebc4a009974",
+        "index.html": "7ad531f6d5249344bab708622b664c31df3fa58813b880bdebf6760f4ffab261",
+        "sw.js": "50ea55f980a52dd6c61f3914b6882436277d3e37b20887db27b2be2bd6839569"
+      }
+    },
+    {
+      "id": "calc.percentage",
+      "receipt": {
+        "output": "fbc26557dbb3c43b",
+        "source": "fd3f5bfa6e55f2ca"
+      },
+      "assets_sha256": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-calc-percentage-dxh1dd9d2ad5d34a18.js": "d15ee0f36341aad0c33dcd6457e7bb80f54d2385a478039aa2045ab5058f2b89",
+        "assets/run-calc-percentage_bg-dxh954a731f9fc46213.wasm": "cc2d98a2dd5c4a2aabc59a49f4d0de9eefd9b78b62d698e9db3f2d89c570fb34",
+        "index.html": "824040e818878075083b0ef8affff93143a19c2367d30dd0408fba1db68d69e8",
+        "sw.js": "36b1f5ece869756e0f3c7b5fb8e4968d7bd55d5c284e22d9c46bdb34eb8f3a17"
+      }
+    },
+    {
+      "id": "calc.rule-of-three",
+      "receipt": {
+        "output": "d536cbad785b6af9",
+        "source": "5ddec820f4f21db5"
+      },
+      "assets_sha256": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-calc-rule-of-three-dxhffd9eab25eae78f7.js": "9c31db7b6a1d0eddfb9b5ddff97f8d81ead925996155c9aad047d382a5ff4371",
+        "assets/run-calc-rule-of-three_bg-dxh461a5fe8559f947f.wasm": "e2868ceed7615a9d65fdf5ef40a84d9921abd72c59cf4d24dff5730753c1c7c8",
+        "index.html": "bd8139827995ee6f8ab39b63f86c31cbf2d5f36de68567c3043c6347a69151fe",
+        "sw.js": "f61e9663809b1ede794c19fd50e0746c38d0b15c12a961102cff4eb5a5d68ca0"
+      }
+    },
+    {
+      "id": "calc.tip",
+      "receipt": {
+        "output": "b94ea21b38422c22",
+        "source": "a3f85124a02c6972"
+      },
+      "assets_sha256": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-calc-tip-dxh6928f0cb7bd35bca.js": "44db39b9e06677958a206c8082cd6929f9e02f46c1687def094e809d13284803",
+        "assets/run-calc-tip_bg-dxh10c5f3784c6a0b6.wasm": "6d88d2525f91ac39eb7e103c66c6f98b942a67f46a7afada60d49ef9a1db7c5f",
+        "index.html": "dd415ad2daa5ef82396d698aa0892b20f0809af0462f4e0f3194c03e81f46a91",
+        "sw.js": "2d576b49e0bca3baf726183828d91cc8bf0c921c544f2319844692397f1dc6f0"
+      }
+    },
+    {
+      "id": "calc.unit-price",
+      "receipt": {
+        "output": "1938f72f0f757e44",
+        "source": "6d98c78f020b2827"
+      },
+      "assets_sha256": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-calc-unit-price-dxhe3517308ed8cc81.js": "1c48ca53bf92483fa49954d27257032125e62ba4526cf89228689bfadf3d843a",
+        "assets/run-calc-unit-price_bg-dxh817f6c9a746dc9b0.wasm": "1817d988c3ff59fbae423ab31bb67596de48e9c662e9611882521128d0938804",
+        "index.html": "7038c5186b051f34909a8855cf6cdc39f8a307176bc7033d9a957d2e66563e61",
+        "sw.js": "45245827f5d842a13484049324d5ae800274ad1b7095b9dbafd760a03f749349"
+      }
+    },
+    {
+      "id": "calc.vat",
+      "receipt": {
+        "output": "830c1a8fb4f3f400",
+        "source": "74329cf601d42e4d"
+      },
+      "assets_sha256": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-calc-vat-dxhb04c03bb7ed4bca.js": "36364a7319917c5aeb9a906480458096308a8de1113b746cbfa89054b12bef8e",
+        "assets/run-calc-vat_bg-dxh56657dd74e21750.wasm": "bea03048bfb307d6d05046fbc5ff288df057c3dfa5f93fcf139c9f184dfee449",
+        "index.html": "06978ebe68e70869462636be198f2d347cc374436caae03087f712ba88372709",
+        "sw.js": "d5979b041c6bd60d8c0413202757e687b9bc8707b179574ef789230e6c999f22"
+      }
+    },
+    {
+      "id": "code.base64",
+      "receipt": {
+        "output": "627d65d765e41a5f",
+        "source": "9fc8dfcc00f02ea2"
+      },
+      "assets_sha256": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-code-base64-dxhb4a0c2314aca8e96.js": "2e70b5011f043f1a6f987e97de61cf2ecf4079da45a000d513676713247f0695",
+        "assets/run-code-base64_bg-dxh6bf783239de058b0.wasm": "5e98258c3958e12f463d47be6fc7f94cb6bab25fd697a0cec895b4aa1ecce173",
+        "index.html": "5b7994e79d1809b26b77503a08ab8c2d92600f13dc879bdc1807ac116faa62f5",
+        "sw.js": "5c682523b07d1206148d09803379626648868b7d48ac4235abd367741119f7c5"
+      }
+    },
+    {
+      "id": "code.chmod",
+      "receipt": {
+        "output": "f8e9fd87b39c6566",
+        "source": "fb2dfbc211439117"
+      },
+      "assets_sha256": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-code-chmod-dxh3a984f0d9e877ce.js": "b982d46362f0f2c2b0c6ab412936faebdba64e3c4f81a82b875d3640a011d154",
+        "assets/run-code-chmod_bg-dxhd5da13fc393ad24.wasm": "ffd878071ae06233677ef6147bf717e6f7584e50e08caed2f4796ece40f1d543",
+        "index.html": "00410402dd0579fd906b51a1b2a8f61d8eabcebaaf763d8975f8194da9112057",
+        "sw.js": "4c9de3d6a47875fc42e363df3d12a9a72d0d8468e387214dd400a79f777c6627"
+      }
+    },
+    {
+      "id": "code.html-entities",
+      "receipt": {
+        "output": "37a2e5213425b01e",
+        "source": "25ae37db6d7eaa70"
+      },
+      "assets_sha256": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-code-html-entities-dxh89aae98d4b4035fe.js": "45c53e1a5d5c91a42b250af1d9ec4d0071923c1d489f864db296d0e0af0803b5",
+        "assets/run-code-html-entities_bg-dxhb42f08de37ac5d0.wasm": "f050095a910d48645705a4faf1ce6ccccb6f1f90120d6b2953f56ff4240fb0d3",
+        "index.html": "c7fe68c810f92984a3083c19baf175608c5f4a3f485d74512b108b9b1d945ac7",
+        "sw.js": "22125251af1b492f2a7a8cf80005504907c0fb08e54d9e805d7bda39bb59c1d5"
+      }
+    },
+    {
+      "id": "code.json-formatter",
+      "receipt": {
+        "output": "df2d042972b49494",
+        "source": "20d829a69ca39870"
+      },
+      "assets_sha256": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-code-json-formatter-dxhb7e61d544f69d85.js": "d31dfd2d4306f07dfe5f8fceb5b108db5e7453293ed7920ac2b89d6e2389204d",
+        "assets/run-code-json-formatter_bg-dxhfaeee21915c4a494.wasm": "63d4b153e36837701289282d75055f804ea9ceac72b09f3ab79ee2744950cc35",
+        "index.html": "6cc3a013200ad9fecbfdcdcb8f998766cbdc4a8249d831c8be43caa126acacdf",
+        "sw.js": "f40f5e0a9ee66577f4cc7955c6f207e2fe6ef73960fa2fc66fa4dd4503db37ae"
+      }
+    },
+    {
+      "id": "code.markdown-table",
+      "receipt": {
+        "output": "49cf793c069e11a5",
+        "source": "41b21b6bb7825388"
+      },
+      "assets_sha256": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-code-markdown-table-dxh314c70c4ef729479.js": "3b2a1471c0b40d9babdb63acbf72d1307063c6ff701333ee38df36373fd935eb",
+        "assets/run-code-markdown-table_bg-dxh15244b64907a9de6.wasm": "2bd8d9362b7edcf28348a46f655f8360952324a1458f2a497e0528398acb13a9",
+        "index.html": "736871a2583747e8917265a798b8c4589fdf0e54065ab2ed417f78aee9b96047",
+        "sw.js": "a77b929b78eb08b481b2dd5f41e787be80287b8e98639ccb131817a2bd261419"
+      }
+    },
+    {
+      "id": "code.number-base",
+      "receipt": {
+        "output": "0deac9b5dbe157d2",
+        "source": "b6f1d0d1e319410f"
+      },
+      "assets_sha256": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-code-number-base-dxhee3c27d8876598.js": "4b37aca03209c35135cdcd91b8c5bf0e5702b30e2661bc1b8ebab4a5558e4313",
+        "assets/run-code-number-base_bg-dxhf61639638db62c48.wasm": "17c8f61687f411378d4cf887f7e7f81550841ba4228cee938f7af6b91b253590",
+        "index.html": "08d1a89fa1f2eecad1eb6aada738baf1ae5af98c8e545255c9e5bd9458628092",
+        "sw.js": "af4ebc14879d4469247dd09282c552be4b4e5325727cef1105bbcafb82467ff8"
+      }
+    },
+    {
+      "id": "code.url-encoder",
+      "receipt": {
+        "output": "63044c814a021b23",
+        "source": "7ab1f475a61f0f55"
+      },
+      "assets_sha256": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-code-url-encoder-dxh4dd433602fdace7f.js": "5c0ebf98fcadf0b1b05e619d6291b2dc7623d3813845dc335651663602f793a5",
+        "assets/run-code-url-encoder_bg-dxh4cb14accb5bb4d3e.wasm": "27d826f5b75b1fbc970f94ecc569f3e2dabae05c6227c24a3a6775f0a670e231",
+        "index.html": "e11cb2a9e150ba8180dc3ffd9d82151ca63592513c2b579d7f3cc0a80369ea0d",
+        "sw.js": "1acdc5802497364981125cc57982c42f0b9d14f329d72da333f30a8e073615dc"
+      }
+    },
+    {
+      "id": "code.uuid-generator",
+      "receipt": {
+        "output": "d1e1fcb75a35920f",
+        "source": "46c52ca1e16710af"
+      },
+      "assets_sha256": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-code-uuid-generator-dxhe895567a80dc884.js": "ab51717e2e80cb0374e75725462b001f6e2fc4f302d4cafec02caba571da81f6",
+        "assets/run-code-uuid-generator_bg-dxh6520851c9827552.wasm": "2d86fb01e8293dab47d57a4a6d3ab71294a6f8a06ee2aee8a3b80651ad7cc159",
+        "index.html": "e0deb2406dd38d6ddec6476458caed505dca737832d16010ce5ec2674b0b3e1f",
+        "sw.js": "2c71f4a368e71896ace76838b693dac925be84f05846929b45fb03b82c501aa0"
+      }
+    },
+    {
+      "id": "color.contrast-checker",
+      "receipt": {
+        "output": "e8277a937c897ee8",
+        "source": "cac0b19f9996ed9c"
+      },
+      "assets_sha256": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-color-contrast-checker-dxh33389ba0d2891060.js": "92b3c2aa1c984a6f75f0e8d4e60091b0bfd2dcf44ec41251aadd1d05ba8ba541",
+        "assets/run-color-contrast-checker_bg-dxh666cf8f6b6bc4aea.wasm": "735b39aa04b9140280cc3fb1bb7b14a3e7fab878091187694ce1a2950510c869",
+        "index.html": "8414ff00bec99999d9f14680434b8a8f82091531e02d50c3f3c7f01c8e4d07b6",
+        "sw.js": "7fd692333ff808446bd8fdc66f4e5f77f3bbd1b95858645c34ceafe681e8f093"
+      }
+    },
+    {
+      "id": "color.converter",
+      "receipt": {
+        "output": "a6a52cf19df1235a",
+        "source": "1ae1d41750cf6330"
+      },
+      "assets_sha256": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-color-converter-dxhe5ce5947c6cfc055.js": "b9b016c1a2e5d409dba59f9a53b4f7e0d2499081458ce334fc68bc6d405c0669",
+        "assets/run-color-converter_bg-dxhe6aaee5478fc57cb.wasm": "eadabc23a89e20c4cfc9e117fb370d1b31bbc8794f6c963d05248f7803c953d1",
+        "index.html": "05a444974e1a497481e374d2e03d898b6cd51c646c6dde0cc9d9f29d5469b2b7",
+        "sw.js": "e59e427b0525870e2f9ed07d863d69694c23ee0ff6b03692c32aac753bc9fe6e"
+      }
+    },
+    {
+      "id": "convert.timestamp",
+      "receipt": {
+        "output": "d2ee31faf9fa8537",
+        "source": "f948020cf82b2842"
+      },
+      "assets_sha256": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-convert-timestamp-dxhcbc25376bc7aad9.js": "685c7dd04f0aba56729f5851b61f0efd47255a0193f80d7ffc48aa448b8095d7",
+        "assets/run-convert-timestamp_bg-dxh4bb1ecae9b948eae.wasm": "01fe5ded698e7980d6a24e1414d2ecae4350e621629de33d2e09f6c884351603",
+        "index.html": "329a6c123b4433baa46b2b241fdd1ce11c4d533497b9f18994ad69552e0ad06c",
+        "sw.js": "4a8b950e1a5c41bb93c916509cbd5608b4fc1e1255b4eecc9db4470f5c09c9df"
+      }
+    },
+    {
+      "id": "convert.units",
+      "receipt": {
+        "output": "d0adc52858810037",
+        "source": "d423c88b935e2974"
+      },
+      "assets_sha256": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-convert-units-dxhdd54aa7ebf8196f.js": "4e8fadf29fca0260a81fabbdab996f32947786bc5a81da226b4a5b1c0f95922d",
+        "assets/run-convert-units_bg-dxh90d724a7e8e5344.wasm": "9165fa193afff481a69eb92c31c68c8fa49da17cd174a43fe012783824fd2012",
+        "index.html": "da04b946b3d0b84dc69180eed87cc6af97b49b67cc4cebf0421824eedd998c4a",
+        "sw.js": "9c0a717dd6b68761b662365937e1960b5897d8dd13a40c01101284b66d814567"
+      }
+    },
+    {
+      "id": "image.convert",
+      "receipt": {
+        "output": "4c5e43c9a6917b7f",
+        "source": "b29d085e78efbb8b"
+      },
+      "assets_sha256": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-image-convert-dxhd6c1dacd929d7ba.js": "08e71300dce33b3b4b13091eef5a0077ccd922cad8fc61e4496c5e041cf79c1c",
+        "assets/run-image-convert_bg-dxh727c47fe59641df7.wasm": "49b3737b0497a325b4c3c0345796a984c58262e8354df10b63acf6a8fdbebd0c",
+        "engine-d41864915ee3b368/engine.d.ts": "d114020af9732f46326c9ddbd364e0bc4b050cbc5b981eb006ffc0a062b03c67",
+        "engine-d41864915ee3b368/engine.js": "a6b549ce318f9a992de745384c37ff431ad46a606f1aa576fa04104447378d88",
+        "engine-d41864915ee3b368/engine_bg.wasm": "b58f7880035acfcc2053a6133b9c1cf2fdba8b362c1f5258b6e0d9d447024a9a",
+        "engine-d41864915ee3b368/engine_bg.wasm.d.ts": "2da05e4f068a9c95d13c5514bb60f0da18f25b26b2069eff06ccc49da893d234",
+        "engine-d41864915ee3b368/snippets/kortex-platform-1522588929894d19/inline0.js": "76bd9b9646d04bbe3b3970a9cfb8f0118e3fcfd9d15a1e709662b8dfff82b3e1",
+        "engine-d41864915ee3b368/snippets/kortex-platform-1522588929894d19/inline1.js": "fa7f4829b246a5b75e36bc4905d1f51aeaac5040d8b527cedb51ab4ebddb152f",
+        "engine-d41864915ee3b368/worker.js": "762922d5cc65361a440475782b1b2648e046cfac5b8b1a32c9ac7a879af7bcce",
+        "index.html": "87adf9ad4e04026639de3c66cff82890a377877b8af0ead24c1d272fab761a76",
+        "sw.js": "8b82612048199adcd73a8eeb9bd19aa89007036eaa5814f79a82921b3ae3ba1b"
+      }
+    },
+    {
+      "id": "pdf.merge",
+      "receipt": {
+        "output": "fb047ec895fb1ab8",
+        "source": "e1a13b5974cb9a5b"
+      },
+      "assets_sha256": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-pdf-merge-dxh3eed507ac12ea4c2.js": "de7c2673845affccbf569ec5dd896e8a560b173cd6cbada0a976c3bfb058f4b2",
+        "assets/run-pdf-merge_bg-dxh688d4a117864bf34.wasm": "2d108cbb5f5a02508aa1d24a8f9857bc933566b02d0126b549c4f1b4f62a38ff",
+        "engine-a7a168a7c22c0cbe/engine.d.ts": "d114020af9732f46326c9ddbd364e0bc4b050cbc5b981eb006ffc0a062b03c67",
+        "engine-a7a168a7c22c0cbe/engine.js": "9a3c23b9f2b3f61347a4f9c627f953bb12b122f0cbc7799eae4a52e51e2f5b11",
+        "engine-a7a168a7c22c0cbe/engine_bg.wasm": "511266bd08d83d223d21e377f4d6cab9e45c99afa23e465b515c963b7c0200e8",
+        "engine-a7a168a7c22c0cbe/engine_bg.wasm.d.ts": "2da05e4f068a9c95d13c5514bb60f0da18f25b26b2069eff06ccc49da893d234",
+        "engine-a7a168a7c22c0cbe/snippets/kortex-platform-1522588929894d19/inline0.js": "76bd9b9646d04bbe3b3970a9cfb8f0118e3fcfd9d15a1e709662b8dfff82b3e1",
+        "engine-a7a168a7c22c0cbe/snippets/kortex-platform-1522588929894d19/inline1.js": "fa7f4829b246a5b75e36bc4905d1f51aeaac5040d8b527cedb51ab4ebddb152f",
+        "engine-a7a168a7c22c0cbe/worker.js": "762922d5cc65361a440475782b1b2648e046cfac5b8b1a32c9ac7a879af7bcce",
+        "index.html": "3da248e121c1eea70ae32c55e8abb8648d89e3b2117cb02db5e800ef5b10c5d5",
+        "sw.js": "7400add63e0e9c2e098f3333b7b61f95148dd21c2fbd42db7c06760deb63b072"
+      }
+    },
+    {
+      "id": "qr.generator",
+      "receipt": {
+        "output": "7c47f7ec6da77e51",
+        "source": "7e98e774b33a8e26"
+      },
+      "assets_sha256": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-qr-generator-dxh837b47e1f5fe292b.js": "88322df5e8b6af1e9b381c77097454155369314d700c68c109716f638ef7064b",
+        "assets/run-qr-generator_bg-dxh6d5b22cfabbd248e.wasm": "8674585a5bf8e618b70718a00f9f637ddec746e23cd8ea9d3c5caddfe125cf89",
+        "index.html": "e8fb37adaa0f463e5612597ca98737b98b6a26ca321fb77bd5510c144f1d371b",
+        "sw.js": "3313b6a2181a7d6721a6dfe911caee3c1a4510c164b6202bbf2f88421d45ddef"
+      }
+    },
+    {
+      "id": "secure.hash-calculator",
+      "receipt": {
+        "output": "569bb1f67543dbf6",
+        "source": "55887e46e51e8de9"
+      },
+      "assets_sha256": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-secure-hash-calculator-dxhb6d4cd5ae5c7571.js": "83421568897c79a7e829e88a7bbde6054f6760ddc0de66edd4643c3fc6a31f60",
+        "assets/run-secure-hash-calculator_bg-dxh5d4d7dfc56250eb.wasm": "d2c9e751d18d3834288e06e8dd5c764844d5d0f396ca17a35918c8c936bee8bc",
+        "engine-bd69640626b45485/engine.d.ts": "d114020af9732f46326c9ddbd364e0bc4b050cbc5b981eb006ffc0a062b03c67",
+        "engine-bd69640626b45485/engine.js": "a6b549ce318f9a992de745384c37ff431ad46a606f1aa576fa04104447378d88",
+        "engine-bd69640626b45485/engine_bg.wasm": "d3ac9aab994c1a0921387c100a0ff913c45b4de6f1aaec07f89ab6b815ae5bb2",
+        "engine-bd69640626b45485/engine_bg.wasm.d.ts": "2da05e4f068a9c95d13c5514bb60f0da18f25b26b2069eff06ccc49da893d234",
+        "engine-bd69640626b45485/snippets/kortex-platform-1522588929894d19/inline0.js": "76bd9b9646d04bbe3b3970a9cfb8f0118e3fcfd9d15a1e709662b8dfff82b3e1",
+        "engine-bd69640626b45485/snippets/kortex-platform-1522588929894d19/inline1.js": "fa7f4829b246a5b75e36bc4905d1f51aeaac5040d8b527cedb51ab4ebddb152f",
+        "engine-bd69640626b45485/worker.js": "762922d5cc65361a440475782b1b2648e046cfac5b8b1a32c9ac7a879af7bcce",
+        "index.html": "8cea83ef00508b09ace4eaea36f312bec9d69c75da45219405daeb4930983794",
+        "sw.js": "15840e4eadd0c4bceb6f4ea24e62144a293a4e2acaa44393ae8963ba981367b0"
+      }
+    },
+    {
+      "id": "secure.password-generator",
+      "receipt": {
+        "output": "4388526b8d7e46a1",
+        "source": "5457c76144182dd6"
+      },
+      "assets_sha256": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-secure-password-generator-dxh4e8bc325fe738454.js": "b4280c577eed6244f234e9c7654e8d19910d518fbde48d39e71d8749278dddc7",
+        "assets/run-secure-password-generator_bg-dxhd2d49e14b9f8d54f.wasm": "e73bb5b9f15e7d73cbb35531917273556e20110959b74281a70dd76ff8b0a42d",
+        "index.html": "887be0b3258b96746fca485b50c504686f6dd89ba45572fe8f0cd03ef7424af4",
+        "sw.js": "2e8cc66b512d5fd24e2043210c1cf1894077e3177697d9337cfa6e1fba1e5486"
+      }
+    },
+    {
+      "id": "text.case-converter",
+      "receipt": {
+        "output": "e777febedd051f31",
+        "source": "65a6ec1707e7cddf"
+      },
+      "assets_sha256": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-text-case-converter-dxh2cde6298fdfec4f.js": "2b97a26a0b42d7bb4520daa32d44dab6c1115c1daf77d0e06eb8ccfe651ee8c6",
+        "assets/run-text-case-converter_bg-dxhc6eac94a39082de.wasm": "5b46ad002ab931b4544892213137d2d0b6750d85f7cc2f5c98ec36a8c03f47c7",
+        "index.html": "786d58a3bffc70cc2a2ce9ddd0a607189ac1f4fe6161d234f3d0b5d86a34120f",
+        "sw.js": "a74e7c95d76a71ab9fdb4e92e079c7a403f5d3b4b2f5e01d3ec9c386e5ce8407"
+      }
+    },
+    {
+      "id": "text.cleaner",
+      "receipt": {
+        "output": "a5adb2d26bf72b51",
+        "source": "06ee99cc0472a45b"
+      },
+      "assets_sha256": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-text-cleaner-dxhb59f21fd227de8c.js": "13a2894d13d23bf6cc57562193c22f4a194469b87ff18a3277392812716b0085",
+        "assets/run-text-cleaner_bg-dxh76b1e8fff42b951.wasm": "1d7bc4bb97d404a8927e01974db188c4e16b5b55b91b1ff49296a5514efe1821",
+        "index.html": "09802b3aef157fcd16913970080ce7fb0240f10b751194d66a36f701829ab524",
+        "sw.js": "b6357389294119cd19a7865275960905b04a08543169942e68462cdca7f0f0cf"
+      }
+    },
+    {
+      "id": "text.deduplicate",
+      "receipt": {
+        "output": "333f262a219bf81e",
+        "source": "ec2ada249ff3b645"
+      },
+      "assets_sha256": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-text-deduplicate-dxh9942d530c17d6a7c.js": "95a2101479bd05d0b71fb33cb255b93ab5b61a9babbdef727dd9acc0d7e79ab8",
+        "assets/run-text-deduplicate_bg-dxh48c3d0369994da4.wasm": "69a76bbe960357702b2a730efcfb61a5c99004e6e2e891876f6507eb648362ae",
+        "index.html": "7e464c37cc61eddd3c2949e8dd16a550cee8fd04a0729d007d79580e858056b6",
+        "sw.js": "65e7ffd7f4654f18ac56a455d10bf1f4a4369a5904c49bb94a5505e783c3aa05"
+      }
+    },
+    {
+      "id": "text.find-replace",
+      "receipt": {
+        "output": "52d90c7074ddfbf7",
+        "source": "224c4d978d7310ed"
+      },
+      "assets_sha256": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-text-find-replace-dxh94b7f3acdf639a.js": "b4ff0a70e2205e935c9c3d4d2cd5540227f2fea3086ba0c487c128b52509f64e",
+        "assets/run-text-find-replace_bg-dxh5b55dc91fafa445a.wasm": "41cfcaf9e5b7b22e590406288fcd44c96288cfccd832098c2d912224d0c74a15",
+        "index.html": "a726cd828507ee309fd48b40a7fd1dc1c88a9c1b439b0b5c9e32152e8668625f",
+        "sw.js": "6e6634c1767c505d7eb99df78d569d5b8bd4876fece7b893500226fec28909c2"
+      }
+    },
+    {
+      "id": "text.lorem-ipsum",
+      "receipt": {
+        "output": "acc82025bbeab05a",
+        "source": "0890097fb318e409"
+      },
+      "assets_sha256": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-text-lorem-ipsum-dxhc7596cf59077aa7c.js": "91d96a1f7eeb793f85cae0a1ce1f3d16762c0724f96ae209bdf995ae8d775982",
+        "assets/run-text-lorem-ipsum_bg-dxh8a8bf62af099d4cf.wasm": "81571f7c86bbd1bad11cdcc3d775b1efa3b3fa623545e812a14b7471d200d47a",
+        "index.html": "1135b722225315ac132e740331b26cc05ba035947668e86149615cdf1731a5b9",
+        "sw.js": "c0aa77e5187d28072f6c6200d4cc34948c7e1160aefdb05e720eed4426989f47"
+      }
+    },
+    {
+      "id": "text.slug-generator",
+      "receipt": {
+        "output": "d9d08c7b26a6951e",
+        "source": "edcaa45aa188b3b6"
+      },
+      "assets_sha256": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-text-slug-generator-dxh90f834e65bf8e19.js": "0b9bbc9c9b206d4765d624fd4fc631529db3a4f53325aaa69304067ab3546b8d",
+        "assets/run-text-slug-generator_bg-dxh2a3968acb96b9eda.wasm": "89929f2382e905372527d96548936d9132b79cd54eeb39868718244ce9cadbc3",
+        "index.html": "b47f5f11aa0f60c343c54503a1d66c18dd9cbaf371526f32cc4c38e8c957ca34",
+        "sw.js": "d44e380dd83fc3d0aa56af3b71660088ff9a5cf4982ca1813d3d30bd0714b6a4"
+      }
+    },
+    {
+      "id": "text.sort-lines",
+      "receipt": {
+        "output": "2714bbc664ea526d",
+        "source": "926c406595dc7120"
+      },
+      "assets_sha256": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-text-sort-lines-dxhad71304abebfa3d.js": "81574e5ce6ee7474494c830b8c7e7ed02fc0c776f1a68336ca68f6911849d2ff",
+        "assets/run-text-sort-lines_bg-dxh634ad12457c7bf71.wasm": "f5cb9a715d5b6d4db144b4878aa7e0876efdd00533fec6d4484451794dea5dd9",
+        "index.html": "784c8ec07c896194eada0571a148a2db525bbcc63af80255b76265d773ffecc3",
+        "sw.js": "195cab67e6ac8c591719215ff30e7dfba1ca6106df68c7ebfc884bb69830ad8c"
+      }
+    },
+    {
+      "id": "text.word-counter",
+      "receipt": {
+        "output": "52b5d144e448cc02",
+        "source": "baf8c660578c486d"
+      },
+      "assets_sha256": {
+        "assets/kortex-dxh646138425a587558.css": "6cc120fdbddaf6f8c7b3a53a60e8693e29131263cae9f427e1f81fcf7721002f",
+        "assets/run-text-word-counter-dxhf0982984e8f8ed44.js": "8c09810b920593b9ce888b91ec81b39b3f34ea93f02a08097b84dc32ee3c1e86",
+        "assets/run-text-word-counter_bg-dxhe44cde2419347894.wasm": "ef40b75d5f719ee906d4abc3a85eecc1bc2908e922c19505f30b8d22e9504c64",
+        "index.html": "1019233c544fcc3d94214fc025a4b60972888b09e77b99dd2cf07fc692f8dc2e",
+        "sw.js": "839489ac6193547bd5badc17925d5cc9d37b553a3c19c4b5795215368e5379f1"
+      }
+    }
+  ],
+  "native_sha256": "8a6b25caf3cc92d5600915d588ebbb03a5558934276886e65b81aa3632c224bb",
+  "deployment": {
+    "run": "f50661b6-c607-4fd6-b636-925d8259c4bb",
+    "site": "fc59ec49-b143-44b3-9d88-2844ff4e72d4",
+    "api": "be8f7808-b259-4d4a-9687-815d5a763c4f (unchanged)",
+    "account_database": "14db05e6-f667-4423-a289-946a0f18ebca (unchanged; see fresh-account-database evidence)",
+    "dns": "Current verified public DoH records for project hosts used only by test processes; TLS validation kept"
+  },
+  "logs_sha256": {
+    "/tmp/kortex-clipboard-tests-final.log": "0d9b4b3c191b54262d8d47fce2497fddce1ec239585b01410fef9a9408db23ca",
+    "/tmp/kortex-clipboard-clippy-final.log": "bbd7a3475716e53f6ec9e558533d0b05833b52f3052cb82d46e64566c1cee686",
+    "/tmp/kortex-clipboard-wasm-check.log": "dd8df69161e69ed9702d5ff335c69bd547e2ac97c1cc1eeff5ef5e1f59dc6ac4",
+    "/tmp/kortex-clipboard-browser.log": "bc584ac6fa8a0bf6a96d4d804fbf60eaf77409bc77e36a205e102c44a947ce77",
+    "/tmp/kortex-clipboard-desktop.log": "a2725bc15adab3cffc124eca28d6101f83b719ba18e76c90506a6cc9207029ae",
+    "/tmp/kortex-clipboard-structure.log": "ec15787f9bf775183450fe30d01fb926213f7afa0cd30cfe6de6a8fc66c5247d",
+    "/tmp/kortex-clipboard-build-final.log": "92f9ffc9cbafeb5f3c3acc050fe6dd860cbc2020feac03d480712058aa242e03",
+    "/tmp/kortex-clipboard-site-build.log": "ff31415aeb1cb5c9e65c55a92fa9d85dcd5617a497037d90409c309bef2c99d0",
+    "/tmp/kortex-clipboard-publish-run.log": "f4aa1ff85e4152fd9f935d842239e093fd748b571bbeb6c2edb24c3b7cd838f8",
+    "/tmp/kortex-clipboard-publish-site.log": "8050faea43056584d4181b34bda60636c55aef0a2c017b02fcde1cfa17b26967",
+    "/tmp/kortex-clipboard-public-recipe.log": "14554420282211a7c96d73535134c24361ecd166c90c7bf986460c5f4f848f28",
+    "/tmp/kortex-clipboard-ui-recipe.log": "1c28c2b5709a565362510fe3cfb09b609fd838e40b0cf835c2add1fbbc2007d6",
+    "/tmp/kortex-clipboard-build-0.log": "20de422de98e0dcf040e1d9030d781ce828b8ab43dac5f40fe54c6a2e0010d42",
+    "/tmp/kortex-clipboard-build-1.log": "aab458807693ef8aab0612ef966b0c7df50e585300d1690ddfc1b84102027acd"
+  }
+}

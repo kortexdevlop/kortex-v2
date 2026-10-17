@@ -1,6 +1,6 @@
 //! Package and account commands: install, update, remove, installed, available, doctor, open,
 //! login, logout, whoami.
-use std::io::{BufRead, Write};
+use std::io::Write;
 
 use kortex_pkg::{
     Credentials, Index, KDF_ITERATIONS, doctor, install, installed_binary, remove, self_update,
@@ -24,28 +24,14 @@ pub struct StdIo;
 
 impl CliIo for StdIo {
     fn prompt(&mut self, label: &str) -> Option<String> {
-        eprint!("{label}");
-        let _ = std::io::stderr().flush();
-        let mut line = String::new();
-        std::io::stdin()
-            .lock()
-            .read_line(&mut line)
-            .ok()
-            .filter(|n| *n > 0)?;
-        Some(line.trim().to_owned())
+        kortex_platform::native::terminal_line(Some(label), true)
     }
-
     fn password(&mut self, label: &str, from_stdin: bool) -> Option<String> {
         if from_stdin {
-            let mut line = String::new();
-            std::io::stdin()
-                .lock()
-                .read_line(&mut line)
-                .ok()
-                .filter(|n| *n > 0)?;
-            return Some(line.trim_end_matches(['\r', '\n']).to_owned());
+            kortex_platform::native::terminal_line(None, false)
+        } else {
+            kortex_platform::native::terminal_password(label)
         }
-        rpassword::prompt_password(label).ok()
     }
 }
 
@@ -87,19 +73,7 @@ fn take_value(args: &mut Vec<String>, flag: &str) -> Option<String> {
 }
 
 fn device_name() -> String {
-    std::env::var("HOSTNAME")
-        .or_else(|_| std::env::var("COMPUTERNAME"))
-        .ok()
-        .filter(|h| !h.is_empty())
-        .or_else(|| {
-            std::process::Command::new("hostname")
-                .output()
-                .ok()
-                .and_then(|o| String::from_utf8(o.stdout).ok())
-                .map(|h| h.trim().to_owned())
-                .filter(|h| !h.is_empty())
-        })
-        .unwrap_or_else(|| "kortex-cli".to_owned())
+    kortex_platform::native::device_name()
 }
 
 /// If this machine is linked to an account that asks for it, checks the password before changing
@@ -237,7 +211,7 @@ pub fn run(
             let index = env.load_index().map_err(|e| e.to_string())?;
             let target = env.target().map_err(|e| e.to_string())?.to_owned();
             if take_flag(&mut args, "--self") {
-                let exe = std::env::current_exe().map_err(|e| e.to_string())?;
+                let exe = kortex_platform::native::env::current_exe().map_err(|e| e.to_string())?;
                 match self_update(
                     &index,
                     &env.index_src,
@@ -384,8 +358,7 @@ pub fn run(
             let id = args.first().ok_or("usage : kortex open <outil>")?;
             let bin = installed_binary(&env.home, id)
                 .ok_or_else(|| format!("{id} n'est pas installé (kortex install {id})"))?;
-            std::process::Command::new(&bin)
-                .spawn()
+            kortex_platform::native::launch_executable(&bin)
                 .map_err(|e| format!("lancement de {} impossible : {e}", bin.display()))?;
             writeln!(out, "{id} lancé").map_err(w)?;
             Ok(true)

@@ -1,0 +1,25 @@
+[ui]
+title = "Vérificateur de contraste WCAG"
+[errors]
+empty_input = "Saisissez un texte."
+invalid_param = "Valeur invalide."
+missing_input = "Ajoutez le contenu à traiter."
+cancelled = "Annulé."
+division_by_zero = "Ce calcul exige une base non nulle."
+invalid_color = "Couleur invalide : vérifiez le format et les composantes."
+empty_slug = "Le texte ne contient aucun caractère utilisable pour ce slug."
+[outputs]
+ratio = "Rapport de contraste"
+aa_normal = "AA — texte normal (4,5:1)"
+aa_large = "AA — grand texte (3:1)"
+aaa_normal = "AAA — texte normal (7:1)"
+aaa_large = "AAA — grand texte (4,5:1)"
+[values]
+aa_normal_pass = "Conforme"
+aa_normal_fail = "Insuffisant"
+aa_large_pass = "Conforme"
+aa_large_fail = "Insuffisant"
+aaa_normal_pass = "Conforme"
+aaa_normal_fail = "Insuffisant"
+aaa_large_pass = "Conforme"
+aaa_large_fail = "Insuffisant"

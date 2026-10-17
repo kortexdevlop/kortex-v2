@@ -1,0 +1,15 @@
+.store-hero { padding: var(--k-space-6); display: grid; gap: var(--k-space-3); }
+.store-hero h2 { max-width: 24ch; font-size: clamp(1.5rem, 4vw, 2.6rem); }
+.store-delivery { margin-block: var(--k-space-4); }
+.store-filters { display: flex; gap: var(--k-space-3); flex-wrap: wrap; align-items: center; }
+.store-filters input[type=search] { flex: 1; min-width: 180px; }
+.store-filters select { width: auto; }
+.store-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: var(--k-space-4); }
+.store-tool { display: flex; flex-direction: column; gap: var(--k-space-3); }
+.store-tool h2 { font-size: 1.2rem; }
+.store-tool > p { flex: 1; }
+.store-tool .k-btn { min-height: 44px; text-align: center; }
+.store-badges { display: flex; gap: var(--k-space-2); color: var(--k-text-2); flex-wrap: wrap; }
+.store-detail { position: fixed; inset: auto var(--k-space-4) var(--k-space-4); max-height: 80vh; overflow: auto; z-index: 20; box-shadow: var(--k-shadow-4); background: var(--k-surface); padding: var(--k-space-5); border-radius: var(--k-radius-card); }
+.store-detail dl { display: grid; grid-template-columns: auto 1fr; gap: var(--k-space-3); }
+.store-detail dd { margin: 0; }

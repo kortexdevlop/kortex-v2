@@ -1,0 +1,72 @@
+schema = 1
+[tool]
+id = "text.find-replace"
+version = "1.0.0"
+universe = "text"
+status = "beta"
+ui = "auto"
+platforms = ["web", "desktop"]
+offline = true
+ai = false
+viral_priority = 1
+[tool.name]
+fr = "Rechercher et remplacer"
+en = "Find and Replace"
+[tool.tagline]
+fr = "Remplacez un texte exact, avec comptage des occurrences."
+en = "Replace exact text and count matching occurrences."
+[tool.slug]
+fr = "rechercher-remplacer"
+en = "find-and-replace"
+[search]
+keywords.fr = ["rechercher et remplacer", "rechercher remplacer"]
+keywords.en = ["find and replace", "find and replace"]
+intents.fr = ["Remplacez un texte exact, avec comptage des occurrences."]
+intents.en = ["Replace exact text and count matching occurrences."]
+related = []
+[limits]
+timeout_s = 10
+
+[[inputs]]
+id = "text"
+type = "text"
+required = true
+max_len = 100000
+multiline = true
+label = { fr = "Texte", en = "Text" }
+
+[[params]]
+id = "search"
+type = "text"
+default = ""
+level = "simple"
+label = { fr = "Texte à chercher", en = "Find" }
+
+[[params]]
+id = "replacement"
+type = "text"
+default = ""
+level = "simple"
+label = { fr = "Remplacer par", en = "Replace with" }
+
+[[params]]
+id = "first_only"
+type = "bool"
+default = false
+level = "medium"
+label = { fr = "Première occurrence uniquement", en = "First occurrence only" }
+
+[[outputs]]
+id = "text"
+type = "text"
+
+[[outputs]]
+id = "count"
+type = "integer"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "write"
+sensitive = false
+privacy = "local"

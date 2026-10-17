@@ -39,6 +39,7 @@ jobs:
       - run: cargo xtask tokens
       - run: cargo xtask registry
       - run: cargo xtask icons
+      - run: node --test scripts/tests/offline-routing.test.mjs scripts/tests/host-fallback.test.mjs
       - run: pnpm --filter @kortex/site test
       - run: pnpm site:build
   services:

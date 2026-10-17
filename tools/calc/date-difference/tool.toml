@@ -1,0 +1,64 @@
+schema = 1
+[tool]
+id = "calc.date-difference"
+version = "1.0.0"
+universe = "calc"
+status = "beta"
+ui = "auto"
+platforms = ["web", "desktop"]
+offline = true
+ai = false
+viral_priority = 1
+[tool.name]
+fr = "Écart entre deux dates"
+en = "Date Difference"
+[tool.tagline]
+fr = "Calculez le nombre de jours entre deux dates du calendrier."
+en = "Calculate calendar days between two dates."
+[tool.slug]
+fr = "ecart-entre-dates"
+en = "date-difference"
+[search]
+keywords.fr = ["écart entre deux dates", "ecart entre dates"]
+keywords.en = ["date difference", "date difference"]
+intents.fr = ["Calculez le nombre de jours entre deux dates du calendrier."]
+intents.en = ["Calculate calendar days between two dates."]
+related = []
+[limits]
+timeout_s = 10
+
+[[params]]
+id = "start"
+type = "text"
+default = "2024-01-01"
+level = "simple"
+label = { fr = "Date de départ (AAAA-MM-JJ)", en = "Start date (YYYY-MM-DD)" }
+
+[[params]]
+id = "end"
+type = "text"
+default = "2024-02-01"
+level = "simple"
+label = { fr = "Date de fin (AAAA-MM-JJ)", en = "End date (YYYY-MM-DD)" }
+
+[[params]]
+id = "inclusive"
+type = "bool"
+default = false
+level = "medium"
+label = { fr = "Inclure les deux dates", en = "Include both dates" }
+
+[[outputs]]
+id = "days"
+type = "integer"
+
+[[outputs]]
+id = "weeks"
+type = "number"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "write"
+sensitive = false
+privacy = "local"

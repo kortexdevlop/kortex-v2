@@ -1,0 +1,25 @@
+[ui]
+title = "WCAG Contrast Checker"
+[errors]
+empty_input = "Enter some text."
+invalid_param = "Invalid value."
+missing_input = "Add the content to process."
+cancelled = "Cancelled."
+division_by_zero = "This calculation requires a nonzero base."
+invalid_color = "Invalid color: check the format and component ranges."
+empty_slug = "The text contains no usable characters for this slug."
+[outputs]
+ratio = "Contrast ratio"
+aa_normal = "AA — normal text (4.5:1)"
+aa_large = "AA — large text (3:1)"
+aaa_normal = "AAA — normal text (7:1)"
+aaa_large = "AAA — large text (4.5:1)"
+[values]
+aa_normal_pass = "Pass"
+aa_normal_fail = "Fail"
+aa_large_pass = "Pass"
+aa_large_fail = "Fail"
+aaa_normal_pass = "Pass"
+aaa_normal_fail = "Fail"
+aaa_large_pass = "Pass"
+aaa_large_fail = "Fail"

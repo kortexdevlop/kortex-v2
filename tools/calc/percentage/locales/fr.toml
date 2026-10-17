@@ -1,0 +1,18 @@
+[ui]
+title = "Calculateur de pourcentages"
+[errors]
+empty_input = "Saisissez un texte."
+invalid_param = "Valeur invalide."
+missing_input = "Ajoutez le contenu à traiter."
+cancelled = "Annulé."
+division_by_zero = "Ce calcul exige une base non nulle."
+invalid_color = "Couleur invalide : vérifiez le format et les composantes."
+empty_slug = "Le texte ne contient aucun caractère utilisable pour ce slug."
+[outputs]
+result = "Résultat"
+[options]
+operation_part = "B % de A"
+operation_share = "A représente quel % de B ?"
+operation_change = "Évolution de A vers B (%)"
+operation_increase = "Augmenter A de B %"
+operation_decrease = "Réduire A de B %"

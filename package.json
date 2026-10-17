@@ -4,6 +4,7 @@
   "packageManager": "pnpm@12.6.0",
   "scripts": {
     "site:dev": "pnpm --filter @kortex/site dev",
-    "site:build": "pnpm --filter @kortex/site build"
+    "site:build": "pnpm --filter @kortex/site build",
+    "deploy": "pnpm site:build && node scripts/prepare-publish.mjs && node scripts/publish.mjs"
   }
 }

@@ -27,7 +27,7 @@ function parseMessages(v: unknown): Msg[] {
 
 export async function getCredits(ctx: Ctx): Promise<Response> {
   const uid = await requireUser(ctx);
-  return json(await creditsView(ctx.env, uid));
+  return json({ ...await creditsView(ctx.env, uid), available: Boolean(ctx.env.AI) });
 }
 
 /** POST { messages, model?: "fast" | "smart", max_tokens?, consent: true }

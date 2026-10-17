@@ -25,7 +25,7 @@ test('credits start at 100% and the view exposes percentages only', async () => 
   const { env } = makeEnv();
   const { cookie } = await signup(env);
   const r = await call(env, 'GET', '/v1/ai/credits', undefined, { cookie });
-  assert.deepEqual(r.data, { percent: 100, status: 'ok', resets_in_seconds: null });
+  assert.deepEqual(r.data, { percent: 100, status: 'ok', resets_in_seconds: null, available: false });
 });
 
 test('chat requires consent, valid messages, a known model and a sane max_tokens', async () => {

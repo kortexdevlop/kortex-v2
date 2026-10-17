@@ -129,10 +129,10 @@ pub fn Switch(label: String, checked: bool, onchange: EventHandler<bool>) -> Ele
 }
 
 #[component]
-pub fn Progress(value: f32) -> Element {
+pub fn Progress(value: f32, #[props(default)] indeterminate: bool) -> Element {
     let pct = (value.clamp(0.0, 1.0) * 100.0).round();
     rsx! {
-        div { class: "k-progress", role: "progressbar", "aria-valuemin": "0", "aria-valuemax": "100", "aria-valuenow": "{pct}",
+        div { class: "k-progress", role: "progressbar", "aria-valuemin": "0", "aria-valuemax": "100", "aria-valuenow": (!indeterminate).then(|| pct.to_string()),
             div { class: "k-progress-bar", style: "width: {pct}%" }
         }
     }

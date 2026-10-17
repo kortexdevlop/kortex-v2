@@ -61,11 +61,11 @@ pub(crate) fn check_version(v: &str) -> Result<()> {
 impl Home {
     /// `$KORTEX_HOME`, else `~/.kortex`.
     pub fn from_env() -> Result<Self> {
-        let user_home = std::env::var_os("HOME")
-            .or_else(|| std::env::var_os("USERPROFILE"))
+        let user_home = kortex_platform::native::env::var_os("HOME")
+            .or_else(|| kortex_platform::native::env::var_os("USERPROFILE"))
             .map(PathBuf::from)
             .ok_or_else(|| PkgError::new(Kind::Io, "dossier personnel introuvable (HOME)"))?;
-        let root = std::env::var_os("KORTEX_HOME")
+        let root = kortex_platform::native::env::var_os("KORTEX_HOME")
             .map_or_else(|| user_home.join(".kortex"), PathBuf::from);
         Ok(Self { root, user_home })
     }
@@ -106,7 +106,7 @@ impl Home {
     }
 
     pub fn load_registry(&self) -> Result<Registry> {
-        match std::fs::read(self.registry_path()) {
+        match kortex_platform::native::fs::read(self.registry_path()) {
             Ok(b) => serde_json::from_slice(&b)
                 .map_err(|e| PkgError::new(Kind::Parse, format!("registry.json illisible : {e}"))),
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(Registry {
@@ -119,11 +119,12 @@ impl Home {
 
     /// Atomic write (temp file + rename): a crash never leaves a half-written registry.
     pub fn save_registry(&self, r: &Registry) -> Result<()> {
-        std::fs::create_dir_all(&self.root)?;
-        let tmp = self
-            .root
-            .join(format!(".registry.{}.tmp", std::process::id()));
-        std::fs::write(
+        kortex_platform::native::fs::create_dir_all(&self.root)?;
+        let tmp = self.root.join(format!(
+            ".registry.{}.tmp",
+            kortex_platform::native::process_id()
+        ));
+        kortex_platform::native::fs::write(
             &tmp,
             serde_json::to_vec_pretty(&Registry {
                 schema: 1,
@@ -131,7 +132,7 @@ impl Home {
             })
             .map_err(|e| PkgError::new(Kind::Parse, e.to_string()))?,
         )?;
-        std::fs::rename(&tmp, self.registry_path())?;
+        kortex_platform::native::fs::rename(&tmp, self.registry_path())?;
         Ok(())
     }
 }

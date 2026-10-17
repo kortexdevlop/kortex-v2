@@ -27,8 +27,30 @@ export const allowedOrigins = (env: Env): string[] =>
 export async function readJson(req: Request, maxBytes = 70_000): Promise<unknown> {
   const len = Number(req.headers.get('content-length') ?? '0');
   if (len > maxBytes) throw new HttpError(413, 'payload_too_large');
-  const text = await req.text();
-  if (text.length > maxBytes) throw new HttpError(413, 'payload_too_large');
+  const reader = req.body?.getReader();
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+  if (reader) {
+    try {
+      while (true) {
+        const {value, done} = await reader.read();
+        if (done) break;
+        size += value.byteLength;
+        if (size > maxBytes) {
+          void reader.cancel().catch(() => {});
+          throw new HttpError(413, 'payload_too_large');
+        }
+        chunks.push(value);
+      }
+    } finally { reader.releaseLock(); }
+  }
+  const bytes = new Uint8Array(size);
+  let offset = 0;
+  for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.length; }
+  let text: string;
+  try { text = new TextDecoder('utf-8', {fatal: true, ignoreBOM: false}).decode(bytes); }
+  catch { throw new HttpError(400, 'invalid_json'); }
+
   try {
     return JSON.parse(text);
   } catch {

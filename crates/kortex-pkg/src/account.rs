@@ -48,30 +48,28 @@ impl Home {
     }
 
     pub fn load_credentials(&self) -> Option<Credentials> {
-        serde_json::from_slice(&std::fs::read(self.credentials_path()).ok()?).ok()
+        serde_json::from_slice(&kortex_platform::native::fs::read(self.credentials_path()).ok()?)
+            .ok()
     }
 
     /// Written with owner-only permissions; the token is as sensitive as a password.
     pub fn save_credentials(&self, c: &Credentials) -> Result<()> {
-        std::fs::create_dir_all(self.root())?;
-        let tmp = self
-            .root()
-            .join(format!(".credentials.{}.tmp", std::process::id()));
-        std::fs::write(
+        kortex_platform::native::fs::create_dir_all(self.root())?;
+        let tmp = self.root().join(format!(
+            ".credentials.{}.tmp",
+            kortex_platform::native::process_id()
+        ));
+        kortex_platform::native::fs::write(
             &tmp,
             serde_json::to_vec_pretty(c).map_err(|e| PkgError::new(Kind::Parse, e.to_string()))?,
         )?;
-        #[cfg(unix)]
-        {
-            use std::os::unix::fs::PermissionsExt;
-            std::fs::set_permissions(&tmp, std::fs::Permissions::from_mode(0o600))?;
-        }
-        std::fs::rename(&tmp, self.credentials_path())?;
+        kortex_platform::native::fs::set_private(&tmp)?;
+        kortex_platform::native::fs::rename(&tmp, self.credentials_path())?;
         Ok(())
     }
 
     pub fn clear_credentials(&self) {
-        let _ = std::fs::remove_file(self.credentials_path());
+        let _ = kortex_platform::native::fs::remove_file(self.credentials_path());
     }
 }
 
@@ -103,47 +101,27 @@ fn call(
             format!("API non chiffrée refusée : {api}"),
         ));
     }
-    let agent: ureq::Agent = ureq::Agent::config_builder()
-        .timeout_global(Some(Duration::from_secs(30)))
-        .http_status_as_error(false)
-        .build()
-        .into();
     let url = format!("{}{path}", api.trim_end_matches('/'));
-    let net =
-        |e: ureq::Error| PkgError::new(Kind::Network, format!("serveur injoignable ({url}) : {e}"));
     let bearer = token.map(|t| format!("Bearer {t}"));
-    let mut res = match method {
-        "GET" | "DELETE" => {
-            let mut r = if method == "GET" {
-                agent.get(&url)
-            } else {
-                agent.delete(&url)
-            }
-            .header("X-Kortex-Request", "1");
-            if let Some(b) = &bearer {
-                r = r.header("Authorization", b);
-            }
-            r.call().map_err(net)?
-        }
-        _ => {
-            let mut r = agent
-                .post(&url)
-                .header("X-Kortex-Request", "1")
-                .content_type("application/json");
-            if let Some(b) = &bearer {
-                r = r.header("Authorization", b);
-            }
-            r.send(body.map_or_else(|| "{}".to_owned(), ToString::to_string))
-                .map_err(net)?
-        }
-    };
-    let status = res.status().as_u16();
-    let bytes = res
-        .body_mut()
-        .with_config()
-        .limit(1 << 20)
-        .read_to_vec()
-        .map_err(|e| PkgError::new(Kind::Network, format!("réponse illisible : {e}")))?;
+    let mut headers = vec![
+        ("X-Kortex-Request", "1"),
+        ("Content-Type", "application/json"),
+    ];
+    if let Some(value) = bearer.as_deref() {
+        headers.push(("Authorization", value));
+    }
+    let payload = body.map_or_else(|| "{}".to_owned(), ToString::to_string);
+    let response = kortex_platform::native::http(kortex_platform::native::HttpRequest {
+        method,
+        url: &url,
+        headers: &headers,
+        body: Some(payload.as_bytes()),
+        timeout: Duration::from_secs(30),
+        max_bytes: 1 << 20,
+    })
+    .map_err(|e| PkgError::new(Kind::Network, format!("serveur injoignable : {e}")))?;
+    let status = response.status;
+    let bytes = response.body;
     Ok(Reply {
         status,
         body: serde_json::from_slice(&bytes).unwrap_or(serde_json::Value::Null),

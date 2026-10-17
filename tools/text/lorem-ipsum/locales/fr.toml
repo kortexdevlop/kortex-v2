@@ -1,0 +1,16 @@
+[ui]
+title = "Générateur Lorem ipsum"
+[errors]
+empty_input = "Saisissez un texte."
+invalid_param = "Valeur invalide."
+missing_input = "Ajoutez le contenu à traiter."
+cancelled = "Annulé."
+division_by_zero = "Ce calcul exige une base non nulle."
+invalid_color = "Couleur invalide : vérifiez le format et les composantes."
+empty_slug = "Le texte ne contient aucun caractère utilisable pour ce slug."
+[outputs]
+text = "Texte de remplissage"
+words = "Mots générés"
+[options]
+unit_paragraphs = "Paragraphes"
+unit_words = "Mots"

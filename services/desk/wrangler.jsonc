@@ -1,0 +1,16 @@
+{
+  "name": "kortex-desk",
+  "compatibility_date": "2026-09-01",
+  "workers_dev": false,
+  "routes": [
+    {
+      "pattern": "workspace.kortex.site",
+      "custom_domain": true
+    }
+  ],
+  "assets": {
+    "directory": "../../dist/publish/desk",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "none"
+  }
+}

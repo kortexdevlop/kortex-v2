@@ -21,3 +21,9 @@ cargo test -p tool-<univers>-<nom>
 Vérifier l'outil en ligne de commande : `cargo run -p kortex-cli -- run <univers>.<nom> --input … --param …`.
 
 Ne jamais modifier `web/site` : l'outil apparaît automatiquement partout via le registre.
+
+Pour un moteur lourd (image, PDF, hash de gros fichiers), déclarer `web_worker = true` dans `[tool]`. `cargo xtask build <id>` compile automatiquement le moteur headless et son Worker ; `wasm-bindgen` doit correspondre à la version verrouillée du dépôt. Le délai de `[limits].timeout_s` inclut le chargement du moteur. L'UI propose alors une annulation immédiate ; les codes d'erreur doivent figurer dans les locales FR/EN. Voir ADR 0008.
+
+Pour compiler un lot web sans reconstruire les autres outils : `cargo xtask build text.cleaner calc.tip convert.units`. La compilation est séquentielle et réutilise le cache commun.
+
+Les builds web conservent désormais un reçu local dans `.kortex/build/<id>/build-receipt.json`. Si les sources, les bibliothèques partagées, la configuration et tous les fichiers produits sont inchangés, `xtask build` évite la compilation. Un fichier de sortie supprimé ou modifié invalide également le reçu. Le cache concerne les builds réalisés après cette mise à jour.

@@ -1,7 +1,7 @@
 use std::collections::BTreeMap;
 
 use dioxus::prelude::*;
-use kortex_pkg::ToolStatus;
+use kortex_store::engine::ToolStatus;
 use kortex_store::{Action, Catalogue, ToolRow, primary_action, universes, visible};
 
 /// `names` = (fr, en); `state` = (installed version, available version, update available, supported).
