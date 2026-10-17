@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "steps": [
+    "17.5",
+    "17.8"
+  ],
+  "run_id": 39053032032,
+  "quality_run_id": 39053032002,
+  "provenance": {
+    "source_run": "39032642157",
+    "source_commit": "26051d4bb72b79401a38cd014802cc7cec515957",
+    "publication_commit": "fb2c6f31beb30197802b9fbba951f0766444fbb2",
+    "published": false
+  },
+  "pull_request_head": "2b734d59665e8ca47a20829814acbf1c2024fea6",
+  "pull_request_merge": {
+    "parents": [
+      "bde9c16250a97f2cb51f2863d3e9b7b307298c51",
+      "2b734d59665e8ca47a20829814acbf1c2024fea6"
+    ],
+    "sha": "fb2c6f31beb30197802b9fbba951f0766444fbb2"
+  },
+  "tools": 38,
+  "apps": 3,
+  "sha256_files_verified": 223,
+  "static_targets": [
+    "site",
+    "run",
+    "desk",
+    "hub",
+    "store"
+  ],
+  "configuration_targets_verified": true,
+  "public_desktop_feed_absent": true,
+  "published": false,
+  "limits": [
+    "Cloudflare deployment secrets absent; publication job skipped",
+    "Prepared artifact is not a public preview",
+    "Native keychain and OS installation acceptance remain open"
+  ]
+}

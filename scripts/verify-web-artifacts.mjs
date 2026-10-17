@@ -9,7 +9,7 @@ if(!directory||!/^([a-f0-9]{40})$/.test(commit??''))throw Error('Expected artifa
 const source=resolve(directory);
 function command(program,args){const r=spawnSync(program,args,{cwd:root,encoding:'utf8'});if(r.status!==0)throw Error(program==='git'&&args[0]==='diff'?'Compiled sources differ: build a new release web artifact':`${program} failed: ${r.stderr}`);return r.stdout.trim();}
 // Site integration may change independently; every compiled source/configuration must match.
-command('git',['diff','--exit-code',commit,'--','Cargo.toml','Cargo.lock','rust-toolchain.toml','.cargo','crates','tools','apps','xtask','design','registry']);
+command('git',['diff','--exit-code',commit,'--','Cargo.toml','Cargo.lock','rust-toolchain.toml','.cargo','crates','tools','apps','xtask','design','registry','brand']);
 const tools=JSON.parse(readFileSync(join(root,'registry/index.json'),'utf8')).tools.map(({tool})=>tool.id);
 const apps=JSON.parse(readFileSync(join(root,'registry/apps.json'),'utf8')).apps.filter(({app})=>['beta','stable'].includes(app.status)&&app.platforms.includes('web')).map(({app})=>app.id);
 if(tools.length!==38)throw Error('The frozen catalogue must contain 38 tools');

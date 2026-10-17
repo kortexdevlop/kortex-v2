@@ -1,5 +1,5 @@
 # Progress
-_Last update: 2026-10-17 — sauvegarde manuelle Rust et confidentialité publiées, preuves consolidées_
+_Last update: 2026-10-17 — Store publié, compilations GitHub et préparation CI statique_
 
 ## Current phase
 Store 0.2 Rust/Dioxus commun publié sur https://store.kortex.site/ : catalogue gelé 38 outils, recherche, univers, fiches/permissions et ouverture web ; détection native des installations réelles. Les 38 outils web et les trois apps compilés sur GitHub (39032642157) ont été récupérés, vérifiés et publiés ; recettes publiques Store et Hub/Desk réussies. Linux + macOS ARM/Intel : 126 paquets vérifiés, dont 84 signatures macOS. Windows a compilé/paqueté les 42 exécutables mais le contrôle CP1252 a échoué ; correctif UTF-8 et cache au commit ca3d62342a6cbbacf493628ddfb0cdbfdb1e1ec1, relance ciblée 39049702070 en cours. Gate local complet vert ; CI qualité c95bf87 (39048924068) verte. PR privée #1. Installation publique fermée : trousseau, confirmations, bundles et recettes OS restent ouverts ; aucune app déclarée fonctionnellement complète.
@@ -355,3 +355,7 @@ stable: 0 · beta: 38 · draft: 0 — calc 13, code 8, color 2, convert 2, image
 - Verified Linux/macOS packages extracted without execution under `.kortex/binaries/<target>/<id>/`, with each written binary SHA-256 checked. 126 executables currently available there.
 
 - Deployment verifier accepted all 41 real bundles and rejected corrupted HTML, an incomplete catalogue and compiled-source drift. Workflow YAML/shell parsed; standalone Rust helper compiled and formatted; full repository gate passed. New workflow preparation is tested on PR changes, with publication disabled for PRs.
+
+- Step 8.5 implementation specification added in docs/KEYCHAIN_MIGRATION.md: actual caller/API gaps, explicit backend injection, OS errors, migration order, redaction, login/logout recovery and grouped acceptance matrix. All implementation/OS checks remain explicitly unchecked.
+
+- Static CI preparation 39053032032 passed; quality CI 39053032002 passed. Downloaded prepared artifact verified: 38 tools, three apps, 223 matching SHA-256 files, five expected static configurations, no desktop installer/feed. Provenance is the real GitHub PR merge fb2c6f31 (parents include 2b734d5), not falsely the branch head. Publication skipped as required for PR; Cloudflare secrets remain absent. Final guide/brand-source guard lot passed the complete local gate.

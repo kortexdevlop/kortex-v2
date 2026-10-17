@@ -7,7 +7,7 @@ The current public scope is the Astro site and the 38 existing web tools. The ac
 3. Run `pnpm run deploy`. This rebuilds Astro, prepares public artifacts, prints the inventory, applies pending account migrations, publishes the API and checks its health, then publishes the tool host followed by the site host.
 4. Check HTTPS, one complete tool execution, search, and the account flow and unavailable desktop download page. Record versions and results in `docs/PROGRESS.md`.
 
-Domains come from `brand/domains.toml`; `scripts/prepare-publish.mjs` generates the two Wrangler configurations. The staging directories are `dist/publish/site` and `dist/publish/run`. Local desktop release test feeds, installation scripts, hidden files, source maps and Rust sources are excluded or rejected. File size/count checks enforce the static asset free-plan limits verified on 2026-10-16.
+Domains come from `brand/domains.toml`; `scripts/prepare-publish.mjs` generates the static Wrangler configurations from the site/tool/app inventory. The staging directories are `dist/publish/site` and `dist/publish/run`. Local desktop release test feeds, installation scripts, hidden files, source maps and Rust sources are excluded or rejected. File size/count checks enforce the static asset free-plan limits verified on 2026-10-16.
 
 HTTP security headers are generated with the artifacts. Site inline scripts use content hashes. The isolated Dioxus tool origin needs `unsafe-eval` because Dioxus 0.7.10 implements document evaluation with `Function::new_with_args`; it does not receive account cookies. The account API remains a separate origin. Do not add an X-Frame-Options DENY/SAMEORIGIN header to the tool host: it must accept the site iframe.
 
