@@ -1,5 +1,7 @@
 //! Explicit clipboard operations; reads happen only when requested by a caller.
-use crate::{PlatformError, Result};
+#[cfg(any(target_arch = "wasm32", target_os = "macos", not(feature = "document")))]
+use crate::PlatformError;
+use crate::Result;
 use std::future::Future;
 
 #[cfg(target_os = "macos")]

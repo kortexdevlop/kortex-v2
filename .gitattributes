@@ -1,0 +1,12 @@
+# Keep generated registries, manifests and fingerprints identical across checkout platforms.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.gif binary
+*.pdf binary
+*.woff2 binary
+*.ico binary
+*.icns binary
+**/tests/fixtures/** -text

@@ -76,6 +76,7 @@ jobs:
           sudo apt-get install -y libwebkit2gtk-4.1-dev libgtk-3-dev libxdo-dev libayatana-appindicator3-dev
       - uses: Swatinem/rust-cache@v2
         with:
+          cache-on-failure: true
           workspaces: |
             .
             .kortex/desktop/* -> .kortex/target-desktop
@@ -103,7 +104,10 @@ jobs:
               # Free ad hoc signature: required to run on Apple Silicon. Gatekeeper still warns on browser
               # downloads; installs through the CLI/Store carry no quarantine flag. Paid signing can be
               # added here later without touching anything else.
-              find "dist/desktop/$target" -type f -perm -u+x -exec codesign --force --sign - {} \;
+              while IFS= read -r -d '' binary; do
+                codesign --force --sign - "$binary"
+                codesign --verify --strict "$binary"
+              done < <(find "dist/desktop/$target" -type f -perm -u+x -print0)
             fi
             cargo xtask package cli --target "$target"
             for id in $APP_LIST; do cargo xtask package "$id" --target "$target"; done
@@ -128,10 +132,14 @@ jobs:
       - run: rustup show
       - uses: Swatinem/rust-cache@v2
         with:
+          cache-on-failure: true
           workspaces: |
             .
             .kortex/build/* -> .kortex/target
           cache-directories: |
+            .kortex/target
+            .kortex/target-worker
+            .kortex/target-apps
             ~/.cache/dioxus
       - name: Existing Dioxus compiler (official pinned binary)
         env:
@@ -144,6 +152,16 @@ jobs:
           tar -xzf dx-x86_64-unknown-linux-gnu.tar.gz
           find "$RUNNER_TEMP/dioxus" -type f -name dx -exec chmod +x {} \;
           find "$RUNNER_TEMP/dioxus" -type f -name dx -printf '%h\n' >> "$GITHUB_PATH"
+      - name: Existing wasm-bindgen compiler (pinned to the worker contract)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/wasm-bindgen"
+          gh release download 0.2.129 --repo wasm-bindgen/wasm-bindgen --pattern 'wasm-bindgen-0.2.129-x86_64-unknown-linux-musl.tar.gz' --dir "$RUNNER_TEMP/wasm-bindgen"
+          cd "$RUNNER_TEMP/wasm-bindgen"
+          echo '82d12bb940e2d4e72e0d5605387fc1b8ca179044e012b620f0ce4e7440e8320e  wasm-bindgen-0.2.129-x86_64-unknown-linux-musl.tar.gz' | sha256sum --check
+          tar -xzf wasm-bindgen-0.2.129-x86_64-unknown-linux-musl.tar.gz
+          find "$RUNNER_TEMP/wasm-bindgen" -type f -name wasm-bindgen -printf '%h\n' >> "$GITHUB_PATH"
       - name: Compile all requested tools and released apps for WebAssembly
         env:
           DX_CLI_TELEMETRY: 'false'

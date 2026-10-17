@@ -49,7 +49,7 @@
   },
   "public_installation": false,
   "github": {
-    "status": "pending dispatch after mandatory gate",
+    "status": "first run: windows/web failed, linux/macos in progress",
     "tools": 38,
     "targets": [
       "x86_64-unknown-linux-gnu",
@@ -57,7 +57,18 @@
       "x86_64-apple-darwin",
       "x86_64-pc-windows-msvc",
       "wasm32-unknown-unknown"
-    ]
+    ],
+    "run_id": 39031294481,
+    "run_url": "https://github.com/kortexdevlop/kortex-v2/actions/runs/39031294481",
+    "commit": "7ed41ae47a71056d980519537a7237044d00ec3a",
+    "pull_request": "https://github.com/kortexdevlop/kortex-v2/pull/1",
+    "expected_desktop_packages": 168,
+    "expected_web_bundles": 41,
+    "failures": {
+      "windows": "Path separator and checkout CRLF mismatches in structural gate",
+      "web": "Worker forced offline with missing byteorder-lite on fresh CI",
+      "quality": "PlatformError unused on Linux with document feature"
+    }
   },
   "limits": [
     "Native keychain and install confirmation remain open",
@@ -100,5 +111,19 @@
       "API typecheck and tests",
       "release workflow YAML structure"
     ]
+  },
+  "pipeline_fix": {
+    "gate": "passed",
+    "changes": [
+      "cfg-aware clipboard import",
+      "native Path comparisons",
+      "LF checkout with binary/fixture preservation",
+      "normal Cargo network policy for worker builds",
+      "pinned official wasm-bindgen CLI with SHA-256",
+      "shared native Cargo cache for CLI/apps/tools",
+      "blocking macOS signature verification",
+      "cache retained after build failure"
+    ],
+    "engines_modified": false
   }
 }

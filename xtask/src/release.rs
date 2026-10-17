@@ -44,6 +44,21 @@ fn abs(p: &str) -> Result<PathBuf, String> {
         .map_err(|e| e.to_string())
 }
 
+fn resolve_desktop_target_dir(root: &Path, configured: Option<PathBuf>) -> PathBuf {
+    match configured.filter(|path| !path.as_os_str().is_empty()) {
+        Some(path) if path.is_absolute() => path,
+        Some(path) => root.join(path),
+        None => root.join(".kortex/target-desktop"),
+    }
+}
+
+fn desktop_target_dir(root: &Path) -> PathBuf {
+    resolve_desktop_target_dir(
+        root,
+        std::env::var_os("CARGO_TARGET_DIR").map(PathBuf::from),
+    )
+}
+
 fn b64_seed(s: &str) -> Result<[u8; 32], String> {
     // Reuse the pkg crate's decoder through a signature round-trip is overkill: decode inline.
     const T: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -239,7 +254,7 @@ fn App() -> Element {{
     fs::write(work.join("src/main.rs"), desktop_source).map_err(|e| e.to_string())?;
 
     println!("… compilation desktop de {id} pour {target}");
-    let target_dir = root.join(".kortex/target-desktop");
+    let target_dir = desktop_target_dir(&root);
     let mut cmd = Command::new("cargo");
     cmd.args(["build", "--release"])
         .current_dir(&work)
@@ -302,8 +317,10 @@ pub fn build_app(args: &[String]) -> Result<(), String> {
         .ok_or_else(|| format!("application `{id}` introuvable (apps/<nom>/app.toml)"))?;
     let fingerprint = crate::apps::fingerprint(id)?;
     let target = host_target(args)?;
+    let build_root = desktop_target_dir(&abs(".")?);
     let mut cmd = Command::new("cargo");
-    cmd.args(["build", "--release", "-p", &meta.krate]);
+    cmd.args(["build", "--release", "-p", &meta.krate])
+        .env("CARGO_TARGET_DIR", &build_root);
     if Some(target.as_str()) != current_target() {
         cmd.args(["--target", &target]);
     }
@@ -315,9 +332,6 @@ pub fn build_app(args: &[String]) -> Result<(), String> {
     } else {
         meta.krate.clone()
     };
-    let build_root = std::env::var_os("CARGO_TARGET_DIR")
-        .map(PathBuf::from)
-        .unwrap_or_else(|| PathBuf::from("target"));
     let built = if Some(target.as_str()) == current_target() {
         build_root.join("release")
     } else {
@@ -348,8 +362,10 @@ fn cli_version() -> Result<String, String> {
 /// `cargo xtask build-cli [--target T]`: the `kortex` command-line binary.
 pub fn build_cli(args: &[String]) -> Result<(), String> {
     let target = host_target(args)?;
+    let build_root = desktop_target_dir(&abs(".")?);
     let mut cmd = Command::new("cargo");
-    cmd.args(["build", "--release", "-p", "kortex-cli"]);
+    cmd.args(["build", "--release", "-p", "kortex-cli"])
+        .env("CARGO_TARGET_DIR", &build_root);
     if Some(target.as_str()) != current_target() {
         cmd.args(["--target", &target]);
     }
@@ -357,9 +373,9 @@ pub fn build_cli(args: &[String]) -> Result<(), String> {
         return Err("la compilation de la CLI a échoué".into());
     }
     let built = if Some(target.as_str()) == current_target() {
-        PathBuf::from("target/release")
+        build_root.join("release")
     } else {
-        Path::new("target").join(&target).join("release")
+        build_root.join(&target).join("release")
     }
     .join(binary_name_cli(&target));
     let dest = Path::new("dist/desktop").join(&target).join("cli");
@@ -613,6 +629,23 @@ pub fn release_index(args: &[String]) -> Result<(), String> {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn desktop_builders_share_a_resolved_cache_root() {
+        let root = std::env::current_dir().expect("current directory");
+        assert_eq!(
+            super::resolve_desktop_target_dir(&root, None),
+            root.join(".kortex/target-desktop")
+        );
+        assert_eq!(
+            super::resolve_desktop_target_dir(&root, Some("custom-target".into())),
+            root.join("custom-target")
+        );
+        assert_eq!(
+            super::resolve_desktop_target_dir(&root, Some(root.clone())),
+            root
+        );
+    }
+
     use super::*;
 
     #[test]

@@ -49,9 +49,12 @@ pub fn run(filter: Option<&str>) -> Result<(), String> {
         for issue in validate(contract, &universes) {
             errors.push(format!("✗ {dir} : {}", issue.0));
         }
-        let expected = format!("tools/{}/", contract.tool.universe);
-        if !dir.starts_with(&expected) {
-            errors.push(format!("✗ {dir} : doit se trouver dans `{expected}<nom>/`"));
+        let expected = std::path::Path::new("tools").join(&contract.tool.universe);
+        if t.dir.parent() != Some(expected.as_path()) {
+            errors.push(format!(
+                "✗ {dir} : doit se trouver dans `tools/{}/<nom>/`",
+                contract.tool.universe
+            ));
         }
         if !seen_ids.insert(id.clone()) {
             errors.push(format!("✗ {dir} : id `{id}` en double"));

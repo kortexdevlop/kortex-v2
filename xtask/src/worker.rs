@@ -83,13 +83,7 @@ pub fn run(inputs: JsValue, params: JsValue) -> Result<JsValue, JsValue> {
     .map_err(|e| e.to_string())?;
     let target = root.join(".kortex/target-worker");
     let status = Command::new("cargo")
-        .args([
-            "build",
-            "--release",
-            "--target",
-            "wasm32-unknown-unknown",
-            "--offline",
-        ])
+        .args(["build", "--release", "--target", "wasm32-unknown-unknown"])
         .current_dir(&work)
         .env("CARGO_TARGET_DIR", &target)
         .status()
