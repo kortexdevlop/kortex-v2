@@ -17,10 +17,10 @@ Référence : MASTER_PROMPT.md + RULES.md. Complète PLAN.md (qui reste le suivi
 
 | # | Écart | Règle / section | Gravité |
 |---|---|---|---|
-| V1 | **Polices non auto-hébergées** : `kortex.css` déclare `Inter Variable` mais aucun `.woff2` dans le dépôt → repli système | §4.3, §8.5, §2.15 | Moyenne |
+| V1 | ~~Polices non auto-hébergées~~ **Inter Variable intégrée (lot 4)** ; reste la monospace (repli système) et le contrôle de la CSP publiée | §4.3, §8.5 | Partiel |
 | V2 | **Jetons desktop en clair** (`credentials.json` 0600) en prod ; correctif trousseau non publié | §9.6, RULES 6.1 | Haute |
-| V3 | **Pas de `engine.wasm` headless** pour 35 outils sur 38 ; pas de mode `--engine` JSON-RPC/stdio | §7.1, §7.3 | Haute |
-| V4 | **Desktop : calcul lourd dans une future UI** (pas de thread/exécuteur natif) | §6.3, RULES 4.4 | Haute |
+| V3 | Mode `--engine` JSON-RPC **réalisé** (lot 3, binaire macOS Intel exécuté) ; reste `engine.wasm` headless pour 35 outils sur 38 | §7.1, §7.3 | Partiel |
+| V4 | Exécuteur natif sur thread avec annulation, délai et panique contenue **réalisé** (lot 3) ; recette en fenêtre native non faite | §6.3, RULES 4.4 | Partiel |
 | V5 | ~~`ui = "custom"` non branché~~ **Capacité ajoutée (lot 2)** : aucun des 38 outils n'était en `custom` ; mécanisme prouvé web (rendu) et desktop (compilé, lancé) sur un outil jetable. Reste : rendu desktop inspecté, 7.6 (UI QR) | §6.4 | Partiel |
 | V6 | **Crates manquantes** : `kortex-io`, `kortex-media`, `kortex-ai` (le client IA, ex. conversion/adapters IO) | §5.2 | Moyenne (créer quand usage réel) |
 | V7 | xtask : `new-app`, `dev`, `ci-budget` **ajoutés (lot A)** ; restent `og-images` et `deploy` | §13, §11 | Partiel |
