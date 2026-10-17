@@ -22,14 +22,73 @@ fn fx(name: &str) -> Fx {
     let dir = std::env::temp_dir().join(format!("kortex-cli-pkg-{}-{name}", std::process::id()));
     let _ = std::fs::remove_dir_all(&dir);
     std::fs::create_dir_all(dir.join("rel")).expect("dirs");
+    let api = installation_account();
     let env = PkgEnv {
-        home: Home::at(dir.join("home/.kortex"), dir.join("home")),
+        home: Home::at(dir.join("home/.kortex"), dir.join("home")).with_secret_store(
+            std::sync::Arc::new(kortex_platform::secrets::MemorySecretStore::default()),
+        ),
         index_src: dir.join("rel/index.json").to_string_lossy().into_owned(),
         public_key: public_key_b64(&SEED),
         target: Some(TARGET.to_owned()),
-        api: "http://127.0.0.1:9".to_owned(), // nothing listens here: these tests never use the account
+        api: api.clone(),
     };
+    env.home
+        .save_credentials(&kortex_pkg::Credentials {
+            api,
+            email: "fixture@example.test".into(),
+            device_id: "fixture-device".into(),
+            token: "fixture-token".into(),
+        })
+        .expect("isolated account fixture");
     Fx { dir, env }
+}
+
+// Real local account verification with a public fixture; never accesses the OS keychain.
+fn installation_account() -> String {
+    use std::io::{BufRead, Read, Write};
+    let listener = std::net::TcpListener::bind("127.0.0.1:0").expect("bind");
+    let url = format!("http://{}", listener.local_addr().expect("address"));
+    std::thread::spawn(move || {
+        for connection in listener.incoming() {
+            let Ok(mut stream) = connection else { break };
+            let mut reader = std::io::BufReader::new(&mut stream);
+            let mut headers = String::new();
+            loop {
+                let mut line = String::new();
+                if reader.read_line(&mut line).unwrap_or(0) == 0 || line == "\r\n" {
+                    break;
+                }
+                headers.push_str(&line);
+            }
+            let length = headers
+                .lines()
+                .find_map(|line| {
+                    line.to_ascii_lowercase()
+                        .strip_prefix("content-length:")
+                        .and_then(|v| v.trim().parse::<usize>().ok())
+                })
+                .unwrap_or(0);
+            let mut body = vec![0; length];
+            let _ = reader.read_exact(&mut body);
+            let allowed = headers
+                .to_ascii_lowercase()
+                .contains("authorization: bearer fixture-token");
+            let (status, reply) = if allowed {
+                (
+                    200,
+                    r#"{"ok":true,"email":"fixture@example.test","data":{"confirm_install":false}}"#,
+                )
+            } else {
+                (401, r#"{"error":"unauthenticated"}"#)
+            };
+            let _ = write!(
+                stream,
+                "HTTP/1.1 {status} OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{reply}",
+                reply.len()
+            );
+        }
+    });
+    url
 }
 
 fn package(id: &str, version: &str, bin: &[u8]) -> Vec<u8> {

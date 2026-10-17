@@ -41,3 +41,7 @@ Store reuses the existing internal `kortex-shell` and existing workspace Serde. 
 
 ### Static deployment CI (2026-10-17)
 The deployment workflow reuses the existing pinned Wrangler 4.151.0 through npm exec on its temporary GitHub runner only. The receipt verifier uses Node.js built-ins and the existing Rust compiler/std library; no product dependency or additional catalogue tool is introduced. Cloudflare credentials remain GitHub Actions secrets, never artifacts.
+
+### Native credential store (step 8.5, 2026-10-17)
+`keyring =4.2.0`, native-only optional `kortex-platform/secret-store` feature: required OS-protected storage for desktop device credentials. Its v1 backend selects macOS Keychain, Windows Credential Manager and Linux Secret Service (zbus/Rust crypto), without a plaintext fallback or extra CLI executable. Existing pkg/CLI opt in; browser builds exclude it. Reimplementing secure OS protocols/FFI is rejected. Sources: https://github.com/open-source-cooperative/keyring-rs/blob/v4.2.0/Cargo.toml and src/v1.rs. License MIT/Apache-2.0 is compatible with the proprietary product; no paid service.
+Linux Secret Service acceptance uses the free OS packages `gnome-keyring` and `dbus-x11` on an ephemeral GitHub runner only; these are test prerequisites, not bundled executables or a new tool in the catalogue. The test daemon stores only a public fixture in an isolated temporary data directory. No production credential is used.

@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "run_id": 39049702070,
+  "commit": "ca3d62342a6cbbacf493628ddfb0cdbfdb1e1ec1",
+  "index_sha256": "247204573a584533de415e991a7f284e6e3812394d5e544726597bd747eb84e0",
+  "signature_verified": true,
+  "indexed_packages": 42,
+  "targets": [
+    "x86_64-pc-windows-msvc"
+  ],
+  "published": false,
+  "limits": [
+    "Windows-only signed index; no unified four-target feed",
+    "No public release created; URLs are not declared available",
+    "Does not include the later credential-store changes"
+  ]
+}

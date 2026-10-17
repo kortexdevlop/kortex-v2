@@ -1,0 +1,271 @@
+{
+  "schema": 1,
+  "commit": "ca3d62342a6cbbacf493628ddfb0cdbfdb1e1ec1",
+  "run_id": "39049702070",
+  "target": "x86_64-pc-windows-msvc",
+  "tool_count": 38,
+  "packages": {
+    "apps.desk": {
+      "file": "apps.desk-0.2.0-x86_64-pc-windows-msvc.tar.gz",
+      "version": "0.2.0",
+      "sha256": "82df03b98a2e1e90bdcb4612ea79f939d5e0ef19ed9ce77d4a56feff89cac68e",
+      "sha256_binary": "dbb9ba0d6386f4ef6d5a02feeebd21ee0127a65c7220ea0eea4bc14866461c44"
+    },
+    "apps.hub": {
+      "file": "apps.hub-0.2.0-x86_64-pc-windows-msvc.tar.gz",
+      "version": "0.2.0",
+      "sha256": "8bfef688c3c1eee0e1163dd7ea52e283def11339c2b922504019149c3faff884",
+      "sha256_binary": "a439aa4ef4f3a06a13c02d1b17eed2ae5a2d47f0d500634fab83c343e4fc092e"
+    },
+    "apps.store": {
+      "file": "apps.store-0.2.0-x86_64-pc-windows-msvc.tar.gz",
+      "version": "0.2.0",
+      "sha256": "1a93ecdd4da25269b7da36897d2ba6b6ac4d9c2f5a1ed545c01c1886a73ab937",
+      "sha256_binary": "86c12a0386b161f5ab23f5645b6e98ccc2e8adbd82336e2a28c67edae2d1b01e"
+    },
+    "calc.age": {
+      "file": "calc.age-1.0.0-x86_64-pc-windows-msvc.tar.gz",
+      "version": "1.0.0",
+      "sha256": "b8894f4d269a7c52ee5bb4161996201e0a5c8d34414669dee538c562356550ab",
+      "sha256_binary": "1b9ee3e3abad66fc3f1674175410a087defbeedf0ea1e268dee225698a72c593"
+    },
+    "calc.average": {
+      "file": "calc.average-1.0.0-x86_64-pc-windows-msvc.tar.gz",
+      "version": "1.0.0",
+      "sha256": "99401b6f96edc11e64160da04d730ebe7657f13cb230836165370c06951744b3",
+      "sha256_binary": "ba02cc347e238b32da935f2fee27a99f76dac8844c4a6477882d998f2c554bff"
+    },
+    "calc.compound-interest": {
+      "file": "calc.compound-interest-1.0.0-x86_64-pc-windows-msvc.tar.gz",
+      "version": "1.0.0",
+      "sha256": "ae3e54b14a50082b4d077ada9f65977888bbb625412bedcca7bc14e960892336",
+      "sha256_binary": "25ec84f645cf4774e64a764b988b5860706e28f774fe60ac9ed40ee2cb537ce9"
+    },
+    "calc.date-add": {
+      "file": "calc.date-add-1.0.0-x86_64-pc-windows-msvc.tar.gz",
+      "version": "1.0.0",
+      "sha256": "1696d408cda84484925270f4ab0df4efebc0b2cfa457191433a6d139d8b3d06d",
+      "sha256_binary": "320eeb5cdfc170e8d42a61cf3b29735094557a7ffd1be0f4b0f6efacd874e8c2"
+    },
+    "calc.date-difference": {
+      "file": "calc.date-difference-1.0.0-x86_64-pc-windows-msvc.tar.gz",
+      "version": "1.0.0",
+      "sha256": "441b9711f503bf961d9de6c6277832d31bd2f3b53bdcc5530438a756053278de",
+      "sha256_binary": "39916ecc6a92e20b800706868a0c060ee1efaeb72e91c848320c45ec27fb29b2"
+    },
+    "calc.fuel-cost": {
+      "file": "calc.fuel-cost-1.0.0-x86_64-pc-windows-msvc.tar.gz",
+      "version": "1.0.0",
+      "sha256": "0f76d042992d5361fc778e17bdd87f7b4d485700a4e811836ae005f0328ac4c8",
+      "sha256_binary": "6dda1d10cb0242a61e2e58eae114255fb4c5eb4a5a0daad94becbbe7f86c1691"
+    },
+    "calc.gross-net-salary": {
+      "file": "calc.gross-net-salary-1.0.0-x86_64-pc-windows-msvc.tar.gz",
+      "version": "1.0.0",
+      "sha256": "69a38e5804e0ae4af45d95dcbf6cee56ba9a41f6af056e0d06fc44144ea6dca7",
+      "sha256_binary": "ab20769a20d77346bbcba3c02f63957f12ccbfeb71b4028ad7f11fc1db115150"
+    },
+    "calc.loan": {
+      "file": "calc.loan-1.0.0-x86_64-pc-windows-msvc.tar.gz",
+      "version": "1.0.0",
+      "sha256": "2fddc24ea95bdd32c81d4cda74358ea9e83eb5466789772a2ba9a8b4928049d3",
+      "sha256_binary": "beffe77641c09750bc34192a74226e86b320b644131893e76bb801128437c976"
+    },
+    "calc.percentage": {
+      "file": "calc.percentage-1.0.0-x86_64-pc-windows-msvc.tar.gz",
+      "version": "1.0.0",
+      "sha256": "414dead61f8fde0d7825f5010c7470413019d90ae0dfee296072bd538a7589aa",
+      "sha256_binary": "5ae13f344bb80d490a6195dff737ea3d858517be5c6478f0358f9835904c02a6"
+    },
+    "calc.rule-of-three": {
+      "file": "calc.rule-of-three-1.0.0-x86_64-pc-windows-msvc.tar.gz",
+      "version": "1.0.0",
+      "sha256": "9ec7b085ea5b00ad6b88893c6e84953004c643f3e8597ed54e61a8b9ee3e6f75",
+      "sha256_binary": "badccc44652fa3d7ff6f96f66f401bba98180f44ac841c5b2339613738a0f4c8"
+    },
+    "calc.tip": {
+      "file": "calc.tip-1.0.0-x86_64-pc-windows-msvc.tar.gz",
+      "version": "1.0.0",
+      "sha256": "42abd18991eb05bd95f995b2ce0cf1b2ac3c7768dc6b26a964f85b69c07959f9",
+      "sha256_binary": "cfc5c18bb5c6ce757b1a782863d283769faadb2a09bc5e4e671ed70c2a94270c"
+    },
+    "calc.unit-price": {
+      "file": "calc.unit-price-1.0.0-x86_64-pc-windows-msvc.tar.gz",
+      "version": "1.0.0",
+      "sha256": "a1198d02ed8fcb185a0a28faf835417997ff2f52b5b6f8f55682beeaaaeb00db",
+      "sha256_binary": "419a501ccc5974ced8d8635b4c37780d25b78d8637950c264d2463b1f7f12f06"
+    },
+    "calc.vat": {
+      "file": "calc.vat-1.0.0-x86_64-pc-windows-msvc.tar.gz",
+      "version": "1.0.0",
+      "sha256": "b3e957a9f43cf9353519aac4597515c59c159cffe0e7e18c492f257a816e57c3",
+      "sha256_binary": "cb1a78192dea764088a9dd22e4e1416a61ce1b241009941386b5fb991c0be4c9"
+    },
+    "cli": {
+      "file": "cli-0.1.0-x86_64-pc-windows-msvc.tar.gz",
+      "version": "0.1.0",
+      "sha256": "9f3c3aa019bf748055bcde8a60aca47941d64169bb67aa2720e59c88c862e405",
+      "sha256_binary": "8bf1f8a4ff778e5fe2002f6d2463de8d254ab7f87f2594df4750d6d324eafce8"
+    },
+    "code.base64": {
+      "file": "code.base64-1.0.0-x86_64-pc-windows-msvc.tar.gz",
+      "version": "1.0.0",
+      "sha256": "2e1e1e98cad59ef20a68f2c88d66cc7aec6f92a7fae23e0b10f9fbb64b490328",
+      "sha256_binary": "5c32b35f347851a95ea60284acf6d03338e51894a2f03a2711b9a1bdccdf26be"
+    },
+    "code.chmod": {
+      "file": "code.chmod-1.0.0-x86_64-pc-windows-msvc.tar.gz",
+      "version": "1.0.0",
+      "sha256": "0f47998d5d5b59b86e7d97ee0c3f6bcd423e818bc190f1f43fc4a5088cf388bd",
+      "sha256_binary": "3c8d9009d9b156f562503b4e0847283bf8ec9611ccd168c3dc57d5c14d1cb152"
+    },
+    "code.html-entities": {
+      "file": "code.html-entities-1.0.0-x86_64-pc-windows-msvc.tar.gz",
+      "version": "1.0.0",
+      "sha256": "1774ef2016e4b011ce892caea2369c3f46d42b2d7fc2234d6ccae1ae05b9d925",
+      "sha256_binary": "2a91c6b129cab39d55344dbbad37f631fc9eb5ddf0f3b9185ee31f6c262285db"
+    },
+    "code.json-formatter": {
+      "file": "code.json-formatter-1.0.0-x86_64-pc-windows-msvc.tar.gz",
+      "version": "1.0.0",
+      "sha256": "0c59ea30322677f5d3d6138414e16c445b0493ba7e99db78a4d6534c7bee3050",
+      "sha256_binary": "0d717fee147b649451e3be66ba376e8e2e5af2a879de712f42e203f02cb897bd"
+    },
+    "code.markdown-table": {
+      "file": "code.markdown-table-1.0.0-x86_64-pc-windows-msvc.tar.gz",
+      "version": "1.0.0",
+      "sha256": "ad19617ad254aff830111a74420242b771a630dcbd3cd6d44bbf9f82a8c060c5",
+      "sha256_binary": "1d47045c40657a2b70dd5a6674e275e55f8781e32929f3de2b0275a06638ee27"
+    },
+    "code.number-base": {
+      "file": "code.number-base-1.0.0-x86_64-pc-windows-msvc.tar.gz",
+      "version": "1.0.0",
+      "sha256": "ee7ee5876a50784f0cb0c6d4398ca53d6aa3a95b5b0b2ac3754d48edf846623d",
+      "sha256_binary": "8c16ed86eba3c9d7b63dec86c1997efb0f02d8744b342b972490e015497ae2fa"
+    },
+    "code.url-encoder": {
+      "file": "code.url-encoder-1.0.0-x86_64-pc-windows-msvc.tar.gz",
+      "version": "1.0.0",
+      "sha256": "4f487e81e36af3d7e5e713e455e6b77e82021406fff1ea78fc89851dfecfdffc",
+      "sha256_binary": "d3be5aa6af6dcef2b7615917b252970ae0af1c1e4332796a659a5d38b4f7a5d7"
+    },
+    "code.uuid-generator": {
+      "file": "code.uuid-generator-1.0.0-x86_64-pc-windows-msvc.tar.gz",
+      "version": "1.0.0",
+      "sha256": "aa21403cbd6c97fcee13e18c72def2f11140572be4908055bdfcba9e7fd65dd8",
+      "sha256_binary": "7d5e3dcf48632d23c033da7cb14d3703e8907b21f9ca3e08f66b0dd413ec8772"
+    },
+    "color.contrast-checker": {
+      "file": "color.contrast-checker-1.0.0-x86_64-pc-windows-msvc.tar.gz",
+      "version": "1.0.0",
+      "sha256": "fda4c97f646c9f1188d287d0f1a238c6b1dc1e0cb19af5d6a688c6bf3b998ddc",
+      "sha256_binary": "846ca4025283f24607ce7bc132cbf35195d4e98522df842539e2427fb4047b34"
+    },
+    "color.converter": {
+      "file": "color.converter-1.0.0-x86_64-pc-windows-msvc.tar.gz",
+      "version": "1.0.0",
+      "sha256": "b606a6ec1b409d72f4cfaee98a1db8901b3e9d9998abe8843a7486bbcf8f652d",
+      "sha256_binary": "73ac5148ef2b6d3e8d3b246bfe6d3e0ce2b273427c671e33c1141ab122989d8c"
+    },
+    "convert.timestamp": {
+      "file": "convert.timestamp-1.0.0-x86_64-pc-windows-msvc.tar.gz",
+      "version": "1.0.0",
+      "sha256": "2b462a3b0d2e9c086d4b5f0f7666760b0c5619ddbf8b7bb63724da55fa090982",
+      "sha256_binary": "4d941f23346695d2c08692df4d414bcae60edb0cbd42b9612ce1477a4c32d20c"
+    },
+    "convert.units": {
+      "file": "convert.units-1.0.0-x86_64-pc-windows-msvc.tar.gz",
+      "version": "1.0.0",
+      "sha256": "add2557405f97beec4999b53703f49d03f3121a2028e2391ea634e9986922ee9",
+      "sha256_binary": "31aabe4f33ce5a1fccdea4f61cc84e43d2a387cb7d631bcbc2dc83b560ca1e99"
+    },
+    "image.convert": {
+      "file": "image.convert-1.0.0-x86_64-pc-windows-msvc.tar.gz",
+      "version": "1.0.0",
+      "sha256": "d82063123794d0d0f764ebc76328b584d66adf0e95ecde16ca60b1a56074f1d5",
+      "sha256_binary": "a615b416cd5f8a39401254ec2721cd10859cae9b3dccc6e86fd4a4aa66b0d4a7"
+    },
+    "pdf.merge": {
+      "file": "pdf.merge-1.0.0-x86_64-pc-windows-msvc.tar.gz",
+      "version": "1.0.0",
+      "sha256": "779880c7f1258d2ba91bbb120db941de3fae81f08b64efd5ed549ece81902b4a",
+      "sha256_binary": "2984399e9333141d73280bfdecdb395f4c7513623adb9e20251f9798316a5a14"
+    },
+    "qr.generator": {
+      "file": "qr.generator-1.0.0-x86_64-pc-windows-msvc.tar.gz",
+      "version": "1.0.0",
+      "sha256": "6d38e12dae034f5c79392d69253c5aa0957ea4676eab40fe1385e38877544a91",
+      "sha256_binary": "7e8e4884fb07c09b4fc7855de6531e8ca6cd5abf1cec2a812f0f77200d62e390"
+    },
+    "secure.hash-calculator": {
+      "file": "secure.hash-calculator-1.0.0-x86_64-pc-windows-msvc.tar.gz",
+      "version": "1.0.0",
+      "sha256": "a55b5ba4d577733f6b84eb4819062afa61edf68593b0b04aa51b2003aee6df6a",
+      "sha256_binary": "1efc047defea683a02fc3f158b0690508a807a439f9f0514af1b7b09ac06196f"
+    },
+    "secure.password-generator": {
+      "file": "secure.password-generator-1.0.0-x86_64-pc-windows-msvc.tar.gz",
+      "version": "1.0.0",
+      "sha256": "9320b95bd2e083cc1dd346b03c298c3671675b0bca3a762fbadfae7adefc6381",
+      "sha256_binary": "1e37ac8c8995abfcbe657b7515ba483a54af219c4546cd81bdd831d7c0e95f97"
+    },
+    "text.case-converter": {
+      "file": "text.case-converter-1.0.0-x86_64-pc-windows-msvc.tar.gz",
+      "version": "1.0.0",
+      "sha256": "f73b3fe7a4eef2de3e15c4451fdb09feb4e00d66570da9909e2226ed011f9172",
+      "sha256_binary": "28549570bc11c69151399e1540dd2bb28d7a4fe0301e4689ccfd3678821594bc"
+    },
+    "text.cleaner": {
+      "file": "text.cleaner-1.0.0-x86_64-pc-windows-msvc.tar.gz",
+      "version": "1.0.0",
+      "sha256": "239c666e08fa66a80e58f8ae35eb90ad9f2a97ed693faa7a7c58afe4f36a5c29",
+      "sha256_binary": "1625cd81cdd748e4259fe50731aede82f47fbc7108898edc77d8bbe3d7810a49"
+    },
+    "text.deduplicate": {
+      "file": "text.deduplicate-1.0.0-x86_64-pc-windows-msvc.tar.gz",
+      "version": "1.0.0",
+      "sha256": "319dcbd699135347a1aa4962e523c0a2c2e5e0bd1b519a86b8bc09e8d42ccf01",
+      "sha256_binary": "e914d976f63d8815ea13739d22925055e8b72cd76acb1260e48569f7394d5dc8"
+    },
+    "text.find-replace": {
+      "file": "text.find-replace-1.0.0-x86_64-pc-windows-msvc.tar.gz",
+      "version": "1.0.0",
+      "sha256": "3c719f6e6e60454dd17b156dc2ee7c735f545c4d0f5a714d1a3706af9e80ce3a",
+      "sha256_binary": "9ff888a56e5fcc15c0390d87867a380e5c81cdaad948df096725a153839cccb8"
+    },
+    "text.lorem-ipsum": {
+      "file": "text.lorem-ipsum-1.0.0-x86_64-pc-windows-msvc.tar.gz",
+      "version": "1.0.0",
+      "sha256": "9aa039493d748ee4f79c7e545323885abe93a40375b6781418612c75948c1b8c",
+      "sha256_binary": "3a42388e75c2985c607ee2e6e4a2c663f773acf28742ef2244cdb9635733943e"
+    },
+    "text.slug-generator": {
+      "file": "text.slug-generator-1.0.0-x86_64-pc-windows-msvc.tar.gz",
+      "version": "1.0.0",
+      "sha256": "5b02e2e553ea57f58f9323ff3160ebb217e40046dec8e7dd860d9bd9bd9c4c83",
+      "sha256_binary": "5840fcec9bf233eb03ddfa9498847b3b4ea4731fcddacfd11e8355497c66d806"
+    },
+    "text.sort-lines": {
+      "file": "text.sort-lines-1.0.0-x86_64-pc-windows-msvc.tar.gz",
+      "version": "1.0.0",
+      "sha256": "84a895abab2a3b7f3a1014c46d0666a21586a859fbde9b52b234ed598724c1ec",
+      "sha256_binary": "110573c08f0a3670f28fe8a7b7cd7309ab57bb50ade927379c7fb76ecfcdb325"
+    },
+    "text.word-counter": {
+      "file": "text.word-counter-1.0.0-x86_64-pc-windows-msvc.tar.gz",
+      "version": "1.0.0",
+      "sha256": "966c8836e4f288ecdce436723c987f41d3f08d87e6c9a6b624a72fe96e1a7cc9",
+      "sha256_binary": "105271c22da11b3821cf9c314e0334a2da9d2631d9413722673db352bc5404b5"
+    }
+  },
+  "profile": {
+    "lto": "thin",
+    "codegen_units": "8"
+  },
+  "verification": {
+    "archive_hashes": true,
+    "binary_hashes": true,
+    "versions_and_target": true,
+    "signatures": false
+  }
+}

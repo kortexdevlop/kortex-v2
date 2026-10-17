@@ -5,6 +5,7 @@ edition.workspace = true
 publish.workspace = true
 
 [features]
+secret-store = ["dep:keyring"]
 document = ["dep:dioxus", "dep:serde_json"]
 
 [dependencies]
@@ -21,6 +22,7 @@ serde-wasm-bindgen = "0.6"
 js-sys = "0.3"
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+keyring = { version = "=4.2.0", optional = true }
 rpassword = "7"
 ureq = { version = "3", default-features = false, features = ["rustls", "gzip"] }
 

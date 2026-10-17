@@ -1,5 +1,7 @@
+use kortex_platform::secrets::{NativeSecretStore, SecretStore};
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
 
 use serde::{Deserialize, Serialize};
 
@@ -10,6 +12,7 @@ use crate::version::Version;
 #[derive(Debug, Clone)]
 pub struct Home {
     root: PathBuf,
+    pub(crate) secrets: Arc<dyn SecretStore>,
     /// Where launchers (`.desktop`, `.app`, Start Menu entries) go; defaults to the user's home.
     user_home: PathBuf,
 }
@@ -67,7 +70,7 @@ impl Home {
             .ok_or_else(|| PkgError::new(Kind::Io, "dossier personnel introuvable (HOME)"))?;
         let root = kortex_platform::native::env::var_os("KORTEX_HOME")
             .map_or_else(|| user_home.join(".kortex"), PathBuf::from);
-        Ok(Self { root, user_home })
+        Ok(Self::at(root, user_home))
     }
 
     /// Explicit locations (tests, portable installs).
@@ -75,8 +78,16 @@ impl Home {
     pub fn at(root: impl Into<PathBuf>, user_home: impl Into<PathBuf>) -> Self {
         Self {
             root: root.into(),
+            secrets: Arc::new(NativeSecretStore),
             user_home: user_home.into(),
         }
+    }
+
+    /// Explicit backend injection for isolated tests and controlled hosts.
+    #[must_use]
+    pub fn with_secret_store(mut self, secrets: Arc<dyn SecretStore>) -> Self {
+        self.secrets = secrets;
+        self
     }
 
     #[must_use]

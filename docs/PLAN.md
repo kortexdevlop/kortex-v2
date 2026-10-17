@@ -167,7 +167,7 @@ Référence : §§9.5–9.6, 10.
 | 8.2 | Inscription/connexion mot de passe, sessions et suppression/export | Présent publié | Oui — recettes consignées | Parcours QA public réussi sur la nouvelle base vide demandée le 2026-10-17 : inscription, connexion, réglages, export, suppression ; zéro compte après nettoyage. [Preuve](validation/2026-10-17-fresh-account-database.json). API tests historiques ; ne signifie pas que le client Rust est terminé. |
 | 8.3 | Passkeys et gestion de sécurité | Présent web/API | Oui — portée ciblée | Signature ES256, origine/RP, UV, challenge unique, rotation et révocation testés ; vrais appareils Safari/Firefox et client Rust restent non validés. |
 | 8.4 | Créer le client Rust kortex-auth réutilisable | Client de session web Rust présent | Non — auth complète/native/passkeys encore absentes | kortex-auth reconnaît le cookie HttpOnly existant via plateforme, profil typé et contrôle du compte attendu ; kortex-pkg reste distinct. Formulaires Rust, passkeys et jetons natifs/trousseau non livrés. |
-| 8.5 | Stocker les jetons desktop dans le trousseau système | Écart important | Non | credentials.json en clair avec permissions Unix 0600 : ne satisfait pas le trousseau demandé. Audit et séquence 8.5.1–8.5.6 dans KEYCHAIN_MIGRATION.md ; backends par OS et migration non implémentés. |
+| 8.5 | Stocker les jetons desktop dans le trousseau système | Écart important | Non | credentials.json en clair avec permissions Unix 0600 : ne satisfait pas le trousseau demandé. Audit et séquence 8.5.1–8.5.6 dans KEYCHAIN_MIGRATION.md ; backends keyring natifs, migration/relecture/rollback, diagnostics masqués et erreurs typées implémentés ; gate et recettes OS en cours. |
 | 8.6 | Activer Turnstile sur formulaires sensibles | Bloqué | Non | Validation préparée, clé publique vide, API Cloudflare 403 avec le jeton courant ; rester désactivé sans clé/secret et recette. |
 | 8.7 | Décider et fournir vérification e-mail / récupération de compte | Non livré | Non | Fournisseur gratuit à déterminer ; pas d’affirmation d’e-mail vérifié ni de récupération inexistante. |
 | 8.8 | Mesurer CPU et charge réels sur le plan gratuit | Non validé | Non | Succès de requêtes ne constitue pas une mesure de CPU sous charge ; campagne limitée à prévoir avant ouverture large. |
@@ -210,7 +210,7 @@ Référence : §§1, 5.1, 7, 9.
 | Étape | Livrable / action | État | Validée ? | Preuve actuelle ou condition de validation |
 |---|---|---|---|---|
 | 11.1 | Définir le contrat app commun avant une nouvelle app | Réalisé — contrat | Oui — périmètre schéma | Contrat app commun, métadonnées/ports/permissions partagés ; vérification FR/EN, UI custom et fichiers obligatoires. Exemple Store validé ; gabarit new-app et exécuteurs restent distincts. |
-| 11.2 | Créer les features web et desktop sur les mêmes sources | Présent Hub/Desk/Store | Oui — web, Linux, macOS ARM/Intel | Les trois apps 0.2 compilent les mêmes sources Rust/Dioxus ; preuves CI par cible et reçus web vérifiés. Vérification finale Windows en cours ; distribution et recette native distinctes. |
+| 11.2 | Créer les features web et desktop sur les mêmes sources | Présent Hub/Desk/Store | Oui — web, Linux, macOS ARM/Intel | Les trois apps 0.2 compilent les mêmes sources Rust/Dioxus ; preuves CI par cible et reçus web vérifiés. Windows également vérifié au commit ca3d623. Ces preuves précèdent le lot trousseau ; distribution et recette native distinctes. |
 | 11.3 | Générer les registres, lancements et paquets depuis app.toml | Partiel | Non | Registre apps.json, métadonnées et packaging all découvrent les contrats ; lancement et paquets des deux cibles restent à compléter. |
 | 11.4 | Partager header, shell, bus, auth, sync et composants | Socle partiel utilisé | Non — interfaces complètes ouvertes | Hub/Desk utilisent shell/UI/bus ready-init et clients Rust de session/snapshots explicites. Auth native, transferts typés, synchronisation automatique et autres hôtes restent absents. |
 | 11.5 | Prouver un parcours web + desktop minimal avant de poursuivre | À faire | Non | Compilation wasm et native du même exemple/app, recette, artefacts identifiés ; condition bloquante pour les phases applicatives suivantes. |
@@ -297,7 +297,7 @@ Référence : §11.
 | 17.1 | Conserver qualité Rust et tests services/site en CI | Validé sur GitHub | Oui — run 39048924068 | Commit c95bf87 : fmt, Clippy, tests workspace, contrôle structurel, build/test site et services tous verts ; debug CI réduit pour respecter le disque du runner gratuit. |
 | 17.2 | Compiler les bundles web modifiés dans CI | Release complète réussie | Partiel — détection PR ouverte | Run 39032642157 : 38 outils + trois apps WebAssembly, reçus et sorties vérifiés. Preuve validation/2026-10-17-github-web.json ; filtrage automatique des modifications en PR encore ouvert. |
 | 17.3 | Valider les apps dans la même CI et les garde-fous | Réalisé — contrôles et builds | Oui — périmètre compilation | Check couvre contrats app, UI/fichiers/plateforme ; release compile les trois apps depuis le registre pour web et desktop. Recette native fonctionnelle distincte. |
-| 17.4 | Compiler/recetter le desktop lors des releases groupées | Trois cibles vérifiées ; Windows à reprendre | Non — vérification Windows et recette OS ouvertes | Run 39031294481 : Linux et macOS ARM/Intel, 126 paquets vérifiés (38 outils + trois apps + CLI par cible), 84 signatures Mac vérifiées. Windows run 39032642157 : 42 paquets construits, vérificateur bloqué par encodage CP1252 ; correctif UTF-8 et relance ciblée. Preuves par cible dans validation/2026-10-17-desktop-*.json. |
+| 17.4 | Compiler/recetter le desktop lors des releases groupées | Quatre cibles récupérées et vérifiées | Non — recette OS/installations ouverte | 168 exécutables de release vérifiés : Linux/macOS ARM/Intel du run 39031294481 (7ed41ae), Windows du run 39049702070 (ca3d623), 42 par cible. 84 signatures Mac et index signé Windows vérifiés. Ces artefacts précèdent le lot trousseau ; preuves par cible dans validation/. |
 | 17.5 | Finaliser déploiement reproductible et preview | Préparation CI validée | Non — secrets et publication CI ouverts | Run 39053032032 vert : artefact public récupéré, 223 fichiers SHA-256 et cinq configurations vérifiés, provenance commit de merge PR conservée. Publication statique séparée prévue avec reçus de versions et 41 contrôles publics ; secrets Cloudflare absents, publication/preview publique non validées. Preuve validation/2026-10-17-static-ci-preparation.json. |
 | 17.6 | Documenter publication locale comme secours autorisé | Clarifié | Oui — règle consolidée | RULES.md §8 et MASTER réconciliés : CI nominale, secours local reproductible autorisé, publication des lots déjà autorisée. La CI/CD elle-même reste incomplète (17.5). |
 | 17.7 | Optimiser filtres, caches et budget CI réel | Partiel — équivalence ponctuelle prouvée | Non | CI Linux et cache source/sortie ; après correction des seules traductions Hub, réutilisation prouvée par ancien/nouveau hash et entrées .d du compilateur excluant kortex-shell. Invalidation générale encore trop large ; détection ciblée par dépendances et budget CI restent à finaliser. |
@@ -320,48 +320,48 @@ Référence : §15 phase 12.
 
 ## Matrice factuelle des 38 outils
 
-Inventaire sur disque dans [ARTIFACT_AUDIT.json](ARTIFACT_AUDIT.json), complété le 17 octobre 2026 par la reconstruction des 38 UI web, les 38 reçus vérifiés et les [empreintes du lot](validation/2026-10-17-platform-boundary.json). « Oui » ici signifie uniquement fichier/artefact constaté. La validation fonctionnelle complète web + desktop reste **Non pour chacun**, tant que la matrice de recette n’est pas close. Les 38 outils restent bêta. Les artefacts actuels Linux et macOS ARM/Intel du run 39031294481 sont récupérés et vérifiés (126 paquets, versions/cibles/empreintes et 84 signatures macOS). Windows a compilé les 42 paquets dans le run 39032642157 ; son contrôle final et la récupération sont relancés dans 39049702070.
+Inventaire sur disque dans [ARTIFACT_AUDIT.json](ARTIFACT_AUDIT.json), complété le 17 octobre 2026 par la reconstruction des 38 UI web, les 38 reçus vérifiés et les [empreintes du lot](validation/2026-10-17-platform-boundary.json). « Oui » ici signifie uniquement fichier/artefact constaté. La validation fonctionnelle complète web + desktop reste **Non pour chacun**, tant que la matrice de recette n’est pas close. Les 38 outils restent bêta. Les artefacts actuels Linux et macOS ARM/Intel du run 39031294481 sont récupérés et vérifiés (126 paquets, versions/cibles/empreintes et 84 signatures macOS). Windows : 42 paquets récupérés, contrôlés et extraits du run corrigé 39049702070 (ca3d623). Total de release vérifié : 168 exécutables, antérieurs au lot trousseau en développement.
 
 | Outil | Moteur Rust / contrat / tests présents | UI wasm présente | Moteur wasm séparé présent | Reçu web présent | Artefacts desktop CI récupérés et vérifiés | Validation complète |
 |---|---|---|---|---|---|---|
-| `calc.age` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel | Non |
-| `calc.average` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel | Non |
-| `calc.compound-interest` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel | Non |
-| `calc.date-add` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel | Non |
-| `calc.date-difference` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel | Non |
-| `calc.fuel-cost` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel | Non |
-| `calc.gross-net-salary` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel | Non |
-| `calc.loan` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel | Non |
-| `calc.percentage` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel | Non |
-| `calc.rule-of-three` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel | Non |
-| `calc.tip` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel | Non |
-| `calc.unit-price` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel | Non |
-| `calc.vat` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel | Non |
-| `code.base64` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel | Non |
-| `code.chmod` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel | Non |
-| `code.html-entities` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel | Non |
-| `code.json-formatter` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel | Non |
-| `code.markdown-table` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel | Non |
-| `code.number-base` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel | Non |
-| `code.url-encoder` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel | Non |
-| `code.uuid-generator` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel | Non |
-| `color.contrast-checker` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel | Non |
-| `color.converter` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel | Non |
-| `convert.timestamp` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel | Non |
-| `convert.units` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel | Non |
-| `image.convert` | Oui | Oui | Oui | Oui | Linux x86_64, macOS ARM/Intel | Non |
-| `pdf.merge` | Oui | Oui | Oui | Oui | Linux x86_64, macOS ARM/Intel | Non |
-| `qr.generator` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel | Non |
-| `secure.hash-calculator` | Oui | Oui | Oui | Oui | Linux x86_64, macOS ARM/Intel | Non |
-| `secure.password-generator` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel | Non |
-| `text.case-converter` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel | Non |
-| `text.cleaner` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel | Non |
-| `text.deduplicate` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel | Non |
-| `text.find-replace` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel | Non |
-| `text.lorem-ipsum` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel | Non |
-| `text.slug-generator` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel | Non |
-| `text.sort-lines` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel | Non |
-| `text.word-counter` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel | Non |
+| `calc.age` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel, Windows x86_64 | Non |
+| `calc.average` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel, Windows x86_64 | Non |
+| `calc.compound-interest` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel, Windows x86_64 | Non |
+| `calc.date-add` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel, Windows x86_64 | Non |
+| `calc.date-difference` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel, Windows x86_64 | Non |
+| `calc.fuel-cost` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel, Windows x86_64 | Non |
+| `calc.gross-net-salary` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel, Windows x86_64 | Non |
+| `calc.loan` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel, Windows x86_64 | Non |
+| `calc.percentage` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel, Windows x86_64 | Non |
+| `calc.rule-of-three` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel, Windows x86_64 | Non |
+| `calc.tip` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel, Windows x86_64 | Non |
+| `calc.unit-price` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel, Windows x86_64 | Non |
+| `calc.vat` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel, Windows x86_64 | Non |
+| `code.base64` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel, Windows x86_64 | Non |
+| `code.chmod` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel, Windows x86_64 | Non |
+| `code.html-entities` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel, Windows x86_64 | Non |
+| `code.json-formatter` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel, Windows x86_64 | Non |
+| `code.markdown-table` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel, Windows x86_64 | Non |
+| `code.number-base` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel, Windows x86_64 | Non |
+| `code.url-encoder` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel, Windows x86_64 | Non |
+| `code.uuid-generator` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel, Windows x86_64 | Non |
+| `color.contrast-checker` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel, Windows x86_64 | Non |
+| `color.converter` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel, Windows x86_64 | Non |
+| `convert.timestamp` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel, Windows x86_64 | Non |
+| `convert.units` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel, Windows x86_64 | Non |
+| `image.convert` | Oui | Oui | Oui | Oui | Linux x86_64, macOS ARM/Intel, Windows x86_64 | Non |
+| `pdf.merge` | Oui | Oui | Oui | Oui | Linux x86_64, macOS ARM/Intel, Windows x86_64 | Non |
+| `qr.generator` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel, Windows x86_64 | Non |
+| `secure.hash-calculator` | Oui | Oui | Oui | Oui | Linux x86_64, macOS ARM/Intel, Windows x86_64 | Non |
+| `secure.password-generator` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel, Windows x86_64 | Non |
+| `text.case-converter` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel, Windows x86_64 | Non |
+| `text.cleaner` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel, Windows x86_64 | Non |
+| `text.deduplicate` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel, Windows x86_64 | Non |
+| `text.find-replace` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel, Windows x86_64 | Non |
+| `text.lorem-ipsum` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel, Windows x86_64 | Non |
+| `text.slug-generator` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel, Windows x86_64 | Non |
+| `text.sort-lines` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel, Windows x86_64 | Non |
+| `text.word-counter` | Oui | Oui | Non | Oui | Linux x86_64, macOS ARM/Intel, Windows x86_64 | Non |
 
 ## Définition d’une prochaine étape validée
 

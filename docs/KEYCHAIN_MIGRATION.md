@@ -1,10 +1,10 @@
 # Desktop credential migration — step 8.5
 
-Status: implementation specification; **not implemented or validated**. Authority: RULES.md §§4/6/7 and MASTER_PROMPT.md account/distribution requirements. No new product tool, service, dependency or paid signature is authorized by this document.
+Status: native adapter, protected records, migration/rollback and caller error propagation implemented; **full local gate passed; OS acceptance pending**. Authority: RULES.md §§4/6/7 and MASTER_PROMPT.md account/distribution requirements. No new product tool, service, dependency or paid signature is authorized by this document.
 
 ## Existing behavior and affected callers
 
-`crates/kortex-pkg/src/account.rs` stores the full `Credentials` value, including the device token, in `Home::credentials_path()` (`credentials.json`). Unix mode 0600 does not meet the system keychain requirement. `load_credentials()` currently returns `Option`, conflating missing, unreadable and invalid data. `clear_credentials()` silently ignores deletion errors. The derived Debug implementation exposes the token if the value is formatted.
+The previous `crates/kortex-pkg/src/account.rs` stored the full `Credentials` value, including the device token, in `Home::credentials_path()` (`credentials.json`). Unix mode 0600 does not meet the system keychain requirement. The previous `load_credentials()` returned `Option`, conflating missing, unreadable and invalid data. The previous `clear_credentials()` ignored deletion errors and the derived Debug exposed the token. The current implementation returns Result, redacts tokens and uses only the protected backend, with verified legacy migration.
 
 Consumers include CLI login/logout/whoami and package commands, plus the native Store/package library. Shared Rust session clients for browser cookies remain distinct; browser cookies must never be copied to this native store. The 38 tool engines do not need credential access.
 
@@ -21,15 +21,18 @@ Consumers include CLI login/logout/whoami and package commands, plus the native 
 
 | Check | Required result | Current validation |
 |---|---|---|
-| Fresh login | Protected record present; no plaintext token file | Not performed |
-| Existing credential migration | Verified protected item; legacy file removed only after successful persistence | Not performed |
-| Locked/unavailable backend | Actionable failure; no plaintext fallback, install or false login success | Not performed |
-| Failed write/read-back/delete | No false success; previous account remains recoverable | Not performed |
-| Failed new-token persistence | New remote token revocation attempted; error returned | Not performed |
-| Offline logout / failed local clear | Local and remote outcomes distinguished; failed clear remains an error | Not performed |
-| Isolated test store | No access to the user's real keychain entries | Not performed |
-| Privacy | Debug/errors/exports contain no token/auth key/password | Not performed |
-| macOS / Windows / Linux | Each changed native consumer compiled and the OS backend exercised | Not performed |
-| Browser boundary | Browser build excludes native secret backend; HttpOnly session handling retained | Not performed |
+| Fresh login | Protected record present; no plaintext token file | Passed with injected store; actual OS acceptance pending |
+| Existing credential migration | Verified protected item; legacy file removed only after successful persistence | Passed with injected store; actual OS acceptance pending |
+| Locked/unavailable backend | Actionable failure; no plaintext fallback, install or false login success | Passed with injected store; actual OS acceptance pending |
+| Failed write/read-back/delete | No false success; previous account remains recoverable | Passed with injected store; actual OS acceptance pending |
+| Failed new-token persistence | New remote token revocation attempted; error returned | Passed with injected store; actual OS acceptance pending |
+| Offline logout / failed local clear | Local and remote outcomes distinguished; failed clear remains an error | Passed with injected store; actual OS acceptance pending |
+| Isolated test store | No access to the user's real keychain entries | Passed with injected store; actual OS acceptance pending |
+| Privacy | Debug/errors/exports contain no token/auth key/password | Passed with injected store; actual OS acceptance pending |
+| macOS / Windows / Linux | Each changed native consumer compiled and the OS backend exercised | Passed with injected store; actual OS acceptance pending |
+| Browser boundary | Browser build excludes native secret backend; HttpOnly session handling retained | Passed with injected store; actual OS acceptance pending |
 
 Run the targeted failure/migration cases as one group, then the repository gate before commit. Compile changed native consumers for the affected OS targets and the shared app web target to prove feature isolation. Rebuild/reuse the 38 tool artifacts only according to actual compiled inputs and valid receipts; never relabel an old binary as a new-source build. Keep desktop public distribution closed until 8.5, 10.4, 10.6, 10.7 and 10.9 have their own required evidence.
+
+## Implementation evidence in progress
+Native-only keyring 4.2.0 is justified in deps.md and ADR 0022. Memory backends are injected explicitly per Home. The initial grouped gate passed for the native adapter/callers. The final full gate passed including the anonymous-install regression, distinct logout outcomes and compilation of the opt-in isolated OS recipe. Native smoke steps time out after three minutes to avoid a blocking unlock prompt consuming the CI budget. credentials.yml builds the native workspace for four targets and compiles Store web with an explicit native-dependency exclusion check. Native roundtrips use isolated CI stores/public fixture data; they are ignored in ordinary local tests. No production keychain item is used by tests. The 168 earlier release binaries remain bound to their older commits.

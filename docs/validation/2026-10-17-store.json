@@ -49,7 +49,7 @@
   },
   "public_installation": false,
   "github": {
-    "status": "Linux/macOS packages verified; all web bundles verified; Windows compiled but UTF-8 verification retry required",
+    "status": "All four release targets and web compiled; all 168 native release packages verified; later credential-store implementation is separate and pending acceptance",
     "tools": 38,
     "targets": [
       "x86_64-unknown-linux-gnu",
@@ -69,11 +69,12 @@
       "web": "Worker forced offline with missing byteorder-lite on fresh CI",
       "quality": "PlatformError unused on Linux with document feature"
     },
-    "verified_native_packages": 126,
+    "verified_native_packages": 168,
     "verified_native_targets": [
       "x86_64-unknown-linux-gnu",
       "aarch64-apple-darwin",
-      "x86_64-apple-darwin"
+      "x86_64-apple-darwin",
+      "x86_64-pc-windows-msvc"
     ],
     "web_verified": {
       "run_id": 39032642157,
@@ -86,6 +87,13 @@
       "run_id": 39048924068,
       "commit": "c95bf87b0f37e50c0526f13955d6f66d6266d861",
       "conclusion": "success"
+    },
+    "windows_verified": {
+      "run_id": 39049702070,
+      "commit": "ca3d62342a6cbbacf493628ddfb0cdbfdb1e1ec1",
+      "packages": 42,
+      "signed_index_verified": true,
+      "public_release": false
     }
   },
   "limits": [

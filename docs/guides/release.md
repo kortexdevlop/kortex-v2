@@ -11,9 +11,9 @@ Les artefacts vérifiés sont extraits dans `.kortex/binaries/<target>/<id>/` :
 | Linux x86_64 | 42 | release 39031294481, commit 7ed41ae |
 | macOS Intel | 42 | même run ; signatures ad hoc vérifiées |
 | macOS ARM | 42 | même run ; signatures ad hoc vérifiées |
-| Windows x86_64 | En attente de récupération | run 39032642157 : 42 compilés/paquetés, vérificateur bloqué par CP1252 ; relance corrigée 39049702070 |
+| Windows x86_64 | 42 | run 39049702070 vert, commit ca3d623 ; index signé vérifié |
 
-Chaque cible comporte 38 outils, trois apps (Store, Hub, Desk) et la CLI. Les archives originales restent dans `.kortex/ci-artifacts/<run>/<os>/`. Les preuves versionnées dans `docs/validation/2026-10-17-desktop-*.json` indiquent le commit exact, les versions, cibles et SHA-256 des archives/binaires. Ne pas attribuer un ancien artefact à un commit plus récent.
+Chaque cible comporte 38 outils, trois apps (Store, Hub, Desk) et la CLI : **168 exécutables de release récupérés et vérifiés**. Ces binaires précèdent les nouvelles modifications du trousseau ; celles-ci suivent une compilation/recette native dédiée, explicitement séparée des releases. Les archives originales restent dans `.kortex/ci-artifacts/<run>/<os>/`. Les preuves versionnées dans `docs/validation/2026-10-17-desktop-*.json` indiquent le commit exact, les versions, cibles et SHA-256 des archives/binaires. Ne pas attribuer un ancien artefact à un commit plus récent.
 
 ## Workflow GitHub
 
@@ -33,6 +33,6 @@ Les installateurs `installers/install.sh` et `install.ps1` sont présents comme 
 
 ## Blocages avant ouverture desktop
 
-Le stockage historique `credentials.json` doit être remplacé par le trousseau système (8.5), les installations anonymes et confirmations doivent être corrigées (10.4), les bundles/lanceurs doivent être complets (10.6), puis installation, désinstallation, mises à jour, raccourcis et interfaces doivent être recettés par OS (10.7/10.9). L’index nécessite encore une protection contre le retour à une ancienne release. Un lanceur Windows `.cmd` ne vaut pas le raccourci `.lnk` demandé.
+Le remplacement de `credentials.json` par le trousseau système est implémenté mais attend sa validation native complète (8.5). La CLI refuse désormais les installations anonymes dans les sources en validation ; confirmations/permissions complètes restent à recetter (10.4). les bundles/lanceurs doivent être complets (10.6), puis installation, désinstallation, mises à jour, raccourcis et interfaces doivent être recettés par OS (10.7/10.9). L’index nécessite encore une protection contre le retour à une ancienne release. Un lanceur Windows `.cmd` ne vaut pas le raccourci `.lnk` demandé.
 
 La compilation et les tests actuels ne ferment aucun de ces points à eux seuls. Voir `docs/PLAN.md` pour les validations distinctes.

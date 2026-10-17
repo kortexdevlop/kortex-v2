@@ -16,8 +16,8 @@ pub mod shortcuts;
 mod version;
 
 pub use account::{
-    Credentials, DEFAULT_API, KDF_ITERATIONS, confirm_password, confirm_required, derive_auth_key,
-    forget_install, login_device, logout, record_install, whoami,
+    Credentials, DEFAULT_API, KDF_ITERATIONS, LogoutOutcome, confirm_password, confirm_required,
+    derive_auth_key, forget_install, login_device, logout, record_install, whoami,
 };
 pub use env::{DEFAULT_INDEX, PkgEnv};
 pub use error::{Kind, PkgError};

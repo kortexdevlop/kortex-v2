@@ -84,8 +84,10 @@ fn confirm_with_account(
     from_stdin: bool,
     out: &mut dyn Write,
 ) -> Result<(), String> {
-    let Some(c) = creds else { return Ok(()) };
-    let required = kortex_pkg::confirm_required(c).map_err(|e| format!("impossible de vérifier ton compte ({e}) : réessaie en ligne, ou `kortex logout` pour installer sans compte"))?;
+    let Some(c) = creds else {
+        return Err("compte requis pour installer : lance `kortex login`".into());
+    };
+    let required = kortex_pkg::confirm_required(c).map_err(|e| format!("impossible de vérifier ton compte ({e}) : réessaie en ligne ou reconnecte ce compte avec `kortex login`"))?;
     if !required {
         return Ok(());
     }
@@ -170,14 +172,15 @@ pub fn run(
         }
         "logout" => {
             match kortex_pkg::logout(&env.home).map_err(|e| e.to_string())? {
-                true => writeln!(out, "✓ déconnecté, appareil révoqué"),
-                false => writeln!(out, "Déconnecté localement (le serveur n'a pas pu être prévenu : révoque l'appareil depuis ton compte)."),
+                kortex_pkg::LogoutOutcome::Revoked => writeln!(out, "✓ déconnecté, appareil révoqué"),
+                kortex_pkg::LogoutOutcome::Missing => writeln!(out, "Aucun compte connecté sur cet appareil."),
+                kortex_pkg::LogoutOutcome::LocalOnly => writeln!(out, "Déconnecté localement (le serveur n'a pas pu être prévenu : révoque l'appareil depuis ton compte)."),
             }
             .map_err(w)?;
             Ok(true)
         }
         "whoami" => {
-            let Some(c) = env.home.load_credentials() else {
+            let Some(c) = env.home.load_credentials().map_err(|e| e.to_string())? else {
                 writeln!(out, "Non connecté (kortex login).").map_err(w)?;
                 return Ok(true);
             };
@@ -200,7 +203,7 @@ pub fn run(
             } else {
                 args
             };
-            let creds = env.home.load_credentials();
+            let creds = env.home.load_credentials().map_err(|e| e.to_string())?;
             confirm_with_account(creds.as_ref(), io, from_stdin, out)?;
             for id in ids {
                 install_one(env, &index, &id, creds.as_ref(), out)?;
@@ -237,7 +240,7 @@ pub fn run(
             if ids.is_empty() {
                 writeln!(out, "Aucun outil installé.").map_err(w)?;
             }
-            let creds = env.home.load_credentials();
+            let creds = env.home.load_credentials().map_err(|e| e.to_string())?;
             for id in ids {
                 let mut note = |_: &str| {};
                 match update(&env.home, &index, &env.index_src, &id, &target, &mut note)
@@ -264,7 +267,7 @@ pub fn run(
                 .unwrap_or_else(|| id.clone());
             remove(&env.home, id, &display).map_err(|e| e.to_string())?;
             writeln!(out, "✓ {id} supprimé").map_err(w)?;
-            if let Some(c) = env.home.load_credentials() {
+            if let Ok(Some(c)) = env.home.load_credentials() {
                 let _ = kortex_pkg::forget_install(&c, id);
             }
             Ok(true)
@@ -335,7 +338,7 @@ pub fn run(
                     writeln!(out, "✗ index — {e}").map_err(w)?;
                 }
             }
-            match env.home.load_credentials() {
+            match env.home.load_credentials().map_err(|e| e.to_string())? {
                 Some(c) => match kortex_pkg::whoami(&c) {
                     Ok(Some(email)) => writeln!(out, "✓ compte — {email}").map_err(w)?,
                     Ok(None) => {
@@ -345,8 +348,11 @@ pub fn run(
                     }
                     Err(e) => writeln!(out, "• compte — non vérifié ({e})").map_err(w)?,
                 },
-                None => writeln!(out, "• compte — non connecté (facultatif : kortex login)")
-                    .map_err(w)?,
+                None => writeln!(
+                    out,
+                    "• compte — non connecté (kortex login requis pour installer)"
+                )
+                .map_err(w)?,
             }
             if bad > 0 {
                 Err(format!("{bad} problème(s) détecté(s)"))

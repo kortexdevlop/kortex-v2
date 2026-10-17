@@ -4,6 +4,7 @@ use std::fmt;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Kind {
     BadSignature,
+    CredentialStore,
     Integrity,
     Unsafe,
     Network,
