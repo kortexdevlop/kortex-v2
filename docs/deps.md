@@ -52,3 +52,6 @@ Linux Secret Service acceptance uses the free OS packages `gnome-keyring` and `d
 ### Contract JSON Schema (step 4.5, 2026-10-17)
 `serde_json` 1 is now also a dependency of `kortex-contract` (already used by xtask, runtime and platform): it builds the JSON Schema tool definitions from contracts for future Mind/Seek hosts. Alternative rejected: hand-written schemas per tool (drift from contracts). Small, already in the lockfile, no new ecosystem.
 
+### Native execution and `--engine` (steps 3.4/3.6/3.10, 2026-10-17)
+`serde_json` 1 is also a native-only dependency of `kortex-runtime` (`cfg(not(wasm32))`, absent from browser bundles): it parses and writes the JSON-RPC lines of the desktop `--engine` mode. Threads, condition variables and standard streams use only `std` behind `kortex-platform::native` (`task`, `stdio`); no async runtime, no new crate. Alternative rejected: an async runtime such as tokio for one blocking worker thread (large, a second execution model).
+

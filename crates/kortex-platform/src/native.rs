@@ -99,6 +99,10 @@ pub mod env {
     pub fn current_exe() -> io::Result<PathBuf> {
         std::env::current_exe()
     }
+    /// Command-line arguments after the program name.
+    pub fn args() -> Vec<String> {
+        std::env::args().skip(1).collect()
+    }
     pub fn home_dir() -> Option<PathBuf> {
         var_os("HOME")
             .or_else(|| var_os("USERPROFILE"))
@@ -284,6 +288,203 @@ pub fn run_cli(
         Err(error) => {
             eprintln!("erreur : {error}");
             std::process::ExitCode::FAILURE
+        }
+    }
+}
+
+/// Process input/output for headless modes (`--engine`); commands stay testable by taking
+/// generic readers and writers.
+pub mod stdio {
+    use std::io::{self, BufRead, Write};
+
+    /// Locked standard input and output, for a request/response loop.
+    #[must_use]
+    pub fn streams() -> (impl BufRead, impl Write) {
+        (io::stdin().lock(), io::stdout().lock())
+    }
+}
+
+/// Background execution: a dedicated thread plus a single-value completion slot that can be
+/// awaited from a UI future or blocked on from a headless loop.
+pub mod task {
+    use std::future::Future;
+    use std::io;
+    use std::pin::Pin;
+    use std::sync::{Arc, Condvar, Mutex, MutexGuard};
+    use std::task::{Context, Poll, Waker};
+    use std::time::Duration;
+
+    struct State<T> {
+        value: Option<T>,
+        done: bool,
+        waker: Option<Waker>,
+    }
+
+    struct Inner<T> {
+        state: Mutex<State<T>>,
+        signal: Condvar,
+    }
+
+    /// First-writer-wins completion slot with a single consumer.
+    pub struct Slot<T>(Arc<Inner<T>>);
+
+    impl<T> Clone for Slot<T> {
+        fn clone(&self) -> Self {
+            Self(Arc::clone(&self.0))
+        }
+    }
+
+    impl<T> Default for Slot<T> {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+
+    impl<T> Slot<T> {
+        #[must_use]
+        pub fn new() -> Self {
+            Self(Arc::new(Inner {
+                state: Mutex::new(State {
+                    value: None,
+                    done: false,
+                    waker: None,
+                }),
+                signal: Condvar::new(),
+            }))
+        }
+
+        fn lock(&self) -> MutexGuard<'_, State<T>> {
+            // A poisoned lock only means another thread panicked while holding it; the state
+            // is a plain value and stays consistent.
+            self.0
+                .state
+                .lock()
+                .unwrap_or_else(std::sync::PoisonError::into_inner)
+        }
+
+        /// Stores `value` unless the slot is already complete; returns whether it was stored.
+        pub fn complete(&self, value: T) -> bool {
+            let waker = {
+                let mut state = self.lock();
+                if state.done {
+                    return false;
+                }
+                state.value = Some(value);
+                state.done = true;
+                state.waker.take()
+            };
+            self.0.signal.notify_all();
+            if let Some(waker) = waker {
+                waker.wake();
+            }
+            true
+        }
+
+        #[must_use]
+        pub fn is_done(&self) -> bool {
+            self.lock().done
+        }
+
+        /// Blocks up to `timeout`; returns whether the slot completed in time.
+        #[must_use]
+        pub fn wait_done(&self, timeout: Duration) -> bool {
+            let guard = self.lock();
+            let (guard, _) = self
+                .0
+                .signal
+                .wait_timeout_while(guard, timeout, |state| !state.done)
+                .unwrap_or_else(std::sync::PoisonError::into_inner);
+            guard.done
+        }
+
+        /// Blocks until completion and takes the value.
+        #[must_use]
+        pub fn wait_blocking(&self) -> Option<T> {
+            let guard = self.lock();
+            let mut guard = self
+                .0
+                .signal
+                .wait_while(guard, |state| !state.done)
+                .unwrap_or_else(std::sync::PoisonError::into_inner);
+            guard.value.take()
+        }
+
+        /// Future resolving to the value once completed (`None` if another consumer took it).
+        #[must_use]
+        pub fn wait(&self) -> Wait<T> {
+            Wait(self.clone())
+        }
+    }
+
+    pub struct Wait<T>(Slot<T>);
+
+    impl<T> Future for Wait<T> {
+        type Output = Option<T>;
+
+        fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
+            let mut state = self.0.lock();
+            if state.done {
+                Poll::Ready(state.value.take())
+            } else {
+                state.waker = Some(cx.waker().clone());
+                Poll::Pending
+            }
+        }
+    }
+
+    /// Runs `job` on a new named thread.
+    ///
+    /// # Errors
+    /// The operating system could not create the thread.
+    pub fn spawn(name: &str, job: impl FnOnce() + Send + 'static) -> io::Result<()> {
+        std::thread::Builder::new()
+            .name(name.to_owned())
+            .spawn(job)
+            .map(|_| ())
+    }
+
+    #[cfg(test)]
+    mod tests {
+        use super::*;
+
+        fn block<F: Future>(fut: F) -> F::Output {
+            let mut fut = std::pin::pin!(fut);
+            let mut cx = Context::from_waker(Waker::noop());
+            loop {
+                if let Poll::Ready(v) = fut.as_mut().poll(&mut cx) {
+                    return v;
+                }
+                std::thread::yield_now();
+            }
+        }
+
+        #[test]
+        fn first_completion_wins_and_value_is_awaitable() {
+            let slot = Slot::new();
+            assert!(slot.complete(1));
+            assert!(!slot.complete(2));
+            assert_eq!(block(slot.wait()), Some(1));
+        }
+
+        #[test]
+        fn background_thread_completes_a_blocked_waiter() {
+            let slot = Slot::new();
+            let remote = slot.clone();
+            assert!(
+                spawn("test-worker", move || {
+                    remote.complete(42);
+                })
+                .is_ok()
+            );
+            assert_eq!(slot.wait_blocking(), Some(42));
+        }
+
+        #[test]
+        fn wait_done_times_out_when_nothing_completes() {
+            let slot = Slot::<u8>::new();
+            assert!(!slot.wait_done(Duration::from_millis(20)));
+            slot.complete(1);
+            assert!(slot.wait_done(Duration::from_millis(20)));
         }
     }
 }

@@ -1,4 +1,7 @@
 //! Engine runtime: execution context, shared data types, minimal executor.
+#[cfg(not(target_arch = "wasm32"))]
+pub mod native;
+
 use std::future::Future;
 use std::pin::pin;
 use std::sync::Arc;
