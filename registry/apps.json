@@ -160,6 +160,59 @@
       "app": {
         "ai": false,
         "aliases": {},
+        "bundles_engines": true,
+        "id": "apps.mind",
+        "name": {
+          "en": "Kortex Mind",
+          "fr": "Kortex Mind"
+        },
+        "offline": false,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "mind",
+          "fr": "mind"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Describe what you need: Mind picks the tools and runs them on your device.",
+          "fr": "Décrivez votre besoin : Mind choisit les outils et les lance sur votre appareil."
+        },
+        "ui": "custom",
+        "universe": "apps",
+        "version": "0.1.0",
+        "viral_priority": 3,
+        "web_worker": false
+      },
+      "inputs": [],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": null
+      },
+      "outputs": [],
+      "params": [],
+      "permissions": {
+        "clipboard": "none",
+        "filesystem": "write",
+        "network": true,
+        "privacy": "ai-consent",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {},
+        "keywords": {},
+        "related": []
+      },
+      "variants": []
+    },
+    {
+      "app": {
+        "ai": false,
+        "aliases": {},
         "id": "apps.seek",
         "name": {
           "en": "Kortex Seek",

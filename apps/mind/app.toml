@@ -1,0 +1,29 @@
+schema = 1
+
+[app]
+id = "apps.mind"
+version = "0.1.0"
+universe = "apps"
+status = "beta"
+bundles_engines = true
+ui = "custom"
+platforms = ["web", "desktop"]
+offline = false
+ai = false
+
+[app.name]
+fr = "Kortex Mind"
+en = "Kortex Mind"
+[app.tagline]
+fr = "Décrivez votre besoin : Mind choisit les outils et les lance sur votre appareil."
+en = "Describe what you need: Mind picks the tools and runs them on your device."
+[app.slug]
+fr = "mind"
+en = "mind"
+
+[permissions]
+network = true
+filesystem = "write"
+clipboard = "none"
+sensitive = false
+privacy = "ai-consent"

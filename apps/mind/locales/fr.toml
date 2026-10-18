@@ -1,0 +1,83 @@
+[ui]
+title = "Kortex Mind"
+subtitle = "Dites ce que vous voulez faire : Mind choisit les outils, vous validez le plan, tout s’exécute sur votre appareil."
+empty = "Posez une demande, par exemple : « Nettoie le texte 'Bonjour   le   monde ' puis mets-le en majuscules ». Les textes entre guillemets restent sur votre appareil."
+thinking = "Réflexion…"
+message = "Votre message"
+placeholder = "Ex. : fusionne mes PDF, génère un mot de passe de 20 caractères…"
+send = "Envoyer"
+stop = "Arrêter"
+new = "Nouvelle conversation"
+saved = "Enregistré dans"
+
+[account]
+checking = "Vérification du compte…"
+signed_out_web = "Mind demande un compte Kortex (crédits d’IA personnels)."
+signed_out_desktop = "Connectez-vous d’abord avec la commande « kortex login » : Mind utilisera ce compte."
+sign_in = "Se connecter"
+unavailable = "Le compte est injoignable pour le moment. Vérifiez votre connexion et réessayez."
+
+[credits]
+label = "Crédits IA"
+paused = "L’IA est en pause pour aujourd’hui, elle revient à"
+empty = "Vos crédits sont épuisés, ils reviennent progressivement : prochain palier à"
+low = "Il vous reste peu de crédits."
+
+[consent]
+title = "Avant de commencer"
+body = "Vos messages sont envoyés à Gemma (Google), hébergé par Cloudflare Workers AI, pour choisir les outils. Vos textes entre guillemets et vos fichiers ne le sont jamais : le modèle ne voit que leur nom, leur type et leur taille, sauf si vous cochez explicitement « Partager le contenu » pour un texte. Les outils s’exécutent localement."
+accept = "J’ai compris, continuer"
+
+[plan]
+title = "Plan proposé"
+hint = "Rien ne s’exécute avant votre accord. Vérifiez les outils, les entrées et les paramètres."
+approve = "Valider et exécuter"
+refuse = "Refuser"
+refused = "Plan refusé."
+confirm_sensitive = "action sensible : je confirme"
+confirm_network = "accès réseau : je confirme"
+confirm_write = "écriture sur le disque : je confirme"
+
+[attach]
+title = "Joindre un texte ou des fichiers"
+text_label = "Texte à joindre (désigné par @texteN)"
+add_text = "Ajouter ce texte"
+drop = "Déposer des fichiers"
+drop_hint = "ou cliquer pour choisir (désignés par @fichierN)"
+share = "Partager le contenu avec Gemma"
+never_shared = "contenu jamais partagé"
+remove = "Retirer"
+
+[export]
+button = "Exporter en workflow Flow"
+name = "Plan Mind"
+nothing = "Aucun outil exécuté pour le moment : rien à exporter."
+files = "Ce plan utilise des fichiers : Flow ne sait pas encore les représenter."
+
+[result]
+download = "Enregistrer le fichier"
+not_kept = "Résultat non conservé après rechargement."
+
+[errors]
+unknown = "Une erreur est survenue"
+missing_confirmation = "Cochez les confirmations demandées avant d’exécuter"
+too_many_steps = "Trop d’étapes pour une seule demande : j’arrête ici. Précisez la suite."
+too_many_corrections = "Je n’arrive pas à construire un plan valide pour cette demande. Reformulez-la."
+consent_required = "Le consentement est nécessaire pour envoyer un message."
+ai_paused = "L’IA est en pause pour aujourd’hui (quota gratuit partagé)."
+user_empty = "Vos crédits sont épuisés pour le moment."
+ai_unavailable = "Le modèle est indisponible. Réessayez dans un instant."
+network = "Connexion interrompue."
+truncated = "La réponse s’est arrêtée trop tôt. Réessayez."
+unauthorized = "Session expirée : reconnectez-vous."
+rate_limited = "Trop de demandes, patientez une minute."
+invalid_messages = "La conversation est trop longue ou invalide : commencez-en une nouvelle."
+messages_too_large = "La conversation est trop volumineuse : commencez-en une nouvelle."
+tool_not_installed = "Cet outil n’est pas installé sur cet ordinateur."
+worker_failed = "L’outil n’a pas pu terminer."
+worker_timeout = "L’outil a dépassé le temps imparti."
+worker_protocol = "L’outil a répondu de façon inattendue."
+cancelled = "Annulé."
+empty_input = "Le texte est vide."
+file_type_mismatch = "Le contenu d’un fichier ne correspond pas au type attendu."
+invalid_param = "Valeur de paramètre invalide."

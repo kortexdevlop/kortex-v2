@@ -1,0 +1,83 @@
+[ui]
+title = "Kortex Mind"
+subtitle = "Say what you want to do: Mind picks the tools, you approve the plan, everything runs on your device."
+empty = "Ask for something, for example: \"Clean the text 'Hello   world ' then make it uppercase\". Quoted texts stay on your device."
+thinking = "Thinking…"
+message = "Your message"
+placeholder = "E.g. merge my PDFs, generate a 20-character password…"
+send = "Send"
+stop = "Stop"
+new = "New conversation"
+saved = "Saved to"
+
+[account]
+checking = "Checking your account…"
+signed_out_web = "Mind needs a Kortex account (personal AI credits)."
+signed_out_desktop = "Sign in first with the \"kortex login\" command: Mind will use that account."
+sign_in = "Sign in"
+unavailable = "The account cannot be reached right now. Check your connection and try again."
+
+[credits]
+label = "AI credits"
+paused = "AI is paused for today, it comes back at"
+empty = "Your credits are used up, they come back gradually: next step at"
+low = "You are running low on credits."
+
+[consent]
+title = "Before you start"
+body = "Your messages are sent to Gemma (Google), hosted by Cloudflare Workers AI, to choose the tools. Your quoted texts and your files never are: the model only sees their name, type and size, unless you explicitly tick \"Share content\" for a text. Tools run locally."
+accept = "I understand, continue"
+
+[plan]
+title = "Proposed plan"
+hint = "Nothing runs before you agree. Check the tools, inputs and parameters."
+approve = "Approve and run"
+refuse = "Refuse"
+refused = "Plan refused."
+confirm_sensitive = "sensitive action: I confirm"
+confirm_network = "network access: I confirm"
+confirm_write = "writing to disk: I confirm"
+
+[attach]
+title = "Attach a text or files"
+text_label = "Text to attach (named @texteN)"
+add_text = "Add this text"
+drop = "Drop files"
+drop_hint = "or click to choose (named @fichierN)"
+share = "Share the content with Gemma"
+never_shared = "content never shared"
+remove = "Remove"
+
+[export]
+button = "Export as a Flow workflow"
+name = "Mind plan"
+nothing = "No tool has run yet: nothing to export."
+files = "This plan uses files: Flow cannot represent them yet."
+
+[result]
+download = "Save the file"
+not_kept = "Result not kept after a reload."
+
+[errors]
+unknown = "Something went wrong"
+missing_confirmation = "Tick the requested confirmations before running"
+too_many_steps = "Too many steps for one request: I stop here. Tell me what to do next."
+too_many_corrections = "I cannot build a valid plan for this request. Please rephrase it."
+consent_required = "Consent is required to send a message."
+ai_paused = "AI is paused for today (shared free quota)."
+user_empty = "Your credits are used up for now."
+ai_unavailable = "The model is unavailable. Try again in a moment."
+network = "Connection interrupted."
+truncated = "The answer stopped too early. Try again."
+unauthorized = "Session expired: sign in again."
+rate_limited = "Too many requests, wait a minute."
+invalid_messages = "The conversation is too long or invalid: start a new one."
+messages_too_large = "The conversation is too large: start a new one."
+tool_not_installed = "This tool is not installed on this computer."
+worker_failed = "The tool could not finish."
+worker_timeout = "The tool took too long."
+worker_protocol = "The tool answered unexpectedly."
+cancelled = "Cancelled."
+empty_input = "The text is empty."
+file_type_mismatch = "A file's content does not match the expected type."
+invalid_param = "Invalid parameter value."

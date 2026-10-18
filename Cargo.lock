@@ -3341,6 +3341,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "kortex-ai"
+version = "0.1.0"
+dependencies = [
+ "kortex-contract",
+ "kortex-runtime",
+ "kortex-workflow",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "kortex-auth"
 version = "0.1.0"
 dependencies = [
@@ -3451,6 +3462,7 @@ dependencies = [
  "kortex-runtime",
  "kortex-shell",
  "kortex-ui",
+ "kortex-workflow",
  "serde",
  "serde_json",
  "toml 0.9.12+spec-1.1.0",
@@ -3488,6 +3500,26 @@ version = "0.1.0"
 dependencies = [
  "kortex-contract",
  "toml 0.9.12+spec-1.1.0",
+]
+
+[[package]]
+name = "kortex-mind"
+version = "0.1.0"
+dependencies = [
+ "dioxus",
+ "kortex-ai",
+ "kortex-auth",
+ "kortex-contract",
+ "kortex-i18n",
+ "kortex-pkg",
+ "kortex-platform",
+ "kortex-runtime",
+ "kortex-search",
+ "kortex-shell",
+ "kortex-ui",
+ "kortex-workflow",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]
@@ -3534,11 +3566,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "kortex-search"
+version = "0.1.0"
+
+[[package]]
 name = "kortex-seek"
 version = "0.1.0"
 dependencies = [
  "dioxus",
  "kortex-i18n",
+ "kortex-search",
  "kortex-shell",
  "kortex-ui",
 ]
@@ -3595,6 +3632,18 @@ dependencies = [
  "kortex-i18n",
  "kortex-platform",
  "kortex-runtime",
+ "toml 0.9.12+spec-1.1.0",
+]
+
+[[package]]
+name = "kortex-workflow"
+version = "0.1.0"
+dependencies = [
+ "kortex-contract",
+ "kortex-platform",
+ "kortex-runtime",
+ "serde",
+ "serde_json",
  "toml 0.9.12+spec-1.1.0",
 ]
 

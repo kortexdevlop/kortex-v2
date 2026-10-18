@@ -63,3 +63,7 @@ Font file only, no npm dependency kept: `inter-latin-wght-normal.woff2` from `@f
 
 ### Shared crates for Mind (steps 5.2, 9.5, 14.x, 2026-10-18)
 `kortex-search` (Seek's engine moved out of the app, now used by Mind to pick candidate tools), `kortex-workflow` (Flow's graph, validation, step-by-step execution and installed-binary runner, now used by Flow and Mind) and `kortex-ai` (gateway wire format, SSE parser, tool definitions from contracts, reference protocol, plan validation, per-attachment consent, credits). Internal crates, each with two real users; no new external dependency (`serde`, `serde_json`, `toml` are already allowed).
+
+### Mind (steps 14.x, 2026-10-18)
+`apps/mind` uses only crates already allowed (`serde`, `serde_json`, Dioxus) and the internal shared crates `kortex-ai`, `kortex-search`, `kortex-workflow`, `kortex-auth`; desktop credentials come from `kortex-pkg` (native-only). The AI provider is Cloudflare Workers AI through the existing `AI` binding (free plan, 10 000 neurons/day shared, capped by the gateway), model `@cf/google/gemma-4-26b-a4b-it` (ADR 0023). No new external package, no paid service.
+
