@@ -74,6 +74,51 @@ pub fn compose_icon(glyph: &str, hue: f64) -> Result<String, String> {
     ))
 }
 
+/// OKLCH hue (degrees) of a `#rrggbb` color, so app icons follow the accent token.
+#[must_use]
+pub fn hue_of_hex(hex: &str) -> Option<f64> {
+    let digits = hex.strip_prefix('#')?;
+    if digits.len() != 6 {
+        return None;
+    }
+    let channel = |i: usize| {
+        u8::from_str_radix(&digits[i..i + 2], 16).ok().map(|v| {
+            let c = f64::from(v) / 255.0;
+            if c <= 0.040_45 {
+                c / 12.92
+            } else {
+                ((c + 0.055) / 1.055).powf(2.4)
+            }
+        })
+    };
+    let (r, g, b) = (channel(0)?, channel(2)?, channel(4)?);
+    let l = (0.412_221_470_8 * r + 0.536_332_536_3 * g + 0.051_445_992_9 * b).cbrt();
+    let m = (0.211_903_498_2 * r + 0.680_699_545_1 * g + 0.107_396_956_6 * b).cbrt();
+    let s = (0.088_302_461_9 * r + 0.281_718_837_6 * g + 0.629_978_700_5 * b).cbrt();
+    let a = 1.977_998_495_1 * l - 2.428_592_205 * m + 0.450_593_709_9 * s;
+    let bb = 0.025_904_037_1 * l + 0.782_771_766_2 * m - 0.808_675_766 * s;
+    Some(bb.atan2(a).to_degrees().rem_euclid(360.0))
+}
+
+/// PNG icon set of an application: the glyph on the accent-hued squircle, in the sizes a PWA
+/// manifest and iOS expect.
+///
+/// # Errors
+/// The glyph or the hue cannot be used.
+pub fn app_icons(glyph: &str, accent_hex: &str) -> Result<Vec<(&'static str, Vec<u8>)>, String> {
+    let hue = hue_of_hex(accent_hex)
+        .ok_or_else(|| format!("couleur d'accent illisible : {accent_hex}"))?;
+    let svg = compose_icon(glyph, hue)?;
+    [
+        ("icon-192.png", 192),
+        ("icon-512.png", 512),
+        ("apple-touch-icon.png", 180),
+    ]
+    .into_iter()
+    .map(|(name, size)| Ok((name, render_png(&svg, size)?)))
+    .collect()
+}
+
 /// Greedy word wrap on character count.
 fn wrap(text: &str, max: usize, lines: usize) -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
@@ -144,7 +189,7 @@ fn footer(lang: &str) -> &'static str {
     }
 }
 
-fn render_png(svg: &str, width: u32) -> Result<Vec<u8>, String> {
+pub(crate) fn render_png(svg: &str, width: u32) -> Result<Vec<u8>, String> {
     let mut opt = resvg::usvg::Options::default();
     {
         let db = opt.fontdb_mut();

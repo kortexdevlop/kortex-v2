@@ -67,7 +67,14 @@ pub(crate) fn fingerprint(id: &str) -> Result<String, String> {
     let root = std::env::current_dir().map_err(|e| e.to_string())?;
     let name = id.strip_prefix("apps.").ok_or("invalid app id")?;
     let base = crate::build::source_fingerprint(&root, &root.join("apps").join(name))?;
-    let mut paths = vec!["brand", "registry/index.json"];
+    let mut paths = vec![
+        "brand",
+        "registry/index.json",
+        "web/shell",
+        "design/tokens",
+        "xtask/src/pwa.rs",
+        "xtask/src/icons.rs",
+    ];
     // An app that ships every tool's engine depends on every tool: conservative on purpose.
     if discover()?
         .iter()
@@ -176,6 +183,9 @@ pub fn build_web(id: &str) -> Result<(), String> {
     let html = fs::read_to_string(destination.join("index.html")).map_err(|e| e.to_string())?;
     fs::create_dir_all(destination.join("en")).map_err(|e| e.to_string())?;
     fs::write(destination.join("en/index.html"), html).map_err(|e| e.to_string())?;
+    // Installable PWA: manifest, icons and offline worker, written last so the worker lists
+    // every other file of the bundle.
+    crate::pwa::write(&app, &destination)?;
     receipt(id, "web", &fingerprint, &destination)?;
     println!("✓ {id} web → {}", destination.display());
     Ok(())

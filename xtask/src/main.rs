@@ -11,6 +11,7 @@ mod icons;
 mod new_app;
 mod new_tool;
 mod platform_check;
+mod pwa;
 mod registry;
 mod release;
 mod schema;

@@ -158,7 +158,11 @@ pub fn affected(files: &[String], krates: &[Krate]) -> Affected {
         {
             result.all = true;
         }
-        if file.starts_with("registry/") || file.starts_with("web/shell/") {
+        if file.starts_with("registry/")
+            || file.starts_with("web/shell/")
+            || file == "xtask/src/pwa.rs"
+            || file == "xtask/src/icons.rs"
+        {
             registry_changed = true;
         }
         if let Some(owner) = krates
