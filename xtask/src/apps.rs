@@ -67,7 +67,7 @@ pub(crate) fn fingerprint(id: &str) -> Result<String, String> {
     let root = std::env::current_dir().map_err(|e| e.to_string())?;
     let name = id.strip_prefix("apps.").ok_or("invalid app id")?;
     let base = crate::build::source_fingerprint(&root, &root.join("apps").join(name))?;
-    let extra = ["brand", "registry/index.json", "crates/kortex-pkg"]
+    let extra = ["brand", "registry/index.json"]
         .iter()
         .map(|p| crate::build::tree_fingerprint(&root.join(p)))
         .collect::<Result<Vec<_>, _>>()?;

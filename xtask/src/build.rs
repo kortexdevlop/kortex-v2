@@ -42,6 +42,23 @@ pub(crate) fn tool_view(custom_ui: bool, cancel_prop: &str) -> String {
     }
 }
 
+/// `cargo xtask fingerprint <univers.nom | apps.nom>`: the receipt source hash (debugging aid).
+pub fn print_fingerprint(args: &[String]) -> Result<(), String> {
+    let id = args.first().ok_or("usage : cargo xtask fingerprint <id>")?;
+    let root = abs(".")?;
+    let dir = if let Some(name) = id.strip_prefix("apps.") {
+        root.join("apps").join(name)
+    } else {
+        let tool = tools::discover()?
+            .into_iter()
+            .find(|t| t.contract.as_ref().is_ok_and(|c| c.tool.id == *id))
+            .ok_or_else(|| format!("outil `{id}` introuvable"))?;
+        abs(&tool.dir.to_string_lossy())?
+    };
+    println!("{}", source_fingerprint(&root, &dir)?);
+    Ok(())
+}
+
 pub fn run(args: &[String]) -> Result<(), String> {
     let ids: Vec<_> = args.iter().filter(|arg| arg.as_str() != "--web").collect();
     if ids.is_empty() {
@@ -357,42 +374,157 @@ pub(crate) fn tree_fingerprint(path: &Path) -> Result<String, String> {
     Ok(format!("{:016x}", hash.finish()))
 }
 
+/// `Cargo.lock` entries reachable from `roots` (workspace crates), canonicalised: a dependency
+/// bump that no bundle input can see does not change the result.
+pub(crate) fn lock_subset(lock: &str, roots: &[String]) -> Result<String, String> {
+    use std::collections::{BTreeMap, BTreeSet};
+    let table: toml::Table = lock.parse().map_err(|e: toml::de::Error| e.to_string())?;
+    let packages = table
+        .get("package")
+        .and_then(toml::Value::as_array)
+        .ok_or("Cargo.lock sans paquets")?;
+    let mut by_name: BTreeMap<&str, Vec<&toml::Table>> = BTreeMap::new();
+    for package in packages.iter().filter_map(toml::Value::as_table) {
+        if let Some(name) = package.get("name").and_then(toml::Value::as_str) {
+            by_name.entry(name).or_default().push(package);
+        }
+    }
+    let mut seen: BTreeSet<String> = BTreeSet::new();
+    let mut stack: Vec<String> = roots.to_vec();
+    let mut lines = Vec::new();
+    while let Some(spec) = stack.pop() {
+        // A dependency is `name`, `name version` or `name version (source)`.
+        let mut parts = spec.split(' ');
+        let (name, version) = (parts.next().unwrap_or_default(), parts.next());
+        for package in by_name.get(name).into_iter().flatten() {
+            let found = package.get("version").and_then(toml::Value::as_str);
+            if version.is_some() && version != found {
+                continue;
+            }
+            let key = format!("{name} {}", found.unwrap_or_default());
+            if !seen.insert(key.clone()) {
+                continue;
+            }
+            lines.push(format!("{package}"));
+            stack.extend(
+                package
+                    .get("dependencies")
+                    .and_then(toml::Value::as_array)
+                    .into_iter()
+                    .flatten()
+                    .filter_map(|d| d.as_str().map(str::to_owned)),
+            );
+        }
+    }
+    lines.sort();
+    Ok(lines.join("\n"))
+}
+
+/// Hash of everything a bundle build reads: the crate's own tree, the dependency closure of
+/// workspace crates (plus the host wrapper libraries for a tool), the reachable lockfile
+/// entries, the toolchain, the generated stylesheet and the xtask files that generate wrappers.
+/// An unrelated crate, tool or xtask command never invalidates the receipt.
 pub(crate) fn source_fingerprint(root: &Path, tool: &Path) -> Result<String, String> {
     use std::hash::{Hash, Hasher};
     let mut hash = std::collections::hash_map::DefaultHasher::new();
     tree_fingerprint(tool)?.hash(&mut hash);
-    for name in [
+    let dir = tool
+        .strip_prefix(root)
+        .map_err(|e| e.to_string())?
+        .to_string_lossy()
+        .replace('\\', "/");
+    let krates = crate::changed::workspace(root)?;
+    let closure = crate::changed::bundle_crates(&krates, &dir);
+    if closure.is_empty() {
+        return Err(format!(
+            "{dir} : aucune crate du workspace à cet emplacement"
+        ));
+    }
+    let mut files: Vec<&str> = vec![
         "Cargo.toml",
-        "Cargo.lock",
         "rust-toolchain.toml",
         ".cargo",
         "design/dist/kortex.css",
-        "xtask/src",
-        "xtask/Cargo.toml",
-    ] {
+    ];
+    files.extend(
+        crate::changed::GLOBAL_PATHS
+            .iter()
+            .copied()
+            .filter(|p| p.starts_with("xtask/")),
+    );
+    for name in files {
         name.hash(&mut hash);
-        tree_fingerprint(&root.join(name))?.hash(&mut hash);
-    }
-    // All internal libraries except unrelated CLI/package management. New shared libraries
-    // automatically participate without having to update this list.
-    let mut crates = fs::read_dir(root.join("crates"))
-        .map_err(|e| e.to_string())?
-        .map(|e| e.map(|e| e.path()).map_err(|e| e.to_string()))
-        .collect::<Result<Vec<_>, _>>()?;
-    crates.sort();
-    for path in crates {
-        if path.is_dir()
-            && !matches!(
-                path.file_name().and_then(|n| n.to_str()),
-                Some("kortex-cli" | "kortex-pkg")
-            )
-        {
-            path.file_name().hash(&mut hash);
+        let path = root.join(name);
+        if path.exists() {
             tree_fingerprint(&path)?.hash(&mut hash);
         }
     }
+    for krate in &closure {
+        krate.name.hash(&mut hash);
+        tree_fingerprint(&root.join(&krate.dir))?.hash(&mut hash);
+    }
+    let roots: Vec<String> = closure.iter().map(|k| k.name.clone()).collect();
+    lock_subset(
+        &fs::read_to_string(root.join("Cargo.lock")).map_err(|e| e.to_string())?,
+        &roots,
+    )?
+    .hash(&mut hash);
     for name in ["RUSTFLAGS", "CARGO_ENCODED_RUSTFLAGS", "RUSTUP_TOOLCHAIN"] {
         std::env::var_os(name).hash(&mut hash);
     }
     Ok(format!("{:016x}", hash.finish()))
+}
+
+#[cfg(test)]
+mod fingerprint_tests {
+    use super::lock_subset;
+
+    const LOCK: &str = r#"
+version = 4
+[[package]]
+name = "tool-a"
+version = "0.1.0"
+dependencies = ["kortex", "serde 1.0.1"]
+[[package]]
+name = "kortex"
+version = "0.1.0"
+dependencies = ["serde 1.0.1"]
+[[package]]
+name = "serde"
+version = "1.0.1"
+source = "registry+x"
+checksum = "aa"
+[[package]]
+name = "serde"
+version = "0.9.0"
+source = "registry+x"
+checksum = "bb"
+[[package]]
+name = "unrelated"
+version = "0.1.0"
+dependencies = ["ureq"]
+[[package]]
+name = "ureq"
+version = "3.0.0"
+source = "registry+x"
+checksum = "cc"
+"#;
+
+    #[test]
+    fn lock_subset_keeps_only_reachable_packages_with_the_right_version() {
+        let subset = lock_subset(LOCK, &["tool-a".to_owned()]).unwrap_or_default();
+        assert!(subset.contains("name = \"kortex\""));
+        assert!(subset.contains("version = \"1.0.1\""));
+        assert!(!subset.contains("0.9.0"), "unreachable serde version");
+        assert!(!subset.contains("ureq") && !subset.contains("unrelated"));
+    }
+
+    #[test]
+    fn lock_subset_changes_when_a_reachable_dependency_changes() {
+        let bumped = LOCK.replace("checksum = \"aa\"", "checksum = \"zz\"");
+        let roots = ["tool-a".to_owned()];
+        assert_ne!(lock_subset(LOCK, &roots), lock_subset(&bumped, &roots));
+        let unrelated = LOCK.replace("checksum = \"cc\"", "checksum = \"zz\"");
+        assert_eq!(lock_subset(LOCK, &roots), lock_subset(&unrelated, &roots));
+    }
 }

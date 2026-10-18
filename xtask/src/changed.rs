@@ -18,7 +18,7 @@ const WRAPPER_CRATES: [&str; 5] = [
 ];
 
 /// Paths whose change can alter every bundle.
-const GLOBAL_PATHS: [&str; 12] = [
+pub const GLOBAL_PATHS: [&str; 12] = [
     "Cargo.toml",
     "Cargo.lock",
     "rust-toolchain.toml",
@@ -94,9 +94,60 @@ fn closure(start: &str, graph: &BTreeMap<&str, &Krate>) -> BTreeSet<String> {
     seen
 }
 
+/// Workspace crates read from `cargo metadata` (path dependencies only).
+///
+/// # Errors
+/// `cargo metadata` failed or produced unreadable output.
+pub fn workspace(root: &std::path::Path) -> Result<Vec<Krate>, String> {
+    // `abs(".")` yields `…/.`: normalise so manifest paths can be made relative to the root.
+    let root: std::path::PathBuf = root.components().collect();
+    let root = root.as_path();
+    let out = Command::new("cargo")
+        .args([
+            "metadata",
+            "--format-version",
+            "1",
+            "--no-deps",
+            "--offline",
+        ])
+        .current_dir(root)
+        .output()
+        .map_err(|e| e.to_string())?;
+    if !out.status.success() {
+        return Err(format!(
+            "cargo metadata : {}",
+            String::from_utf8_lossy(&out.stderr)
+        ));
+    }
+    parse_metadata(
+        &String::from_utf8_lossy(&out.stdout),
+        &format!("{}/", root.to_string_lossy()),
+    )
+}
+
+/// Workspace crates whose sources end up in the bundle built from the crate in `dir`: its own
+/// dependency closure, plus the host wrapper libraries for a tool (`tools/…`). One rule shared
+/// by PR selection ([`affected`]) and the build receipts, so they can never disagree.
+#[must_use]
+pub fn bundle_crates<'a>(krates: &'a [Krate], dir: &str) -> Vec<&'a Krate> {
+    let graph: BTreeMap<&str, &Krate> = krates.iter().map(|k| (k.name.as_str(), k)).collect();
+    let Some(own) = krates.iter().find(|k| k.dir == dir) else {
+        return Vec::new();
+    };
+    let mut names = closure(&own.name, &graph);
+    if dir.starts_with("tools/") {
+        for wrapper in WRAPPER_CRATES {
+            names.extend(closure(wrapper, &graph));
+        }
+    }
+    names
+        .iter()
+        .filter_map(|n| graph.get(n.as_str()).copied())
+        .collect()
+}
+
 #[must_use]
 pub fn affected(files: &[String], krates: &[Krate]) -> Affected {
-    let graph: BTreeMap<&str, &Krate> = krates.iter().map(|k| (k.name.as_str(), k)).collect();
     let mut result = Affected::default();
     let mut changed: BTreeSet<&str> = BTreeSet::new();
     let mut registry_changed = false;
@@ -107,7 +158,7 @@ pub fn affected(files: &[String], krates: &[Krate]) -> Affected {
         {
             result.all = true;
         }
-        if file.starts_with("registry/") {
+        if file.starts_with("registry/") || file.starts_with("web/shell/") {
             registry_changed = true;
         }
         if let Some(owner) = krates
@@ -118,23 +169,18 @@ pub fn affected(files: &[String], krates: &[Krate]) -> Affected {
             changed.insert(owner.name.as_str());
         }
     }
-    let wrapper: BTreeSet<String> = WRAPPER_CRATES
-        .iter()
-        .flat_map(|name| closure(name, &graph))
-        .collect();
     for krate in krates {
         let is_tool = krate.dir.starts_with("tools/") && !krate.dir.ends_with("_template");
         let is_app = krate.dir.starts_with("apps/");
         if !is_tool && !is_app {
             continue;
         }
-        let mut deps = closure(&krate.name, &graph);
-        if is_tool {
-            deps.extend(wrapper.iter().cloned());
-        }
-        let hit = result.all
-            || (is_app && registry_changed)
-            || deps.iter().any(|d| changed.contains(d.as_str()));
+        let deps: BTreeSet<&str> = bundle_crates(krates, &krate.dir)
+            .iter()
+            .map(|k| k.name.as_str())
+            .collect();
+        let hit =
+            result.all || (is_app && registry_changed) || deps.iter().any(|d| changed.contains(d));
         if !hit {
             continue;
         }
@@ -306,10 +352,12 @@ mod tests {
     }
 
     #[test]
-    fn registry_changes_only_touch_apps() {
-        let r = affected(&files(&["registry/index.json"]), &workspace());
-        assert!(r.tools.is_empty());
-        assert_eq!(r.apps.len(), 1);
+    fn registry_and_web_shell_changes_only_touch_apps() {
+        for path in ["registry/index.json", "web/shell/index.html"] {
+            let r = affected(&files(&[path]), &workspace());
+            assert!(r.tools.is_empty(), "{path}");
+            assert_eq!(r.apps.len(), 1, "{path}");
+        }
     }
 
     #[test]

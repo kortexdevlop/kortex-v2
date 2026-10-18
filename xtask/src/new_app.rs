@@ -7,6 +7,7 @@ const FILES: &[(&str, &str)] = &[
     ("app.toml", include_str!("../templates/app/app.toml")),
     ("Cargo.toml", include_str!("../templates/app/Cargo.toml")),
     ("Dioxus.toml", include_str!("../templates/app/Dioxus.toml")),
+    ("index.html", include_str!("../../web/shell/index.html")),
     ("glyph.svg", include_str!("../templates/app/glyph.svg")),
     (
         "CHANGELOG.md",

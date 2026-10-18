@@ -221,6 +221,36 @@ pub fn run(filter: Option<&str>) -> Result<(), String> {
                     errors.push(format!("✗ {dir} : {name} manquant"));
                 }
             }
+            // Web shell (MASTER_PROMPT §5 `web/shell`): one HTML template for every app, and the
+            // tab title comes from `Dioxus.toml`, which must match the contract's English name.
+            let shell = fs::read_to_string("web/shell/index.html").unwrap_or_default();
+            if shell.is_empty() {
+                errors.push("✗ web/shell/index.html manquant".to_owned());
+            } else if fs::read_to_string(app.dir.join("index.html"))
+                .ok()
+                .as_deref()
+                != Some(shell.as_str())
+            {
+                errors.push(format!(
+                    "✗ {dir} : index.html doit être identique à web/shell/index.html"
+                ));
+            }
+            let expected_title = app.contract.app.name.get("en").cloned().unwrap_or_default();
+            let title = fs::read_to_string(app.dir.join("Dioxus.toml"))
+                .ok()
+                .and_then(|text| text.parse::<toml::Table>().ok())
+                .and_then(|t| {
+                    t.get("web")?
+                        .get("app")?
+                        .get("title")?
+                        .as_str()
+                        .map(str::to_owned)
+                });
+            if title.as_deref() != Some(expected_title.as_str()) {
+                errors.push(format!(
+                    "✗ {dir} : Dioxus.toml [web.app] title doit valoir `{expected_title}`"
+                ));
+            }
             if app.contract.app.ui == kortex_contract::UiKind::Custom
                 && !app.dir.join("src/ui.rs").is_file()
             {
