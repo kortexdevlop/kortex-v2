@@ -401,6 +401,7 @@ pub fn to_workflow(
                 value: value.to_owned(),
             },
             retries: 0,
+            pos: None,
         });
     }
     for call in executed {
@@ -415,6 +416,7 @@ pub fn to_workflow(
                     .collect(),
             },
             retries: 0,
+            pos: None,
         });
         for (port, reference) in &call.refs {
             let from = match reference {

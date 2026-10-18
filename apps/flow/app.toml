@@ -5,6 +5,7 @@ id = "apps.flow"
 version = "0.1.0"
 universe = "apps"
 status = "beta"
+bundles_engines = true
 ui = "custom"
 platforms = ["web", "desktop"]
 offline = false

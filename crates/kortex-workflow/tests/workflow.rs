@@ -81,6 +81,7 @@ fn text(id: &str, value: &str) -> Node {
             value: value.into(),
         },
         retries: 0,
+        pos: None,
     }
 }
 
@@ -92,6 +93,7 @@ fn tool(id: &str, tool: &str) -> Node {
             params: BTreeMap::new(),
         },
         retries: 0,
+        pos: None,
     }
 }
 
@@ -579,4 +581,58 @@ fn an_invalid_workflow_cannot_start_a_stepper() {
         Execution::new(&w, &cat).err().map(|f| f.code),
         Some("invalid_workflow".to_owned())
     );
+}
+
+#[test]
+fn auto_layout_places_chains_left_to_right_and_keeps_existing_positions() {
+    use kortex_workflow::{Pos, auto_layout};
+    let mut workflow = Workflow {
+        nodes: vec![
+            text("a", "x"),
+            tool("b", "t"),
+            tool("c", "t"),
+            text("d", "y"),
+        ],
+        edges: vec![
+            Edge {
+                from: Endpoint {
+                    node: "a".into(),
+                    port: "text".into(),
+                },
+                to: Endpoint {
+                    node: "b".into(),
+                    port: "text".into(),
+                },
+            },
+            Edge {
+                from: Endpoint {
+                    node: "b".into(),
+                    port: "text".into(),
+                },
+                to: Endpoint {
+                    node: "c".into(),
+                    port: "text".into(),
+                },
+            },
+        ],
+        ..Workflow::default()
+    };
+    workflow.nodes[3].pos = Some(Pos { x: 7, y: 9 });
+    auto_layout(&mut workflow);
+    let x = |i: usize| workflow.nodes[i].pos.map(|p| p.x);
+    assert!(
+        x(0) < x(1) && x(1) < x(2),
+        "each link moves one column right"
+    );
+    assert_eq!(workflow.nodes[3].pos, Some(Pos { x: 7, y: 9 }));
+    let json = to_json(&workflow);
+    assert_eq!(from_json(&json), Ok(workflow));
+}
+
+#[test]
+fn a_file_without_positions_still_loads() {
+    let json =
+        r#"{"version":1,"name":"","nodes":[{"id":"n1","kind":"text","value":"a"}],"edges":[]}"#;
+    let workflow = from_json(json).expect("legacy file");
+    assert_eq!(workflow.nodes[0].pos, None);
 }

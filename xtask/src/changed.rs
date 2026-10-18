@@ -55,10 +55,14 @@ pub fn parse_metadata(json: &str, root: &str) -> Result<Vec<Krate>, String> {
         .as_array()
         .ok_or("metadata sans packages")?;
     let names: BTreeSet<&str> = packages.iter().filter_map(|p| p["name"].as_str()).collect();
+    // Windows paths use `\`: compare both sides with `/`.
+    let root = root.replace('\\', "/");
+    let root = root.as_str();
     let mut krates = Vec::new();
     for package in packages {
         let name = package["name"].as_str().ok_or("package sans nom")?;
         let manifest = package["manifest_path"].as_str().ok_or("manifest absent")?;
+        let manifest = manifest.replace('\\', "/");
         let dir = manifest
             .trim_end_matches("/Cargo.toml")
             .strip_prefix(root)
@@ -372,5 +376,13 @@ mod tests {
         let krates = parse_metadata(json, "/r/").unwrap_or_default();
         assert_eq!(krates[0], krate("a", "crates/a", &["b"]));
         assert_eq!(krates[1].dir, "crates/b");
+    }
+
+    #[test]
+    fn windows_manifest_paths_resolve_to_workspace_relative_dirs() {
+        let json = r#"{"packages":[
+            {"name":"desk","manifest_path":"D:\\a\\k\\k\\apps\\desk\\Cargo.toml","dependencies":[]}]}"#;
+        let krates = parse_metadata(json, "D:\\a\\k\\k/").unwrap_or_default();
+        assert_eq!(krates[0].dir, "apps/desk");
     }
 }

@@ -56,6 +56,7 @@
       "app": {
         "ai": false,
         "aliases": {},
+        "bundles_engines": true,
         "id": "apps.flow",
         "name": {
           "en": "Kortex Flow",

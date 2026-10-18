@@ -1,11 +1,9 @@
 ## Présentation
-Kortex Flow enchaîne des outils Kortex : un texte de départ, puis des outils reliés entre eux, chacun recevant le résultat du précédent. Un workflow est un petit fichier JSON versionné que vous pouvez exporter et importer.
+Kortex Flow est un éditeur visuel d’automatisation : vous posez des outils Kortex sur un canevas comme des cartes, vous les reliez, et le résultat de chacun alimente le suivant. Un workflow est un petit fichier JSON versionné que vous pouvez exporter et importer.
 ## Utilisation
-Ajoutez un texte et un ou plusieurs outils, choisissez pour chaque entrée l’étape qui la fournit, réglez les paramètres, puis exécutez. Flow vérifie les types des ports et refuse les boucles avant de lancer quoi que ce soit. Dans l’application bureau, chaque outil installé s’exécute sur votre ordinateur ; sur le web, vous construisez, exportez et importez vos workflows.
+Choisissez un outil dans la palette : il se place à droite du nœud sélectionné et se relie à lui automatiquement, ce qui permet de construire une chaîne en quelques clics. Pour relier autrement, glissez d’une sortie (à droite d’une carte) vers une entrée (à gauche d’une autre) ; Flow vérifie les types et refuse les boucles. Glissez une carte pour la déplacer, le fond pour naviguer, la molette pour zoomer ; Suppr supprime, Ctrl+Z et Ctrl+Y annulent et rétablissent. Les propriétés du nœud sélectionné (texte, paramètres, nouvelles tentatives) sont dans le panneau de droite. Exécutez : chaque carte indique en direct si elle attend, tourne, réussit ou échoue, et son résultat se lit dans le panneau.
 ## Questions fréquentes
 ### Mes données quittent-elles mon appareil ?
-Non. Les étapes s’exécutent localement avec les outils installés ; le workflow n’enregistre que sa structure et vos textes dans le stockage de votre appareil.
-### Pourquoi ne puis-je pas exécuter dans le navigateur ?
-Les moteurs des outils ne sont pas encore servis à cette application. L’exécution est donc proposée sur ordinateur, avec les outils que vous avez installés.
+Non. Chaque outil s’exécute localement : dans le navigateur par son moteur embarqué, sur le bureau par l’outil installé. Le workflow ne conserve que sa structure, les positions et vos textes dans le stockage de votre appareil.
 ### Quels outils puis-je utiliser ?
-Cette version propose les outils dont les entrées obligatoires sont du texte. Les outils qui demandent des fichiers viendront avec les nœuds de fichiers.
+Cette version propose les outils dont les entrées obligatoires sont du texte. Les outils qui demandent des fichiers viendront avec les nœuds de fichier.

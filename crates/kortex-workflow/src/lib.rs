@@ -37,6 +37,53 @@ pub struct Node {
     /// Extra attempts after a failure (0 = run once).
     #[serde(default)]
     pub retries: u8,
+    /// Where the editor shows the node (canvas units); absent in files written before the canvas.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pos: Option<Pos>,
+}
+
+/// A position on the editor canvas. It never changes what a workflow does.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Pos {
+    pub x: i32,
+    pub y: i32,
+}
+
+/// Horizontal and vertical distance between the columns and rows of an automatic layout.
+pub const LAYOUT_STEP: (i32, i32) = (288, 170);
+
+/// Gives every node without a position one: columns follow the longest chain that feeds the node,
+/// rows follow the order of the nodes inside a column. Positioned nodes are left where they are.
+pub fn auto_layout(workflow: &mut Workflow) {
+    let mut depth: BTreeMap<String, i32> = BTreeMap::new();
+    let ids: Vec<String> = workflow.nodes.iter().map(|n| n.id.clone()).collect();
+    // Longest-path layering; bounded passes keep a cyclic file from looping.
+    for _ in 0..ids.len() {
+        let mut changed = false;
+        for edge in &workflow.edges {
+            let from = depth.get(&edge.from.node).copied().unwrap_or(0);
+            let entry = depth.entry(edge.to.node.clone()).or_insert(0);
+            if *entry < from + 1 && (from as usize) < ids.len() {
+                *entry = from + 1;
+                changed = true;
+            }
+        }
+        if !changed {
+            break;
+        }
+    }
+    let mut rows: BTreeMap<i32, i32> = BTreeMap::new();
+    for node in &mut workflow.nodes {
+        let column = depth.get(&node.id).copied().unwrap_or(0);
+        let row = rows.entry(column).or_insert(0);
+        if node.pos.is_none() {
+            node.pos = Some(Pos {
+                x: 40 + column * LAYOUT_STEP.0,
+                y: 40 + *row * LAYOUT_STEP.1,
+            });
+        }
+        *row += 1;
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]

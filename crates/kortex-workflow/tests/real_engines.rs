@@ -60,6 +60,7 @@ fn tool(id: &str, tool: &str, params: &[(&str, &str)]) -> Node {
                 .collect(),
         },
         retries: 0,
+        pos: None,
     }
 }
 
@@ -87,6 +88,7 @@ fn workflow(text: &str) -> Workflow {
                 id: "n1".into(),
                 kind: NodeKind::Text { value: text.into() },
                 retries: 0,
+                pos: None,
             },
             tool("n2", "text.cleaner", &[]),
             tool("n3", "text.case-converter", &[("case", "snake")]),
