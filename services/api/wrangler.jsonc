@@ -2,8 +2,10 @@
   "name": "kortex-api",
   "main": "src/index.ts",
   "compatibility_date": "2026-09-01",
-  // Workers AI has no local emulation: `remote: true` proxies the binding to the real service in dev.
-  "ai": { "binding": "AI", "remote": true },
+  "ai": {
+    "binding": "AI",
+    "remote": true
+  },
   "d1_databases": [
     {
       "binding": "DB",
@@ -30,7 +32,9 @@
         "TURNSTILE_REQUIRED": "false"
       },
       "name": "kortex-api",
-      "ai": { "binding": "AI" },
+      "ai": {
+        "binding": "AI"
+      },
       "workers_dev": false,
       "routes": [
         {

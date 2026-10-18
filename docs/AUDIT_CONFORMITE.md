@@ -24,13 +24,13 @@ Référence : MASTER_PROMPT.md + RULES.md. Complète PLAN.md (qui reste le suivi
 | V5 | ~~`ui = "custom"` non branché~~ **Capacité ajoutée (lot 2)** : aucun des 38 outils n'était en `custom` ; mécanisme prouvé web (rendu) et desktop (compilé, lancé) sur un outil jetable. Reste : rendu desktop inspecté, 7.6 (UI QR) | §6.4 | Partiel |
 | V6 | `kortex-io` (lot 5) et `kortex-ai` (lot 12) **créées avec des usages réels** ; reste `kortex-media` (aucun usage tant qu'il n'y a pas d'outil média) | §5.2 | Partiel |
 | V7 | xtask : `new-app`, `dev`, `ci-budget` **ajoutés (lot A)** ; restent `og-images` et `deploy` | §13, §11 | Partiel |
-| V8 | Passerelle IA dans le Worker `api` (ADR 0006/0023) : **fonctionnelle et vérifiée avec le vrai modèle** ; `proxy` et `oauth-broker` toujours absents (aucun usage tant que Flow n'a pas de connecteurs) ; déploiement production de l'IA non fait | §8.7, §10 | Partiel |
+| V8 | Passerelle IA dans le Worker `api` (ADR 0006/0023) **déployée en production**, vérifiée avec le vrai modèle en développement ; `proxy` et `oauth-broker` toujours absents (aucun usage tant que Flow n'a pas de connecteurs) | §8.7, §10 | Partiel |
 | V9 | ~~`services/{desk,hub,run,site,store}` ne contiennent qu'un `wrangler.jsonc`~~ **Non-violation** : Workers Static Assets de §8.7 ; documenté dans ARCHITECTURE.md | §8.7 | Résolu |
 | V10 | e2e : `tests/e2e/smoke.mjs` + `playwright` 1.63.0 ajoutés (lot 2), exécutés en local ; **CI non encore exécutée** | §11 | Partiel |
 | V11 | ~~`web/shell/` absent~~ **Gabarit HTML partagé créé (lot 6)** : `dx` l’applique (titre, `lang`, `noindex`, `noscript`) ; `check` impose le même `index.html` et un titre `Dioxus.toml` égal au nom du contrat. Corrige aussi le titre « dioxus \| ⛺ » de Store | §5 | Résolu |
 | V12 | ~~ADR 0012 et 0013 manquants~~ **Non-violation** : retrait volontaire, documenté dans docs/adr/README.md | §0.3 | Résolu |
 | V13 | ~~`#000000` en dur~~ **Non-violation** : valeur par défaut d'un `<input type=color>` (donnée, RULES 5.3) | RULES 5.3 | Résolu |
-| V14 | **Seek, Flow v0.1 et Mind réalisés** (Mind : Gemma 4 sur Workers AI, appels de fonctions par références, exécution locale web et desktop, recette réelle) ; non publiés (règle 8.4) ; Flow sans canvas ni connecteurs | §9 | Réalisé (non publié) |
+| V14 | **Seek, Flow v0.1 et Mind réalisés et publiés** (search., flow., agent. kortex.site, 2026-10-18) ; Flow sans canvas ni connecteurs ; chat Mind non testé en production faute de compte de test de production | §9 | Réalisé |
 | V15 | Empreintes de reçus **précises** (lot 6, mesurées) ; `xtask changed` et job `web-changed` exécutés en CI (runs 39070786316 et suivants). Gain de minutes réel à mesurer sur une PR ciblée | §11, RULES 7.2 | Réalisé |
 | V16 | **Pas de preview / rollback reproductible** ; Turnstile désactivé ; vérif e-mail absente ; mentions légales en brouillon (adresse postale manquante) | §10, §2.15 | Moyenne |
 | V17 | `credentials.yml` : déclenché seulement sur chemins précis ; mais plafond de 1830 min (macOS ×10) — à surveiller avec `xtask ci-budget` | §11 | Basse |

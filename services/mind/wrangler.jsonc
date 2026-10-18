@@ -1,0 +1,16 @@
+{
+  "name": "kortex-mind",
+  "compatibility_date": "2026-09-01",
+  "workers_dev": false,
+  "routes": [
+    {
+      "pattern": "agent.kortex.site",
+      "custom_domain": true
+    }
+  ],
+  "assets": {
+    "directory": "../../dist/publish/mind",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "none"
+  }
+}
