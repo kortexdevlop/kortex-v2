@@ -1,8 +1,9 @@
 //! Conversation messages and the gateway request body (`POST /v1/ai/chat`).
+use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 
 /// A tool call proposed by the model. `name` is the function name (`text__cleaner`).
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ToolCall {
     pub id: String,
     pub name: String,
@@ -10,7 +11,7 @@ pub struct ToolCall {
     pub arguments: String,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Message {
     System(String),
     User(String),

@@ -6,13 +6,14 @@ use std::collections::BTreeMap;
 use kortex_contract::{PortType, ToolContract};
 use kortex_runtime::{FileData, Value, ValueMap};
 use kortex_workflow::{Edge, Endpoint, FORMAT_VERSION, Node, NodeKind, TEXT_PORT, Workflow, adapt};
+use serde::{Deserialize, Serialize};
 use serde_json::Value as Json;
 
 use crate::chat::ToolCall;
 use crate::consent::{Attachment, Kind};
 use crate::tools::tool_id;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Reference {
     /// `@texteN`
     Text(usize),
@@ -338,7 +339,7 @@ pub fn summarize(call_id: &str, outputs: &ValueMap) -> String {
 }
 
 /// A call that ran, for the workflow export.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Executed {
     pub call_id: String,
     pub tool: String,

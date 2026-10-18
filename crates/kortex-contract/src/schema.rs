@@ -41,6 +41,10 @@ pub struct ToolMeta {
     /// Run the web engine in an isolated Worker; desktop keeps its native runner.
     #[serde(default)]
     pub web_worker: bool,
+    /// Web builds of this application ship the headless engine of every tool under `engines/`
+    /// (Mind and Flow run tools in Web Workers of their own origin).
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub bundles_engines: bool,
     pub platforms: Vec<String>,
     #[serde(default)]
     pub offline: bool,
@@ -54,6 +58,11 @@ pub struct ToolMeta {
     /// Former slugs per language, kept as redirects.
     #[serde(default)]
     pub aliases: BTreeMap<String, Vec<String>>,
+}
+
+#[allow(clippy::trivially_copy_pass_by_ref)]
+const fn is_false(value: &bool) -> bool {
+    !*value
 }
 
 const fn default_priority() -> u8 {

@@ -111,7 +111,7 @@ jobs:
           find "$RUNNER_TEMP/dioxus" -type f -name dx -exec chmod +x {} \;
           find "$RUNNER_TEMP/dioxus" -type f -name dx -printf '%h\n' >> "$GITHUB_PATH"
       - name: Existing wasm-bindgen compiler (pinned to the worker contract)
-        if: steps.changed.outputs.tools != ''
+        if: steps.changed.outputs.tools != '' || contains(steps.changed.outputs.apps, 'apps.mind')
         run: |
           mkdir -p "$RUNNER_TEMP/wasm-bindgen"
           gh release download 0.2.129 --repo wasm-bindgen/wasm-bindgen --pattern 'wasm-bindgen-0.2.129-x86_64-unknown-linux-musl.tar.gz' --dir "$RUNNER_TEMP/wasm-bindgen"

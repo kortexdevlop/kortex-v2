@@ -67,7 +67,15 @@ pub(crate) fn fingerprint(id: &str) -> Result<String, String> {
     let root = std::env::current_dir().map_err(|e| e.to_string())?;
     let name = id.strip_prefix("apps.").ok_or("invalid app id")?;
     let base = crate::build::source_fingerprint(&root, &root.join("apps").join(name))?;
-    let extra = ["brand", "registry/index.json"]
+    let mut paths = vec!["brand", "registry/index.json"];
+    // An app that ships every tool's engine depends on every tool: conservative on purpose.
+    if discover()?
+        .iter()
+        .any(|a| a.contract.app.id == id && a.contract.app.bundles_engines)
+    {
+        paths.extend(["tools", "crates"]);
+    }
+    let extra = paths
         .iter()
         .map(|p| crate::build::tree_fingerprint(&root.join(p)))
         .collect::<Result<Vec<_>, _>>()?;
@@ -160,6 +168,11 @@ pub fn build_web(id: &str) -> Result<(), String> {
         fs::remove_dir_all(&destination).map_err(|e| e.to_string())?;
     }
     copy(&source, &destination)?;
+    if app.contract.app.bundles_engines {
+        // Headless engines served from the app's own origin: Workers must be same-origin.
+        crate::worker::build_engine(&["all".to_owned()])?;
+        copy(&root.join("dist/engines"), &destination.join("engines"))?;
+    }
     let html = fs::read_to_string(destination.join("index.html")).map_err(|e| e.to_string())?;
     fs::create_dir_all(destination.join("en")).map_err(|e| e.to_string())?;
     fs::write(destination.join("en/index.html"), html).map_err(|e| e.to_string())?;

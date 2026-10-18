@@ -49,6 +49,16 @@ pub async fn request_as(
     path: &str,
     body: Option<&str>,
 ) -> Result<kortex_platform::document::AccountResponse> {
+    request_at(api(), user, method, path, body).await
+}
+/// Same as [`request_as`] against an explicit API base (a development server from the page URL).
+pub async fn request_at(
+    api: &str,
+    user: Option<&str>,
+    method: &str,
+    path: &str,
+    body: Option<&str>,
+) -> Result<kortex_platform::document::AccountResponse> {
     if !supported() {
         return Err(Error::Unsupported);
     }
@@ -56,7 +66,7 @@ pub async fn request_as(
         return Err(Error::InvalidResponse);
     }
     let response =
-        kortex_platform::document::account_request(&format!("{}{path}", api()), method, body, user)
+        kortex_platform::document::account_request(&format!("{api}{path}"), method, body, user)
             .await
             .map_err(|_| Error::Network)?;
     match response.status {
@@ -81,7 +91,11 @@ pub fn decode<T: DeserializeOwned>(body: &str) -> Result<T> {
     serde_json::from_str(body).map_err(|_| Error::InvalidResponse)
 }
 pub async fn session() -> Result<Option<Profile>> {
-    let response = match request("GET", "/v1/me", None).await {
+    session_at(api()).await
+}
+/// The signed-in account on an explicit API base.
+pub async fn session_at(api: &str) -> Result<Option<Profile>> {
+    let response = match request_at(api, None, "GET", "/v1/me", None).await {
         Err(Error::SignedOut) => return Ok(None),
         other => other?,
     };

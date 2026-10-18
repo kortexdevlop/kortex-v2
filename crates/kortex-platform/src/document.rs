@@ -212,7 +212,7 @@ pub async fn account_request(
     if !cookie_session_supported() {
         return Err(crate::PlatformError("account_native_unavailable".into()));
     }
-    if !url.starts_with("https://")
+    if !(url.starts_with("https://") || is_dev_origin(url))
         || !["GET", "PUT"].contains(&method)
         || body.is_some_and(|s| s.len() > 70_000)
     {
@@ -230,9 +230,125 @@ pub async fn account_request(
     Ok(reply)
 }
 
+/// One step of a streamed `fetch`.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum FetchEvent {
+    /// The response status, sent once before any chunk.
+    Status(u16),
+    /// A piece of the response body, decoded as UTF-8.
+    Chunk(String),
+    End,
+    /// Network error, abort or oversized body.
+    Failed,
+}
+
+#[derive(serde::Deserialize)]
+struct RawFetchEvent {
+    status: Option<u16>,
+    chunk: Option<String>,
+    end: Option<bool>,
+}
+
+/// A cookie-authenticated POST whose response body is read as it arrives (server-sent events).
+/// The session cookie never reaches Rust or UI storage.
+pub struct FetchStream(Eval);
+
+impl FetchStream {
+    /// Next event; after `End` or `Failed` keep calling and it returns `Failed`.
+    pub async fn next(&mut self) -> FetchEvent {
+        match self.0.recv::<RawFetchEvent>().await {
+            Ok(RawFetchEvent {
+                status: Some(status),
+                ..
+            }) => FetchEvent::Status(status),
+            Ok(RawFetchEvent {
+                chunk: Some(chunk), ..
+            }) => FetchEvent::Chunk(chunk),
+            Ok(RawFetchEvent {
+                end: Some(true), ..
+            }) => FetchEvent::End,
+            _ => FetchEvent::Failed,
+        }
+    }
+
+    /// Aborts the request; the stream then ends with `Failed`.
+    pub fn cancel(&self) {
+        let _ = self.0.send(true);
+    }
+
+    /// A copyable handle that cancels this request from elsewhere (a Stop button) while another
+    /// task is waiting in [`Self::next`].
+    #[must_use]
+    pub fn canceller(&self) -> FetchCanceller {
+        FetchCanceller(self.0)
+    }
+}
+
+/// Cancels a [`FetchStream`] it was taken from.
+#[derive(Clone, Copy)]
+pub struct FetchCanceller(Eval);
+
+impl FetchCanceller {
+    pub fn cancel(&self) {
+        let _ = self.0.send(true);
+    }
+}
+
+/// A development API base given in the page URL (`?api=http://127.0.0.1:8787`), honoured only when
+/// the page itself is served from `localhost` or `127.0.0.1`; `None` otherwise (production).
+pub async fn dev_api_override() -> Option<String> {
+    let value = eval(
+        "const q = new URLSearchParams(location.search).get('api') || ''; \
+         const local = ['localhost', '127.0.0.1'].includes(location.hostname); \
+         return local && /^http:\\/\\/(localhost|127\\.0\\.0\\.1)(:[0-9]+)?$/.test(q) ? q : '';",
+    )
+    .join::<String>()
+    .await
+    .ok()?;
+    (!value.is_empty()).then_some(value)
+}
+
+fn is_dev_origin(url: &str) -> bool {
+    ["http://localhost", "http://127.0.0.1"]
+        .iter()
+        .any(|prefix| {
+            url.strip_prefix(prefix)
+                .is_some_and(|rest| rest.starts_with([':', '/']))
+        })
+}
+
+/// Starts a streamed POST. HTTPS only (plain HTTP to `localhost`/`127.0.0.1` for development).
+///
+/// # Errors
+/// `fetch_native_unavailable` outside the browser, `fetch_invalid_request` for a refused URL or
+/// an oversized body.
+pub fn fetch_stream(url: &str, body: &str, user: Option<&str>) -> crate::Result<FetchStream> {
+    if !cookie_session_supported() {
+        return Err(crate::PlatformError("fetch_native_unavailable".into()));
+    }
+    if !(url.starts_with("https://") || is_dev_origin(url)) || body.len() > 170_000 {
+        return Err(crate::PlatformError("fetch_invalid_request".into()));
+    }
+    let args = serde_json::json!([url, body, user]);
+    Ok(FetchStream(eval(
+        &include_str!("fetch-stream.js").replace("__KORTEX_ARGS__", &args.to_string()),
+    )))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn streamed_fetch_accepts_https_and_local_dev_only() {
+        assert!(is_dev_origin("http://localhost:8787/v1/ai/chat"));
+        assert!(is_dev_origin("http://127.0.0.1/x"));
+        assert!(!is_dev_origin("http://localhost.evil.test/x"));
+        assert!(!is_dev_origin("http://example.com/x"));
+        // Outside a browser the call is refused whatever the URL.
+        assert!(fetch_stream("https://api.kortex.site/v1/ai/chat", "{}", None).is_err());
+    }
+
     #[test]
     fn binary_and_untrusted_names_are_serialized_without_script_interpolation() {
         assert_eq!(base64(b""), "");

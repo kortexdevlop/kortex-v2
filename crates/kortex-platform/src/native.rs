@@ -229,6 +229,55 @@ pub fn is_local_http(url: &str) -> bool {
         .map_or(authority, |(host, _)| host);
     matches!(host, "localhost" | "127.0.0.1")
 }
+/// Like [`http`], but hands the response body to `sink` as it arrives instead of buffering it.
+/// `on_status` is called once with the status code before any body byte; `sink` returns `false`
+/// to stop reading (the connection is dropped). Returns the status code.
+///
+/// # Errors
+/// Transport failure, a body larger than `max_bytes`, or a non-UTF-8-agnostic read error.
+pub fn http_stream(
+    request: HttpRequest<'_>,
+    on_status: impl FnOnce(u16),
+    mut sink: impl FnMut(&[u8]) -> bool,
+) -> Result<u16, String> {
+    use std::io::Read;
+    let secure = request.url.starts_with("https://");
+    if !secure && !is_local_http(request.url) {
+        return Err("unencrypted remote HTTP is forbidden".into());
+    }
+    if request.method != "POST" {
+        return Err("unsupported HTTP method".into());
+    }
+    let agent: ureq::Agent = ureq::Agent::config_builder()
+        .timeout_global(Some(request.timeout))
+        .http_status_as_error(false)
+        .https_only(secure)
+        .max_redirects(0)
+        .build()
+        .into();
+    let mut builder = agent.post(request.url);
+    for (name, value) in request.headers {
+        builder = builder.header(*name, *value);
+    }
+    let mut response = builder
+        .send(request.body.unwrap_or_default())
+        .map_err(|e| e.to_string())?;
+    let status = response.status().as_u16();
+    on_status(status);
+    let mut reader = response
+        .body_mut()
+        .with_config()
+        .limit(request.max_bytes)
+        .reader();
+    let mut buffer = [0_u8; 4096];
+    loop {
+        let read = reader.read(&mut buffer).map_err(|e| e.to_string())?;
+        if read == 0 || !sink(&buffer[..read]) {
+            return Ok(status);
+        }
+    }
+}
+
 pub fn http(request: HttpRequest<'_>) -> Result<HttpResponse, String> {
     let secure = request.url.starts_with("https://");
     if !secure && !is_local_http(request.url) {
@@ -432,6 +481,96 @@ pub mod task {
         }
     }
 
+    struct ChannelState<T> {
+        queue: std::collections::VecDeque<T>,
+        closed: bool,
+        waker: Option<Waker>,
+    }
+
+    /// Unbounded multi-message channel with an awaitable receiver: a background thread streams
+    /// values to a UI future. Clone the handle to give the sender side to another thread.
+    pub struct Channel<T>(Arc<Mutex<ChannelState<T>>>);
+
+    impl<T> Clone for Channel<T> {
+        fn clone(&self) -> Self {
+            Self(Arc::clone(&self.0))
+        }
+    }
+
+    impl<T> Default for Channel<T> {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+
+    impl<T> Channel<T> {
+        #[must_use]
+        pub fn new() -> Self {
+            Self(Arc::new(Mutex::new(ChannelState {
+                queue: std::collections::VecDeque::new(),
+                closed: false,
+                waker: None,
+            })))
+        }
+
+        fn lock(&self) -> MutexGuard<'_, ChannelState<T>> {
+            self.0
+                .lock()
+                .unwrap_or_else(std::sync::PoisonError::into_inner)
+        }
+
+        /// Queues a value; ignored once the channel is closed.
+        pub fn send(&self, value: T) {
+            let waker = {
+                let mut state = self.lock();
+                if state.closed {
+                    return;
+                }
+                state.queue.push_back(value);
+                state.waker.take()
+            };
+            if let Some(waker) = waker {
+                waker.wake();
+            }
+        }
+
+        /// No more values will come: receivers drain the queue, then get `None`.
+        pub fn close(&self) {
+            let waker = {
+                let mut state = self.lock();
+                state.closed = true;
+                state.waker.take()
+            };
+            if let Some(waker) = waker {
+                waker.wake();
+            }
+        }
+
+        /// Future of the next value, or `None` once closed and drained.
+        #[must_use]
+        pub fn recv(&self) -> Recv<T> {
+            Recv(self.clone())
+        }
+    }
+
+    pub struct Recv<T>(Channel<T>);
+
+    impl<T> Future for Recv<T> {
+        type Output = Option<T>;
+
+        fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
+            let mut state = self.0.lock();
+            if let Some(value) = state.queue.pop_front() {
+                Poll::Ready(Some(value))
+            } else if state.closed {
+                Poll::Ready(None)
+            } else {
+                state.waker = Some(cx.waker().clone());
+                Poll::Pending
+            }
+        }
+    }
+
     /// Runs `job` on a new named thread.
     ///
     /// # Errors
@@ -477,6 +616,28 @@ pub mod task {
                 .is_ok()
             );
             assert_eq!(slot.wait_blocking(), Some(42));
+        }
+
+        #[test]
+        fn channel_delivers_in_order_then_ends_when_closed() {
+            let channel = Channel::new();
+            let remote = channel.clone();
+            assert!(
+                spawn("test-sender", move || {
+                    for n in 0..3 {
+                        remote.send(n);
+                    }
+                    remote.close();
+                    remote.send(99); // ignored after close
+                })
+                .is_ok()
+            );
+            let mut seen = Vec::new();
+            while let Some(n) = block(channel.recv()) {
+                seen.push(n);
+            }
+            assert_eq!(seen, [0, 1, 2]);
+            assert_eq!(block(channel.recv()), None);
         }
 
         #[test]
@@ -577,6 +738,118 @@ pub mod process {
             assert!(
                 exchange(Path::new("/usr/bin/false"), &[], "", Duration::from_secs(5)).is_err()
             );
+        }
+    }
+}
+
+#[cfg(all(test, unix))]
+mod http_stream_tests {
+    use super::*;
+    use std::io::{Read, Write};
+    use std::net::TcpListener;
+    use std::time::Duration;
+
+    /// One-shot server: replies with a chunked body, one chunk every 80 ms.
+    fn serve(chunks: Vec<&'static str>) -> String {
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap_or_else(|e| unreachable!("{e}"));
+        let addr = listener
+            .local_addr()
+            .unwrap_or_else(|e| unreachable!("{e}"));
+        std::thread::spawn(move || {
+            let Ok((mut socket, _)) = listener.accept() else {
+                return;
+            };
+            let mut request = [0_u8; 4096];
+            let _ = socket.read(&mut request);
+            let _ = socket.write_all(b"HTTP/1.1 200 OK\r\nContent-Type: text/event-stream\r\nTransfer-Encoding: chunked\r\nConnection: close\r\n\r\n");
+            for chunk in chunks {
+                let _ = socket.write_all(format!("{:x}\r\n{chunk}\r\n", chunk.len()).as_bytes());
+                let _ = socket.flush();
+                std::thread::sleep(Duration::from_millis(80));
+            }
+            let _ = socket.write_all(b"0\r\n\r\n");
+        });
+        format!("http://127.0.0.1:{}/", addr.port())
+    }
+
+    fn request(url: &str) -> HttpRequest<'_> {
+        HttpRequest {
+            method: "POST",
+            url,
+            headers: &[],
+            body: Some(b"{}"),
+            timeout: Duration::from_secs(10),
+            max_bytes: 1 << 20,
+        }
+    }
+
+    #[test]
+    fn chunks_reach_the_sink_one_by_one_while_the_server_is_still_sending() {
+        let url = serve(vec!["data: a\n\n", "data: b\n\n", "data: c\n\n"]);
+        let started = std::time::Instant::now();
+        let mut arrivals: Vec<(String, Duration)> = Vec::new();
+        let mut announced = None;
+        let status = http_stream(
+            request(&url),
+            |code| announced = Some(code),
+            |bytes| {
+                arrivals.push((
+                    String::from_utf8_lossy(bytes).into_owned(),
+                    started.elapsed(),
+                ));
+                true
+            },
+        );
+        assert_eq!(announced, Some(200), "the status is known before the body");
+        assert_eq!(status, Ok(200));
+        let text: String = arrivals.iter().map(|(t, _)| t.as_str()).collect();
+        assert_eq!(text, "data: a\n\ndata: b\n\ndata: c\n\n");
+        assert!(
+            arrivals.len() >= 3,
+            "received incrementally, not as one buffer: {arrivals:?}"
+        );
+        assert!(
+            arrivals[0].1 < Duration::from_millis(200),
+            "the first chunk does not wait for the last"
+        );
+    }
+
+    #[test]
+    fn the_sink_can_stop_the_read_early() {
+        let url = serve(vec!["one", "two", "three"]);
+        let mut seen = 0;
+        let status = http_stream(
+            request(&url),
+            |_| {},
+            |_| {
+                seen += 1;
+                false
+            },
+        );
+        assert_eq!(status, Ok(200));
+        assert_eq!(seen, 1);
+    }
+
+    #[test]
+    fn remote_plain_http_and_other_methods_are_refused() {
+        let mut remote = request("http://example.com/");
+        assert!(http_stream(remote_ref(&mut remote), |_| {}, |_| true).is_err());
+        let mut get = request("http://127.0.0.1:1/");
+        get.method = "GET";
+        assert_eq!(
+            http_stream(get, |_| {}, |_| true),
+            Err("unsupported HTTP method".into())
+        );
+    }
+
+    fn remote_ref<'a>(r: &'a mut HttpRequest<'_>) -> HttpRequest<'a> {
+        HttpRequest {
+            method: r.method,
+            url: r.url,
+            headers: r.headers,
+            body: r.body,
+            timeout: r.timeout,
+            max_bytes: r.max_bytes,
         }
     }
 }
