@@ -488,3 +488,95 @@ pub mod task {
         }
     }
 }
+
+/// Child processes started by hosts (Flow runs installed tool binaries in `--engine` mode).
+pub mod process {
+    use std::io::{self, Read, Write};
+    use std::path::Path;
+    use std::process::{Command, Stdio};
+    use std::time::{Duration, Instant};
+
+    /// Starts `program` with `args`, writes `input` to its standard input, closes it and returns
+    /// what the process printed on standard output. The process is killed after `timeout`.
+    ///
+    /// # Errors
+    /// The process could not start, its streams failed, it exceeded `timeout`
+    /// (`io::ErrorKind::TimedOut`) or it exited unsuccessfully.
+    pub fn exchange(
+        program: &Path,
+        args: &[&str],
+        input: &str,
+        timeout: Duration,
+    ) -> io::Result<String> {
+        let mut child = Command::new(program)
+            .args(args)
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::null())
+            .spawn()?;
+        let mut stdin = child
+            .stdin
+            .take()
+            .ok_or_else(|| io::Error::other("no stdin"))?;
+        let mut stdout = child
+            .stdout
+            .take()
+            .ok_or_else(|| io::Error::other("no stdout"))?;
+        let reader = std::thread::spawn(move || {
+            let mut text = String::new();
+            stdout.read_to_string(&mut text).map(|_| text)
+        });
+        // A child that exits early closes the pipe: the exit status below tells why.
+        let _ = stdin.write_all(input.as_bytes());
+        drop(stdin);
+        let started = Instant::now();
+        let status = loop {
+            if let Some(status) = child.try_wait()? {
+                break status;
+            }
+            if started.elapsed() >= timeout {
+                let _ = child.kill();
+                let _ = child.wait();
+                return Err(io::Error::new(io::ErrorKind::TimedOut, "process timed out"));
+            }
+            std::thread::sleep(Duration::from_millis(5));
+        };
+        let text = reader
+            .join()
+            .map_err(|_| io::Error::other("reader thread panicked"))??;
+        if status.success() {
+            Ok(text)
+        } else {
+            Err(io::Error::other(format!("process exited with {status}")))
+        }
+    }
+
+    #[cfg(all(test, unix))]
+    mod tests {
+        use super::*;
+
+        #[test]
+        fn exchange_pipes_input_through_a_real_process() {
+            let out = exchange(Path::new("/bin/cat"), &[], "ping\n", Duration::from_secs(5));
+            assert_eq!(out.unwrap_or_default(), "ping\n");
+        }
+
+        #[test]
+        fn exchange_kills_a_process_that_exceeds_its_timeout() {
+            let err = exchange(
+                Path::new("/bin/sleep"),
+                &["5"],
+                "",
+                Duration::from_millis(100),
+            );
+            assert_eq!(err.map_err(|e| e.kind()), Err(io::ErrorKind::TimedOut));
+        }
+
+        #[test]
+        fn exchange_reports_a_failing_exit_status() {
+            assert!(
+                exchange(Path::new("/usr/bin/false"), &[], "", Duration::from_secs(5)).is_err()
+            );
+        }
+    }
+}

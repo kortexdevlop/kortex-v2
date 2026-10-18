@@ -14,6 +14,12 @@ pub struct Entry {
     pub search: kortex_contract::Search,
     #[serde(default)]
     pub variants: Vec<kortex_contract::Variant>,
+    #[serde(default)]
+    pub inputs: Vec<kortex_contract::Input>,
+    #[serde(default)]
+    pub params: Vec<kortex_contract::Param>,
+    #[serde(default)]
+    pub outputs: Vec<kortex_contract::Output>,
 }
 #[derive(Deserialize)]
 struct Registry {
@@ -73,6 +79,12 @@ fn installed_path(id: &str) -> Option<std::path::PathBuf> {
             .ok()?
             .is_file())
     .then_some(canonical)
+}
+/// Verified path of an installed tool binary (desktop only; `None` on the web or when absent).
+#[cfg(not(target_arch = "wasm32"))]
+#[must_use]
+pub fn installed_binary(id: &str) -> Option<std::path::PathBuf> {
+    installed_path(id)
 }
 pub fn launch_installed(id: &str) -> bool {
     #[cfg(target_arch = "wasm32")]

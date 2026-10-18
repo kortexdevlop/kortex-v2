@@ -130,6 +130,23 @@ jobs:
           cargo xtask tokens
           if [ "$ALL" = "true" ]; then cargo xtask build all; elif [ -n "$TOOLS" ]; then cargo xtask build $TOOLS; fi
           for id in $APPS; do cargo xtask build-app "$id" --web; done
+      - uses: pnpm/action-setup@v4
+        if: contains(steps.changed.outputs.apps, 'apps.seek') || contains(steps.changed.outputs.apps, 'apps.flow')
+      - uses: actions/setup-node@v4
+        if: contains(steps.changed.outputs.apps, 'apps.seek') || contains(steps.changed.outputs.apps, 'apps.flow')
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Browser recipes of the rebuilt Seek and Flow apps
+        if: contains(steps.changed.outputs.apps, 'apps.seek') || contains(steps.changed.outputs.apps, 'apps.flow')
+        env:
+          APPS: ${{ steps.changed.outputs.apps }}
+        run: |
+          set -euo pipefail
+          pnpm install --frozen-lockfile
+          pnpm exec playwright install --with-deps chromium
+          case " $APPS " in *" apps.seek "*) node tests/e2e/seek.mjs ;; esac
+          case " $APPS " in *" apps.flow "*) node tests/e2e/flow.mjs ;; esac
       - name: Nothing to compile
         if: steps.changed.outputs.tools == '' && steps.changed.outputs.apps == ''
         run: echo "No web bundle is affected by this change."

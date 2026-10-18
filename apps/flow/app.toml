@@ -1,0 +1,28 @@
+schema = 1
+
+[app]
+id = "apps.flow"
+version = "0.1.0"
+universe = "apps"
+status = "beta"
+ui = "custom"
+platforms = ["web", "desktop"]
+offline = false
+ai = false
+
+[app.name]
+fr = "Kortex Flow"
+en = "Kortex Flow"
+[app.tagline]
+fr = "Enchaînez vos outils en workflows locaux."
+en = "Chain your tools into local workflows."
+[app.slug]
+fr = "flow"
+en = "flow"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "none"
+sensitive = false
+privacy = "local"

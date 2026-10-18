@@ -56,6 +56,58 @@
       "app": {
         "ai": false,
         "aliases": {},
+        "id": "apps.flow",
+        "name": {
+          "en": "Kortex Flow",
+          "fr": "Kortex Flow"
+        },
+        "offline": false,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "flow",
+          "fr": "flow"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Chain your tools into local workflows.",
+          "fr": "Enchaînez vos outils en workflows locaux."
+        },
+        "ui": "custom",
+        "universe": "apps",
+        "version": "0.1.0",
+        "viral_priority": 3,
+        "web_worker": false
+      },
+      "inputs": [],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": null
+      },
+      "outputs": [],
+      "params": [],
+      "permissions": {
+        "clipboard": "none",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {},
+        "keywords": {},
+        "related": []
+      },
+      "variants": []
+    },
+    {
+      "app": {
+        "ai": false,
+        "aliases": {},
         "id": "apps.hub",
         "name": {
           "en": "Kortex Hub",

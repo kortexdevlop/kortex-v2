@@ -30,7 +30,7 @@ Référence : MASTER_PROMPT.md + RULES.md. Complète PLAN.md (qui reste le suivi
 | V11 | ~~`web/shell/` absent~~ **Gabarit HTML partagé créé (lot 6)** : `dx` l’applique (titre, `lang`, `noindex`, `noscript`) ; `check` impose le même `index.html` et un titre `Dioxus.toml` égal au nom du contrat. Corrige aussi le titre « dioxus \| ⛺ » de Store | §5 | Résolu |
 | V12 | ~~ADR 0012 et 0013 manquants~~ **Non-violation** : retrait volontaire, documenté dans docs/adr/README.md | §0.3 | Résolu |
 | V13 | ~~`#000000` en dur~~ **Non-violation** : valeur par défaut d'un `<input type=color>` (donnée, RULES 5.3) | RULES 5.3 | Résolu |
-| V14 | **Kortex Seek réalisé** (lot 8, niveau 1, web + desktop compilés, recette web) ; **Flow** en cours (lot 9) ; **Mind** non réalisé : son cœur est l'IA, désactivée par RULES 8.4 | §9 | Partiel |
+| V14 | **Seek** (lot 8) et **Flow v0.1** (lot 9 : moteur de graphe, éditeur par étapes, exécution desktop réelle) réalisés, web + desktop compilés ; **Mind** non réalisé : son cœur est l'IA, désactivée par RULES 8.4 ; Flow sans canvas, déclencheurs, connecteurs | §9 | Partiel |
 | V15 | Empreintes de reçus **précises** (lot 6, mesurées) ; `xtask changed` et job `web-changed` exécutés en CI (runs 39070786316 et suivants). Gain de minutes réel à mesurer sur une PR ciblée | §11, RULES 7.2 | Réalisé |
 | V16 | **Pas de preview / rollback reproductible** ; Turnstile désactivé ; vérif e-mail absente ; mentions légales en brouillon (adresse postale manquante) | §10, §2.15 | Moyenne |
 | V17 | `credentials.yml` : déclenché seulement sur chemins précis ; mais plafond de 1830 min (macOS ×10) — à surveiller avec `xtask ci-budget` | §11 | Basse |
