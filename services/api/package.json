@@ -5,7 +5,7 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "test": "node --test --experimental-sqlite tests/*.test.ts",
-    "dev": "wrangler dev --local --port 8787",
+    "dev": "wrangler dev --port 8787",
     "migrate:local": "wrangler d1 migrations apply kortex-accounts --local"
   },
   "devDependencies": {

@@ -63,6 +63,15 @@ export async function call(env: Env, method: string, path: string, body?: unknow
   return { status: res.status, data, headers: res.headers };
 }
 
+/** Same request, but the untouched `Response` (streaming bodies, cancellation). */
+export async function callRaw(env: Env, method: string, path: string, body: unknown, opts: CallOpts = {}): Promise<Response> {
+  const headers: Record<string, string> = { ...(opts.headers ?? {}), 'Content-Type': 'application/json' };
+  const origin = opts.origin === undefined ? 'https://kortex.site' : opts.origin;
+  if (origin) headers.Origin = origin;
+  if (opts.cookie) headers.Cookie = opts.cookie;
+  return handle(new Request(`https://api.kortex.site${path}`, { method, headers, body: JSON.stringify(body) }), env);
+}
+
 /** Client-side derivation with few iterations (tests only; real clients use 600 000). */
 export async function creds(email: string, password: string) {
   return { email, auth_key: await deriveAuthKey(email, password, 1000), kdf: 1 };

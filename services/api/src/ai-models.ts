@@ -1,11 +1,15 @@
-// Neuron prices per million tokens, from the Workers AI pricing page (checked 2026-10-15).
-// Re-check when changing models: prices differ a lot between model sizes.
+// Workers AI model used by the gateway. Gemma 4 26B A4B: 256k context, native function calling.
+// Price: $0.10 / M input tokens and $0.30 / M output tokens (model page, checked 2026-10-18);
+// Workers AI bills 1 000 neurons = $0.011, hence 9 091 and 27 273 neurons per million tokens.
+// The model's own responses report `usage.neurons` (verified on real calls: it matches these
+// prices), which is what we settle on; the prices only drive the reservation and the fallback.
 export interface ModelInfo { id: string; inPerM: number; outPerM: number }
 
 export const MODELS: Record<string, ModelInfo> = {
-  fast: { id: '@cf/meta/llama-3.2-3b-instruct', inPerM: 4_625, outPerM: 30_475 },
-  smart: { id: '@cf/meta/llama-3.1-8b-instruct-fp8-fast', inPerM: 4_119, outPerM: 34_868 },
+  gemma: { id: '@cf/google/gemma-4-26b-a4b-it', inPerM: 9_091, outPerM: 27_273 },
 };
+
+export const DEFAULT_MODEL = 'gemma';
 
 /** Cost in neurons of `inTokens` prompt tokens and `outTokens` generated tokens. */
 export function neurons(m: ModelInfo, inTokens: number, outTokens: number): number {
