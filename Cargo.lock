@@ -3518,6 +3518,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "kortex-seek"
+version = "0.1.0"
+dependencies = [
+ "dioxus",
+ "kortex-i18n",
+ "kortex-shell",
+ "kortex-ui",
+]
+
+[[package]]
 name = "kortex-shell"
 version = "0.1.0"
 dependencies = [

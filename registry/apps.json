@@ -108,6 +108,58 @@
       "app": {
         "ai": false,
         "aliases": {},
+        "id": "apps.seek",
+        "name": {
+          "en": "Kortex Seek",
+          "fr": "Kortex Seek"
+        },
+        "offline": false,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "seek",
+          "fr": "seek"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Describe what you need, Seek finds the tool.",
+          "fr": "Décrivez votre besoin, Seek trouve l’outil."
+        },
+        "ui": "custom",
+        "universe": "apps",
+        "version": "0.1.0",
+        "viral_priority": 3,
+        "web_worker": false
+      },
+      "inputs": [],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": null
+      },
+      "outputs": [],
+      "params": [],
+      "permissions": {
+        "clipboard": "none",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {},
+        "keywords": {},
+        "related": []
+      },
+      "variants": []
+    },
+    {
+      "app": {
+        "ai": false,
+        "aliases": {},
         "id": "apps.store",
         "name": {
           "en": "Kortex Store",

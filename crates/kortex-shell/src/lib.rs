@@ -12,6 +12,8 @@ pub const CSS: &str = include_str!("shell.css");
 pub struct Entry {
     pub tool: kortex_contract::ToolMeta,
     pub search: kortex_contract::Search,
+    #[serde(default)]
+    pub variants: Vec<kortex_contract::Variant>,
 }
 #[derive(Deserialize)]
 struct Registry {
