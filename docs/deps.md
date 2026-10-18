@@ -60,3 +60,6 @@ Font file only, no npm dependency kept: `inter-latin-wght-normal.woff2` from `@f
 
 ### Kortex Flow (steps 15.1-15.4, 2026-10-18)
 `apps/flow` reuses `serde`/`serde_json` (workflow files, JSON-RPC to tool engines), `toml` (contract defaults, already allowed) and the internal shared crates; no new external dependency. Child processes go through the new `kortex-platform::native::process` (std only). Alternatives rejected: an embedded scripting language or a graph library (large, a second execution model, unnecessary for typed ports).
+
+### Shared crates for Mind (steps 5.2, 9.5, 14.x, 2026-10-18)
+`kortex-search` (Seek's engine moved out of the app, now used by Mind to pick candidate tools), `kortex-workflow` (Flow's graph, validation, step-by-step execution and installed-binary runner, now used by Flow and Mind) and `kortex-ai` (gateway wire format, SSE parser, tool definitions from contracts, reference protocol, plan validation, per-attachment consent, credits). Internal crates, each with two real users; no new external dependency (`serde`, `serde_json`, `toml` are already allowed).

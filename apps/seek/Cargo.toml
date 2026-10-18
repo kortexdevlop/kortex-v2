@@ -19,6 +19,7 @@ web = ["dioxus/web"]
 
 [dependencies]
 kortex-shell = { path = "../../crates/kortex-shell" }
+kortex-search = { path = "../../crates/kortex-search" }
 kortex-ui = { path = "../../crates/kortex-ui" }
 kortex-i18n = { path = "../../crates/kortex-i18n" }
 dioxus = { version = "0.7.10", features = ["macro", "html", "signals", "hooks", "document", "launch"] }

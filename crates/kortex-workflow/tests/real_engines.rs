@@ -6,10 +6,25 @@ use std::collections::BTreeMap;
 use std::path::PathBuf;
 use std::time::Duration;
 
-use kortex_flow::catalogue::ports;
-use kortex_flow::engine::{Edge, Endpoint, Node, NodeKind, Workflow, run};
-use kortex_flow::runner::ProcessRunner;
 use kortex_runtime::{CancelToken, Value};
+use kortex_workflow::process::ProcessRunner;
+use kortex_workflow::{Edge, Endpoint, Node, NodeKind, Workflow, run};
+
+fn ports() -> &'static std::collections::BTreeMap<String, kortex_workflow::ToolPorts> {
+    static PORTS: std::sync::OnceLock<
+        std::collections::BTreeMap<String, kortex_workflow::ToolPorts>,
+    > = std::sync::OnceLock::new();
+    PORTS.get_or_init(|| {
+        let registry = std::fs::read_to_string(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/../../registry/index.json"
+        ))
+        .unwrap_or_default();
+        kortex_workflow::catalogue_of(
+            &kortex_workflow::contracts_from_registry(&registry).unwrap_or_default(),
+        )
+    })
+}
 
 fn binary(id: &str) -> Option<PathBuf> {
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../dist/desktop");
@@ -86,7 +101,7 @@ fn workflow(text: &str) -> Workflow {
     }
 }
 
-fn text(report: &kortex_flow::engine::Report, node: &str) -> String {
+fn text(report: &kortex_workflow::Report, node: &str) -> String {
     match report.results.get(node).and_then(|r| r.get("text")) {
         Some(Value::Text(t)) => t.clone(),
         other => unreachable!("{node}: {other:?}"),

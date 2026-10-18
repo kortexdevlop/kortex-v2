@@ -2,11 +2,11 @@ use std::cell::RefCell;
 use std::collections::BTreeMap;
 
 use kortex_contract::PortType;
-use kortex_flow::engine::{
-    Edge, Endpoint, FORMAT_VERSION, Node, NodeKind, ParamSpec, Port, RunError, Runner, ToolPorts,
-    Workflow, adapt, from_json, order, param_values, run, to_json, validate,
-};
 use kortex_runtime::{CancelToken, Table, ToolError, Value, ValueMap};
+use kortex_workflow::{
+    Edge, Endpoint, Execution, FORMAT_VERSION, Node, NodeKind, ParamSpec, Port, RunError, Runner,
+    Step, ToolPorts, Workflow, adapt, from_json, order, param_values, run, to_json, validate,
+};
 
 fn port(id: &str, ty: PortType, required: bool) -> Port {
     Port {
@@ -456,4 +456,127 @@ fn table_ports_feed_csv_file_inputs() {
         vec![edge(("t", "table"), ("f", "file"))],
     );
     assert!(codes(&w).contains(&"type_mismatch"));
+}
+
+#[test]
+fn a_host_can_drive_the_run_one_job_at_a_time_and_report_back_later() {
+    let w = workflow(
+        vec![
+            text("s", "x"),
+            tool("u", "text.upper"),
+            tool("r", "text.repeat"),
+        ],
+        vec![
+            edge(("s", "text"), ("u", "text")),
+            edge(("u", "text"), ("r", "text")),
+        ],
+    );
+    let cat = catalogue();
+    let cancel = CancelToken::default();
+    let mut execution = Execution::new(&w, &cat).unwrap_or_else(|e| unreachable!("{e:?}"));
+    // The constant node is resolved without a job; the first job is the upper-casing tool.
+    let Step::Run(first) = execution.next(&cancel) else {
+        unreachable!("first job")
+    };
+    assert_eq!(
+        (first.node.as_str(), first.tool.as_str()),
+        ("u", "text.upper")
+    );
+    assert_eq!(first.inputs["text"], Value::Text("x".into()));
+    // Asking again before reporting returns the same job (an async host may poll).
+    assert_eq!(execution.next(&cancel), Step::Run(first.clone()));
+    execution.finish(Ok(ValueMap::from([(
+        "text".to_owned(),
+        Value::Text("X".into()),
+    )])));
+    let Step::Run(second) = execution.next(&cancel) else {
+        unreachable!("second job")
+    };
+    assert_eq!(
+        second.inputs["text"],
+        Value::Text("X".into()),
+        "data flows from the reported result"
+    );
+    execution.finish(Ok(ValueMap::from([(
+        "text".to_owned(),
+        Value::Text("XX".into()),
+    )])));
+    let Step::Done(report) = execution.next(&cancel) else {
+        unreachable!("done")
+    };
+    assert_eq!(report.results["r"]["text"], Value::Text("XX".into()));
+    assert_eq!(report.journal, ["s: ok", "u: ok", "r: ok"]);
+}
+
+#[test]
+fn the_stepper_retries_a_failed_job_and_then_reports_the_failure() {
+    let mut w = workflow(
+        vec![text("s", "x"), tool("u", "text.upper")],
+        vec![edge(("s", "text"), ("u", "text"))],
+    );
+    w.nodes[1].retries = 1;
+    let cat = catalogue();
+    let cancel = CancelToken::default();
+    let mut execution = Execution::new(&w, &cat).unwrap_or_else(|e| unreachable!("{e:?}"));
+    let Step::Run(job) = execution.next(&cancel) else {
+        unreachable!("job")
+    };
+    execution.finish(Err(RunError {
+        code: "worker_failed".into(),
+        detail: None,
+    }));
+    assert_eq!(
+        execution.next(&cancel),
+        Step::Run(job),
+        "one retry allowed: same job again"
+    );
+    execution.finish(Err(RunError {
+        code: "worker_failed".into(),
+        detail: Some("again".into()),
+    }));
+    let Step::Failed(failure) = execution.next(&cancel) else {
+        unreachable!("failure")
+    };
+    assert_eq!(
+        (
+            failure.code.as_str(),
+            failure.node.as_deref(),
+            failure.detail.as_deref()
+        ),
+        ("worker_failed", Some("u"), Some("again"))
+    );
+    assert!(failure.report.journal.iter().any(|l| l.contains("retry 1")));
+}
+
+#[test]
+fn cancelling_while_a_job_is_out_stops_at_the_next_request_and_never_retries() {
+    let mut w = workflow(
+        vec![text("s", "x"), tool("u", "text.upper")],
+        vec![edge(("s", "text"), ("u", "text"))],
+    );
+    w.nodes[1].retries = 3;
+    let cat = catalogue();
+    let cancel = CancelToken::default();
+    let mut execution = Execution::new(&w, &cat).unwrap_or_else(|e| unreachable!("{e:?}"));
+    assert!(matches!(execution.next(&cancel), Step::Run(_)));
+    cancel.cancel();
+    execution.finish(Err(RunError {
+        code: ToolError::CANCELLED.into(),
+        detail: None,
+    }));
+    let Step::Failed(failure) = execution.next(&cancel) else {
+        unreachable!("cancelled")
+    };
+    assert_eq!(failure.code, ToolError::CANCELLED);
+    assert!(!failure.report.journal.iter().any(|l| l.contains("retry")));
+}
+
+#[test]
+fn an_invalid_workflow_cannot_start_a_stepper() {
+    let cat = catalogue();
+    let w = workflow(vec![tool("u", "text.upper")], vec![]);
+    assert_eq!(
+        Execution::new(&w, &cat).err().map(|f| f.code),
+        Some("invalid_workflow".to_owned())
+    );
 }
