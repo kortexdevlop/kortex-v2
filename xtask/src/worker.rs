@@ -131,3 +131,64 @@ pub fn run(inputs: JsValue, params: JsValue) -> Result<JsValue, JsValue> {
         .collect::<String>();
     Ok((out, folder, codes))
 }
+
+/// `cargo xtask build-engine <univers.nom… | all>`: headless `engine.wasm` + `worker.js` for any
+/// tool (MASTER_PROMPT §7.3), written to `dist/engines/<id>/`. Flow, Mind and the CLI-style hosts
+/// run engines from there; it does not depend on the tool's UI or its `web_worker` flag. A
+/// receipt (source fingerprint + output hash) skips identical rebuilds.
+pub fn build_engine(args: &[String]) -> Result<(), String> {
+    let root = std::env::current_dir().map_err(|e| e.to_string())?;
+    let wanted: Vec<&String> = args.iter().collect();
+    if wanted.is_empty() {
+        return Err("usage : cargo xtask build-engine <univers.nom… | all>".to_owned());
+    }
+    let all = wanted.iter().any(|a| a.as_str() == "all");
+    let mut built = 0_usize;
+    for tool in crate::tools::discover()? {
+        let contract = tool
+            .contract
+            .map_err(|e| format!("{} : {e}", tool.dir.display()))?;
+        let id = contract.tool.id;
+        if !all && !wanted.iter().any(|w| **w == id) {
+            continue;
+        }
+        let tool_dir = root.join(&tool.dir);
+        let dest = root.join("dist/engines").join(&id);
+        let receipt = root.join(".kortex/engines").join(&id).join("receipt.json");
+        let source = crate::build::source_fingerprint(&root, &tool_dir)?;
+        if dest.is_dir()
+            && let Ok(previous) = fs::read_to_string(&receipt)
+        {
+            let current = serde_json::json!({"source": source, "output": crate::build::tree_fingerprint(&dest)?})
+                .to_string();
+            if previous == current {
+                println!("✓ dist/engines/{id}/ à jour (compilation évitée)");
+                built += 1;
+                continue;
+            }
+        }
+        let (out, _, _) = build(&root, &tool_dir, &id)?;
+        let _ = fs::remove_dir_all(&dest);
+        fs::create_dir_all(&dest).map_err(|e| e.to_string())?;
+        for name in ["engine.js", "engine_bg.wasm", "worker.js"] {
+            fs::copy(out.join(name), dest.join(name))
+                .map_err(|e| format!("{id} : {name} : {e}"))?;
+        }
+        if let Some(parent) = receipt.parent() {
+            fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+        }
+        fs::write(
+            &receipt,
+            serde_json::json!({"source": source, "output": crate::build::tree_fingerprint(&dest)?})
+                .to_string(),
+        )
+        .map_err(|e| e.to_string())?;
+        let size = fs::metadata(dest.join("engine_bg.wasm")).map_or(0, |m| m.len());
+        println!("✓ dist/engines/{id}/ (wasm : {} Ko)", size / 1024);
+        built += 1;
+    }
+    if built == 0 {
+        return Err("aucun outil correspondant".to_owned());
+    }
+    Ok(())
+}

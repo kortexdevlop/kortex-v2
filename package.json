@@ -6,7 +6,8 @@
     "site:dev": "pnpm --filter @kortex/site dev",
     "site:build": "pnpm --filter @kortex/site build",
     "deploy": "pnpm site:build && node scripts/prepare-publish.mjs && node scripts/publish.mjs",
-    "e2e": "node tests/e2e/smoke.mjs"
+    "e2e": "node tests/e2e/smoke.mjs",
+    "e2e:engines": "node tests/e2e/engines.mjs"
   },
   "devDependencies": {
     "playwright": "1.63.0"

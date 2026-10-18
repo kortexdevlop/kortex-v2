@@ -171,6 +171,18 @@ jobs:
           if [ "$TOOLS" = "all" ]; then cargo xtask build all; else cargo xtask build $TOOLS; fi
           APP_LIST=$(python -c 'import json; print(" ".join(a["app"]["id"] for a in json.load(open("registry/apps.json", encoding="utf-8"))["apps"] if a["app"]["status"] in ["beta", "stable"]))')
           for id in $APP_LIST; do cargo xtask build-app "$id" --web; done
+      - name: Headless engines (engine.wasm + worker.js) for Flow, Mind and other hosts
+        env:
+          DX_CLI_TELEMETRY: 'false'
+        run: |
+          set -euo pipefail
+          if [ "$TOOLS" = "all" ]; then cargo xtask build-engine all; else cargo xtask build-engine $TOOLS; fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: headless-engines
+          path: dist/engines/
+          if-no-files-found: error
+          retention-days: 7
       - uses: actions/upload-artifact@v4
         with:
           name: web-bundles-and-receipts

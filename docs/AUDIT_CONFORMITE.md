@@ -19,7 +19,7 @@ Référence : MASTER_PROMPT.md + RULES.md. Complète PLAN.md (qui reste le suivi
 |---|---|---|---|
 | V1 | ~~Polices non auto-hébergées~~ **Inter Variable intégrée (lot 4)** ; reste la monospace (repli système) et le contrôle de la CSP publiée | §4.3, §8.5 | Partiel |
 | V2 | **Jetons desktop en clair** (`credentials.json` 0600) en prod ; correctif trousseau non publié | §9.6, RULES 6.1 | Haute |
-| V3 | Mode `--engine` JSON-RPC **réalisé** (lot 3, binaire macOS Intel exécuté) ; reste `engine.wasm` headless pour 35 outils sur 38 | §7.1, §7.3 | Partiel |
+| V3 | `--engine` JSON-RPC (lot 3) **et** `engine.wasm` headless pour les 38 outils (lot 7, exécutés en Worker réel pour 4 cas) ; reste leur diffusion par l'hôte `run` et la CI | §7.1, §7.3 | Réalisé (non publié) |
 | V4 | Exécuteur natif sur thread avec annulation, délai et panique contenue **réalisé** (lot 3) ; recette en fenêtre native non faite | §6.3, RULES 4.4 | Partiel |
 | V5 | ~~`ui = "custom"` non branché~~ **Capacité ajoutée (lot 2)** : aucun des 38 outils n'était en `custom` ; mécanisme prouvé web (rendu) et desktop (compilé, lancé) sur un outil jetable. Reste : rendu desktop inspecté, 7.6 (UI QR) | §6.4 | Partiel |
 | V6 | Crate `kortex-io` **créée avec un usage réel** (validation par signature, lot 5) ; `kortex-media` et `kortex-ai` restent à créer quand un usage existe | §5.2 | Partiel |
