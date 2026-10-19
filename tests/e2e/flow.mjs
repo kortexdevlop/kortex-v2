@@ -277,7 +277,7 @@ try {
   let answer = { status: 200, json: { status: 201, headers: {}, url: 'https://api.github.com/x', body_base64: Buffer.from('created').toString('base64') } };
   await net.route('https://api.kortex.site/v1/proxy', async route => {
     const request = route.request();
-    const cors = { 'access-control-allow-origin': request.headers().origin ?? '*', 'access-control-allow-credentials': 'true', 'access-control-allow-headers': 'content-type, x-kortex-request, x-kortex-user', 'access-control-allow-methods': 'POST' };
+    const cors = { 'access-control-allow-origin': origin, 'access-control-allow-credentials': 'true', 'access-control-allow-headers': 'content-type, x-kortex-request, x-kortex-user', 'access-control-allow-methods': 'POST' };
     if (request.method() === 'OPTIONS') return route.fulfill({ status: 204, headers: cors });
     proxied.push({ body: JSON.parse(request.postData()), headers: request.headers() });
     await route.fulfill({ status: answer.status, headers: { ...cors, 'content-type': 'application/json' }, body: JSON.stringify(answer.json) });
@@ -327,7 +327,7 @@ try {
   const sent = [];
   await tg.route('https://api.kortex.site/v1/proxy', async route => {
     const request = route.request();
-    const cors = { 'access-control-allow-origin': request.headers().origin ?? '*', 'access-control-allow-credentials': 'true', 'access-control-allow-headers': 'content-type, x-kortex-request, x-kortex-user', 'access-control-allow-methods': 'POST' };
+    const cors = { 'access-control-allow-origin': origin, 'access-control-allow-credentials': 'true', 'access-control-allow-headers': 'content-type, x-kortex-request, x-kortex-user', 'access-control-allow-methods': 'POST' };
     if (request.method() === 'OPTIONS') return route.fulfill({ status: 204, headers: cors });
     sent.push(JSON.parse(request.postData()));
     await route.fulfill({ status: 200, headers: { ...cors, 'content-type': 'application/json' }, body: JSON.stringify({ status: 200, headers: {}, url: 'x', body_base64: Buffer.from('{"ok":true}').toString('base64') }) });
@@ -373,7 +373,7 @@ try {
   };
   await brain.route('https://api.kortex.site/**', async route => {
     const request = route.request();
-    const cors = { 'access-control-allow-origin': request.headers().origin ?? '*', 'access-control-allow-credentials': 'true', 'access-control-allow-headers': 'content-type, x-kortex-request, x-kortex-user', 'access-control-allow-methods': 'GET, POST' };
+    const cors = { 'access-control-allow-origin': origin, 'access-control-allow-credentials': 'true', 'access-control-allow-headers': 'content-type, x-kortex-request, x-kortex-user', 'access-control-allow-methods': 'GET, POST' };
     if (request.method() === 'OPTIONS') return route.fulfill({ status: 204, headers: cors });
     const path = new URL(request.url()).pathname;
     if (path === '/v1/me') {
@@ -462,7 +462,7 @@ try {
   await guest.addInitScript(() => localStorage.clear());
   await guest.route('https://api.kortex.site/**', async route => {
     const request = route.request();
-    const cors = { 'access-control-allow-origin': request.headers().origin ?? '*', 'access-control-allow-credentials': 'true', 'access-control-allow-headers': 'content-type, x-kortex-request, x-kortex-user', 'access-control-allow-methods': 'GET, POST' };
+    const cors = { 'access-control-allow-origin': origin, 'access-control-allow-credentials': 'true', 'access-control-allow-headers': 'content-type, x-kortex-request, x-kortex-user', 'access-control-allow-methods': 'GET, POST' };
     if (request.method() === 'OPTIONS') return route.fulfill({ status: 204, headers: cors });
     return route.fulfill({ status: 401, headers: { ...cors, 'content-type': 'application/json' }, body: '{"error":"unauthenticated"}' });
   });
@@ -581,7 +581,7 @@ try {
   const wire = async page => {
     await page.route('https://api.kortex.site/**', async route => {
       const request = route.request();
-      const cors = { 'access-control-allow-origin': request.headers().origin ?? '*', 'access-control-allow-credentials': 'true', 'access-control-allow-headers': 'content-type, x-kortex-request, x-kortex-user', 'access-control-allow-methods': 'GET, PUT, POST' };
+      const cors = { 'access-control-allow-origin': origin, 'access-control-allow-credentials': 'true', 'access-control-allow-headers': 'content-type, x-kortex-request, x-kortex-user', 'access-control-allow-methods': 'GET, PUT, POST' };
       const reply = (status, body) => route.fulfill({ status, headers: { ...cors, 'content-type': 'application/json' }, body: JSON.stringify(body) });
       if (request.method() === 'OPTIONS') return route.fulfill({ status: 204, headers: cors });
       const { pathname } = new URL(request.url());
