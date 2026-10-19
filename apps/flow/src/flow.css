@@ -86,3 +86,9 @@
 .flow-template{display:grid;gap:var(--k-space-2);align-content:start;padding:var(--k-space-4);border:1px solid var(--k-border);border-radius:var(--k-radius-field);background:var(--k-bg)}
 .flow-template p{margin:0;color:var(--k-text-2);line-height:1.5;font-size:.9rem}
 .flow-needs{display:flex;flex-wrap:wrap;gap:var(--k-space-1)}
+.flow-run-nodes{flex-basis:100%;margin:var(--k-space-2) 0 0;padding-left:var(--k-space-5);display:grid;gap:var(--k-space-1);font-size:.85rem}
+.flow-run-nodes li[data-state=failed]{color:var(--k-danger)}
+.flow-run-nodes li[data-state=done] .flow-run-state{color:var(--k-success)}
+.flow-run-nodes li[data-state=skipped],.flow-run-nodes li[data-state=not_run]{color:var(--k-text-2)}
+.flow-run-state{font-weight:600}
+.flow-run-error{margin-top:var(--k-space-1)}

@@ -16,7 +16,8 @@ use crate::canvas::{
 };
 use crate::catalogue::{connector_tools, ports, usable_tools};
 use crate::engine::{
-    Endpoint, Execution, Node, NodeKind, Step, Workflow, auto_layout, from_json, to_json, validate,
+    Endpoint, Execution, Node, NodeKind, Step, Workflow, auto_layout, from_json, order, to_json,
+    validate,
 };
 use crate::inspector::inspector;
 
@@ -191,6 +192,9 @@ pub(crate) struct Ctx {
     pub lib_tab: Signal<String>,
     pub lib_search: Signal<String>,
     pub confirm_delete: Signal<Option<String>>,
+    pub runs: Signal<crate::history::Runs>,
+    pub hist_open: Signal<bool>,
+    pub hist_open_run: Signal<Option<u64>>,
     pub(crate) states: Signal<States>,
     view: Signal<View>,
     drag: Signal<Drag>,
@@ -241,6 +245,7 @@ async fn execute(
     mut states: Signal<States>,
     mut results: Signal<BTreeMap<String, ValueMap>>,
     mut log: Signal<Vec<String>>,
+    mut runs: Signal<crate::history::Runs>,
     lang: String,
 ) -> bool {
     let l = locale(&lang);
@@ -254,12 +259,29 @@ async fn execute(
             return false;
         }
     };
+    let started = kortex_platform::now_ms();
+    let titles: Vec<(String, String)> = order(&workflow)
+        .unwrap_or_default()
+        .into_iter()
+        .map(|i| {
+            (
+                workflow.nodes[i].id.clone(),
+                node_title(&workflow.nodes[i], l, &lang),
+            )
+        })
+        .collect();
+    let mut spent: BTreeMap<String, u64> = BTreeMap::new();
     let mut ok = true;
+    let mut ending: (BTreeSet<String>, BTreeSet<String>, Option<(String, String)>) =
+        Default::default();
     loop {
         match execution.next(&token) {
             Step::Run(job) => {
                 states.write().insert(job.node.clone(), RunState::Running);
+                let began = kortex_platform::now_ms();
                 let outcome = crate::runner::run(&job).await;
+                *spent.entry(job.node.clone()).or_insert(0) +=
+                    kortex_platform::now_ms().saturating_sub(began);
                 let node = job.node.clone();
                 match &outcome {
                     Ok(outputs) => {
@@ -273,6 +295,8 @@ async fn execute(
                 execution.finish(outcome);
             }
             Step::Done(report) => {
+                ending.0 = report.results.keys().cloned().collect();
+                ending.1 = report.skipped.iter().cloned().collect();
                 for (id, outputs) in report.results {
                     states.write().insert(id.clone(), RunState::Done);
                     results.write().insert(id, outputs);
@@ -285,6 +309,22 @@ async fn execute(
             }
             Step::Failed(failure) => {
                 ok = false;
+                ending.0 = failure.report.results.keys().cloned().collect();
+                ending.1 = failure.report.skipped.iter().cloned().collect();
+                ending.2 = failure.node.clone().map(|node| {
+                    (
+                        node,
+                        format!(
+                            "{}{}",
+                            failure.code,
+                            failure
+                                .detail
+                                .as_deref()
+                                .map(|d| format!(" ({d})"))
+                                .unwrap_or_default()
+                        ),
+                    )
+                });
                 if let Some(node) = &failure.node {
                     states.write().insert(node.clone(), RunState::Failed);
                 }
@@ -301,6 +341,23 @@ async fn execute(
             }
         }
     }
+    let (done, skipped, failed) = ending;
+    let name = if workflow.name.trim().is_empty() {
+        l.t("lib.untitled").to_owned()
+    } else {
+        workflow.name.clone()
+    };
+    runs.write()
+        .push(crate::history::record(&crate::history::Outcome {
+            workflow: &name,
+            at: started,
+            total_ms: kortex_platform::now_ms().saturating_sub(started),
+            order: &titles,
+            ms: &spent,
+            done: &done,
+            skipped: &skipped,
+            failed: failed.as_ref().map(|(n, e)| (n.as_str(), e.clone())),
+        }));
     ok
 }
 
@@ -464,6 +521,7 @@ pub fn App() -> Element {
     let (library_loaded, _) =
         use_hook(|| shell::load::<crate::library::Library>("flow", "library"));
     let (current_loaded, _) = use_hook(|| shell::load::<Option<String>>("flow", "current-id"));
+    let (runs_loaded, _) = use_hook(|| shell::load::<crate::history::Runs>("flow", "runs"));
     let ctx = Ctx {
         workflow,
         history: use_signal(History::default),
@@ -480,6 +538,9 @@ pub fn App() -> Element {
         lib_tab: use_signal(|| "mine".to_owned()),
         lib_search: use_signal(String::new),
         confirm_delete: use_signal(|| None),
+        runs: use_signal(move || runs_loaded.clone()),
+        hist_open: use_signal(|| false),
+        hist_open_run: use_signal(|| None),
         view: use_signal(View::default),
         drag: use_signal(|| Drag::Idle),
         cursor: use_signal(|| (0.0, 0.0)),
@@ -521,6 +582,9 @@ pub fn App() -> Element {
     });
     use_effect(move || {
         shell::save("flow", "current-id", &*ctx.current_id.read());
+    });
+    use_effect(move || {
+        shell::save("flow", "runs", &*ctx.runs.read());
     });
     // Agent nodes: the account and credits are looked up only once a workflow has one, and the
     // text of those nodes is sent to the model only after the user agrees (kept on this device).
@@ -696,6 +760,18 @@ pub fn App() -> Element {
                     },
                     "📚 " {l.t("lib.title")}
                 }
+                button {
+                    class: "k-btn",
+                    "data-variant": "ghost",
+                    r#type: "button",
+                    "data-action": "history",
+                    "aria-expanded": "{ctx.hist_open}",
+                    onclick: move |_| {
+                        let mut open = ctx.hist_open;
+                        open.set(!open());
+                    },
+                    "🕘 " {l.t("hist.title")}
+                }
                 span { class: "flow-sep" }
                 button {
                     class: "k-btn",
@@ -719,7 +795,7 @@ pub fn App() -> Element {
                         cancel.set(token.clone());
                         let (wf, chosen, lang) = (workflow.peek().clone(), files.peek().clone(), run_lang.clone());
                         spawn(async move {
-                            let ok = execute(wf, chosen, token, states, results, log, lang).await;
+                            let ok = execute(wf, chosen, token, states, results, log, ctx.runs, lang).await;
                             outcome.set(Some(ok));
                             running.set(false);
                             if let Some(c) = crate::ai::last_credits() {
@@ -751,6 +827,9 @@ pub fn App() -> Element {
                     },
                     {l.t("ui.export")}
                 }
+            }
+            if (ctx.hist_open)() {
+                {crate::libui::history_panel(ctx, l)}
             }
             if (ctx.lib_open)() {
                 {crate::libui::library_panel(ctx, l, &lang)}

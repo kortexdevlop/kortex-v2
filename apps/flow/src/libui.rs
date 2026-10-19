@@ -204,3 +204,104 @@ pub(crate) fn library_panel(ctx: Ctx, l: &'static kortex_i18n::Catalog, lang: &s
         }
     }
 }
+
+/// Past runs: what each card did, how long it took and the error of a failed one; never data.
+pub(crate) fn history_panel(ctx: Ctx, l: &'static kortex_i18n::Catalog) -> Element {
+    let Ctx {
+        mut runs,
+        mut hist_open_run,
+        ..
+    } = ctx;
+    let items = runs.read().items.clone();
+    let none_yet = items.is_empty();
+    let opened = hist_open_run();
+    let error_text = |raw: &str| {
+        let (code, detail) = raw
+            .split_once(" (")
+            .map_or((raw, None), |(c, d)| (c, Some(d.trim_end_matches(')'))));
+        let key = format!("errors.{code}");
+        let text = l.t(&key);
+        let base = if text == key {
+            code.to_owned()
+        } else {
+            text.to_owned()
+        };
+        detail.map_or(base.clone(), |d| format!("{base} ({d})"))
+    };
+    rsx! {
+        section { class: "flow-library", "data-panel": "history", "aria-label": l.t("hist.title"),
+            div { class: "flow-lib-head",
+                strong { {l.t("hist.title")} }
+                button {
+                    class: "k-btn",
+                    "data-variant": "ghost",
+                    r#type: "button",
+                    "data-action": "clear-history",
+                    disabled: none_yet,
+                    onclick: move |_| runs.write().clear(),
+                    {l.t("hist.clear")}
+                }
+            }
+            p { class: "flow-hint", {l.t("hist.help")} }
+            if none_yet {
+                p { class: "flow-hint", {l.t("hist.empty")} }
+            }
+            ul { class: "flow-lib-list",
+                for run in items {
+                    li { key: "{run.id}", class: "flow-lib-item", "data-run": "{run.id}", "data-ok": "{run.ok}",
+                        div { class: "flow-lib-main",
+                            strong { if run.ok { "✓ " } else { "✗ " } "{run.workflow}" }
+                            span { class: "flow-hint",
+                                "{crate::history::utc_label(run.at)} · {crate::history::duration_label(run.total_ms)} · {run.nodes.len()} {l.t(\"lib.nodes\")}"
+                            }
+                        }
+                        div { class: "flow-lib-buttons",
+                            button {
+                                class: "k-btn",
+                                "data-variant": "ghost",
+                                r#type: "button",
+                                "data-action": "toggle-run",
+                                onclick: {
+                                    let id = run.id;
+                                    move |_| hist_open_run.set(if hist_open_run() == Some(id) { None } else { Some(id) })
+                                },
+                                {l.t("hist.details")}
+                            }
+                            button {
+                                class: "k-btn",
+                                "data-variant": "ghost",
+                                r#type: "button",
+                                "data-action": "forget-run",
+                                onclick: {
+                                    let id = run.id;
+                                    move |_| runs.write().remove(id)
+                                },
+                                {l.t("hist.forget")}
+                            }
+                        }
+                        if opened == Some(run.id) {
+                            ol { class: "flow-run-nodes", "data-run-nodes": "{run.id}",
+                                for node in run.nodes.clone() {
+                                    li { key: "{node.node}", "data-state": "{node.state}",
+                                        span { class: "flow-run-state", {state_label(l, &node.state)} }
+                                        " {node.node} · {node.title}"
+                                        if node.ms > 0 {
+                                            " · {crate::history::duration_label(node.ms)}"
+                                        }
+                                        if let Some(error) = &node.error {
+                                            div { class: "flow-run-error", role: "alert", "{error_text(error)}" }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+fn state_label(l: &kortex_i18n::Catalog, state: &str) -> String {
+    l.t(&format!("hist.state_{state}")).to_owned()
+}
