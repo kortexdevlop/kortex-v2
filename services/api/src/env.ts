@@ -13,6 +13,12 @@ export interface Env {
   AI_USER_CAP?: string;
   AI_USER_REFILL_3H?: string;
   AI_GLOBAL_DAILY?: string;
+  /** Comma-separated connector hosts the proxy may call with credentials (suffix match). */
+  PROXY_CONNECTORS?: string;
+  PROXY_FREE_PER_HOUR?: string;
+  PROXY_CONNECTOR_PER_HOUR?: string;
+  /** `OAUTH_<PROVIDER>_ID` / `OAUTH_<PROVIDER>_SECRET`: Worker secrets of the OAuth broker. */
+  [secret: `OAUTH_${string}`]: string | undefined;
 }
 
 export interface Ctx {

@@ -6,6 +6,8 @@ import * as passkeys from './routes/passkeys.ts';
 import * as ai from './routes/ai.ts';
 import * as data from './routes/data.ts';
 import * as dev from './routes/devices.ts';
+import * as proxy from './routes/proxy.ts';
+import * as oauth from './routes/oauth.ts';
 
 type Handler = (ctx: Ctx, params: Record<string, string>) => Promise<Response>;
 const routes: [string, RegExp, Handler][] = [];
@@ -47,6 +49,10 @@ add('POST', '/v1/usage', data.postUsage);
 add('GET', '/v1/usage', data.getUsage);
 add('GET', '/v1/ai/credits', ai.getCredits);
 add('POST', '/v1/ai/chat', ai.chat);
+add('POST', '/v1/proxy', proxy.forward);
+add('GET', '/v1/oauth/providers', oauth.providers);
+add('POST', '/v1/oauth/exchange', oauth.exchange);
+add('POST', '/v1/oauth/refresh', oauth.refresh);
 
 const SECURITY_HEADERS = {
   'X-Content-Type-Options': 'nosniff',
