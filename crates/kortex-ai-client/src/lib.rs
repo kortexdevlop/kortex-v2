@@ -163,7 +163,7 @@ mod platform {
     use kortex_ai::credits::Credits;
     use kortex_platform::document::{FetchCanceller, FetchEvent, FetchStream, fetch_stream};
 
-    use super::{Account, Auth, Piece, Source};
+    use super::{Account, Auth, Failure, Piece, Source};
 
     thread_local! {
         static ACTIVE: Cell<Option<FetchCanceller>> = const { Cell::new(None) };
@@ -234,6 +234,24 @@ mod platform {
             .flatten()
             .and_then(|v| Credits::from_json(&v))
     }
+    /// One JSON request to the account API with the browser session.
+    pub async fn request(
+        auth: &Auth,
+        method: &str,
+        path: &str,
+        body: Option<&str>,
+    ) -> Result<(u16, String), Failure> {
+        let Auth::Web { api, user } = auth else {
+            return Err(Failure::Network);
+        };
+        match kortex_auth::request_at(api, user.as_deref(), method, path, body).await {
+            Ok(reply) => Ok((reply.status, reply.body)),
+            Err(kortex_auth::Error::SignedOut | kortex_auth::Error::SessionChanged) => {
+                Err(Failure::SignedOut)
+            }
+            Err(_) => Err(Failure::Network),
+        }
+    }
 }
 
 #[cfg(not(target_arch = "wasm32"))]
@@ -247,7 +265,7 @@ mod platform {
     use kortex_platform::native::{HttpRequest, http_stream};
     use kortex_runtime::CancelToken;
 
-    use super::{Account, Auth, Piece, Source, Utf8Stream};
+    use super::{Account, Auth, Failure, Piece, Source, Utf8Stream};
 
     static ACTIVE: Mutex<Option<CancelToken>> = Mutex::new(None);
 
@@ -362,6 +380,44 @@ mod platform {
         .ok()?;
         slot.wait().await.flatten()
     }
+    /// One JSON request to the account API with the device token.
+    pub async fn request(
+        auth: &Auth,
+        method: &str,
+        path: &str,
+        body: Option<&str>,
+    ) -> Result<(u16, String), Failure> {
+        let Auth::Device { api, token } = auth else {
+            return Err(Failure::Network);
+        };
+        let (url, bearer) = (format!("{api}{path}"), format!("Bearer {token}"));
+        let (method, body) = (method.to_owned(), body.map(str::to_owned));
+        let slot = Slot::new();
+        let remote = slot.clone();
+        spawn("kortex-ai-request", move || {
+            let headers = [
+                ("X-Kortex-Request", "1"),
+                ("Content-Type", "application/json"),
+                ("Authorization", bearer.as_str()),
+            ];
+            let reply = kortex_platform::native::http(HttpRequest {
+                method: &method,
+                url: &url,
+                headers: &headers,
+                body: body.as_deref().map(str::as_bytes),
+                timeout: Duration::from_secs(30),
+                max_bytes: 1_000_000,
+            });
+            remote
+                .complete(reply.map(|r| (r.status, String::from_utf8_lossy(&r.body).into_owned())));
+        })
+        .map_err(|_| Failure::Network)?;
+        match slot.wait().await {
+            Some(Ok((401 | 403, _))) => Err(Failure::SignedOut),
+            Some(Ok(reply)) => Ok(reply),
+            _ => Err(Failure::Network),
+        }
+    }
 }
 
 /// The account the app talks for, found at start-up.
@@ -378,7 +434,15 @@ pub enum Account {
     Unavailable,
 }
 
-pub use platform::{Stream, account, cancel, credits, start};
+/// Why an account request did not come back.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Failure {
+    /// No session or the session ended (401/403).
+    SignedOut,
+    Network,
+}
+
+pub use platform::{Stream, account, cancel, credits, request, start};
 
 /// Asks the model and returns its complete turn (and the credits left), streaming live events.
 ///

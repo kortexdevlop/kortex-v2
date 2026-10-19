@@ -1,0 +1,12 @@
+[package]
+name = "kortex-vault"
+version = "0.1.0"
+edition.workspace = true
+publish.workspace = true
+
+# End-to-end encryption of what Kortex syncs: the key is derived from a passphrase that never
+# leaves the device, the server only ever stores ciphertext. Pure: randomness is passed in.
+[dependencies]
+aes-gcm = { version = "0.10", default-features = false, features = ["aes", "alloc"] }
+pbkdf2 = { version = "0.12", default-features = false, features = ["hmac"] }
+sha2 = "0.10"

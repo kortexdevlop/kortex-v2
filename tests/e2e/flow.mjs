@@ -573,6 +573,80 @@ try {
   await nest.locator('[data-node="n2"] .flow-node-head').click();
   await nest.locator('.flow-result', { hasText: 'Bonjour ADA !' }).waitFor();
   checks.push('a saved workflow used as a card');
+  // Encrypted sync between two devices (separate browser profiles) against a simulated sync store.
+  const store = new Map();
+  const wire = async page => {
+    await page.route('https://api.kortex.site/**', async route => {
+      const request = route.request();
+      const cors = { 'access-control-allow-origin': request.headers().origin ?? '*', 'access-control-allow-credentials': 'true', 'access-control-allow-headers': 'content-type, x-kortex-request, x-kortex-user', 'access-control-allow-methods': 'GET, PUT, POST' };
+      const reply = (status, body) => route.fulfill({ status, headers: { ...cors, 'content-type': 'application/json' }, body: JSON.stringify(body) });
+      if (request.method() === 'OPTIONS') return route.fulfill({ status: 204, headers: cors });
+      const { pathname } = new URL(request.url());
+      if (pathname === '/v1/me') return reply(200, { id: 'u1', email: 'sync@example.test', created_at: 1 });
+      if (pathname === '/v1/sync' && request.method() === 'GET') return reply(200, { items: [...store].map(([key, v]) => ({ key, version: v.version, updated_at: v.updated_at })) });
+      const key = pathname.replace('/v1/sync/', '');
+      if (request.method() === 'GET') return store.has(key) ? reply(200, { key, ...store.get(key) }) : reply(404, { error: 'not_found' });
+      if (request.method() === 'PUT') {
+        const body = JSON.parse(request.postData());
+        const current = store.get(key);
+        if ((current?.version ?? 0) !== body.version) return reply(409, { error: 'version_conflict', current: current ? { ...current } : null });
+        const version = (current?.version ?? 0) + 1;
+        store.set(key, { version, data: body.data, updated_at: Date.now() });
+        return reply(current ? 200 : 201, { key, version });
+      }
+      return reply(404, {});
+    });
+  };
+  const deviceA = await browser.newContext({ locale: 'fr-FR', viewport: { width: 1440, height: 900 } });
+  const a = await deviceA.newPage();
+  await wire(a);
+  await a.goto(origin + '/', { waitUntil: 'networkidle' });
+  await a.locator('[data-add="text"]').click();
+  await a.locator('.flow-inspector textarea').fill('contenu confidentiel');
+  await a.locator('.flow-name input').fill('Facture ultra secrète');
+  await a.locator('[data-action="library"]').click();
+  await a.locator('[data-action="save-workflow"]').click();
+  await a.locator('[data-field="sync-passphrase"]').fill('une phrase de passe');
+  const syncStart = Date.now();
+  await a.locator('[data-action="sync-on"]').click();
+  await a.locator('[data-sync-result="ok"]').waitFor({ timeout: 30000 });
+  const syncMs = Date.now() - syncStart;
+  assert.ok(syncMs < 15000, `the first sync (key derivation included) took ${syncMs} ms`);
+  const onServer = JSON.stringify([...store]);
+  assert.ok(onServer.includes('flow.vault') && /flow\.w[0-9a-f]{12}/.test(onServer));
+  assert.ok(!onServer.includes('Facture') && !onServer.includes('confidentiel') && !onServer.includes('secrète'), 'the store holds only ciphertext');
+  checks.push(`sync: first device uploads encrypted in ${syncMs} ms, nothing readable on the server`);
+  const deviceB = await browser.newContext({ locale: 'fr-FR', viewport: { width: 1440, height: 900 } });
+  const bDevice = await deviceB.newPage();
+  await wire(bDevice);
+  await bDevice.goto(origin + '/', { waitUntil: 'networkidle' });
+  await bDevice.locator('[data-action="library"]').click();
+  await bDevice.locator('[data-field="sync-passphrase"]').fill('une phrase de passe');
+  await bDevice.locator('[data-action="sync-on"]').click();
+  await bDevice.locator('[data-saved]', { hasText: 'Facture ultra secrète' }).waitFor({ timeout: 30000 });
+  checks.push('sync: second device receives the workflow');
+  // An edit on B travels back to A.
+  await bDevice.locator('[data-saved] [data-action="open"]').click();
+  await bDevice.locator('.flow-name input').fill('Facture renommée sur B');
+  await bDevice.locator('[data-action="save-workflow"]').click();
+  await bDevice.locator('[data-action="sync-now"]').click();
+  await bDevice.locator('[data-sync-result="ok"]').waitFor();
+  await a.locator('[data-action="sync-now"]').click();
+  await a.locator('[data-saved]', { hasText: 'Facture renommée sur B' }).waitFor({ timeout: 30000 });
+  checks.push('sync: an edit travels back to the first device');
+  // A third device with another passphrase is refused and changes nothing.
+  const deviceC = await browser.newContext({ locale: 'fr-FR', viewport: { width: 1440, height: 900 } });
+  const c = await deviceC.newPage();
+  await wire(c);
+  await c.goto(origin + '/', { waitUntil: 'networkidle' });
+  const sizeBefore = store.size;
+  await c.locator('[data-action="library"]').click();
+  await c.locator('[data-field="sync-passphrase"]').fill('une autre phrase');
+  await c.locator('[data-action="sync-on"]').click();
+  await c.locator('[data-sync-result="wrong_passphrase"]').waitFor({ timeout: 30000 });
+  assert.equal(store.size, sizeBefore);
+  checks.push('sync: a wrong passphrase is refused');
+  await deviceA.close(); await deviceB.close(); await deviceC.close();
   assert.deepEqual([...labErrors], []);
   assert.deepEqual(errors, []);
   console.log(`flow OK: ${checks.join(', ')}.`);

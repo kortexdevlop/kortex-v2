@@ -198,6 +198,12 @@ pub(crate) struct Ctx {
     pub lib_search: Signal<String>,
     pub confirm_delete: Signal<Option<String>>,
     pub runs: Signal<crate::history::Runs>,
+    pub sync_on: Signal<bool>,
+    pub sync_state: Signal<crate::sync::State>,
+    pub sync_status: Signal<Option<Result<crate::sync::Report, String>>>,
+    pub sync_running: Signal<bool>,
+    pub sync_gen: Signal<u32>,
+    pub sync_pass: Signal<String>,
     pub hist_open: Signal<bool>,
     pub hist_open_run: Signal<Option<u64>>,
     pub(crate) states: Signal<States>,
@@ -465,6 +471,33 @@ fn redo(mut ctx: Ctx) {
     }
 }
 
+/// Syncs the library now (if turned on) and merges the outcome into what is on screen.
+pub(crate) async fn do_sync(mut ctx: Ctx) {
+    if *ctx.sync_running.peek() {
+        return;
+    }
+    let Some(passphrase) = crate::secrets::sync_passphrase() else {
+        return;
+    };
+    ctx.sync_running.set(true);
+    let mut synced = ctx.library.peek().clone();
+    let mut state = ctx.sync_state.peek().clone();
+    match crate::sync_net::run(&passphrase, &mut synced, &mut state).await {
+        Ok(report) => {
+            // The library may have changed while the network answered: keep the newest of each.
+            let mut merged = ctx.library.peek().clone();
+            merged.merge(&synced, kortex_platform::now_ms());
+            if merged != *ctx.library.peek() {
+                ctx.library.set(merged);
+            }
+            ctx.sync_state.set(state);
+            ctx.sync_status.set(Some(Ok(report)));
+        }
+        Err(error) => ctx.sync_status.set(Some(Err(error.code().to_owned()))),
+    }
+    ctx.sync_running.set(false);
+}
+
 /// Puts another workflow in the editor as one undo step; `id` links it to a saved workflow. A
 /// workflow that was never saved is kept in the library first, so opening something never loses it.
 pub(crate) fn load_workflow(
@@ -528,6 +561,7 @@ pub fn App() -> Element {
         use_hook(|| shell::load::<crate::library::Library>("flow", "library"));
     let (current_loaded, _) = use_hook(|| shell::load::<Option<String>>("flow", "current-id"));
     let (runs_loaded, _) = use_hook(|| shell::load::<crate::history::Runs>("flow", "runs"));
+    let (sync_loaded, _) = use_hook(|| shell::load::<crate::sync::State>("flow", "sync-state"));
     let ctx = Ctx {
         workflow,
         history: use_signal(History::default),
@@ -545,6 +579,12 @@ pub fn App() -> Element {
         lib_search: use_signal(String::new),
         confirm_delete: use_signal(|| None),
         runs: use_signal(move || runs_loaded.clone()),
+        sync_on: use_signal(|| crate::secrets::sync_passphrase().is_some()),
+        sync_state: use_signal(move || sync_loaded.clone()),
+        sync_status: use_signal(|| None),
+        sync_running: use_signal(|| false),
+        sync_gen: use_signal(|| 0),
+        sync_pass: use_signal(String::new),
         hist_open: use_signal(|| false),
         hist_open_run: use_signal(|| None),
         view: use_signal(View::default),
@@ -591,6 +631,25 @@ pub fn App() -> Element {
     });
     use_effect(move || {
         shell::save("flow", "runs", &*ctx.runs.read());
+    });
+    use_effect(move || {
+        shell::save("flow", "sync-state", &*ctx.sync_state.read());
+    });
+    // Encrypted sync: a few seconds after the library last changed (and at start-up), if turned on.
+    use_effect(move || {
+        let _ = ctx.library.read();
+        if !*ctx.sync_on.read() {
+            return;
+        }
+        let mut generation = ctx.sync_gen;
+        let mine = generation.peek().wrapping_add(1);
+        generation.set(mine);
+        spawn(async move {
+            kortex_platform::document::sleep(2500).await;
+            if *ctx.sync_gen.peek() == mine {
+                do_sync(ctx).await;
+            }
+        });
     });
     // Agent nodes: the account and credits are looked up only once a workflow has one, and the
     // text of those nodes is sent to the model only after the user agrees (kept on this device).

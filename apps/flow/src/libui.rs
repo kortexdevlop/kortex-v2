@@ -3,7 +3,7 @@ use dioxus::prelude::*;
 
 use crate::library::new_id;
 use crate::templates;
-use crate::ui::{Ctx, load_workflow};
+use crate::ui::{Ctx, do_sync, load_workflow};
 
 fn need_label(l: &kortex_i18n::Catalog, need: &str) -> String {
     match need.strip_prefix("secret:") {
@@ -99,6 +99,7 @@ pub(crate) fn library_panel(ctx: Ctx, l: &'static kortex_i18n::Catalog, lang: &s
                         {l.t("lib.new")}
                     }
                 }
+                {sync_panel(ctx, l)}
                 if saved.is_empty() {
                     p { class: "flow-hint", {l.t("lib.empty")} }
                 }
@@ -307,4 +308,107 @@ pub(crate) fn history_panel(ctx: Ctx, l: &'static kortex_i18n::Catalog) -> Eleme
 
 fn state_label(l: &kortex_i18n::Catalog, state: &str) -> String {
     l.t(&format!("hist.state_{state}")).to_owned()
+}
+
+/// Turn the encrypted sync on or off and see how it went.
+fn sync_panel(ctx: Ctx, l: &'static kortex_i18n::Catalog) -> Element {
+    let Ctx {
+        mut sync_on,
+        mut sync_pass,
+        mut sync_status,
+        sync_state,
+        sync_running,
+        ..
+    } = ctx;
+    let on = sync_on();
+    let status = sync_status();
+    let has_status = status.is_some();
+    let last = sync_state.read().last_sync;
+    rsx! {
+        details { class: "flow-sync", "data-panel": "sync", open: !on || has_status,
+            summary { {l.t("sync.title")} if on { " ✓" } }
+            p { class: "flow-hint", {l.t("sync.help")} }
+            if on {
+                p { class: "flow-hint", "data-sync-last": "",
+                    {if last == 0 { l.t("sync.never").to_owned() } else { format!("{} {}", l.t("sync.last"), crate::history::utc_label(last)) }}
+                }
+                div { class: "flow-lib-actions",
+                    button {
+                        class: "k-btn",
+                        r#type: "button",
+                        "data-action": "sync-now",
+                        disabled: sync_running(),
+                        onclick: move |_| {
+                            spawn(do_sync(ctx));
+                        },
+                        {if sync_running() { l.t("sync.running") } else { l.t("sync.now") }}
+                    }
+                    button {
+                        class: "k-btn",
+                        "data-variant": "ghost",
+                        r#type: "button",
+                        "data-action": "sync-off",
+                        onclick: move |_| {
+                            crate::secrets::clear_sync_passphrase();
+                            crate::sync_net::forget_key();
+                            sync_on.set(false);
+                            sync_status.set(None);
+                        },
+                        {l.t("sync.off")}
+                    }
+                }
+            } else {
+                label { class: "k-field",
+                    span { class: "k-muted", {l.t("sync.passphrase")} }
+                    input {
+                        class: "k-input",
+                        r#type: "password",
+                        autocomplete: "off",
+                        "data-field": "sync-passphrase",
+                        value: "{sync_pass}",
+                        oninput: move |e| sync_pass.set(e.value()),
+                    }
+                }
+                p { class: "flow-hint", {l.t("sync.warning")} }
+                button {
+                    class: "k-btn",
+                    r#type: "button",
+                    "data-action": "sync-on",
+                    disabled: sync_pass().chars().count() < 8,
+                    onclick: move |_| {
+                        if crate::secrets::set_sync_passphrase(&sync_pass.peek()) {
+                            sync_pass.set(String::new());
+                            sync_on.set(true);
+                            sync_status.set(None);
+                            spawn(do_sync(ctx));
+                        } else {
+                            sync_status.set(Some(Err("storage".to_owned())));
+                        }
+                    },
+                    {l.t("sync.on")}
+                }
+            }
+            match status {
+                Some(Ok(report)) => rsx! {
+                    p { class: "flow-hint", role: "status", "data-sync-result": "ok",
+                        "{l.t(\"sync.done\")} {report.pulled} ↓ · {report.pushed} ↑"
+                    }
+                },
+                Some(Err(code)) => rsx! {
+                    p { class: "flow-hint", role: "alert", "data-sync-result": "{code}", {sync_error(l, &code)} }
+                },
+                None => rsx! {},
+            }
+        }
+    }
+}
+
+fn sync_error(l: &kortex_i18n::Catalog, code: &str) -> String {
+    let key = format!("sync.err_{code}");
+    let text = l.t(&key);
+    if text == key {
+        format!("{} ({code})", l.t("sync.err_other"))
+    } else {
+        text.to_owned()
+    }
 }

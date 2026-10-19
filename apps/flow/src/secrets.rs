@@ -90,3 +90,52 @@ pub fn remove(name: &str) {
     all.retain(|n| n != name);
     shell::save("flow", NAMES, &all);
 }
+
+/// The passphrase of the encrypted sync. Kept apart from the named secrets so no workflow can read
+/// it through `{secret:NAME}`; on desktop it lives in the system credential store.
+#[must_use]
+pub fn sync_passphrase() -> Option<String> {
+    #[cfg(target_arch = "wasm32")]
+    {
+        shell::load::<Option<String>>("flow", "sync-passphrase")
+            .0
+            .filter(|p| !p.is_empty())
+    }
+    #[cfg(not(target_arch = "wasm32"))]
+    {
+        use kortex_platform::secrets::{NativeSecretStore, SecretStore};
+        NativeSecretStore
+            .read("kortex-flow-sync", "passphrase")
+            .ok()
+            .flatten()
+            .and_then(|b| String::from_utf8(b).ok())
+            .filter(|p| !p.is_empty())
+    }
+}
+
+/// Remembers the sync passphrase on this device (`false` when the store refuses).
+pub fn set_sync_passphrase(passphrase: &str) -> bool {
+    #[cfg(target_arch = "wasm32")]
+    {
+        shell::save("flow", "sync-passphrase", &Some(passphrase.to_owned()))
+    }
+    #[cfg(not(target_arch = "wasm32"))]
+    {
+        use kortex_platform::secrets::{NativeSecretStore, SecretStore};
+        NativeSecretStore
+            .write("kortex-flow-sync", "passphrase", passphrase.as_bytes())
+            .is_ok()
+    }
+}
+
+pub fn clear_sync_passphrase() {
+    #[cfg(target_arch = "wasm32")]
+    {
+        shell::save("flow", "sync-passphrase", &None::<String>);
+    }
+    #[cfg(not(target_arch = "wasm32"))]
+    {
+        use kortex_platform::secrets::{NativeSecretStore, SecretStore};
+        let _ = NativeSecretStore.delete("kortex-flow-sync", "passphrase");
+    }
+}
