@@ -28,7 +28,7 @@ pub const DELAY_TOOL: &str = "flow.delay";
 /// Longest delay a node may ask for.
 pub const MAX_DELAY_MS: i64 = 30_000;
 
-pub const LOGIC_OPS: [&str; 8] = [
+pub const LOGIC_OPS: [&str; 10] = [
     "condition",
     "filter",
     "merge",
@@ -37,6 +37,8 @@ pub const LOGIC_OPS: [&str; 8] = [
     "foreach",
     "http",
     "ai",
+    "input",
+    "output",
 ];
 /// Most lines a "for each line" node accepts, and the most it can be asked to run.
 pub const MAX_ITEMS: i64 = 200;
@@ -125,6 +127,21 @@ pub fn logic_ports(op: &str) -> Option<ToolPorts> {
                 param("fail_on_error", PortType::Bool, "true", &[]),
             ],
             outputs: vec![input(TEXT_PORT, false), input("status", false)],
+        },
+        // The doors of a workflow used as a card in another one: an input receives the value given
+        // to the card (its default when the workflow runs alone), an output hands one back.
+        "input" => ToolPorts {
+            inputs: vec![],
+            params: vec![
+                param("name", PortType::Text, "input", &[]),
+                param("default", PortType::Text, "", &[]),
+            ],
+            outputs: vec![input(TEXT_PORT, false)],
+        },
+        "output" => ToolPorts {
+            inputs: vec![input(TEXT_PORT, true)],
+            params: vec![param("name", PortType::Text, "output", &[])],
+            outputs: vec![input(TEXT_PORT, false)],
         },
         "ai" => ToolPorts {
             inputs: vec![input("source", false), input("context", false)],
@@ -332,6 +349,10 @@ pub fn eval(op: &str, inputs: &ValueMap, params: &ValueMap) -> Result<ValueMap, 
                 Value::Text(parts.join(&p("separator"))),
             )]))
         }
+        "output" => Ok(ValueMap::from([(
+            TEXT_PORT.to_owned(),
+            Value::Text(text()?),
+        )])),
         "template" => Ok(ValueMap::from([(
             TEXT_PORT.to_owned(),
             Value::Text(render(&p("template"), inputs)?),

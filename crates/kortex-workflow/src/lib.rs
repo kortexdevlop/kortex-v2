@@ -852,6 +852,23 @@ impl<'a> Execution<'a> {
                 Ok(params) => params,
                 Err(e) => return self.failed(Some(&node.id), e.code, Some(e.detail)),
             };
+            if is_logic && name == "input" {
+                // A value handed in by the card that uses this workflow, else the default.
+                let value = match self.provided.get(&node.id) {
+                    Some(Value::Text(t)) => t.clone(),
+                    _ => match params.get("default") {
+                        Some(Value::Text(t)) => t.clone(),
+                        _ => String::new(),
+                    },
+                };
+                self.report.journal.push(format!("{}: ok", node.id));
+                self.report.results.insert(
+                    node.id.clone(),
+                    ValueMap::from([(TEXT_PORT.to_owned(), Value::Text(value))]),
+                );
+                self.cursor += 1;
+                continue;
+            }
             if is_logic && name == "foreach" {
                 let text = match inputs.get("text") {
                     Some(Value::Text(t)) => t.clone(),

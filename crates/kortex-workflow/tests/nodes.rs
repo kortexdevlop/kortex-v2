@@ -461,3 +461,28 @@ fn a_loop_needs_a_text_tool_and_respects_its_size_cap() {
         Value::Text(String::new())
     );
 }
+
+#[test]
+fn input_and_output_cards_are_the_doors_of_a_workflow() {
+    // Alone, an input gives its default; given a value, it gives that value; an output passes it on.
+    let w = flow(
+        vec![
+            logic("in", "input", &[("name", "who"), ("default", "world")]),
+            logic("out", "output", &[("name", "greeting")]),
+        ],
+        vec![edge(("in", "text"), ("out", "text"))],
+    );
+    assert!(validate(&w, &catalogue()).is_empty());
+    assert_eq!(
+        run(&w, BTreeMap::new()).expect("ok").results["out"]["text"],
+        Value::Text("world".into())
+    );
+    let given = BTreeMap::from([("in".to_owned(), Value::Text("Ada".into()))]);
+    assert_eq!(
+        run(&w, given).expect("ok").results["out"]["text"],
+        Value::Text("Ada".into())
+    );
+    // An output needs its text.
+    let lonely = flow(vec![logic("out", "output", &[])], vec![]);
+    assert_eq!(validate(&lonely, &catalogue())[0].code, "missing_input");
+}

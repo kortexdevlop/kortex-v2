@@ -56,6 +56,9 @@ multiple = "Un lot de fichiers"
 files_needed = "Choisissez un fichier pour :"
 
 [errors]
+subflow_missing = "Workflow enregistré introuvable"
+subflow_too_deep = "Trop de workflows imbriqués"
+subflow_invalid = "Le workflow utilisé comme carte est invalide"
 missing_param = "Une valeur obligatoire est vide"
 unknown_tool = "Outil inconnu"
 consent_required = "Acceptez l’envoi du texte au modèle IA pour utiliser un nœud Agent"
@@ -128,6 +131,10 @@ too_new_version = "Workflow créé par une version plus récente de Flow"
 unknown_logic = "Nœud intégré inconnu"
 
 [logic]
+"param.name" = "Nom"
+"param.default" = "Valeur par défaut"
+input = "Entrée du sous-workflow"
+output = "Sortie du sous-workflow"
 ai = "Agent IA"
 "param.task" = "Tâche"
 "param.prompt" = "Consigne"
@@ -211,6 +218,9 @@ tools_help = "Cochez les outils locaux que l’agent peut appeler (texte seuleme
 max_steps = "Étapes au maximum"
 
 [lib]
+group_workflow = "Mes workflows"
+group_connector = "Connecteurs"
+usable_as_card = "Utilisable comme carte"
 title = "Bibliothèque"
 mine = "Mes workflows"
 templates = "Modèles"

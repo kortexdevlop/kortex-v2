@@ -29,6 +29,9 @@ pub async fn run_tool(job: &Job) -> Result<ValueMap, RunError> {
     if job.tool.starts_with("connector.") {
         return send(connector_request(job)?).await;
     }
+    if job.tool.starts_with("workflow.") {
+        return crate::subflow::run(job.clone()).await;
+    }
     let url = format!("/engines/{}/worker.js", job.tool);
     kortex_platform::worker::run(&url, job.inputs.clone(), job.params.clone(), TIMEOUT_MS)
         .await
@@ -56,6 +59,9 @@ pub async fn run_tool(job: &Job) -> Result<ValueMap, RunError> {
     }
     if job.tool.starts_with("connector.") {
         return send(connector_request(job)?).await;
+    }
+    if job.tool.starts_with("workflow.") {
+        return crate::subflow::run(job.clone()).await;
     }
     use kortex_platform::native::task::{Slot, spawn};
     use kortex_workflow::Runner;

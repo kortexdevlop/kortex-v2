@@ -1,10 +1,10 @@
 //! Tool ports and params of the whole catalogue, read from the registry contracts.
 use std::collections::BTreeMap;
-use std::sync::OnceLock;
+use std::sync::{OnceLock, RwLock};
 
 use kortex_shell as shell;
 
-use crate::engine::{ParamSpec, Port, ToolPorts};
+use crate::engine::{Catalogue, NodeKind, ParamSpec, Port, ToolPorts, Workflow};
 
 fn default_text(value: Option<&toml::Value>) -> String {
     match value {
@@ -16,10 +16,78 @@ fn default_text(value: Option<&toml::Value>) -> String {
     }
 }
 
-/// Tool ports and params for the whole catalogue, from the registry contracts.
-pub fn ports() -> &'static BTreeMap<String, ToolPorts> {
-    static PORTS: OnceLock<BTreeMap<String, ToolPorts>> = OnceLock::new();
-    PORTS.get_or_init(|| {
+/// The tools a workflow can use: the registry's tools and the connector actions (fixed), plus the
+/// workflows the user saved that have inputs or outputs (they come and go while the app runs).
+pub struct Catalog {
+    base: BTreeMap<String, ToolPorts>,
+    extra: RwLock<BTreeMap<String, &'static ToolPorts>>,
+}
+
+impl Catalog {
+    #[must_use]
+    pub fn get(&self, id: &str) -> Option<&ToolPorts> {
+        self.base
+            .get(id)
+            .or_else(|| self.extra.read().ok().and_then(|e| e.get(id).copied()))
+    }
+
+    #[must_use]
+    pub fn contains_key(&self, id: &str) -> bool {
+        self.get(id).is_some()
+    }
+
+    /// The fixed tools (registry and connectors), not the saved workflows.
+    pub fn iter(&self) -> impl Iterator<Item = (&String, &ToolPorts)> {
+        self.base.iter()
+    }
+}
+
+impl Catalogue for Catalog {
+    fn tool(&self, id: &str) -> Option<&ToolPorts> {
+        self.get(id)
+    }
+}
+
+/// Replaces the saved workflows offered as tools. An unchanged one is kept as is, so repeated
+/// calls (every render) allocate nothing.
+pub fn set_workflow_tools(tools: Vec<(String, String, ToolPorts)>) {
+    let catalog = ports();
+    if let Ok(mut names) = workflow_names().write() {
+        *names = tools
+            .iter()
+            .map(|(id, name, _)| (id.clone(), name.clone()))
+            .collect();
+    }
+    let tools: BTreeMap<String, ToolPorts> = tools.into_iter().map(|(id, _, p)| (id, p)).collect();
+    let Ok(mut extra) = catalog.extra.write() else {
+        return;
+    };
+    extra.retain(|id, _| tools.contains_key(id));
+    for (id, ports) in tools {
+        if extra.get(&id).is_none_or(|known| **known != ports) {
+            // Small and rare (only when a saved workflow's doors change): leaked on purpose so a
+            // reference can outlive the lock.
+            extra.insert(id, Box::leak(Box::new(ports)));
+        }
+    }
+}
+
+fn workflow_names() -> &'static RwLock<BTreeMap<String, String>> {
+    static NAMES: OnceLock<RwLock<BTreeMap<String, String>>> = OnceLock::new();
+    NAMES.get_or_init(|| RwLock::new(BTreeMap::new()))
+}
+
+/// Display name of a saved workflow used as a tool (`workflow.<id>`).
+#[must_use]
+pub fn workflow_name(tool: &str) -> Option<String> {
+    workflow_names()
+        .read()
+        .ok()
+        .and_then(|n| n.get(tool).cloned())
+}
+
+fn build() -> BTreeMap<String, ToolPorts> {
+    {
         let mut all: BTreeMap<String, ToolPorts> = shell::catalogue()
             .iter()
             .map(|entry| {
@@ -63,6 +131,15 @@ pub fn ports() -> &'static BTreeMap<String, ToolPorts> {
             }
         }
         all
+    }
+}
+
+/// Tool ports and params for the whole catalogue, from the registry contracts.
+pub fn ports() -> &'static Catalog {
+    static PORTS: OnceLock<Catalog> = OnceLock::new();
+    PORTS.get_or_init(|| Catalog {
+        base: build(),
+        extra: RwLock::new(BTreeMap::new()),
     })
 }
 
@@ -83,5 +160,101 @@ pub fn connector_tools(lang: &str) -> Vec<(String, String)> {
         .iter()
         .flat_map(|c| c.actions.iter().map(|a| c.tool_id(&a.id)))
         .filter_map(|id| crate::connectors::display_name(&id, lang).map(|name| (id, name)))
+        .collect()
+}
+
+/// A port name usable as an identifier: lowercase letters, digits, `_` and `-`.
+fn port_name(raw: &str, fallback: &str, taken: &[String]) -> String {
+    let cleaned: String = raw
+        .trim()
+        .to_lowercase()
+        .chars()
+        .map(|c| {
+            if c.is_ascii_alphanumeric() || c == '-' || c == '_' {
+                c
+            } else {
+                '_'
+            }
+        })
+        .collect();
+    let base = match cleaned.trim_matches('_') {
+        "" => fallback.to_owned(),
+        trimmed => trimmed.to_owned(),
+    };
+    let mut name = base.clone();
+    let mut n = 2;
+    while taken.contains(&name) {
+        name = format!("{base}_{n}");
+        n += 1;
+    }
+    name
+}
+
+/// `(port name, node id)` pairs.
+pub type Doors = Vec<(String, String)>;
+
+/// The doors of a workflow: `(port name, node id)` of its input cards and of its output cards.
+#[must_use]
+pub fn doors(workflow: &Workflow) -> (Doors, Doors) {
+    let collect = |wanted: &str, fallback: &str| {
+        let mut out: Vec<(String, String)> = Vec::new();
+        for node in &workflow.nodes {
+            if let NodeKind::Logic { op, params } = &node.kind
+                && op == wanted
+            {
+                let taken: Vec<String> = out.iter().map(|(p, _)| p.clone()).collect();
+                let name = port_name(
+                    params.get("name").map_or("", String::as_str),
+                    fallback,
+                    &taken,
+                );
+                out.push((name, node.id.clone()));
+            }
+        }
+        out
+    };
+    (collect("input", "input"), collect("output", "output"))
+}
+
+/// A saved workflow as a tool: one text input per input card, one text output per output card.
+/// `None` when it has neither.
+#[must_use]
+pub fn workflow_ports(workflow: &Workflow) -> Option<ToolPorts> {
+    let (inputs, outputs) = doors(workflow);
+    if inputs.is_empty() && outputs.is_empty() {
+        return None;
+    }
+    let port = |id: &str| Port {
+        id: id.to_owned(),
+        ty: kortex_contract::PortType::Text,
+        required: false,
+    };
+    Some(ToolPorts {
+        inputs: inputs.iter().map(|(p, _)| port(p)).collect(),
+        params: Vec::new(),
+        outputs: outputs.iter().map(|(p, _)| port(p)).collect(),
+    })
+}
+
+/// Tool id of a saved workflow.
+#[must_use]
+pub fn workflow_tool_id(saved_id: &str) -> String {
+    format!("workflow.{saved_id}")
+}
+
+/// The saved workflows usable as cards (not the one being edited, not deleted ones): tool id, name
+/// and ports.
+#[must_use]
+pub fn workflow_tools(
+    library: &crate::library::Library,
+    editing: Option<&str>,
+) -> Vec<(String, String, ToolPorts)> {
+    library
+        .visible()
+        .into_iter()
+        .filter(|s| Some(s.id.as_str()) != editing)
+        .filter_map(|s| {
+            workflow_ports(&s.workflow).map(|p| (workflow_tool_id(&s.id), s.name.clone(), p))
+        })
         .collect()
 }

@@ -10,5 +10,6 @@ pub mod library;
 pub mod libui;
 pub mod runner;
 pub mod secrets;
+pub mod subflow;
 pub mod templates;
 pub mod ui;

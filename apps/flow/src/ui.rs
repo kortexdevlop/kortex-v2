@@ -59,7 +59,11 @@ pub(crate) fn node_title(node: &Node, l: &kortex_i18n::Catalog, lang: &str) -> S
     match &node.kind {
         NodeKind::Text { .. } => l.t("ui.text_node").to_owned(),
         NodeKind::Tool { tool, .. } => shell::find(tool).map_or_else(
-            || crate::connectors::display_name(tool, lang).unwrap_or_else(|| tool.clone()),
+            || {
+                crate::connectors::display_name(tool, lang)
+                    .or_else(|| crate::catalogue::workflow_name(tool))
+                    .unwrap_or_else(|| tool.clone())
+            },
             |e| shell::name(e, lang),
         ),
         NodeKind::File { multiple, .. } => l
@@ -135,6 +139,7 @@ fn node_line(node: &Node, l: &kortex_i18n::Catalog, chosen: Option<&Value>) -> O
                     if tools.trim().is_empty() { "" } else { " 🛠" }
                 )
             }
+            "input" | "output" => param(params, "name"),
             "foreach" => {
                 let tool = param(params, "tool");
                 if tool.is_empty() {
@@ -238,6 +243,7 @@ fn ui_error(l: &kortex_i18n::Catalog, code: &str, detail: Option<&str>) -> Strin
 }
 
 /// Runs the workflow node by node, reporting live state; stops at the first failure.
+#[allow(clippy::too_many_arguments)]
 async fn execute(
     workflow: Workflow,
     files: BTreeMap<String, Value>,
@@ -616,9 +622,18 @@ pub fn App() -> Element {
     let current = workflow();
     let catalogue = ports();
     let issues = validate(&current, catalogue);
+    // Saved workflows with inputs or outputs are offered as cards (never the one being edited).
+    let offered =
+        crate::catalogue::workflow_tools(&ctx.library.read(), ctx.current_id.read().as_deref());
+    let workflow_cards: Vec<(String, String)> = offered
+        .iter()
+        .map(|(id, name, _)| (id.clone(), name.clone()))
+        .collect();
+    crate::catalogue::set_workflow_tools(offered);
     let tools: Vec<(String, String)> = usable_tools(&lang)
         .into_iter()
         .chain(connector_tools(&lang))
+        .chain(workflow_cards)
         .collect();
     let issue_text = |code: &str, detail: &str| {
         let key = format!("issues.{code}");
@@ -635,7 +650,9 @@ pub fn App() -> Element {
         .iter()
         .filter_map(|n| match &n.kind {
             NodeKind::Tool { tool, .. }
-                if !tool.starts_with("connector.") && shell::installed_binary(tool).is_none() =>
+                if !tool.starts_with("connector.")
+                    && !tool.starts_with("workflow.")
+                    && shell::installed_binary(tool).is_none() =>
             {
                 Some(tool.clone())
             }
@@ -1233,7 +1250,7 @@ fn palette(
         }
         for (universe , items) in groups {
             div { key: "{universe}", class: "flow-group",
-                span { class: "flow-group-name", "{universe}" }
+                span { class: "flow-group-name", {group_label(l, &universe)} }
                 for (id , name) in items {
                     {entry(id.clone(), name, NodeKind::Tool { tool: id, params: BTreeMap::new() })}
                 }
@@ -1574,5 +1591,15 @@ fn ai_panel(
                 p { class: "flow-hint", "data-ai-credits": "", "{status}" }
             }
         }
+    }
+}
+
+fn group_label(l: &kortex_i18n::Catalog, universe: &str) -> String {
+    let key = format!("lib.group_{universe}");
+    let text = l.t(&key);
+    if text == key {
+        universe.to_owned()
+    } else {
+        text.to_owned()
     }
 }

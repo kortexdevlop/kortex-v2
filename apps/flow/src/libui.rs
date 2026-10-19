@@ -107,6 +107,9 @@ pub(crate) fn library_panel(ctx: Ctx, l: &'static kortex_i18n::Catalog, lang: &s
                         li { key: "{item.id}", class: "flow-lib-item", "data-saved": "{item.id}", "data-current": "{here.as_deref() == Some(item.id.as_str())}",
                             div { class: "flow-lib-main",
                                 strong { "{item.name}" }
+                                if crate::catalogue::workflow_ports(&item.workflow).is_some() {
+                                    span { class: "app-badge", "data-card": "{item.id}", {l.t("lib.usable_as_card")} }
+                                }
                                 span { class: "flow-hint", "{item.workflow.nodes.len()} {l.t(\"lib.nodes\")}" }
                             }
                             div { class: "flow-lib-buttons",

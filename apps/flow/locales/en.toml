@@ -56,6 +56,9 @@ multiple = "A batch of files"
 files_needed = "Choose a file for:"
 
 [errors]
+subflow_missing = "Saved workflow not found"
+subflow_too_deep = "Too many nested workflows"
+subflow_invalid = "The workflow used as a card is invalid"
 missing_param = "A required value is empty"
 unknown_tool = "Unknown tool"
 consent_required = "Agree to send the text to the AI model to use an Agent node"
@@ -128,6 +131,10 @@ too_new_version = "Workflow created by a newer version of Flow"
 unknown_logic = "Unknown built-in node"
 
 [logic]
+"param.name" = "Name"
+"param.default" = "Default value"
+input = "Sub-workflow input"
+output = "Sub-workflow output"
 ai = "AI Agent"
 "param.task" = "Task"
 "param.prompt" = "Instruction"
@@ -211,6 +218,9 @@ tools_help = "Tick the local tools the agent may call (text only, no network, no
 max_steps = "Maximum steps"
 
 [lib]
+group_workflow = "My workflows"
+group_connector = "Connectors"
+usable_as_card = "Usable as a card"
 title = "Library"
 mine = "My workflows"
 templates = "Templates"
