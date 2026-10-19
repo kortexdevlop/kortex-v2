@@ -23,6 +23,23 @@ const engine = { chromium, firefox, webkit }[process.env.BROWSER ?? 'chromium'];
 assert.ok(engine, 'BROWSER must be chromium, firefox or webkit');
 const browser = await engine.launch({ headless: true, executablePath: engine === chromium ? process.env.CHROME_PATH || undefined : undefined });
 const checks = [];
+// A real local API for one page: the app opens with ?api=<url> (the localhost-only development
+// override), so CORS, credentials and fetch behave as in production on every engine.
+const apis = [];
+const serveApi = async handler => {
+  const srv = createServer(async (req, res) => {
+    const chunks = [];
+    for await (const c of req) chunks.push(c);
+    const body = Buffer.concat(chunks).toString('utf8');
+    const cors = { 'access-control-allow-origin': req.headers.origin ?? origin, 'access-control-allow-credentials': 'true', 'access-control-allow-headers': 'content-type, x-kortex-request, x-kortex-user', 'access-control-allow-methods': 'GET, POST, PUT', vary: 'Origin' };
+    if (req.method === 'OPTIONS') return res.writeHead(204, cors).end();
+    const out = await handler({ method: req.method, path: new URL(req.url, 'http://x').pathname, headers: req.headers, json: () => JSON.parse(body) });
+    res.writeHead(out.status, { ...cors, 'content-type': out.type ?? 'application/json' }).end(typeof out.body === 'string' ? out.body : JSON.stringify(out.body));
+  });
+  await new Promise(done => srv.listen(0, '127.0.0.1', done));
+  apis.push(srv);
+  return `${origin}/?api=${encodeURIComponent('http://127.0.0.1:' + srv.address().port)}`;
+};
 // What a failing step looked like: console errors and failed requests of the pages under test.
 const diagnostics = [];
 const watch = (page, label) => {
@@ -283,14 +300,12 @@ try {
   await net.addInitScript(() => localStorage.clear());
   const proxied = [];
   let answer = { status: 200, json: { status: 201, headers: {}, url: 'https://api.github.com/x', body_base64: Buffer.from('created').toString('base64') } };
-  await net.route('https://api.kortex.site/v1/proxy', async route => {
-    const request = route.request();
-    const cors = { 'access-control-allow-origin': origin, 'access-control-allow-credentials': 'true', 'access-control-allow-headers': 'content-type, x-kortex-request, x-kortex-user', 'access-control-allow-methods': 'POST' };
-    if (request.method() === 'OPTIONS') return route.fulfill({ status: 204, headers: cors });
-    proxied.push({ body: JSON.parse(request.postData()), headers: request.headers() });
-    await route.fulfill({ status: answer.status, headers: { ...cors, 'content-type': 'application/json' }, body: JSON.stringify(answer.json) });
+  const netUrl = await serveApi(({ method, path, headers, json }) => {
+    if (path !== '/v1/proxy') return { status: 404, body: {} };
+    proxied.push({ body: json(), headers });
+    return { status: answer.status, body: answer.json };
   });
-  await net.goto(origin + '/', { waitUntil: 'networkidle' });
+  await net.goto(netUrl, { waitUntil: 'networkidle' });
   await net.locator('[data-panel="secrets"] summary').click();
   await net.locator('[data-field="secret-name"]').fill('TOKEN');
   await net.locator('[data-field="secret-value"]').fill('abc123');
@@ -333,14 +348,12 @@ try {
   const tg = await context.newPage();
   await tg.addInitScript(() => localStorage.clear());
   const sent = [];
-  await tg.route('https://api.kortex.site/v1/proxy', async route => {
-    const request = route.request();
-    const cors = { 'access-control-allow-origin': origin, 'access-control-allow-credentials': 'true', 'access-control-allow-headers': 'content-type, x-kortex-request, x-kortex-user', 'access-control-allow-methods': 'POST' };
-    if (request.method() === 'OPTIONS') return route.fulfill({ status: 204, headers: cors });
-    sent.push(JSON.parse(request.postData()));
-    await route.fulfill({ status: 200, headers: { ...cors, 'content-type': 'application/json' }, body: JSON.stringify({ status: 200, headers: {}, url: 'x', body_base64: Buffer.from('{"ok":true}').toString('base64') }) });
+  const tgUrl = await serveApi(({ path, json }) => {
+    if (path !== '/v1/proxy') return { status: 404, body: {} };
+    sent.push(json());
+    return { status: 200, body: { status: 200, headers: {}, url: 'x', body_base64: Buffer.from('{"ok":true}').toString('base64') } };
   });
-  await tg.goto(origin + '/', { waitUntil: 'networkidle' });
+  await tg.goto(tgUrl, { waitUntil: 'networkidle' });
   await tg.locator('[data-panel="secrets"] summary').click();
   await tg.locator('[data-field="secret-name"]').fill('TELEGRAM_TOKEN');
   await tg.locator('[data-field="secret-value"]').fill('123:ABC');
@@ -379,25 +392,21 @@ try {
       : { content };
     return `data: ${JSON.stringify({ delta, finish_reason: null })}\n\ndata: ${JSON.stringify({ delta: {}, finish_reason: toolCall ? 'tool_calls' : 'stop' })}\n\nevent: done\ndata: ${JSON.stringify({ credits: { percent: 80, status: 'ok', resets_in_seconds: null } })}\n\n`;
   };
-  await brain.route('https://api.kortex.site/**', async route => {
-    const request = route.request();
-    const cors = { 'access-control-allow-origin': origin, 'access-control-allow-credentials': 'true', 'access-control-allow-headers': 'content-type, x-kortex-request, x-kortex-user', 'access-control-allow-methods': 'GET, POST' };
-    if (request.method() === 'OPTIONS') return route.fulfill({ status: 204, headers: cors });
-    const path = new URL(request.url()).pathname;
+  const brainUrl = await serveApi(({ method, path, json }) => {
     if (path === '/v1/me') {
       return signedIn
-        ? route.fulfill({ status: 200, headers: { ...cors, 'content-type': 'application/json' }, body: JSON.stringify({ id: 'u1', email: 'tester@example.test', created_at: 1 }) })
-        : route.fulfill({ status: 401, headers: { ...cors, 'content-type': 'application/json' }, body: '{"error":"unauthenticated"}' });
+        ? { status: 200, body: { id: 'u1', email: 'tester@example.test', created_at: 1 } }
+        : { status: 401, body: { error: 'unauthenticated' } };
     }
-    if (path === '/v1/ai/credits') return route.fulfill({ status: 200, headers: { ...cors, 'content-type': 'application/json' }, body: JSON.stringify({ percent: 80, status: 'ok', resets_in_seconds: null }) });
-    if (path === '/v1/ai/chat') {
-      asked.push(JSON.parse(request.postData()));
+    if (path === '/v1/ai/credits') return { status: 200, body: { percent: 80, status: 'ok', resets_in_seconds: null } };
+    if (path === '/v1/ai/chat' && method === 'POST') {
+      asked.push(json());
       const next = script.shift() ?? { content: 'no script' };
-      return route.fulfill({ status: 200, headers: { ...cors, 'content-type': 'text/event-stream' }, body: sse(next.content, next.tool) });
+      return { status: 200, type: 'text/event-stream', body: sse(next.content, next.tool) };
     }
-    return route.fulfill({ status: 404, headers: cors, body: '{}' });
+    return { status: 404, body: {} };
   });
-  await brain.goto(origin + '/', { waitUntil: 'networkidle' });
+  await brain.goto(brainUrl, { waitUntil: 'networkidle' });
   await brain.locator('[data-add="text"]').click();
   await brain.locator('.flow-inspector textarea').fill('Kortex builds local-first tools. Ada Lovelace (36) wrote the first program.');
   await brain.locator('[data-add="logic.ai"]').click();
@@ -468,13 +477,8 @@ try {
   signedIn = false;
   const guest = await context.newPage();
   await guest.addInitScript(() => localStorage.clear());
-  await guest.route('https://api.kortex.site/**', async route => {
-    const request = route.request();
-    const cors = { 'access-control-allow-origin': origin, 'access-control-allow-credentials': 'true', 'access-control-allow-headers': 'content-type, x-kortex-request, x-kortex-user', 'access-control-allow-methods': 'GET, POST' };
-    if (request.method() === 'OPTIONS') return route.fulfill({ status: 204, headers: cors });
-    return route.fulfill({ status: 401, headers: { ...cors, 'content-type': 'application/json' }, body: '{"error":"unauthenticated"}' });
-  });
-  await guest.goto(origin + '/', { waitUntil: 'networkidle' });
+  const guestUrl = await serveApi(() => ({ status: 401, body: { error: 'unauthenticated' } }));
+  await guest.goto(guestUrl, { waitUntil: 'networkidle' });
   await guest.locator('[data-add="logic.ai"]').click();
   await guest.locator('[data-ai-account="signed-out"]').waitFor();
   await guest.locator('[data-field="ai-consent"]').check();
@@ -586,32 +590,24 @@ try {
   checks.push('a saved workflow used as a card');
   // Encrypted sync between two devices (separate browser profiles) against a simulated sync store.
   const store = new Map();
-  const wire = async page => {
-    await page.route('https://api.kortex.site/**', async route => {
-      const request = route.request();
-      const cors = { 'access-control-allow-origin': origin, 'access-control-allow-credentials': 'true', 'access-control-allow-headers': 'content-type, x-kortex-request, x-kortex-user', 'access-control-allow-methods': 'GET, PUT, POST' };
-      const reply = (status, body) => route.fulfill({ status, headers: { ...cors, 'content-type': 'application/json' }, body: JSON.stringify(body) });
-      if (request.method() === 'OPTIONS') return route.fulfill({ status: 204, headers: cors });
-      const { pathname } = new URL(request.url());
-      if (pathname === '/v1/me') return reply(200, { id: 'u1', email: 'sync@example.test', created_at: 1 });
-      if (pathname === '/v1/sync' && request.method() === 'GET') return reply(200, { items: [...store].map(([key, v]) => ({ key, version: v.version, updated_at: v.updated_at })) });
-      const key = pathname.replace('/v1/sync/', '');
-      if (request.method() === 'GET') return store.has(key) ? reply(200, { key, ...store.get(key) }) : reply(404, { error: 'not_found' });
-      if (request.method() === 'PUT') {
-        const body = JSON.parse(request.postData());
-        const current = store.get(key);
-        if ((current?.version ?? 0) !== body.version) return reply(409, { error: 'version_conflict', current: current ? { ...current } : null });
-        const version = (current?.version ?? 0) + 1;
-        store.set(key, { version, data: body.data, updated_at: Date.now() });
-        return reply(current ? 200 : 201, { key, version });
-      }
-      return reply(404, {});
-    });
-  };
+  const syncUrl = await serveApi(({ method, path, json }) => {
+    if (path === '/v1/me') return { status: 200, body: { id: 'u1', email: 'sync@example.test', created_at: 1 } };
+    if (path === '/v1/sync' && method === 'GET') return { status: 200, body: { items: [...store].map(([key, v]) => ({ key, version: v.version, updated_at: v.updated_at })) } };
+    const key = path.replace('/v1/sync/', '');
+    if (method === 'GET') return store.has(key) ? { status: 200, body: { key, ...store.get(key) } } : { status: 404, body: { error: 'not_found' } };
+    if (method === 'PUT') {
+      const body = json();
+      const current = store.get(key);
+      if ((current?.version ?? 0) !== body.version) return { status: 409, body: { error: 'version_conflict', current: current ? { ...current } : null } };
+      const version = (current?.version ?? 0) + 1;
+      store.set(key, { version, data: body.data, updated_at: Date.now() });
+      return { status: current ? 200 : 201, body: { key, version } };
+    }
+    return { status: 404, body: {} };
+  });
   const deviceA = await browser.newContext({ locale: 'fr-FR', viewport: { width: 1440, height: 900 } });
   const a = await deviceA.newPage();
-  await wire(a);
-  await a.goto(origin + '/', { waitUntil: 'networkidle' });
+  await a.goto(syncUrl, { waitUntil: 'networkidle' });
   await a.locator('[data-add="text"]').click();
   await a.locator('.flow-inspector textarea').fill('contenu confidentiel');
   await a.locator('.flow-name input').fill('Facture ultra secrète');
@@ -629,8 +625,7 @@ try {
   checks.push(`sync: first device uploads encrypted in ${syncMs} ms, nothing readable on the server`);
   const deviceB = await browser.newContext({ locale: 'fr-FR', viewport: { width: 1440, height: 900 } });
   const bDevice = await deviceB.newPage();
-  await wire(bDevice);
-  await bDevice.goto(origin + '/', { waitUntil: 'networkidle' });
+  await bDevice.goto(syncUrl, { waitUntil: 'networkidle' });
   await bDevice.locator('[data-action="library"]').click();
   await bDevice.locator('[data-field="sync-passphrase"]').fill('une phrase de passe');
   await bDevice.locator('[data-action="sync-on"]').click();
@@ -648,8 +643,7 @@ try {
   // A third device with another passphrase is refused and changes nothing.
   const deviceC = await browser.newContext({ locale: 'fr-FR', viewport: { width: 1440, height: 900 } });
   const c = await deviceC.newPage();
-  await wire(c);
-  await c.goto(origin + '/', { waitUntil: 'networkidle' });
+  await c.goto(syncUrl, { waitUntil: 'networkidle' });
   const sizeBefore = store.size;
   await c.locator('[data-action="library"]').click();
   await c.locator('[data-field="sync-passphrase"]').fill('une autre phrase');
@@ -665,6 +659,7 @@ try {
   console.error(diagnostics.join('\n'));
   throw error;
 } finally {
+  for (const srv of apis) srv.close();
   await browser.close();
   server.close();
 }
