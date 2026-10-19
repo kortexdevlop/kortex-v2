@@ -1,0 +1,26 @@
+{
+  "date": "2026-10-20",
+  "release_run": "39330128948",
+  "commit": "f665a343112f320c86911cc5548996bf460c02b9",
+  "versions": {
+    "kortex-api": "651da94e-ea3f-4afe-b6b9-ce2634a2d5bc",
+    "kortex-run": "cbaa8bd6-3e53-471a-96bd-d1e70b962640",
+    "kortex-desk": "b54d1fed-2ae7-4970-9997-dc436d7ca0d6",
+    "kortex-flow": "f5455379-b480-4ca9-b623-4d8c7c560d8d",
+    "kortex-hub": "259062f5-9d27-4fde-9e4d-4fdd404088d9",
+    "kortex-mind": "3eda4148-10de-4560-93b5-0968d875c292",
+    "kortex-seek": "d5cc0eda-8d16-45cc-a3f1-6fc9ef65d75d",
+    "kortex-store": "1a370293-4adc-4bc1-a14c-b27960c969a6",
+    "kortex-site": "20d14205-f815-418b-a98a-bc69f2372758"
+  },
+  "previous_versions_file": "2026-10-19-flow-agent-publication.json",
+  "previous_api": "de78f4d9-11c7-4e90-809e-605121eac9dd",
+  "migration": "0006_client_errors.sql applied (additive table)",
+  "checks": [
+    "api health ok",
+    "telemetry: valid report 204, unknown app 400, foreign origin 403 (my own test row removed afterwards)",
+    "header audit 9/9",
+    "flow.kortex.site: accent #0066cc, 12 templates, template runs, history lists the run, no page error",
+    "privacy page carries the new sections"
+  ]
+}
