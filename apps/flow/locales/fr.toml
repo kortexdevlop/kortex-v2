@@ -300,3 +300,17 @@ auto_off = "Désactivé après 5 échecs de suite : corrigez le workflow puis r�
 err_interval_too_short = "Intervalle trop court (ou trop long) pour ce workflow."
 err_bad_time = "Heure invalide."
 err_webhook_web = "Le webhook local n'existe que dans l'application."
+
+[builder]
+title = "Décrire ce que je veux (IA)"
+help = "Écrivez en une phrase ce que le workflow doit faire : l'IA propose des cartes déjà reliées, que vous relisez avant d'enregistrer ou d'exécuter. Votre phrase est envoyée au modèle (consentement IA requis, voir le panneau IA)."
+placeholder = "Ex. : nettoyer un texte, compter ses mots puis me donner le résultat"
+build = "Construire"
+working = "Construction…"
+done = "Proposition ouverte dans l'éditeur : relisez-la, rien n'a été exécuté ni enregistré."
+err_consent_required = "Cochez d'abord le consentement IA (panneau IA)."
+err_ai_signin = "Connectez-vous à votre compte Kortex pour utiliser l'IA."
+err_invalid = "Le modèle n'a pas produit de workflow valable. Reformulez en citant les étapes."
+err_empty_request = "Décrivez d'abord ce que vous voulez."
+err_ai_network = "Réseau indisponible."
+err_other = "Construction impossible"

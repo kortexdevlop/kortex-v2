@@ -112,6 +112,20 @@ try {
   await run();
   assert.match(await result(), /Hello Kortex/);
   checks.push('agent called a local tool by reference');
+  // Builder: a sentence becomes a valid proposal (checked by the same validation as a hand-made one).
+  await page.locator('[data-action="library"]').click();
+  await page.locator('[data-panel="builder"] summary').click();
+  await page.locator('[data-field="builder-request"]').fill('Nettoie un texte que je donne, puis passe-le en majuscules et affiche le résultat.');
+  const chats = [];
+  page.on('request', r => { if (r.url().endsWith('/v1/ai/chat')) chats.push(r.postData()); });
+  await page.locator('[data-action="build"]').click();
+  await page.locator('[data-build-result]').waitFor({ timeout: 180000 });
+  const verdict = await page.locator('[data-build-result]').getAttribute('data-build-result');
+  if (verdict !== 'ok') console.error('BUILD REQUESTS', chats.map(c => JSON.parse(c).messages.slice(2)));
+  assert.equal(verdict, 'ok', 'the real model produced a valid workflow, got: ' + verdict);
+  assert.ok((await page.locator('[data-node]').count()) >= 3, 'a few cards were proposed');
+  assert.equal(await page.locator('[data-node][data-state="done"]').count(), 0, 'nothing was run');
+  checks.push('builder from a sentence');
   assert.deepEqual(problems, []);
   console.log(`flow AI OK (real Gemma): ${checks.join(', ')}.`);
 } finally {

@@ -77,6 +77,37 @@ pub fn safe_tools() -> Vec<String> {
         .collect()
 }
 
+/// Asks the model for a plain answer (no tools), for the workflow builder.
+///
+/// # Errors
+/// `consent_required`, `ai_signin`, the gateway's own codes, or `ai_network`.
+pub async fn complete(messages: Vec<kortex_ai::chat::Message>) -> Result<String, String> {
+    if !CONSENT.load(Ordering::SeqCst) {
+        return Err("consent_required".into());
+    }
+    let Account::Ready { auth, .. } = kortex_ai_client::account().await else {
+        return Err("ai_signin".into());
+    };
+    let request = kortex_ai::chat::Request {
+        messages,
+        tools: Vec::new(),
+        stream: true,
+        // The gateway's ceiling for one answer.
+        max_tokens: 2_048,
+    };
+    let (turn, credits) = ask(&auth, &request, |_| {}).await.map_err(|e| {
+        if e.status == 0 {
+            "ai_network".to_owned()
+        } else {
+            e.code
+        }
+    })?;
+    if let (Some(c), Ok(mut last)) = (credits, CREDITS.lock()) {
+        *last = Some(c);
+    }
+    Ok(turn.content.unwrap_or_default())
+}
+
 fn failure(code: &str, detail: Option<String>) -> RunError {
     RunError {
         code: code.to_owned(),

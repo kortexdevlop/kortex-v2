@@ -99,6 +99,7 @@ pub(crate) fn library_panel(ctx: Ctx, l: &'static kortex_i18n::Catalog, lang: &s
                         {l.t("lib.new")}
                     }
                 }
+                {builder_panel(ctx, l, lang)}
                 {sync_panel(ctx, l)}
                 if saved.is_empty() {
                     p { class: "flow-hint", {l.t("lib.empty")} }
@@ -630,6 +631,102 @@ fn trigger_editor(ctx: Ctx, l: &'static kortex_i18n::Catalog, id: &str, has_ai: 
             }
             if let Some(code) = err() {
                 p { class: "flow-hint", role: "alert", "data-trigger-error": "{code}", {trigger_error(l, &code)} }
+            }
+        }
+    }
+}
+
+fn builder_error(l: &kortex_i18n::Catalog, code: &str) -> String {
+    for key in [format!("builder.err_{code}"), format!("errors.{code}")] {
+        let text = l.t(&key);
+        if text != key {
+            return text.to_owned();
+        }
+    }
+    format!("{} ({code})", l.t("builder.err_other"))
+}
+
+/// "Describe what you want": the model proposes a workflow, which opens in the editor unsaved and
+/// unrun so that the person reads it before anything happens.
+fn builder_panel(ctx: Ctx, l: &'static kortex_i18n::Catalog, lang: &str) -> Element {
+    let Ctx {
+        mut build_text,
+        mut build_busy,
+        mut build_status,
+        ai_consent: mut consent,
+        ..
+    } = ctx;
+    let lang = lang.to_owned();
+    let busy = build_busy();
+    let status = build_status();
+    let expanded = status.is_some() || busy;
+    rsx! {
+        details { class: "flow-builder", "data-panel": "builder", open: expanded,
+            summary { {l.t("builder.title")} }
+            p { class: "flow-hint", {l.t("builder.help")} }
+            textarea {
+                class: "k-input",
+                rows: "3",
+                maxlength: "{crate::builder::MAX_REQUEST}",
+                placeholder: l.t("builder.placeholder"),
+                "aria-label": l.t("builder.title"),
+                "data-field": "builder-request",
+                value: "{build_text}",
+                oninput: move |e| build_text.set(e.value()),
+            }
+            label { class: "flow-consent",
+                input {
+                    r#type: "checkbox",
+                    "data-field": "builder-consent",
+                    checked: consent(),
+                    onchange: move |e| {
+                        let on = e.checked();
+                        consent.set(on);
+                        kortex_shell::save("flow", "ai-consent", &on);
+                    },
+                }
+                span { {l.t("ai.consent")} }
+            }
+            button {
+                class: "k-btn",
+                r#type: "button",
+                "data-action": "build",
+                disabled: busy || build_text().trim().is_empty(),
+                onclick: move |_| {
+                    let (request, lang) = (build_text.peek().clone(), lang.clone());
+                    build_status.set(None);
+                    build_busy.set(true);
+                    spawn(async move {
+                        let outcome = if crate::ai::consented() {
+                            crate::builder::build(&request, &lang, crate::catalogue::ports(), crate::ai::complete)
+                                .await
+                                .map_err(|f| if f.code == "transport" { f.detail } else { f.code.to_owned() })
+                        } else {
+                            Err("consent_required".to_owned())
+                        };
+                        match outcome {
+                            Ok(built) => {
+                                let repaired = built.repaired;
+                                let name = built.workflow.name.clone();
+                                load_workflow(ctx, built.workflow, None, &name);
+                                build_text.set(String::new());
+                                build_status.set(Some(Ok(repaired)));
+                            }
+                            Err(code) => build_status.set(Some(Err(code))),
+                        }
+                        build_busy.set(false);
+                    });
+                },
+                {if busy { l.t("builder.working") } else { l.t("builder.build") }}
+            }
+            match status {
+                Some(Ok(_)) => rsx! {
+                    p { class: "flow-hint", role: "status", "data-build-result": "ok", {l.t("builder.done")} }
+                },
+                Some(Err(code)) => rsx! {
+                    p { class: "flow-hint", role: "alert", "data-build-result": "{code}", {builder_error(l, &code)} }
+                },
+                None => rsx! {},
             }
         }
     }

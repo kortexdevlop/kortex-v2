@@ -651,6 +651,45 @@ try {
   await c.locator('[data-sync-result="wrong_passphrase"]').waitFor({ timeout: 30000 });
   assert.equal(store.size, sizeBefore);
   checks.push('sync: a wrong passphrase is refused');
+  // Builder: a sentence becomes a proposed workflow (one repair round), never run or saved.
+  const builderAsked = [];
+  const builderReplies = ['Sorry, I cannot do JSON.', JSON.stringify({ name: 'Nettoyer un texte', nodes: [
+    { id: 'in', type: 'logic', op: 'input', params: { name: 'texte' } },
+    { id: 'c', type: 'tool', tool: 'text.cleaner', params: {} },
+    { id: 'out', type: 'logic', op: 'output', params: { name: 'resultat' } }],
+  edges: [{ from: 'in.text', to: 'c.text' }, { from: 'c.text', to: 'out.text' }] })];
+  const builderUrl = await serveApi(({ method, path, json }) => {
+    if (path === '/v1/me') return { status: 200, body: { id: 'u1', email: 'builder@example.test', created_at: 1 } };
+    if (path === '/v1/ai/credits') return { status: 200, body: { percent: 80, status: 'ok', resets_in_seconds: null } };
+    if (path === '/v1/ai/chat' && method === 'POST') {
+      builderAsked.push(json());
+      const content = builderReplies.shift() ?? '';
+      return { status: 200, type: 'text/event-stream', body: `data: ${JSON.stringify({ delta: { content }, finish_reason: null })}\n\ndata: ${JSON.stringify({ delta: {}, finish_reason: 'stop' })}\n\nevent: done\ndata: ${JSON.stringify({ credits: { percent: 80, status: 'ok', resets_in_seconds: null } })}\n\n` };
+    }
+    return { status: 404, body: {} };
+  });
+  const maker = await browser.newContext({ locale: 'fr-FR', viewport: { width: 1440, height: 900 } });
+  const draft = await maker.newPage();
+  await draft.goto(builderUrl, { waitUntil: 'networkidle' });
+  await draft.locator('[data-action="library"]').click();
+  await draft.locator('[data-panel="builder"] summary').click();
+  await draft.locator('[data-field="builder-request"]').fill('nettoyer un texte');
+  await draft.locator('[data-action="build"]').click();
+  await draft.locator('[data-build-result="consent_required"]').waitFor();
+  assert.equal(builderAsked.length, 0, 'nothing is sent without consent');
+  await draft.locator('[data-field="builder-consent"]').check();
+  await draft.locator('[data-action="build"]').click();
+  await draft.locator('[data-build-result="ok"]').waitFor({ timeout: 30000 });
+  assert.equal(builderAsked.length, 2, 'one repair round');
+  assert.ok(builderAsked[0].messages[0].content.includes('text.cleaner'), 'the model is shown the catalogue');
+  assert.ok(builderAsked[0].messages[1].content.includes('nettoyer un texte'));
+  assert.ok(JSON.stringify(builderAsked[1].messages).includes('not_json'), 'the problem is fed back');
+  assert.equal(await draft.locator('[data-node]').count(), 3);
+  assert.equal(await draft.locator('[data-edge]').count(), 2);
+  assert.equal(await draft.locator('[data-node][data-state="done"]').count(), 0, 'nothing was run');
+  assert.equal(await draft.locator('[data-saved]').count(), 0, 'nothing was saved');
+  checks.push('builder: consent first, catalogue shown to the model, one repair round, opens unrun and unsaved');
+  await maker.close();
   // Automatic triggers: "when Flow opens" runs the saved workflow by itself and records it.
   const auto = await browser.newContext({ locale: 'fr-FR', viewport: { width: 1440, height: 900 } });
   const timer = await auto.newPage();

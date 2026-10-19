@@ -300,3 +300,17 @@ auto_off = "Switched off after 5 failures in a row: fix the workflow, then turn 
 err_interval_too_short = "Interval too short (or too long) for this workflow."
 err_bad_time = "Invalid time."
 err_webhook_web = "The local webhook only exists in the app."
+
+[builder]
+title = "Describe what I want (AI)"
+help = "Write in one sentence what the workflow should do: the AI proposes cards already connected, which you read before saving or running. Your sentence is sent to the model (AI consent required, see the AI panel)."
+placeholder = "E.g. clean a text, count its words, then give me the result"
+build = "Build"
+working = "Building…"
+done = "Proposal opened in the editor: read it first, nothing was run or saved."
+err_consent_required = "Tick the AI consent first (AI panel)."
+err_ai_signin = "Sign in to your Kortex account to use AI."
+err_invalid = "The model did not produce a valid workflow. Rephrase, naming the steps."
+err_empty_request = "Describe what you want first."
+err_ai_network = "Network unavailable."
+err_other = "Could not build"

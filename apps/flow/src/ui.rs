@@ -202,6 +202,10 @@ pub(crate) struct Ctx {
     pub trigger_edit: Signal<Option<String>>,
     pub auto_busy: Signal<bool>,
     pub trigger_err: Signal<Option<String>>,
+    pub build_text: Signal<String>,
+    pub build_busy: Signal<bool>,
+    pub ai_consent: Signal<bool>,
+    pub build_status: Signal<Option<Result<bool, String>>>,
     pub sync_on: Signal<bool>,
     pub sync_state: Signal<crate::sync::State>,
     pub sync_status: Signal<Option<Result<crate::sync::Report, String>>>,
@@ -566,6 +570,7 @@ pub fn App() -> Element {
     let (current_loaded, _) = use_hook(|| shell::load::<Option<String>>("flow", "current-id"));
     let (runs_loaded, _) = use_hook(|| shell::load::<crate::history::Runs>("flow", "runs"));
     let (sync_loaded, _) = use_hook(|| shell::load::<crate::sync::State>("flow", "sync-state"));
+    let (consent_loaded, _) = use_hook(|| shell::load::<bool>("flow", "ai-consent"));
     let (triggers_loaded, _) =
         use_hook(|| shell::load::<crate::triggers::Triggers>("flow", "triggers"));
     let ctx = Ctx {
@@ -589,6 +594,10 @@ pub fn App() -> Element {
         trigger_edit: use_signal(|| None),
         auto_busy: use_signal(|| false),
         trigger_err: use_signal(|| None),
+        build_text: use_signal(String::new),
+        build_busy: use_signal(|| false),
+        ai_consent: use_signal(move || consent_loaded),
+        build_status: use_signal(|| None),
         sync_on: use_signal(|| crate::secrets::sync_passphrase().is_some()),
         sync_state: use_signal(move || sync_loaded.clone()),
         sync_status: use_signal(|| None),
@@ -674,8 +683,7 @@ pub fn App() -> Element {
             .iter()
             .any(|n| matches!(&n.kind, NodeKind::Logic { op, .. } if op == "ai"))
     });
-    let (saved_consent, _) = use_hook(|| shell::load::<bool>("flow", "ai-consent"));
-    let ai_consent = use_signal(move || saved_consent);
+    let ai_consent = ctx.ai_consent;
     let mut ai_account = use_signal(|| kortex_ai_client::Account::Checking);
     let mut ai_credits = use_signal(|| None::<kortex_ai::credits::Credits>);
     crate::ai::set_consent(ai_consent());

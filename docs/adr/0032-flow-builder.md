@@ -1,0 +1,9 @@
+# 0032 — Assistant de construction de workflow (Flow)
+**Statut** : accepté (2026-10-20), demande de l'utilisateur (« un assistant qui construit un workflow à partir d'une phrase »).
+**Décision** :
+- Dans la bibliothèque de Flow, un champ « Décrire ce que je veux (IA) ». Le modèle reçoit le catalogue (identifiants d'outils, ports **avec leur type**, paramètres, cartes intégrées ; sans connecteurs, HTTP ni workflows enregistrés) et répond par un petit JSON (`nodes`, `edges`). Module pur `apps/flow/src/builder.rs`, appel au modèle injecté.
+- **Rien de ce que dit le modèle n'est cru** : le JSON passe par la même validation que le travail manuel (outil inconnu, port inconnu, types incompatibles, entrée déjà prise). En cas de problème, jusqu'à **2 tours de réparation** où les problèmes sont renvoyés avec un conseil ; au-delà, refus (`invalid`) et rien n'est créé. Maximum 14 cartes, phrase limitée à 1 000 caractères, réponse limitée à 2 048 jetons (plafond de la passerelle).
+- Le résultat **s'ouvre dans l'éditeur, non enregistré et non exécuté** : la personne le relit d'abord. Aucun outil n'est lancé par l'assistant.
+- **Consentement et compte** : même règle que le nœud Agent (la phrase est envoyée au modèle ; consentement mémorisé, compte connecté, crédits partagés ADR 0029). Une case de consentement est présente dans le panneau lui-même. Le modèle utilisé est celui de la passerelle centrale (`services/api/src/ai-models.ts`) : le changer change aussi l'assistant.
+- Limite connue : le moteur refuse de relier un nombre à une entrée texte ; le modèle l'essaie parfois (« compte les mots et affiche-les ») et peut échouer après les tours de réparation.
+**Alternatives** : appel d'outils du modèle pour poser les cartes une à une (écarté : plus d'allers-retours donc plus de crédits) ; exécution immédiate du résultat (écarté : l'IA ne doit rien lancer sans relecture).
