@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { extname, resolve, sep } from 'node:path';
-import { chromium } from 'playwright';
+import { chromium, firefox, webkit } from 'playwright';
 
 const dist = resolve(import.meta.dirname, '../../dist/apps/apps.flow');
 assert.ok(existsSync(resolve(dist, 'index.html')), 'dist/apps/apps.flow missing: run `cargo xtask build-app apps.flow --web`');
@@ -18,7 +18,10 @@ const server = createServer((request, response) => {
 });
 await new Promise(done => server.listen(0, '127.0.0.1', done));
 const origin = `http://127.0.0.1:${server.address().port}`;
-const browser = await chromium.launch({ headless: true, executablePath: process.env.CHROME_PATH || undefined });
+// BROWSER=firefox|webkit runs the same recipe on another engine (CI: .github/workflows/browsers.yml).
+const engine = { chromium, firefox, webkit }[process.env.BROWSER ?? 'chromium'];
+assert.ok(engine, 'BROWSER must be chromium, firefox or webkit');
+const browser = await engine.launch({ headless: true, executablePath: engine === chromium ? process.env.CHROME_PATH || undefined : undefined });
 const checks = [];
 const node = (page, id) => page.locator(`[data-node="${id}"]`);
 const left = async (page, id) => parseFloat(await node(page, id).evaluate(e => e.style.left));
