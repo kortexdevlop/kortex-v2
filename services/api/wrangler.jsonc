@@ -29,7 +29,7 @@
         "PBKDF2_ITERATIONS": "5000",
         "WEBAUTHN_RP_ID": "kortex.site",
         "WEBAUTHN_ORIGIN": "https://kortex.site",
-        "TURNSTILE_REQUIRED": "false"
+        "TURNSTILE_REQUIRED": "true"
       },
       "name": "kortex-api",
       "ai": {
