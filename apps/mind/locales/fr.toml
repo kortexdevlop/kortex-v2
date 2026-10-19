@@ -65,6 +65,7 @@ too_many_corrections = "Je n’arrive pas à construire un plan valide pour cett
 consent_required = "Le consentement est nécessaire pour envoyer un message."
 ai_paused = "L’IA est en pause pour aujourd’hui (quota gratuit partagé)."
 user_empty = "Vos crédits sont épuisés pour le moment."
+user_daily = "Vous avez atteint votre part du jour : vos crédits reviennent demain (UTC)."
 ai_unavailable = "Le modèle est indisponible. Réessayez dans un instant."
 network = "Connexion interrompue."
 truncated = "La réponse s’est arrêtée trop tôt. Réessayez."

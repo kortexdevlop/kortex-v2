@@ -13,6 +13,8 @@ export interface Env {
   AI_USER_CAP?: string;
   AI_USER_REFILL_3H?: string;
   AI_GLOBAL_DAILY?: string;
+  /** Neurons one account may spend per UTC day (default 2 500). */
+  AI_USER_DAILY?: string;
   /** Comma-separated connector hosts the proxy may call with credentials (suffix match). */
   PROXY_CONNECTORS?: string;
   PROXY_FREE_PER_HOUR?: string;

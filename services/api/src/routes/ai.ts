@@ -1,6 +1,6 @@
 import type { Ctx } from '../env.ts';
 import { DEFAULT_MODEL, MODELS, estimateTokens, neurons, type ModelInfo } from '../ai-models.ts';
-import { creditsView, markGloballyExhausted, reserve, settle } from '../credits.ts';
+import { appOf, creditsView, markGloballyExhausted, reserve, settle } from '../credits.ts';
 import { HttpError, errorBody, isRecord, json, readJson } from '../http.ts';
 import { rateLimit } from '../ratelimit.ts';
 import { requireUser } from '../session.ts';
@@ -125,6 +125,7 @@ export async function chat(ctx: Ctx): Promise<Response> {
 
   const inTokens = estimateTokens(chars + (parsedTools?.chars ?? 0));
   const estimate = neurons(model, inTokens, maxOut as number);
+  const app = appOf(ctx.req);
   const r = await reserve(ctx.env, uid, estimate);
   if (!r.ok) {
     return json({ ...errorBody(r.reason), credits: await creditsView(ctx.env, uid) }, { status: 429, headers: { 'Retry-After': String(r.retryAfter) } });
@@ -141,11 +142,11 @@ export async function chat(ctx: Ctx): Promise<Response> {
   try {
     out = await ctx.env.AI.run(model.id as never, input as never);
   } catch (e) {
-    await settle(ctx.env, uid, r.cost, 0, modelKey); // nothing was consumed: full refund
+    await settle(ctx.env, uid, r.cost, 0, modelKey, Date.now(), app); // nothing was consumed: full refund
     return providerFailure(ctx, uid, e);
   }
 
-  if (b.stream === true && out instanceof ReadableStream) return streamResponse(ctx, uid, out as ReadableStream<Uint8Array>, r.cost, modelKey, model, inTokens);
+  if (b.stream === true && out instanceof ReadableStream) return streamResponse(ctx, uid, out as ReadableStream<Uint8Array>, r.cost, modelKey, model, inTokens, app);
 
   const result = isRecord(out) ? out : {};
   const choice = Array.isArray(result.choices) && isRecord(result.choices[0]) ? result.choices[0] : {};
@@ -153,7 +154,7 @@ export async function chat(ctx: Ctx): Promise<Response> {
   const content = typeof message.content === 'string' ? message.content : null;
   const toolCalls = Array.isArray(message.tool_calls) && message.tool_calls.length > 0 ? message.tool_calls : undefined;
   const usage = isRecord(result.usage) ? (result.usage as Usage) : undefined;
-  await settle(ctx.env, uid, r.cost, used(usage, model, inTokens, estimateTokens((content ?? '').length)), modelKey);
+  await settle(ctx.env, uid, r.cost, used(usage, model, inTokens, estimateTokens((content ?? '').length)), modelKey, Date.now(), app);
   return json({
     message: { role: 'assistant', content, ...(toolCalls ? { tool_calls: toolCalls } : {}) },
     finish_reason: typeof choice.finish_reason === 'string' ? choice.finish_reason : 'stop',
@@ -173,7 +174,7 @@ async function providerFailure(ctx: Ctx, uid: string, e: unknown): Promise<Respo
 /** Re-emits the provider's SSE as `data: {delta, finish_reason}` events, then `event: done` with the
  *  credits. The reservation is settled exactly once: on the provider's reported neurons at the
  *  end, or on a character-based estimate if the client leaves early or the provider fails. */
-function streamResponse(ctx: Ctx, uid: string, source: ReadableStream<Uint8Array>, reserved: number, modelKey: string, model: ModelInfo, inTokens: number): Response {
+function streamResponse(ctx: Ctx, uid: string, source: ReadableStream<Uint8Array>, reserved: number, modelKey: string, model: ModelInfo, inTokens: number, app: string): Response {
   const reader = source.getReader();
   const decoder = new TextDecoder();
   let buffer = '';
@@ -183,7 +184,7 @@ function streamResponse(ctx: Ctx, uid: string, source: ReadableStream<Uint8Array
   const finish = async (): Promise<void> => {
     if (settled) return;
     settled = true;
-    await settle(ctx.env, uid, reserved, used(usage, model, inTokens, estimateTokens(outChars)), modelKey);
+    await settle(ctx.env, uid, reserved, used(usage, model, inTokens, estimateTokens(outChars)), modelKey, Date.now(), app);
   };
   const handle = (line: string, controller: ReadableStreamDefaultController<Uint8Array>): void => {
     if (!line.startsWith('data:')) return;

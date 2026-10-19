@@ -126,7 +126,7 @@ export async function cleanup(env: Env, now = Date.now()): Promise<void> {
   const cutoff = new Date(now - 90 * 86_400_000).toISOString().slice(0, 10);
   await env.DB.prepare('DELETE FROM sessions WHERE expires_at <= ?1').bind(now).run();
   await env.DB.prepare('DELETE FROM rate_limits WHERE window_start < ?1').bind(Math.floor(now / 1000) - 86_400).run();
-  for (const table of ['usage_daily', 'ai_ledger', 'ai_global', 'client_errors']) {
+  for (const table of ['usage_daily', 'ai_ledger', 'ai_global', 'client_errors', 'ai_user_day', 'ai_app']) {
     await env.DB.prepare(`DELETE FROM ${table} WHERE day < ?1`).bind(cutoff).run();
   }
 }

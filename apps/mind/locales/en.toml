@@ -65,6 +65,7 @@ too_many_corrections = "I cannot build a valid plan for this request. Please rep
 consent_required = "Consent is required to send a message."
 ai_paused = "AI is paused for today (shared free quota)."
 user_empty = "Your credits are used up for now."
+user_daily = "You reached your share for today: your credits come back tomorrow (UTC)."
 ai_unavailable = "The model is unavailable. Try again in a moment."
 network = "Connection interrupted."
 truncated = "The answer stopped too early. Try again."

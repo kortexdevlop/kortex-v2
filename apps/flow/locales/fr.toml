@@ -65,6 +65,7 @@ consent_required = "Acceptez l’envoi du texte au modèle IA pour utiliser un n
 ai_signin = "Connectez-vous à votre compte Kortex pour utiliser l’IA"
 ai_paused = "L’IA est en pause pour aujourd’hui (quota gratuit partagé)"
 user_empty = "Vos crédits IA sont épuisés pour le moment"
+user_daily = "Vous avez atteint votre part du jour : vos crédits IA reviennent demain (UTC)"
 ai_unavailable = "L’IA est indisponible"
 ai_network = "Le modèle est injoignable"
 ai_nothing_to_do = "Donnez une source ou une consigne à l’agent"
