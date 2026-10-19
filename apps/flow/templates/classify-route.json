@@ -1,0 +1,105 @@
+{
+ "id": "classify-route",
+ "name": {
+  "fr": "Classer un message et l’orienter",
+  "en": "Classify a message and route it"
+ },
+ "description": {
+  "fr": "L’IA classe un message (urgent ou normal) puis chaque cas suit son chemin.",
+  "en": "The AI classifies a message (urgent or normal) then each case follows its own path."
+ },
+ "needs": [
+  "ai"
+ ],
+ "samples": {
+  "fr": "Le serveur est tombé, les clients ne peuvent plus se connecter !",
+  "en": "The server is down, customers can no longer log in!"
+ },
+ "workflow": {
+  "version": 1,
+  "name": "",
+  "nodes": [
+   {
+    "id": "n1",
+    "kind": "text",
+    "value": "{sample}"
+   },
+   {
+    "id": "n2",
+    "kind": "logic",
+    "op": "ai",
+    "params": {
+     "task": "classify",
+     "fields": "urgent\nnormal"
+    }
+   },
+   {
+    "id": "n3",
+    "kind": "logic",
+    "op": "condition",
+    "params": {
+     "test": "equals",
+     "value": "urgent"
+    }
+   },
+   {
+    "id": "n4",
+    "kind": "logic",
+    "op": "template",
+    "params": {
+     "template": "🚨 URGENT : {a}"
+    }
+   },
+   {
+    "id": "n5",
+    "kind": "logic",
+    "op": "template",
+    "params": {
+     "template": "Message normal : {a}"
+    }
+   }
+  ],
+  "edges": [
+   {
+    "from": {
+     "node": "n1",
+     "port": "text"
+    },
+    "to": {
+     "node": "n2",
+     "port": "source"
+    }
+   },
+   {
+    "from": {
+     "node": "n2",
+     "port": "text"
+    },
+    "to": {
+     "node": "n3",
+     "port": "text"
+    }
+   },
+   {
+    "from": {
+     "node": "n3",
+     "port": "then"
+    },
+    "to": {
+     "node": "n4",
+     "port": "a"
+    }
+   },
+   {
+    "from": {
+     "node": "n3",
+     "port": "else"
+    },
+    "to": {
+     "node": "n5",
+     "port": "a"
+    }
+   }
+  ]
+ }
+}

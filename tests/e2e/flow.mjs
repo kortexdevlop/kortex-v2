@@ -469,6 +469,51 @@ try {
   await guest.locator('[data-field="ai-consent"]').check();
   assert.ok(await guest.getByRole('button', { name: /Exécuter/ }).isDisabled());
   checks.push('Agent node: signed-out account blocks the run');
+  // The library: templates, saving, and never losing the work in progress.
+  const shelf = await context.newPage();
+  await shelf.addInitScript(() => { if (!sessionStorage.getItem('seeded')) { localStorage.clear(); sessionStorage.setItem('seeded', '1'); } });
+  await shelf.goto(origin + '/', { waitUntil: 'networkidle' });
+  await shelf.locator('[data-add="text"]').click();
+  await shelf.locator('.flow-inspector textarea').fill('travail en cours');
+  await shelf.locator('[data-action="library"]').click();
+  await shelf.locator('[data-tab="templates"]').click();
+  assert.equal(await shelf.locator('[data-template]').count(), 12);
+  await shelf.locator('[data-template="summarize-telegram"] .app-badge', { hasText: 'TELEGRAM_TOKEN' }).waitFor();
+  await shelf.locator('[data-template="hash-file"] .app-badge', { hasText: 'Fichiers' }).waitFor();
+  await shelf.locator('[data-panel="library"] input[type="search"]').fill('slug');
+  assert.equal(await shelf.locator('[data-template]').count(), 1);
+  await shelf.locator('[data-template="clean-slug"] [data-action="use-template"]').click();
+  assert.equal(await shelf.locator('[data-node]').count(), 3);
+  await shelf.getByRole('button', { name: /Exécuter/ }).click();
+  await shelf.locator('[data-node="n3"][data-state="done"]').waitFor({ timeout: 20000 });
+  await shelf.locator('[data-node="n3"] .flow-node-head').click();
+  await shelf.locator('.flow-result', { hasText: 'mon-super-article' }).waitFor();
+  checks.push('template opens and runs');
+  // The workflow that was in progress was kept automatically.
+  await shelf.locator('[data-action="library"]').click();
+  await shelf.locator('[data-tab="mine"]').click();
+  await shelf.locator('[data-saved]').first().waitFor();
+  assert.equal(await shelf.locator('[data-saved]').count(), 1);
+  // Save the template result under its own name, then reopen the first one.
+  await shelf.locator('[data-action="save-workflow"]').click();
+  assert.equal(await shelf.locator('[data-saved]').count(), 2);
+  await shelf.locator('[data-saved]', { hasText: 'Sans titre' }).locator('[data-action="open"]').click();
+  await shelf.locator('[data-node="n1"]').waitFor();
+  assert.equal(await shelf.locator('[data-node]').count(), 1);
+  await shelf.locator('[data-node="n1"] .flow-node-head').click();
+  assert.equal(await shelf.locator('.flow-inspector textarea').inputValue(), 'travail en cours');
+  checks.push('library keeps the work in progress and reopens it');
+  // Duplicate and delete (two clicks) leave the library consistent and survive a reload.
+  await shelf.locator('[data-saved]', { hasText: 'Sans titre' }).locator('[data-action="duplicate"]').click();
+  assert.equal(await shelf.locator('[data-saved]').count(), 3);
+  const doomed = shelf.locator('[data-saved]', { hasText: 'copie' });
+  await doomed.locator('[data-action="delete"]').click();
+  await doomed.locator('[data-action="confirm-delete"]').click();
+  assert.equal(await shelf.locator('[data-saved]').count(), 2);
+  await shelf.reload({ waitUntil: 'networkidle' });
+  await shelf.locator('[data-action="library"]').click();
+  assert.equal(await shelf.locator('[data-saved]').count(), 2);
+  checks.push('duplicate, delete and persistence');
   assert.deepEqual([...labErrors], []);
   assert.deepEqual(errors, []);
   console.log(`flow OK: ${checks.join(', ')}.`);

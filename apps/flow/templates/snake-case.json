@@ -1,0 +1,62 @@
+{
+ "id": "snake-case",
+ "name": {
+  "fr": "Nettoyer et passer en snake_case",
+  "en": "Clean and convert to snake_case"
+ },
+ "description": {
+  "fr": "Nettoie le texte puis le convertit en snake_case, pratique pour des noms de variables.",
+  "en": "Cleans the text then converts it to snake_case, handy for variable names."
+ },
+ "needs": [],
+ "samples": {
+  "fr": "  Nom   du   Client  ",
+  "en": "  Customer   Full   Name  "
+ },
+ "workflow": {
+  "version": 1,
+  "name": "",
+  "nodes": [
+   {
+    "id": "n1",
+    "kind": "text",
+    "value": "{sample}"
+   },
+   {
+    "id": "n2",
+    "kind": "tool",
+    "tool": "text.cleaner"
+   },
+   {
+    "id": "n3",
+    "kind": "tool",
+    "tool": "text.case-converter",
+    "params": {
+     "case": "snake"
+    }
+   }
+  ],
+  "edges": [
+   {
+    "from": {
+     "node": "n1",
+     "port": "text"
+    },
+    "to": {
+     "node": "n2",
+     "port": "text"
+    }
+   },
+   {
+    "from": {
+     "node": "n2",
+     "port": "text"
+    },
+    "to": {
+     "node": "n3",
+     "port": "text"
+    }
+   }
+  ]
+ }
+}

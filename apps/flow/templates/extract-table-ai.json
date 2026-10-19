@@ -1,0 +1,51 @@
+{
+ "id": "extract-table-ai",
+ "name": {
+  "fr": "Extraire un tableau d’un texte (IA)",
+  "en": "Extract a table from a text (AI)"
+ },
+ "description": {
+  "fr": "L’IA lit un texte libre et le range dans un tableau aux colonnes choisies.",
+  "en": "The AI reads a free text and arranges it in a table with the columns you choose."
+ },
+ "needs": [
+  "ai"
+ ],
+ "samples": {
+  "fr": "Ada Lovelace, 36 ans, vit à Londres. Alan Turing, 41 ans, vit à Manchester.",
+  "en": "Ada Lovelace, 36, lives in London. Alan Turing, 41, lives in Manchester."
+ },
+ "workflow": {
+  "version": 1,
+  "name": "",
+  "nodes": [
+   {
+    "id": "n1",
+    "kind": "text",
+    "value": "{sample}"
+   },
+   {
+    "id": "n2",
+    "kind": "logic",
+    "op": "ai",
+    "params": {
+     "task": "extract",
+     "format": "table",
+     "fields": "nom\nage\nville"
+    }
+   }
+  ],
+  "edges": [
+   {
+    "from": {
+     "node": "n1",
+     "port": "text"
+    },
+    "to": {
+     "node": "n2",
+     "port": "source"
+    }
+   }
+  ]
+ }
+}

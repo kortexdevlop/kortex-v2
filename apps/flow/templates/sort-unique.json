@@ -1,0 +1,49 @@
+{
+ "id": "sort-unique",
+ "name": {
+  "fr": "Trier une liste et retirer les doublons",
+  "en": "Sort a list and remove duplicates"
+ },
+ "description": {
+  "fr": "Trie les lignes par ordre alphabétique et supprime les doublons.",
+  "en": "Sorts the lines alphabetically and removes duplicates."
+ },
+ "needs": [],
+ "samples": {
+  "fr": "poire\npomme\npoire\ncerise\npomme",
+  "en": "pear\napple\npear\ncherry\napple"
+ },
+ "workflow": {
+  "version": 1,
+  "name": "",
+  "nodes": [
+   {
+    "id": "n1",
+    "kind": "text",
+    "value": "{sample}"
+   },
+   {
+    "id": "n2",
+    "kind": "tool",
+    "tool": "text.sort-lines",
+    "params": {
+     "sort": "asc",
+     "dedupe": "true",
+     "remove_empty": "true"
+    }
+   }
+  ],
+  "edges": [
+   {
+    "from": {
+     "node": "n1",
+     "port": "text"
+    },
+    "to": {
+     "node": "n2",
+     "port": "text"
+    }
+   }
+  ]
+ }
+}

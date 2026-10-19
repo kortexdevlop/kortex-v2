@@ -183,6 +183,15 @@ pub(crate) struct Ctx {
     pub files: Signal<BTreeMap<String, Value>>,
     pub results: Signal<BTreeMap<String, ValueMap>>,
     pub note: Signal<String>,
+    pub log: Signal<Vec<String>>,
+    pub outcome: Signal<Option<bool>>,
+    pub library: Signal<crate::library::Library>,
+    pub current_id: Signal<Option<String>>,
+    pub lib_open: Signal<bool>,
+    pub lib_tab: Signal<String>,
+    pub lib_search: Signal<String>,
+    pub confirm_delete: Signal<Option<String>>,
+    pub(crate) states: Signal<States>,
     view: Signal<View>,
     drag: Signal<Drag>,
     cursor: Signal<(f64, f64)>,
@@ -190,7 +199,6 @@ pub(crate) struct Ctx {
     mount: Signal<Option<Rc<MountedData>>>,
     mini_frame: Signal<Frame4>,
     mini_mount: Signal<Option<Rc<MountedData>>>,
-    states: Signal<States>,
     clip: Signal<Option<Workflow>>,
     dragged: Signal<Option<NodeKind>>,
 }
@@ -208,7 +216,7 @@ impl Ctx {
         all
     }
 
-    fn select_only(mut self, id: Option<String>) {
+    pub(crate) fn select_only(mut self, id: Option<String>) {
         self.selected.set(id);
         self.extra.write().clear();
     }
@@ -394,6 +402,43 @@ fn redo(mut ctx: Ctx) {
     }
 }
 
+/// Puts another workflow in the editor as one undo step; `id` links it to a saved workflow. A
+/// workflow that was never saved is kept in the library first, so opening something never loses it.
+pub(crate) fn load_workflow(
+    mut ctx: Ctx,
+    mut workflow: Workflow,
+    id: Option<String>,
+    untitled: &str,
+) {
+    let before = ctx.workflow.peek().clone();
+    if !before.nodes.is_empty() && ctx.current_id.peek().is_none() {
+        let name = if before.name.trim().is_empty() {
+            untitled.to_owned()
+        } else {
+            before.name.clone()
+        };
+        let kept = ctx.library.write().save(
+            None,
+            &name,
+            &before,
+            kortex_platform::now_ms(),
+            crate::library::new_id,
+        );
+        ctx.current_id.set(Some(kept));
+    }
+    ctx.snapshot();
+    auto_layout(&mut workflow);
+    ctx.workflow.set(workflow);
+    ctx.current_id.set(id);
+    ctx.select_only(None);
+    ctx.states.write().clear();
+    ctx.results.write().clear();
+    ctx.log.write().clear();
+    ctx.outcome.set(None);
+    ctx.files.write().clear();
+    show_all(ctx);
+}
+
 fn show_all(mut ctx: Ctx) {
     spawn(async move {
         if let Some(f) = read_frame(ctx.mount.peek().clone()).await {
@@ -416,6 +461,9 @@ pub fn App() -> Element {
         auto_layout(&mut w);
         w
     });
+    let (library_loaded, _) =
+        use_hook(|| shell::load::<crate::library::Library>("flow", "library"));
+    let (current_loaded, _) = use_hook(|| shell::load::<Option<String>>("flow", "current-id"));
     let ctx = Ctx {
         workflow,
         history: use_signal(History::default),
@@ -424,6 +472,14 @@ pub fn App() -> Element {
         files: use_signal(BTreeMap::new),
         results: use_signal(BTreeMap::new),
         note: use_signal(String::new),
+        log: use_signal(Vec::new),
+        outcome: use_signal(|| None),
+        library: use_signal(move || library_loaded.clone()),
+        current_id: use_signal(move || current_loaded.clone()),
+        lib_open: use_signal(|| false),
+        lib_tab: use_signal(|| "mine".to_owned()),
+        lib_search: use_signal(String::new),
+        confirm_delete: use_signal(|| None),
         view: use_signal(View::default),
         drag: use_signal(|| Drag::Idle),
         cursor: use_signal(|| (0.0, 0.0)),
@@ -454,12 +510,17 @@ pub fn App() -> Element {
     let mut secret_name = use_signal(String::new);
     let mut secret_value = use_signal(String::new);
     let mut search = use_signal(String::new);
-    let log = use_signal(Vec::<String>::new);
-    let mut outcome = use_signal(|| None::<bool>);
+    let (log, mut outcome) = (ctx.log, ctx.outcome);
     let mut running = use_signal(|| false);
     let mut cancel = use_signal(CancelToken::default);
     use_effect(move || {
         shell::save("flow", "workflow", &*workflow.read());
+    });
+    use_effect(move || {
+        shell::save("flow", "library", &*ctx.library.read());
+    });
+    use_effect(move || {
+        shell::save("flow", "current-id", &*ctx.current_id.read());
     });
     // Agent nodes: the account and credits are looked up only once a workflow has one, and the
     // text of those nodes is sent to the model only after the user agrees (kept on this device).
@@ -625,6 +686,19 @@ pub fn App() -> Element {
                 span { class: "flow-sep" }
                 button {
                     class: "k-btn",
+                    "data-variant": "ghost",
+                    r#type: "button",
+                    "data-action": "library",
+                    "aria-expanded": "{ctx.lib_open}",
+                    onclick: move |_| {
+                        let mut open = ctx.lib_open;
+                        open.set(!open());
+                    },
+                    "📚 " {l.t("lib.title")}
+                }
+                span { class: "flow-sep" }
+                button {
+                    class: "k-btn",
                     r#type: "button",
                     disabled: !can_run,
                     onclick: move |_| {
@@ -677,6 +751,9 @@ pub fn App() -> Element {
                     },
                     {l.t("ui.export")}
                 }
+            }
+            if (ctx.lib_open)() {
+                {crate::libui::library_panel(ctx, l, &lang)}
             }
             div { class: "flow-stage",
                 // Palette: click adds the node after the selected one and links them; dragging

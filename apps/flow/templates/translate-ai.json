@@ -1,0 +1,50 @@
+{
+ "id": "translate-ai",
+ "name": {
+  "fr": "Traduire un texte avec l’IA",
+  "en": "Translate a text with AI"
+ },
+ "description": {
+  "fr": "Traduit un texte dans la langue de votre choix (réglable dans la carte).",
+  "en": "Translates a text into the language of your choice (set in the card)."
+ },
+ "needs": [
+  "ai"
+ ],
+ "samples": {
+  "fr": "Bonjour, ce workflow traduit votre texte.",
+  "en": "Hello, this workflow translates your text."
+ },
+ "workflow": {
+  "version": 1,
+  "name": "",
+  "nodes": [
+   {
+    "id": "n1",
+    "kind": "text",
+    "value": "{sample}"
+   },
+   {
+    "id": "n2",
+    "kind": "logic",
+    "op": "ai",
+    "params": {
+     "task": "translate",
+     "language": "English"
+    }
+   }
+  ],
+  "edges": [
+   {
+    "from": {
+     "node": "n1",
+     "port": "text"
+    },
+    "to": {
+     "node": "n2",
+     "port": "source"
+    }
+   }
+  ]
+ }
+}

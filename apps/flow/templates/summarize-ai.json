@@ -1,0 +1,50 @@
+{
+ "id": "summarize-ai",
+ "name": {
+  "fr": "Résumer un texte avec l’IA",
+  "en": "Summarize a text with AI"
+ },
+ "description": {
+  "fr": "Un texte entre, un résumé court sort. Demande un compte et vos crédits IA.",
+  "en": "Text goes in, a short summary comes out. Needs an account and your AI credits."
+ },
+ "needs": [
+  "ai"
+ ],
+ "samples": {
+  "fr": "Kortex est une suite d’outils qui fonctionnent directement sur votre appareil. Les fichiers ne sont jamais envoyés sur un serveur. Flow permet d’enchaîner ces outils comme dans un schéma, et un agent IA peut aider à traiter les textes.",
+  "en": "Kortex is a suite of tools that run directly on your device. Files are never sent to a server. Flow lets you chain these tools like a diagram, and an AI agent can help process texts."
+ },
+ "workflow": {
+  "version": 1,
+  "name": "",
+  "nodes": [
+   {
+    "id": "n1",
+    "kind": "text",
+    "value": "{sample}"
+   },
+   {
+    "id": "n2",
+    "kind": "logic",
+    "op": "ai",
+    "params": {
+     "task": "summarize",
+     "prompt": "En trois puces au maximum."
+    }
+   }
+  ],
+  "edges": [
+   {
+    "from": {
+     "node": "n1",
+     "port": "text"
+    },
+    "to": {
+     "node": "n2",
+     "port": "source"
+    }
+   }
+  ]
+ }
+}
