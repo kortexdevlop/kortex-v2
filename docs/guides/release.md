@@ -26,7 +26,7 @@ Le vérificateur impose l’inventaire sélectionné, deux fichiers réguliers p
 ## Secrets et publication
 
 - `KORTEX_SIGNING_KEY` : clé de signature de release, déjà configurée dans le dépôt privé. La clé publique est `crates/kortex-pkg/release.pub` ; ne jamais committer la clé privée.
-- `RELEASES_TOKEN` : nécessaire à la publication dans le dépôt public de binaires `kortexdevlop/kortex-releases`, actuellement absent. Ne pas remplacer ce jeton par un accès large aux sources privées.
+- Publication : depuis le passage du dépôt en public (ADR 0024), `publish=true` crée une GitHub Release de `kortex-v2` avec le jeton intégré (`contents: write`) ; aucun jeton personnel n'est nécessaire. L'index signé pointe vers `https://github.com/kortexdevlop/kortex-v2/releases/download/<tag>`. `kortex-releases` n'est plus utilisé.
 - `publish=false` ne crée aucune release publique. Un index signé privé ou un paquet de test ne doit jamais activer le drapeau public `desktop_releases`.
 
 Les installateurs `installers/install.sh` et `install.ps1` sont présents comme sources ; leurs routes publiques restent exclues lorsque la distribution est fermée. Les commandes publiques de téléchargement ne sont donc pas proposées comme un parcours disponible.

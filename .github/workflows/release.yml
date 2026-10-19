@@ -1,7 +1,7 @@
 name: release
 
 # Builds the CLI, the Store and the desktop apps on Linux, macOS and Windows, signs the release index
-# and (when RELEASES_TOKEN is set) publishes everything to the public binaries-only repo.
+# and (when asked) publishes everything as a GitHub Release of this repository, which is public (ADR 0024).
 #
 # Minutes are scarce on a private repository (macOS counts x10, Windows x2): this workflow only runs
 # on `release/*` tags or by hand, never on push. See docs/guides/release.md.
@@ -21,7 +21,7 @@ on:
         type: boolean
         default: true
       publish:
-        description: 'Publish to kortex-releases (needs the RELEASES_TOKEN secret)'
+        description: 'Publish a GitHub Release with the packages and the signed index'
         type: boolean
         default: false
   push:
@@ -201,6 +201,8 @@ jobs:
     needs: [build, web]
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - run: rustup show
@@ -219,7 +221,7 @@ jobs:
           KORTEX_SIGNING_KEY: ${{ secrets.KORTEX_SIGNING_KEY }}
         run: |
           test -n "$KORTEX_SIGNING_KEY" || { echo "::error::secret KORTEX_SIGNING_KEY missing"; exit 1; }
-          cargo xtask release-index --base-url "https://github.com/kortexdevlop/kortex-releases/releases/download/${{ steps.rel.outputs.tag }}"
+          cargo xtask release-index --base-url "https://github.com/${{ github.repository }}/releases/download/${{ steps.rel.outputs.tag }}"
           ls -la dist/release
       - uses: actions/upload-artifact@v4
         with:
@@ -231,13 +233,13 @@ jobs:
             dist/release/build-proof-*.json
           if-no-files-found: error
           retention-days: 7
-      - name: Publish to kortex-releases
-        if: (github.event_name == 'push' || inputs.publish) && env.RELEASES_TOKEN != ''
+      - name: Publish the GitHub Release
+        if: github.event_name == 'push' || inputs.publish
         env:
-          RELEASES_TOKEN: ${{ secrets.RELEASES_TOKEN }}
-          GH_TOKEN: ${{ secrets.RELEASES_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           gh release create "${{ steps.rel.outputs.tag }}" dist/release/* \
-            --repo kortexdevlop/kortex-releases \
+            --repo "${{ github.repository }}" \
+            --target "${{ github.sha }}" \
             --title "${{ steps.rel.outputs.tag }}" \
-            --notes "Binaries and signed index. Source code is private; verify with the Kortex public key."
+            --notes "Binaries and signed index (Ed25519). Verify with the Kortex public key; the installers check every SHA-256."
