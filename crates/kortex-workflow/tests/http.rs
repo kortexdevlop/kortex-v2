@@ -328,3 +328,91 @@ fn connector_contracts_are_validated_when_they_are_read() {
     );
     assert_eq!(split_tool("text.cleaner"), None);
 }
+
+#[test]
+fn the_ai_node_is_a_host_job_and_its_tools_must_be_text_tools() {
+    use kortex_contract::PortType;
+    use kortex_workflow::{AI_TOOL, Port};
+    let port = |id: &str, ty: PortType, required: bool| Port {
+        id: id.into(),
+        ty,
+        required,
+    };
+    let cat: BTreeMap<String, ToolPorts> = BTreeMap::from([
+        (
+            "text.cleaner".to_owned(),
+            ToolPorts {
+                inputs: vec![port("text", PortType::Text, true)],
+                params: vec![],
+                outputs: vec![port("text", PortType::Text, false)],
+            },
+        ),
+        (
+            "pdf.merge".to_owned(),
+            ToolPorts {
+                inputs: vec![port(
+                    "files",
+                    PortType::Files("application/pdf".into()),
+                    true,
+                )],
+                params: vec![],
+                outputs: vec![port(
+                    "file",
+                    PortType::File("application/pdf".into()),
+                    false,
+                )],
+            },
+        ),
+    ]);
+    let ai = |params: &[(&str, &str)]| Node {
+        id: "a".into(),
+        kind: NodeKind::Logic {
+            op: "ai".into(),
+            params: params
+                .iter()
+                .map(|(k, v)| ((*k).into(), (*v).into()))
+                .collect(),
+        },
+        retries: 0,
+        pos: None,
+    };
+    let flow = |n: Node| Workflow {
+        nodes: vec![n],
+        ..Workflow::default()
+    };
+    assert!(
+        validate(
+            &flow(ai(&[("task", "summarize"), ("tools", "text.cleaner")])),
+            &cat
+        )
+        .is_empty()
+    );
+    let codes = |w: &Workflow| {
+        validate(w, &cat)
+            .iter()
+            .map(|i| (i.code, i.detail.clone()))
+            .collect::<Vec<_>>()
+    };
+    assert_eq!(
+        codes(&flow(ai(&[("tools", "pdf.merge")]))),
+        [("bad_param", "tools".to_owned())]
+    );
+    assert_eq!(
+        codes(&flow(ai(&[("tools", "no.such")]))),
+        [("bad_param", "tools".to_owned())]
+    );
+    assert_eq!(
+        codes(&flow(ai(&[("task", "dance")]))),
+        [("bad_param", "task".to_owned())]
+    );
+    let workflow = flow(ai(&[("prompt", "hi"), ("format", "json")]));
+    let mut exec = Execution::new(&workflow, &cat).expect("valid");
+    match exec.next(&CancelToken::default()) {
+        Step::Run(job) => {
+            assert_eq!(job.tool, AI_TOOL);
+            assert_eq!(job.params["format"], Value::Text("json".into()));
+            assert_eq!(job.params["max_steps"], Value::Int(4));
+        }
+        other => panic!("expected the AI job, got {other:?}"),
+    }
+}

@@ -355,6 +355,120 @@ try {
   assert.equal(sent[0].method, 'POST');
   assert.deepEqual(JSON.parse(sent[0].body), { chat_id: '42', text: 'Build "ok"\nall green' });
   checks.push('Telegram connector builds its request from node text and a device secret');
+  // The Agent node: consent first, then the model (simulated gateway) with text, table, JSON repair
+  // and local tools. The wire format is the gateway's real SSE.
+  const brain = await context.newPage();
+  await brain.addInitScript(() => localStorage.clear());
+  const asked = [];
+  let script = [];
+  let signedIn = true;
+  const sse = (content, toolCall) => {
+    const delta = toolCall
+      ? { tool_calls: [{ index: 0, id: 'model-call', function: { name: toolCall.name, arguments: JSON.stringify(toolCall.args) } }] }
+      : { content };
+    return `data: ${JSON.stringify({ delta, finish_reason: null })}\n\ndata: ${JSON.stringify({ delta: {}, finish_reason: toolCall ? 'tool_calls' : 'stop' })}\n\nevent: done\ndata: ${JSON.stringify({ credits: { percent: 80, status: 'ok', resets_in_seconds: null } })}\n\n`;
+  };
+  await brain.route('https://api.kortex.site/**', async route => {
+    const request = route.request();
+    const cors = { 'access-control-allow-origin': request.headers().origin ?? '*', 'access-control-allow-credentials': 'true', 'access-control-allow-headers': 'content-type, x-kortex-request, x-kortex-user', 'access-control-allow-methods': 'GET, POST' };
+    if (request.method() === 'OPTIONS') return route.fulfill({ status: 204, headers: cors });
+    const path = new URL(request.url()).pathname;
+    if (path === '/v1/me') {
+      return signedIn
+        ? route.fulfill({ status: 200, headers: { ...cors, 'content-type': 'application/json' }, body: JSON.stringify({ id: 'u1', email: 'tester@example.test', created_at: 1 }) })
+        : route.fulfill({ status: 401, headers: { ...cors, 'content-type': 'application/json' }, body: '{"error":"unauthenticated"}' });
+    }
+    if (path === '/v1/ai/credits') return route.fulfill({ status: 200, headers: { ...cors, 'content-type': 'application/json' }, body: JSON.stringify({ percent: 80, status: 'ok', resets_in_seconds: null }) });
+    if (path === '/v1/ai/chat') {
+      asked.push(JSON.parse(request.postData()));
+      const next = script.shift() ?? { content: 'no script' };
+      return route.fulfill({ status: 200, headers: { ...cors, 'content-type': 'text/event-stream' }, body: sse(next.content, next.tool) });
+    }
+    return route.fulfill({ status: 404, headers: cors, body: '{}' });
+  });
+  await brain.goto(origin + '/', { waitUntil: 'networkidle' });
+  await brain.locator('[data-add="text"]').click();
+  await brain.locator('.flow-inspector textarea').fill('Kortex builds local-first tools. Ada Lovelace (36) wrote the first program.');
+  await brain.locator('[data-add="logic.ai"]').click();
+  await brain.locator('[data-panel="ai"]').waitFor();
+  await brain.locator('[data-ai-account="ready"]', { hasText: 'tester@example.test' }).waitFor();
+  await brain.locator('[data-ai-credits]', { hasText: '80%' }).waitFor();
+  // No consent, no run: nothing may leave the device.
+  assert.ok(await brain.getByRole('button', { name: /Exécuter/ }).isDisabled());
+  await brain.locator('[data-field="ai-consent"]').check();
+  await brain.locator('.flow-inspector [data-field="task"]').selectOption('summarize');
+  script = [{ content: 'Kortex: local-first tools.' }];
+  await brain.getByRole('button', { name: /Exécuter/ }).click();
+  await brain.locator('[data-node="n2"][data-state="done"]').waitFor({ timeout: 20000 });
+  assert.equal(asked.length, 1);
+  const first = asked[0];
+  assert.equal(first.consent, true);
+  assert.equal(first.stream, true);
+  assert.ok(/DATA|DONNÉE/.test(first.messages[0].content), 'the system prompt marks the source as data');
+  assert.ok(first.messages[1].content.includes('<source>\nKortex builds local-first tools.'));
+  assert.ok(first.messages[1].content.includes('Summarize the source') || first.messages[1].content.includes('Résume la source'));
+  await brain.locator('[data-node="n2"] .flow-node-head').click();
+  await brain.locator('.flow-result', { hasText: 'Kortex: local-first tools.' }).waitFor();
+  checks.push('Agent node: consent, account, credits, prompt sent as data');
+
+  // A table: columns from the fields, filled from the model's JSON.
+  await brain.locator('.flow-inspector [data-field="task"]').selectOption('extract');
+  await brain.locator('.flow-inspector [data-field="format"]').selectOption('table');
+  await brain.locator('.flow-inspector [data-field="fields"]').fill('name\nage');
+  script = [{ content: '```json\n[{"name":"Ada Lovelace","age":36}]\n```' }];
+  await brain.getByRole('button', { name: /Exécuter/ }).click();
+  await brain.locator('[data-node="n2"][data-state="done"]').waitFor({ timeout: 20000 });
+  await brain.locator('.flow-result', { hasText: '1 × 2' }).waitFor();
+  assert.ok((await brain.locator('.flow-inspector').textContent()).includes('name,age'));
+  checks.push('Agent node: table output');
+
+  // Invalid JSON is repaired once.
+  await brain.locator('.flow-inspector [data-field="format"]').selectOption('json');
+  const askedBefore = asked.length;
+  script = [{ content: 'The person is Ada.' }, { content: '{"name":"Ada Lovelace"}' }];
+  await brain.getByRole('button', { name: /Exécuter/ }).click();
+  await brain.locator('[data-node="n2"][data-state="done"]').waitFor({ timeout: 20000 });
+  assert.equal(asked.length - askedBefore, 2, 'one question and one repair');
+  assert.equal(asked.at(-1).messages.length, 4);
+  checks.push('Agent node: JSON repaired once');
+
+  // Tools: the model names the data by reference, the engine runs locally, the answer expands.
+  await brain.locator('.flow-inspector [data-field="format"]').selectOption('text');
+  await brain.locator('.flow-inspector [data-field="task"]').selectOption('prompt');
+  await brain.locator('[data-node="n1"] .flow-node-head').click();
+  await brain.locator('.flow-inspector textarea').fill('  Hello   Kortex  ');
+  await brain.locator('[data-node="n2"] .flow-node-head').click();
+  await brain.locator('[data-panel="agent-tools"] summary').click();
+  await brain.locator('[data-agent-tool="text.cleaner"]').check();
+  await brain.locator('.flow-inspector [data-field="prompt"]').fill('Clean the source and reply with the result');
+  const base = asked.length;
+  script = [{ tool: { name: 'text__cleaner', args: { text: '@texte1' } } }, { content: 'Result: @c1.text' }];
+  await brain.getByRole('button', { name: /Exécuter/ }).click();
+  await brain.locator('[data-node="n2"][data-state="done"]').waitFor({ timeout: 30000 });
+  assert.equal(asked.length - base, 2);
+  assert.equal(asked[base].tools.length, 1);
+  assert.ok(!JSON.stringify(asked[base + 1]).includes('Hello   Kortex'), 'the model never saw the source text');
+  assert.ok(JSON.stringify(asked[base + 1]).includes('@c1.text'), 'it only got a summary with references');
+  await brain.locator('[data-node="n2"] .flow-node-head').click();
+  await brain.locator('.flow-result', { hasText: 'Result: Hello Kortex' }).waitFor();
+  checks.push('Agent node: local tools by reference, references expanded in the answer');
+
+  // Signed out: the panel says so and the run stays closed.
+  signedIn = false;
+  const guest = await context.newPage();
+  await guest.addInitScript(() => localStorage.clear());
+  await guest.route('https://api.kortex.site/**', async route => {
+    const request = route.request();
+    const cors = { 'access-control-allow-origin': request.headers().origin ?? '*', 'access-control-allow-credentials': 'true', 'access-control-allow-headers': 'content-type, x-kortex-request, x-kortex-user', 'access-control-allow-methods': 'GET, POST' };
+    if (request.method() === 'OPTIONS') return route.fulfill({ status: 204, headers: cors });
+    return route.fulfill({ status: 401, headers: { ...cors, 'content-type': 'application/json' }, body: '{"error":"unauthenticated"}' });
+  });
+  await guest.goto(origin + '/', { waitUntil: 'networkidle' });
+  await guest.locator('[data-add="logic.ai"]').click();
+  await guest.locator('[data-ai-account="signed-out"]').waitFor();
+  await guest.locator('[data-field="ai-consent"]').check();
+  assert.ok(await guest.getByRole('button', { name: /Exécuter/ }).isDisabled());
+  checks.push('Agent node: signed-out account blocks the run');
   assert.deepEqual([...labErrors], []);
   assert.deepEqual(errors, []);
   console.log(`flow OK: ${checks.join(', ')}.`);

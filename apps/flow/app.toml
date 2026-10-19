@@ -9,7 +9,7 @@ bundles_engines = true
 ui = "custom"
 platforms = ["web", "desktop"]
 offline = false
-ai = false
+ai = true
 
 [app.name]
 fr = "Kortex Flow"
@@ -22,8 +22,8 @@ fr = "flow"
 en = "flow"
 
 [permissions]
-network = false
-filesystem = "none"
+network = true
+filesystem = "write"
 clipboard = "none"
 sensitive = false
-privacy = "local"
+privacy = "ai-consent"

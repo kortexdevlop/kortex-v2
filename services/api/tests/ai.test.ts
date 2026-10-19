@@ -59,7 +59,10 @@ test('chat requires consent, valid messages, a known model and a sane max_tokens
   assert.equal((await post({ messages: [{ role: 'root', content: 'x' }], consent: true })).data.error, 'invalid_messages');
   assert.equal((await post(chatBody({ model: 'gpt-9' }))).data.error, 'invalid_model');
   assert.equal((await post(chatBody({ max_tokens: 99999 }))).data.error, 'invalid_max_tokens');
-  assert.equal((await post({ messages: [{ role: 'user', content: 'x'.repeat(9000) }], consent: true })).data.error, 'invalid_messages');
+  assert.equal((await post({ messages: [{ role: 'user', content: 'x'.repeat(41_000) }], consent: true })).data.error, 'invalid_messages');
+  // A long source text fits in one message; the whole request stays capped at 48 000 characters.
+  assert.equal((await post({ messages: [{ role: 'user', content: 'x'.repeat(30_000) }], consent: true })).status, 200);
+  assert.equal((await post({ messages: [{ role: 'user', content: 'x'.repeat(30_000) }, { role: 'assistant', content: 'y'.repeat(20_000) }], consent: true })).data.error, 'messages_too_large');
   assert.equal((await post(chatBody({ tools: [] }))).data.error, 'invalid_tools');
   assert.equal((await post(chatBody({ tools: [{ type: 'function', function: { name: 'bad name!', description: 'x', parameters: {} } }] }))).data.error, 'invalid_tools');
   assert.equal((await post(chatBody({ tool_choice: 'auto' }))).data.error, 'invalid_tool_choice', 'tool_choice needs tools');

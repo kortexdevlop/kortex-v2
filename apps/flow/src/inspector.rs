@@ -1,5 +1,7 @@
 //! Properties panel of the selected node: its content, inputs, parameters, retries, chosen files
 //! and results. Wiring by list stays here for keyboard users, next to the drag gesture.
+use std::collections::BTreeMap;
+
 use dioxus::prelude::*;
 use kortex_contract::{ParamLevel, PortType};
 use kortex_runtime::{FileData, Value};
@@ -68,6 +70,7 @@ fn fields(node: &Node, pro: bool, l: &kortex_i18n::Catalog, lang: &str) -> Vec<F
                 .and_then(|e| e.params.iter().find(|p| p.id == spec.id))
                 .is_none_or(|p| pro || p.level != Some(ParamLevel::Pro))
         })
+        .filter(|spec| ai_visible(node, &spec.id))
         .map(|spec| {
             let label = match &node.kind {
                 NodeKind::Logic { .. } => l.t(&format!("logic.param.{}", spec.id)).to_owned(),
@@ -102,7 +105,7 @@ fn fields(node: &Node, pro: bool, l: &kortex_i18n::Catalog, lang: &str) -> Vec<F
                     .unwrap_or_else(|| spec.default.clone()),
                 multiline: matches!(
                     spec.id.as_str(),
-                    "template" | "options" | "headers" | "body"
+                    "template" | "options" | "headers" | "body" | "prompt" | "fields"
                 ) || match &node.kind {
                     NodeKind::Tool { tool, .. } => {
                         crate::connectors::find(tool).is_some_and(|(_, a)| {
@@ -162,6 +165,9 @@ pub(crate) fn inspector(
     };
     rsx! {
         strong { "{id} · {title}" }
+        if let NodeKind::Logic { op, params: stored } = &node.kind && op == "ai" {
+            {tools_picker(&node.id, stored, ctx, l, lang)}
+        }
         if let NodeKind::Tool { tool, .. } = &node.kind {
             if let Some(help) = crate::connectors::help(tool, lang) {
                 p { class: "flow-hint", "data-connector-help": "{tool}", "{help}" }
@@ -290,6 +296,8 @@ pub(crate) fn inspector(
                         let choices: Vec<String> = if is_bool { vec!["true".to_owned(), "false".to_owned()] } else { field.options.clone() };
                         let kind_key = match field.id.as_str() {
                             "keep" => "keep",
+                            "task" => "task",
+                            "format" => "format",
                             _ => "test",
                         };
                         let mut set_change = set.clone();
@@ -475,6 +483,100 @@ fn wire(
                 option { value: "", "—" }
                 for candidate in candidates {
                     option { key: "{candidate}", value: "{candidate}", "{candidate}" }
+                }
+            }
+        }
+    }
+}
+
+/// Which parameters of an Agent node apply to its current task and format.
+fn ai_visible(node: &Node, id: &str) -> bool {
+    let NodeKind::Logic { op, params } = &node.kind else {
+        return true;
+    };
+    if op != "ai" {
+        return true;
+    }
+    let get = |k: &str, d: &'static str| params.get(k).map_or(d, String::as_str);
+    let (task, format) = (get("task", "prompt"), get("format", "text"));
+    match id {
+        "language" => task == "translate",
+        "fields" => matches!(task, "classify" | "extract") || matches!(format, "json" | "table"),
+        // Edited through the tools picker below.
+        "tools" | "max_steps" => false,
+        _ => true,
+    }
+}
+
+/// The local tools an Agent node may call, and how many rounds it may take. Only tools that are
+/// safe to run unattended are offered (no network, no file writes, nothing sensitive).
+fn tools_picker(
+    node_id: &str,
+    params: &BTreeMap<String, String>,
+    ctx: Ctx,
+    l: &'static kortex_i18n::Catalog,
+    lang: &str,
+) -> Element {
+    let mut workflow = ctx.workflow;
+    let chosen: Vec<String> = params
+        .get("tools")
+        .map_or("", String::as_str)
+        .split(',')
+        .map(|t| t.trim().to_owned())
+        .filter(|t| !t.is_empty())
+        .collect();
+    let steps = params
+        .get("max_steps")
+        .cloned()
+        .unwrap_or_else(|| "4".to_owned());
+    let all = crate::ai::safe_tools();
+    let count = chosen.len();
+    let steps_id = node_id.to_owned();
+    let lang = lang.to_owned();
+    rsx! {
+        details { class: "flow-tools", "data-panel": "agent-tools", open: count > 0,
+            summary { "{l.t(\"ai.tools\")} ({count})" }
+            p { class: "flow-hint", {l.t("ai.tools_help")} }
+            for tool in all {
+                {
+                    let name = shell::find(&tool).map_or(tool.clone(), |e| shell::name(e, &lang));
+                    let on = chosen.contains(&tool);
+                    let (id, toggled, current) = (node_id.to_owned(), tool.clone(), chosen.clone());
+                    rsx! {
+                        label { key: "{tool}", class: "flow-consent",
+                            input {
+                                r#type: "checkbox",
+                                "data-agent-tool": "{tool}",
+                                checked: on,
+                                onchange: move |_| {
+                                    ctx.snapshot();
+                                    let mut next = current.clone();
+                                    if let Some(at) = next.iter().position(|t| *t == toggled) {
+                                        next.remove(at);
+                                    } else {
+                                        next.push(toggled.clone());
+                                    }
+                                    set_param(&mut workflow.write(), &id, "tools", next.join(","));
+                                },
+                            }
+                            span { "{name}" }
+                        }
+                    }
+                }
+            }
+            if count > 0 {
+                label { class: "k-field",
+                    span { class: "k-muted", {l.t("ai.max_steps")} }
+                    input {
+                        class: "k-input",
+                        r#type: "number",
+                        min: "1",
+                        max: "6",
+                        "data-field": "max_steps",
+                        value: "{steps}",
+                        onfocus: move |_| ctx.snapshot(),
+                        oninput: move |e| set_param(&mut workflow.write(), &steps_id, "max_steps", e.value()),
+                    }
                 }
             }
         }

@@ -8,12 +8,27 @@ use crate::{ParamSpec, Port, RunError, TEXT_PORT, ToolPorts};
 
 pub const FILE_PORT: &str = "file";
 pub const FILES_PORT: &str = "files";
+/// Pseudo tool name of the AI job: the host asks the model (and runs its local tools).
+pub const AI_TOOL: &str = "flow.ai";
+/// Tasks and output formats of the agent node (`kortex_ai::agent` implements them).
+pub const AI_TASKS: [&str; 9] = [
+    "prompt",
+    "summarize",
+    "translate",
+    "classify",
+    "extract",
+    "sentiment",
+    "rewrite",
+    "proofread",
+    "keywords",
+];
+pub const AI_FORMATS: [&str; 4] = ["text", "json", "table", "list"];
 /// Pseudo tool name of the delay job: the host sleeps, then returns the text unchanged.
 pub const DELAY_TOOL: &str = "flow.delay";
 /// Longest delay a node may ask for.
 pub const MAX_DELAY_MS: i64 = 30_000;
 
-pub const LOGIC_OPS: [&str; 7] = [
+pub const LOGIC_OPS: [&str; 8] = [
     "condition",
     "filter",
     "merge",
@@ -21,6 +36,7 @@ pub const LOGIC_OPS: [&str; 7] = [
     "template",
     "foreach",
     "http",
+    "ai",
 ];
 /// Most lines a "for each line" node accepts, and the most it can be asked to run.
 pub const MAX_ITEMS: i64 = 200;
@@ -109,6 +125,26 @@ pub fn logic_ports(op: &str) -> Option<ToolPorts> {
                 param("fail_on_error", PortType::Bool, "true", &[]),
             ],
             outputs: vec![input(TEXT_PORT, false), input("status", false)],
+        },
+        "ai" => ToolPorts {
+            inputs: vec![input("source", false), input("context", false)],
+            params: vec![
+                param("task", PortType::Enum, "prompt", &AI_TASKS),
+                param("prompt", PortType::Text, "", &[]),
+                param("format", PortType::Enum, "text", &AI_FORMATS),
+                param("fields", PortType::Text, "", &[]),
+                param("language", PortType::Text, "English", &[]),
+                param("tools", PortType::Text, "", &[]),
+                param("max_steps", PortType::Integer, "4", &[]),
+            ],
+            outputs: vec![
+                input(TEXT_PORT, false),
+                Port {
+                    id: "table".to_owned(),
+                    ty: PortType::Table,
+                    required: false,
+                },
+            ],
         },
         _ => return None,
     })

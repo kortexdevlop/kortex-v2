@@ -54,7 +54,7 @@
     },
     {
       "app": {
-        "ai": false,
+        "ai": true,
         "aliases": {},
         "bundles_engines": true,
         "id": "apps.flow",
@@ -92,9 +92,9 @@
       "params": [],
       "permissions": {
         "clipboard": "none",
-        "filesystem": "none",
-        "network": false,
-        "privacy": "local",
+        "filesystem": "write",
+        "network": true,
+        "privacy": "ai-consent",
         "sensitive": false
       },
       "schema": 1,

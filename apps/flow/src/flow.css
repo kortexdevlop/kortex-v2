@@ -67,3 +67,9 @@
 .flow-pick[draggable=true]{cursor:grab}
 .flow-secret{display:flex;align-items:center;justify-content:space-between;gap:var(--k-space-3);padding:var(--k-space-2) 0}
 .flow-secret{display:flex;align-items:center;justify-content:space-between;gap:var(--k-space-3);padding:var(--k-space-2) 0}
+.flow-node[data-kind=ai] .flow-node-head{background:var(--k-surface-2);border-bottom-color:var(--k-accent-2)}
+.flow-node[data-kind=ai]{border-color:var(--k-accent-2)}
+.flow-ai p{margin:var(--k-space-2) 0}
+.flow-consent{display:flex;align-items:flex-start;gap:var(--k-space-2);line-height:1.4;cursor:pointer}
+.flow-consent input{margin-top:.2em}
+.flow-tools summary{cursor:pointer;font-weight:600}

@@ -6,6 +6,7 @@
 //! The model is Gemma 4 on Workers AI (ADR 0023). It never receives file or text contents unless
 //! the user consents, per attachment; it names data with references (`@texte1`, `@fichier1`,
 //! `@c1.text`) that [`plan`] resolves locally.
+pub mod agent;
 pub mod chat;
 pub mod consent;
 pub mod credits;

@@ -123,6 +123,17 @@ fn node_line(node: &Node, l: &kortex_i18n::Catalog, chosen: Option<&Value>) -> O
                 format!("{} {host}", param(params, "method"))
             }
             "template" => param(params, "template").replace('\n', "↵"),
+            "ai" => {
+                let task = param(params, "task");
+                let format = param(params, "format");
+                let tools = param(params, "tools");
+                format!(
+                    "{} → {}{}",
+                    l.t(&format!("logic.task.{task}")),
+                    l.t(&format!("logic.format.{format}")),
+                    if tools.trim().is_empty() { "" } else { " 🛠" }
+                )
+            }
             "foreach" => {
                 let tool = param(params, "tool");
                 if tool.is_empty() {
@@ -450,6 +461,32 @@ pub fn App() -> Element {
     use_effect(move || {
         shell::save("flow", "workflow", &*workflow.read());
     });
+    // Agent nodes: the account and credits are looked up only once a workflow has one, and the
+    // text of those nodes is sent to the model only after the user agrees (kept on this device).
+    let has_ai = use_memo(move || {
+        workflow
+            .read()
+            .nodes
+            .iter()
+            .any(|n| matches!(&n.kind, NodeKind::Logic { op, .. } if op == "ai"))
+    });
+    let (saved_consent, _) = use_hook(|| shell::load::<bool>("flow", "ai-consent"));
+    let ai_consent = use_signal(move || saved_consent);
+    let mut ai_account = use_signal(|| kortex_ai_client::Account::Checking);
+    let mut ai_credits = use_signal(|| None::<kortex_ai::credits::Credits>);
+    crate::ai::set_consent(ai_consent());
+    crate::ai::set_lang(&lang);
+    use_effect(move || {
+        if has_ai() && matches!(*ai_account.peek(), kortex_ai_client::Account::Checking) {
+            spawn(async move {
+                let found = kortex_ai_client::account().await;
+                if let kortex_ai_client::Account::Ready { auth, .. } = &found {
+                    ai_credits.set(kortex_ai_client::credits(auth).await);
+                }
+                ai_account.set(found);
+            });
+        }
+    });
 
     let current = workflow();
     let catalogue = ports();
@@ -489,7 +526,10 @@ pub fn App() -> Element {
         .filter(|n| matches!(n.kind, NodeKind::File { .. }) && !chosen_files.contains_key(&n.id))
         .map(|n| n.id.clone())
         .collect();
+    let ai_ready = !has_ai()
+        || (ai_consent() && matches!(ai_account(), kortex_ai_client::Account::Ready { .. }));
     let can_run = issues.is_empty()
+        && ai_ready
         && missing.is_empty()
         && unfilled.is_empty()
         && !running()
@@ -608,6 +648,9 @@ pub fn App() -> Element {
                             let ok = execute(wf, chosen, token, states, results, log, lang).await;
                             outcome.set(Some(ok));
                             running.set(false);
+                            if let Some(c) = crate::ai::last_credits() {
+                                ai_credits.set(Some(c));
+                            }
                         });
                     },
                     "▶ " {l.t("ui.run")}
@@ -838,6 +881,9 @@ pub fn App() -> Element {
                         }
                     }
                 }
+            }
+            if has_ai() {
+                {ai_panel(l, ai_consent, ai_account, ai_credits)}
             }
             if !unfilled.is_empty() {
                 p { class: "app-note", role: "status", "{l.t(\"ui.files_needed\")} {unfilled.join(\", \")}" }
@@ -1106,10 +1152,11 @@ fn card(
     let pos = node.pos.unwrap_or(crate::engine::Pos { x: 0, y: 0 });
     let title = node_title(node, l, lang);
     let id = node.id.clone();
-    let kind = match node.kind {
+    let kind = match &node.kind {
         NodeKind::Tool { .. } => "tool",
         NodeKind::Text { .. } => "text",
         NodeKind::File { .. } => "file",
+        NodeKind::Logic { op, .. } if op == "ai" => "ai",
         NodeKind::Logic { .. } => "logic",
     };
     let rows = inputs.len().max(outputs.len()).max(1);
@@ -1315,6 +1362,61 @@ fn minimap(current: &Workflow, v: View, size: Frame4, ctx: Ctx) -> Element {
                 }
             }
             rect { class: "v", x: "{vx}", y: "{vy}", width: "{vw}", height: "{vh}" }
+        }
+    }
+}
+
+/// Consent, account and credits for the Agent nodes of the workflow.
+fn ai_panel(
+    l: &'static kortex_i18n::Catalog,
+    mut consent: Signal<bool>,
+    account: Signal<kortex_ai_client::Account>,
+    credits: Signal<Option<kortex_ai::credits::Credits>>,
+) -> Element {
+    use kortex_ai::credits::Status;
+    use kortex_ai_client::Account;
+    let state = account();
+    let status = credits().map(|c| {
+        let key = match c.status {
+            Status::Ok => "ai.credits_ok",
+            Status::Low => "ai.credits_low",
+            Status::Empty => "ai.credits_empty",
+            Status::Paused => "ai.credits_paused",
+        };
+        format!("{} {}% — {}", l.t("ai.credits"), c.percent, l.t(key))
+    });
+    rsx! {
+        div { class: "app-note flow-ai", "data-panel": "ai", role: "status",
+            strong { {l.t("ai.title")} }
+            p { {l.t("ai.what")} }
+            label { class: "flow-consent",
+                input {
+                    r#type: "checkbox",
+                    "data-field": "ai-consent",
+                    checked: consent(),
+                    onchange: move |e| {
+                        let on = e.checked();
+                        consent.set(on);
+                        shell::save("flow", "ai-consent", &on);
+                    },
+                }
+                span { {l.t("ai.consent")} }
+            }
+            match state {
+                Account::Checking => rsx! { p { class: "flow-hint", {l.t("ai.checking")} } },
+                Account::SignedOut => rsx! {
+                    p { class: "flow-hint", role: "alert", "data-ai-account": "signed-out",
+                        {l.t(if cfg!(target_arch = "wasm32") { "ai.signed_out_web" } else { "ai.signed_out_desktop" })}
+                    }
+                },
+                Account::Unavailable => rsx! { p { class: "flow-hint", role: "alert", {l.t("ai.unavailable")} } },
+                Account::Ready { email, .. } => rsx! {
+                    p { class: "flow-hint", "data-ai-account": "ready", "{email}" }
+                },
+            }
+            if let Some(status) = status {
+                p { class: "flow-hint", "data-ai-credits": "", "{status}" }
+            }
         }
     }
 }

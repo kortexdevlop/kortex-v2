@@ -3,13 +3,22 @@
 //! `engine.wasm` that Flow ships under `/engines/` in a Web Worker of its own origin.
 use kortex_runtime::{Value, ValueMap};
 use kortex_workflow::http::{HTTP_TOOL, Request, build_request, check_url, outputs};
-use kortex_workflow::{DELAY_TOOL, Job, MAX_DELAY_MS, RunError};
+use kortex_workflow::{AI_TOOL, DELAY_TOOL, Job, MAX_DELAY_MS, RunError};
+
+/// Runs one job: an Agent node asks the model (which may run local tools), anything else goes
+/// straight to its host.
+pub async fn run(job: &Job) -> Result<ValueMap, RunError> {
+    if job.tool == AI_TOOL {
+        return crate::ai::run(job).await;
+    }
+    run_tool(job).await
+}
 
 /// Time a single tool may take.
 pub const TIMEOUT_MS: u32 = 120_000;
 
 #[cfg(target_arch = "wasm32")]
-pub async fn run(job: &Job) -> Result<ValueMap, RunError> {
+pub async fn run_tool(job: &Job) -> Result<ValueMap, RunError> {
     if job.tool == DELAY_TOOL {
         return delay(job).await;
     }
@@ -33,10 +42,11 @@ pub async fn run(job: &Job) -> Result<ValueMap, RunError> {
 #[cfg(target_arch = "wasm32")]
 pub fn cancel() {
     kortex_platform::worker::cancel();
+    kortex_ai_client::cancel();
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-pub async fn run(job: &Job) -> Result<ValueMap, RunError> {
+pub async fn run_tool(job: &Job) -> Result<ValueMap, RunError> {
     if job.tool == DELAY_TOOL {
         return delay(job).await;
     }
@@ -83,7 +93,9 @@ pub async fn run(job: &Job) -> Result<ValueMap, RunError> {
 
 /// Desktop tools are separate processes with their own time limit; there is no in-flight handle.
 #[cfg(not(target_arch = "wasm32"))]
-pub fn cancel() {}
+pub fn cancel() {
+    kortex_ai_client::cancel();
+}
 
 /// The delay node: waits (the page's own timer, on web and desktop), then passes the text on.
 async fn delay(job: &Job) -> Result<ValueMap, RunError> {

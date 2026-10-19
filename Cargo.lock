@@ -3352,6 +3352,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "kortex-ai-client"
+version = "0.1.0"
+dependencies = [
+ "kortex-ai",
+ "kortex-auth",
+ "kortex-pkg",
+ "kortex-platform",
+ "kortex-runtime",
+ "serde_json",
+]
+
+[[package]]
 name = "kortex-auth"
 version = "0.1.0"
 dependencies = [
@@ -3456,6 +3468,8 @@ name = "kortex-flow"
 version = "0.1.0"
 dependencies = [
  "dioxus",
+ "kortex-ai",
+ "kortex-ai-client",
  "kortex-contract",
  "kortex-i18n",
  "kortex-platform",
@@ -3508,6 +3522,7 @@ version = "0.1.0"
 dependencies = [
  "dioxus",
  "kortex-ai",
+ "kortex-ai-client",
  "kortex-auth",
  "kortex-contract",
  "kortex-i18n",

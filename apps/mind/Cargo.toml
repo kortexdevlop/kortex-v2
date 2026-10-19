@@ -26,6 +26,7 @@ kortex-runtime = { path = "../../crates/kortex-runtime" }
 kortex-workflow = { path = "../../crates/kortex-workflow" }
 kortex-search = { path = "../../crates/kortex-search" }
 kortex-ai = { path = "../../crates/kortex-ai" }
+kortex-ai-client = { path = "../../crates/kortex-ai-client" }
 kortex-auth = { path = "../../crates/kortex-auth" }
 kortex-platform = { path = "../../crates/kortex-platform", features = ["document"] }
 dioxus = { version = "0.7.10", features = ["macro", "html", "signals", "hooks", "document", "launch"] }

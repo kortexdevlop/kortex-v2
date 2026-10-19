@@ -14,8 +14,8 @@ pub mod logic;
 pub mod process;
 
 pub use logic::{
-    DELAY_TOOL, FILE_PORT, FILES_PORT, LOGIC_OPS, MAX_DELAY_MS, MAX_ITEMS, TESTS, file_ports,
-    logic_ports, parse_options, text_io,
+    AI_FORMATS, AI_TASKS, AI_TOOL, DELAY_TOOL, FILE_PORT, FILES_PORT, LOGIC_OPS, MAX_DELAY_MS,
+    MAX_ITEMS, TESTS, file_ports, logic_ports, parse_options, text_io,
 };
 
 /// Version written by this build; older files are migrated, newer ones are refused.
@@ -379,6 +379,21 @@ pub fn validate(workflow: &Workflow, catalogue: &dyn Catalogue) -> Vec<Issue> {
                         }
                         if !headers_ok {
                             issues.push(issue(Some(&node.id), "bad_param", "headers"));
+                        }
+                    } else if name == "ai" && matches!(node.kind, NodeKind::Logic { .. }) {
+                        // Every tool the agent may call must exist and work on one text.
+                        let listed = params.get("tools").map_or("", String::as_str);
+                        let bad = listed
+                            .split(',')
+                            .map(str::trim)
+                            .filter(|t| !t.is_empty())
+                            .any(|t| {
+                                !catalogue
+                                    .tool(t)
+                                    .is_some_and(|p| logic::text_io(p).is_some())
+                            });
+                        if bad {
+                            issues.push(issue(Some(&node.id), "bad_param", "tools"));
                         }
                     } else if name == "foreach" && matches!(node.kind, NodeKind::Logic { .. }) {
                         let chosen = params.get("tool").map_or("", String::as_str);
@@ -816,7 +831,7 @@ impl<'a> Execution<'a> {
                 };
                 inputs.insert(edge.to.port.clone(), value);
             }
-            let skip = if is_logic && name == "http" {
+            let skip = if is_logic && (name == "http" || name == "ai") {
                 // A request never goes out with a missing piece: a skipped feeder skips it.
                 !unavailable.is_empty()
             } else if is_logic && (name == "merge" || name == "template") {
@@ -886,7 +901,7 @@ impl<'a> Execution<'a> {
                 self.finish_batch();
                 continue;
             }
-            if is_logic && name != "delay" && name != "http" {
+            if is_logic && name != "delay" && name != "http" && name != "ai" {
                 match logic::eval(&name, &inputs, &params) {
                     Ok(outputs) => {
                         self.report.journal.push(format!("{}: ok", node.id));
@@ -901,6 +916,8 @@ impl<'a> Execution<'a> {
                 name
             } else if name == "http" {
                 http::HTTP_TOOL.to_owned()
+            } else if name == "ai" {
+                AI_TOOL.to_owned()
             } else {
                 DELAY_TOOL.to_owned()
             };

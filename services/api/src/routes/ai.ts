@@ -6,7 +6,8 @@ import { rateLimit } from '../ratelimit.ts';
 import { requireUser } from '../session.ts';
 
 const MAX_MESSAGES = 60;
-const MAX_MESSAGE_CHARS = 8_000;
+const MAX_MESSAGE_CHARS = 8_000; // tool-call arguments
+const MAX_TEXT_CHARS = 40_000; // one message: Flow sends a whole source text in one
 const MAX_TOTAL_CHARS = 48_000;
 const MAX_TOOLS = 24;
 const MAX_TOOLS_CHARS = 40_000;
@@ -38,7 +39,7 @@ function parseMessages(v: unknown): { messages: Msg[]; chars: number } {
   const messages = v.map((m): Msg => {
     if (!isRecord(m) || typeof m.role !== 'string' || !ROLES.has(m.role)) throw new HttpError(400, 'invalid_messages');
     const text = m.content;
-    if (text !== null && text !== undefined && (typeof text !== 'string' || text.length > MAX_MESSAGE_CHARS)) throw new HttpError(400, 'invalid_messages');
+    if (text !== null && text !== undefined && (typeof text !== 'string' || text.length > MAX_TEXT_CHARS)) throw new HttpError(400, 'invalid_messages');
     if (m.role === 'assistant') {
       // An assistant turn is either text or tool calls (or both); never empty.
       const calls = m.tool_calls === undefined ? undefined : parseToolCalls(m.tool_calls);

@@ -66,4 +66,4 @@ Font file only, no npm dependency kept: `inter-latin-wght-normal.woff2` from `@f
 
 ### Mind (steps 14.x, 2026-10-18)
 `apps/mind` uses only crates already allowed (`serde`, `serde_json`, Dioxus) and the internal shared crates `kortex-ai`, `kortex-search`, `kortex-workflow`, `kortex-auth`; desktop credentials come from `kortex-pkg` (native-only). The AI provider is Cloudflare Workers AI through the existing `AI` binding (free plan, 10 000 neurons/day shared, capped by the gateway), model `@cf/google/gemma-4-26b-a4b-it` (ADR 0023). No new external package, no paid service.
-
+| `serde_json` 1 (`preserve_order`) | kortex-ai | garder l'ordre des clés du JSON du modèle pour les colonnes d'un tableau | `BTreeMap` (ordre alphabétique, colonnes mélangées) | `indexmap` déjà présent dans le lockfile |
