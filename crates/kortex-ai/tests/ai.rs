@@ -4,7 +4,7 @@ use kortex_ai::chat::{ApiError, Message, Request, ToolCall};
 use kortex_ai::consent::{Attachment, Kind, describe_all};
 use kortex_ai::credits::{Credits, Status};
 use kortex_ai::plan::{
-    Context, Executed, ExportError, Reference, parse_reference, plan_call, summarize, to_workflow,
+    Context, Executed, Reference, parse_reference, plan_call, summarize, to_workflow,
 };
 use kortex_ai::prompt;
 use kortex_ai::stream::{Assembler, Event, SseParser, turn_from_response};
@@ -607,8 +607,7 @@ fn the_executed_calls_export_as_a_valid_flow_workflow() {
             )],
         },
     ];
-    let workflow =
-        to_workflow("Mind", &executed, &attachments).unwrap_or_else(|e| unreachable!("{e:?}"));
+    let workflow = to_workflow("Mind", &executed, &attachments);
     assert_eq!(
         workflow
             .nodes
@@ -626,14 +625,82 @@ fn the_executed_calls_export_as_a_valid_flow_workflow() {
     );
     let json = kortex_workflow::to_json(&workflow);
     assert_eq!(kortex_workflow::from_json(&json), Ok(workflow));
-    let with_file = [Executed {
+}
+
+#[test]
+fn file_attachments_export_as_file_nodes_without_their_bytes() {
+    use kortex_ai::consent::Kind;
+    let pdf = |n: usize, name: &str| Attachment {
+        n,
+        kind: Kind::File,
+        name: name.into(),
+        mime: "application/pdf".into(),
+        bytes: b"%PDF-secret".to_vec(),
+        share_content: false,
+    };
+    let attachments = [pdf(1, "a.pdf"), pdf(2, "b.pdf")];
+    let executed = [Executed {
+        call_id: "c1".into(),
+        tool: "pdf.merge".into(),
+        params: ValueMap::new(),
+        refs: vec![
+            ("files".into(), Reference::File(1)),
+            ("files".into(), Reference::File(2)),
+        ],
+    }];
+    let workflow = to_workflow("Mind", &executed, &attachments);
+    let ids: Vec<&str> = workflow.nodes.iter().map(|n| n.id.as_str()).collect();
+    assert_eq!(
+        ids,
+        ["b1", "c1"],
+        "two files on one input form a batch node"
+    );
+    assert_eq!(workflow.edges.len(), 1, "one link per input");
+    let all: Vec<ToolContract> = contracts().into_values().collect();
+    assert_eq!(
+        validate(&workflow, &catalogue_of(&all)).len(),
+        0,
+        "Flow accepts it"
+    );
+    let json = kortex_workflow::to_json(&workflow);
+    assert!(
+        !json.contains("secret") && !json.contains("a.pdf"),
+        "no file content or name"
+    );
+    // A lone file on a batch input becomes a single-file node, which Flow also accepts.
+    let single = [Executed {
         call_id: "c1".into(),
         tool: "pdf.merge".into(),
         params: ValueMap::new(),
         refs: vec![("files".into(), Reference::File(1))],
     }];
-    assert_eq!(
-        to_workflow("x", &with_file, &[]).err(),
-        Some(ExportError::FilesNotExportable)
+    let workflow = to_workflow("Mind", &single, &attachments);
+    assert_eq!(workflow.nodes[0].id, "f1");
+    assert_eq!(validate(&workflow, &catalogue_of(&all)).len(), 0);
+    // Mixed families fall back to any file; the node is still valid for a `*/*` input only.
+    let image = Attachment {
+        n: 3,
+        mime: "image/png".into(),
+        ..pdf(3, "c.png")
+    };
+    let mixed = [pdf(1, "a.pdf"), image];
+    let shared = to_workflow(
+        "Mind",
+        &[Executed {
+            call_id: "c1".into(),
+            tool: "pdf.merge".into(),
+            params: ValueMap::new(),
+            refs: vec![
+                ("files".into(), Reference::File(1)),
+                ("files".into(), Reference::File(3)),
+            ],
+        }],
+        &mixed,
     );
+    match &shared.nodes[0].kind {
+        kortex_workflow::NodeKind::File { accept, multiple } => {
+            assert_eq!((accept.as_str(), *multiple), ("*/*", true))
+        }
+        other => unreachable!("{other:?}"),
+    }
 }

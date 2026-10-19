@@ -41,6 +41,8 @@ struct Field {
     ty: PortType,
     options: Vec<String>,
     value: String,
+    /// Edited in a text area (templates, loop options).
+    multiline: bool,
 }
 
 fn fields(node: &Node, pro: bool, l: &kortex_i18n::Catalog, lang: &str) -> Vec<Field> {
@@ -76,15 +78,29 @@ fn fields(node: &Node, pro: bool, l: &kortex_i18n::Catalog, lang: &str) -> Vec<F
                     .cloned()
                     .unwrap_or_else(|| spec.id.clone()),
             };
+            let looped = matches!(&node.kind, NodeKind::Logic { op, .. } if op == "foreach");
+            let mut options = spec.options;
+            if looped && spec.id == "tool" {
+                // The tools a loop can run: one text in, a text out.
+                options = std::iter::once(String::new())
+                    .chain(
+                        ports()
+                            .iter()
+                            .filter(|(_, p)| crate::engine::text_io(p).is_some())
+                            .map(|(id, _)| id.clone()),
+                    )
+                    .collect();
+            }
             Field {
                 value: params
                     .get(&spec.id)
                     .cloned()
                     .unwrap_or_else(|| spec.default.clone()),
+                multiline: matches!(spec.id.as_str(), "template" | "options"),
                 id: spec.id,
                 label,
                 ty: spec.ty,
-                options: spec.options,
+                options,
             }
         })
         .collect()
@@ -271,9 +287,33 @@ pub(crate) fn inspector(
                                         onchange: move |e| set_change(e.value()),
                                         for option in choices {
                                             option { key: "{option}", value: "{option}",
-                                                {if is_logic && !is_bool { options_label(kind_key, &option) } else { option.clone() }}
+                                                {
+                                                    if field.id == "tool" {
+                                                        if option.is_empty() { "—".to_owned() } else { shell::find(&option).map_or(option.clone(), |e| shell::name(e, lang)) }
+                                                    } else if is_logic && !is_bool {
+                                                        options_label(kind_key, &option)
+                                                    } else {
+                                                        option.clone()
+                                                    }
+                                                }
                                             }
                                         }
+                                    }
+                                } else if field.multiline {
+                                    textarea {
+                                        class: "k-input k-textarea",
+                                        rows: "4",
+                                        spellcheck: "false",
+                                        "data-field": "{field.id}",
+                                        value: "{field.value}",
+                                        onfocus: move |_| ctx.snapshot(),
+                                        oninput: move |e| set_input(e.value()),
+                                    }
+                                    if field.id == "template" {
+                                        span { class: "flow-hint", {l.t("logic.help_template")} }
+                                    }
+                                    if field.id == "options" {
+                                        span { class: "flow-hint", {l.t("logic.help_options")} }
                                     }
                                 } else {
                                     input {

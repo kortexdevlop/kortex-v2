@@ -347,13 +347,6 @@ pub struct Executed {
     pub refs: Vec<(String, Reference)>,
 }
 
-/// The export cannot represent this plan.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum ExportError {
-    /// Flow v1 has no file nodes.
-    FilesNotExportable,
-}
-
 fn param_text(value: &Value) -> String {
     match value {
         Value::Text(t) => t.clone(),
@@ -364,16 +357,38 @@ fn param_text(value: &Value) -> String {
     }
 }
 
-/// The executed calls as a Flow workflow: one tool node per call (`c1`…), one text node per
-/// attachment used (`t1`…), and an edge for every reference.
-///
-/// # Errors
-/// [`ExportError::FilesNotExportable`] when a call used a file attachment.
-pub fn to_workflow(
-    name: &str,
-    executed: &[Executed],
-    attachments: &[Attachment],
-) -> Result<Workflow, ExportError> {
+/// Mime pattern covering every attachment of a batch: their own type when equal, `type/*` when
+/// only the family is shared, any otherwise (empty when nothing is known).
+fn common_mime(ns: &[usize], attachments: &[Attachment]) -> String {
+    let mimes: Vec<&str> = ns
+        .iter()
+        .filter_map(|n| {
+            attachments
+                .iter()
+                .find(|a| a.n == *n && a.kind == Kind::File)
+                .map(|a| a.mime.as_str())
+        })
+        .collect();
+    match mimes.split_first() {
+        None => String::new(),
+        Some((first, rest)) if rest.iter().all(|m| m == first) => (*first).to_owned(),
+        Some((first, rest)) => {
+            let family = first.split('/').next().unwrap_or("");
+            if !family.is_empty() && rest.iter().all(|m| m.split('/').next() == Some(family)) {
+                format!("{family}/*")
+            } else {
+                "*/*".to_owned()
+            }
+        }
+    }
+}
+
+/// The executed calls as a Flow workflow: one tool node per call (`c1`…), one text node per text
+/// attachment used (`t1`…), one file node per file attachment (`f1`…) or per batch of files given
+/// to the same input (`b1`…), and an edge for every reference. File nodes keep only the accepted
+/// type: the user picks the files again in Flow, they are never written into the workflow.
+#[must_use]
+pub fn to_workflow(name: &str, executed: &[Executed], attachments: &[Attachment]) -> Workflow {
     let mut workflow = Workflow {
         version: FORMAT_VERSION,
         name: name.to_owned(),
@@ -382,10 +397,10 @@ pub fn to_workflow(
     let mut used_texts: Vec<usize> = Vec::new();
     for call in executed {
         for (_, reference) in &call.refs {
-            match reference {
-                Reference::File(_) => return Err(ExportError::FilesNotExportable),
-                Reference::Text(n) if !used_texts.contains(n) => used_texts.push(*n),
-                _ => {}
+            if let Reference::Text(n) = reference
+                && !used_texts.contains(n)
+            {
+                used_texts.push(*n);
             }
         }
     }
@@ -404,6 +419,36 @@ pub fn to_workflow(
             pos: None,
         });
     }
+    // File inputs: several files on one input form a batch node, a lone file a single-file node.
+    let mut file_nodes: Vec<(Vec<usize>, String)> = Vec::new();
+    for call in executed {
+        let mut by_port: Vec<(&str, Vec<usize>)> = Vec::new();
+        for (port, reference) in &call.refs {
+            if let Reference::File(n) = reference {
+                match by_port.iter_mut().find(|(p, _)| p == port) {
+                    Some((_, ns)) => ns.push(*n),
+                    None => by_port.push((port, vec![*n])),
+                }
+            }
+        }
+        for (_, ns) in by_port {
+            if file_nodes.iter().any(|(known, _)| *known == ns) {
+                continue;
+            }
+            let multiple = ns.len() > 1;
+            let id = format!("{}{}", if multiple { "b" } else { "f" }, ns[0]);
+            workflow.nodes.push(Node {
+                id: id.clone(),
+                kind: NodeKind::File {
+                    accept: common_mime(&ns, attachments),
+                    multiple,
+                },
+                retries: 0,
+                pos: None,
+            });
+            file_nodes.push((ns, id));
+        }
+    }
     for call in executed {
         workflow.nodes.push(Node {
             id: call.call_id.clone(),
@@ -418,6 +463,7 @@ pub fn to_workflow(
             retries: 0,
             pos: None,
         });
+        let mut linked_files: Vec<&str> = Vec::new();
         for (port, reference) in &call.refs {
             let from = match reference {
                 Reference::Text(n) => Endpoint {
@@ -428,7 +474,29 @@ pub fn to_workflow(
                     node: call.clone(),
                     port: port.clone(),
                 },
-                Reference::File(_) => return Err(ExportError::FilesNotExportable),
+                Reference::File(_) => {
+                    // One link per input, whatever the number of files in the batch.
+                    if linked_files.contains(&port.as_str()) {
+                        continue;
+                    }
+                    linked_files.push(port);
+                    let ns: Vec<usize> = call
+                        .refs
+                        .iter()
+                        .filter_map(|(p, r)| match r {
+                            Reference::File(n) if p == port => Some(*n),
+                            _ => None,
+                        })
+                        .collect();
+                    let Some((_, id)) = file_nodes.iter().find(|(known, _)| *known == ns) else {
+                        continue;
+                    };
+                    let multiple = ns.len() > 1;
+                    Endpoint {
+                        node: id.clone(),
+                        port: if multiple { "files" } else { "file" }.to_owned(),
+                    }
+                }
             };
             workflow.edges.push(Edge {
                 from,
@@ -439,5 +507,5 @@ pub fn to_workflow(
             });
         }
     }
-    Ok(workflow)
+    workflow
 }

@@ -52,7 +52,6 @@ remove = "Remove"
 button = "Export as a Flow workflow"
 name = "Mind plan"
 nothing = "No tool has run yet: nothing to export."
-files = "This plan uses files: Flow cannot represent them yet."
 
 [result]
 download = "Save the file"

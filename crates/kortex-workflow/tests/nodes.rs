@@ -330,3 +330,134 @@ fn bad_logic_params_and_unknown_operations_are_reported() {
     let unknown = flow(vec![logic("x", "teleport", &[])], vec![]);
     assert_eq!(validate(&unknown, &catalogue())[0].code, "unknown_logic");
 }
+
+#[test]
+fn a_template_fills_inputs_with_bounded_filters() {
+    let w = flow(
+        vec![
+            text("a", "  Ada  "),
+            text("b", "line one\nline two"),
+            logic(
+                "t",
+                "template",
+                &[(
+                    "template",
+                    "Hello {a|trim|upper}! {b|lines} lines, first: {b|first_line}. {{ok}}",
+                )],
+            ),
+        ],
+        vec![
+            edge(("a", "text"), ("t", "a")),
+            edge(("b", "text"), ("t", "b")),
+        ],
+    );
+    assert_eq!(
+        run(&w, BTreeMap::new()).expect("ok").results["t"]["text"],
+        Value::Text("Hello ADA! 2 lines, first: line one. {ok}".into())
+    );
+    // Unknown names, unknown filters and unbalanced braces are refused with the placeholder.
+    for bad in ["{z}", "{a|sing}", "{a", "a}"] {
+        let w = flow(
+            vec![text("a", "x"), logic("t", "template", &[("template", bad)])],
+            vec![edge(("a", "text"), ("t", "a"))],
+        );
+        let failure = run(&w, BTreeMap::new()).expect_err(bad);
+        assert_eq!(failure.code, "bad_template", "{bad}");
+    }
+}
+
+#[test]
+fn a_for_each_node_runs_its_tool_once_per_line_and_joins_the_results() {
+    let w = flow(
+        vec![
+            text("t", "alpha\nbeta\ngamma"),
+            logic("loop", "foreach", &[("tool", "text.upper")]),
+        ],
+        vec![edge(("t", "text"), ("loop", "text"))],
+    );
+    assert!(validate(&w, &catalogue()).is_empty());
+    let report = run(&w, BTreeMap::new()).expect("runs");
+    assert_eq!(
+        report.results["loop"]["text"],
+        Value::Text("ALPHA\nBETA\nGAMMA".into())
+    );
+    // The loop stops at the first failing line and names the node.
+    let cat = catalogue();
+    let mut exec = Execution::new(&w, &cat).expect("valid");
+    let mut seen = 0;
+    let failure = loop {
+        match exec.next(&CancelToken::default()) {
+            Step::Run(job) => {
+                seen += 1;
+                assert_eq!(job.node, "loop");
+                exec.finish(if seen == 2 {
+                    Err(kortex_workflow::RunError {
+                        code: "boom".into(),
+                        detail: None,
+                    })
+                } else {
+                    Ok(ValueMap::from([("text".into(), Value::Text("x".into()))]))
+                });
+            }
+            Step::Failed(f) => break f,
+            Step::Done(_) => panic!("must fail"),
+        }
+    };
+    assert_eq!(
+        (failure.code.as_str(), failure.node.as_deref(), seen),
+        ("boom", Some("loop"), 2)
+    );
+    // Cancelling between lines stops the loop.
+    let token = CancelToken::default();
+    let mut exec = Execution::new(&w, &cat).expect("valid");
+    assert!(matches!(exec.next(&token), Step::Run(_)));
+    exec.finish(Ok(ValueMap::from([(
+        "text".into(),
+        Value::Text("A".into()),
+    )])));
+    token.cancel();
+    match exec.next(&token) {
+        Step::Failed(f) => assert_eq!(f.code, "cancelled"),
+        other => panic!("expected cancellation, got {other:?}"),
+    }
+}
+
+#[test]
+fn a_loop_needs_a_text_tool_and_respects_its_size_cap() {
+    let pdf_loop = flow(
+        vec![
+            text("t", "x"),
+            logic("loop", "foreach", &[("tool", "pdf.merge")]),
+        ],
+        vec![edge(("t", "text"), ("loop", "text"))],
+    );
+    assert_eq!(validate(&pdf_loop, &catalogue())[0].code, "bad_param");
+    let none = flow(
+        vec![text("t", "x"), logic("loop", "foreach", &[])],
+        vec![edge(("t", "text"), ("loop", "text"))],
+    );
+    assert_eq!(validate(&none, &catalogue())[0].code, "bad_param");
+    let many = "line\n".repeat(30);
+    let capped = flow(
+        vec![
+            text("t", &many),
+            logic("loop", "foreach", &[("tool", "text.upper"), ("max", "10")]),
+        ],
+        vec![edge(("t", "text"), ("loop", "text"))],
+    );
+    assert_eq!(
+        run(&capped, BTreeMap::new()).expect_err("too many").code,
+        "too_many_items"
+    );
+    let empty = flow(
+        vec![
+            text("t", ""),
+            logic("loop", "foreach", &[("tool", "text.upper")]),
+        ],
+        vec![edge(("t", "text"), ("loop", "text"))],
+    );
+    assert_eq!(
+        run(&empty, BTreeMap::new()).expect("ok").results["loop"]["text"],
+        Value::Text(String::new())
+    );
+}

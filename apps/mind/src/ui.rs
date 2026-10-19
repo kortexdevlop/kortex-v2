@@ -513,13 +513,12 @@ pub fn App() -> Element {
                     Button {
                         ghost: true,
                         onclick: move |_| match conversation.read().export(&l_title(&lang_signal())) {
-                            Ok(workflow) if !workflow.nodes.is_empty() => {
+                            workflow if !workflow.nodes.is_empty() => {
                                 let bytes = kortex_workflow::to_json(&workflow).into_bytes();
                                 let path = save_file("mind-workflow.json", "application/json", &bytes);
                                 note.set(if path.is_empty() { String::new() } else { format!("{} {path}", locale(&lang_signal()).t("ui.saved")) });
                             }
-                            Ok(_) => note.set(locale(&lang_signal()).t("export.nothing").to_owned()),
-                            Err(_) => note.set(locale(&lang_signal()).t("export.files").to_owned()),
+                            _ => note.set(locale(&lang_signal()).t("export.nothing").to_owned()),
                         },
                         {l.t("export.button")}
                     }

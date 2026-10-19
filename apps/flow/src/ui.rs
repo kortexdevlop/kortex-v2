@@ -113,6 +113,18 @@ fn node_line(node: &Node, l: &kortex_i18n::Catalog, chosen: Option<&Value>) -> O
                 )
             }
             "merge" => format!("« {} »", param(params, "separator").replace('\n', "↵")),
+            "template" => param(params, "template").replace('\n', "↵"),
+            "foreach" => {
+                let tool = param(params, "tool");
+                if tool.is_empty() {
+                    "…".to_owned()
+                } else {
+                    format!(
+                        "↻ {}",
+                        shell::find(&tool).map_or(tool.clone(), |e| shell::name(e, "en"))
+                    )
+                }
+            }
             _ => format!("{} ms", param(params, "ms")),
         }),
     }

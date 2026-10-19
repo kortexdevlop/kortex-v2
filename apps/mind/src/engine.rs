@@ -8,9 +8,7 @@ use std::collections::BTreeMap;
 
 use kortex_ai::chat::{Message, Request, ToolCall};
 use kortex_ai::consent::{Attachment, Kind, extract_quoted};
-use kortex_ai::plan::{
-    Context, Executed, ExportError, PlannedCall, plan_call, summarize, to_workflow,
-};
+use kortex_ai::plan::{Context, Executed, PlannedCall, plan_call, summarize, to_workflow};
 use kortex_ai::prompt;
 use kortex_ai::stream::Turn;
 use kortex_contract::ToolContract;
@@ -457,10 +455,9 @@ impl Conversation {
     }
 
     /// Everything run so far as a Flow workflow.
-    ///
-    /// # Errors
-    /// [`ExportError::FilesNotExportable`] when a call used a file attachment.
-    pub fn export(&self, name: &str) -> Result<Workflow, ExportError> {
+    /// File attachments become file nodes the user fills again in Flow.
+    #[must_use]
+    pub fn export(&self, name: &str) -> Workflow {
         to_workflow(name, &self.executed, &self.attachments)
     }
 

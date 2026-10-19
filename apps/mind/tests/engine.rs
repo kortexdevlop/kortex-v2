@@ -158,7 +158,7 @@ fn a_full_exchange_runs_two_chained_tools_without_the_model_seeing_the_data() {
     );
     assert_protocol_consistent(&c.request(vec![], false).messages);
     // The whole exchange exports as a workflow Flow accepts.
-    let workflow = c.export("Mind").unwrap_or_else(|e| unreachable!("{e:?}"));
+    let workflow = c.export("Mind");
     assert_eq!(
         workflow
             .nodes
@@ -303,7 +303,7 @@ fn refusing_a_plan_tells_the_model_and_runs_nothing() {
     );
     assert_eq!(c.transcript().last(), Some(&Entry::Refused));
     assert!(
-        c.export("x").map(|w| w.nodes.is_empty()).unwrap_or(false),
+        c.export("x").nodes.is_empty(),
         "a refused call is not exported"
     );
 }
@@ -362,15 +362,11 @@ fn a_failing_tool_is_reported_to_the_model_and_kept_out_of_the_export() {
     assert!(
         matches!(c.transcript().last(), Some(Entry::Failed { code, .. }) if code == "empty_input")
     );
-    assert!(
-        c.export("x")
-            .map(|w| w.nodes.iter().all(|n| n.id != "c1"))
-            .unwrap_or(false)
-    );
+    assert!(c.export("x").nodes.iter().all(|n| n.id != "c1"));
 }
 
 #[test]
-fn files_are_references_too_and_blocks_the_workflow_export() {
+fn files_are_references_too_and_export_as_file_nodes() {
     let all = contracts();
     let mut c = Conversation::new("fr");
     let n = c.attach_file("a.pdf", "application/pdf", b"%PDF-1.4".to_vec());
@@ -384,7 +380,15 @@ fn files_are_references_too_and_blocks_the_workflow_export() {
         &all,
     );
     c.record_result("c1", Ok(ValueMap::new()));
-    assert!(c.export("x").is_err(), "Flow v1 has no file nodes");
+    let workflow = c.export("x");
+    assert!(
+        workflow.nodes.iter().any(|n| matches!(
+            &n.kind,
+            kortex_workflow::NodeKind::File { accept, .. } if accept == "application/pdf"
+        )),
+        "the file becomes a file node the user fills again in Flow"
+    );
+    assert!(!kortex_workflow::to_json(&workflow).contains("a.pdf"));
 }
 
 #[test]
@@ -466,7 +470,7 @@ fn a_saved_conversation_comes_back_without_file_contents_and_keeps_numbering() {
         "ids continue where they stopped"
     );
     assert!(
-        restored.export("x").is_ok(),
+        !restored.export("x").nodes.is_empty(),
         "executed calls survive the reload"
     );
 }

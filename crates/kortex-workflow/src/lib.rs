@@ -12,7 +12,8 @@ pub mod logic;
 pub mod process;
 
 pub use logic::{
-    DELAY_TOOL, FILE_PORT, FILES_PORT, LOGIC_OPS, MAX_DELAY_MS, TESTS, file_ports, logic_ports,
+    DELAY_TOOL, FILE_PORT, FILES_PORT, LOGIC_OPS, MAX_DELAY_MS, MAX_ITEMS, TESTS, file_ports,
+    logic_ports, parse_options, text_io,
 };
 
 /// Version written by this build; older files are migrated, newer ones are refused.
@@ -350,6 +351,14 @@ pub fn validate(workflow: &Workflow, catalogue: &dyn Catalogue) -> Vec<Issue> {
                             node: Some(node.id.clone()),
                             ..e
                         });
+                    } else if name == "foreach" && matches!(node.kind, NodeKind::Logic { .. }) {
+                        let chosen = params.get("tool").map_or("", String::as_str);
+                        let usable = catalogue
+                            .tool(chosen)
+                            .is_some_and(|t| logic::text_io(t).is_some());
+                        if !usable {
+                            issues.push(issue(Some(&node.id), "bad_param", "tool"));
+                        }
                     }
                 }
             }
@@ -618,6 +627,18 @@ pub struct Execution<'a> {
     failure: Option<(String, RunError)>,
     report: Report,
     provided: BTreeMap<String, Value>,
+    batch: Option<Batch>,
+}
+
+/// A "for each line" node in progress: one job per line, results joined at the end.
+struct Batch {
+    node: String,
+    tool: String,
+    port: String,
+    params: ValueMap,
+    lines: VecDeque<String>,
+    done: Vec<String>,
+    output: String,
 }
 
 impl<'a> Execution<'a> {
@@ -659,11 +680,34 @@ impl<'a> Execution<'a> {
             failure: None,
             report: Report::default(),
             provided: BTreeMap::new(),
+            batch: None,
         })
     }
 
     fn failed(&self, node: Option<&str>, code: &str, detail: Option<String>) -> Step {
         Step::Failed(fail(node, code, detail, self.report.clone()))
+    }
+
+    fn next_batch_job(&mut self) -> Option<Job> {
+        let batch = self.batch.as_mut()?;
+        let line = batch.lines.pop_front()?;
+        Some(Job {
+            node: batch.node.clone(),
+            tool: batch.tool.clone(),
+            inputs: ValueMap::from([(batch.port.clone(), Value::Text(line))]),
+            params: batch.params.clone(),
+        })
+    }
+
+    fn finish_batch(&mut self) {
+        if let Some(batch) = self.batch.take() {
+            self.report.journal.push(format!("{}: ok", batch.node));
+            self.report.results.insert(
+                batch.node,
+                ValueMap::from([(TEXT_PORT.to_owned(), Value::Text(batch.done.join("\n")))]),
+            );
+            self.cursor += 1;
+        }
     }
 
     /// The next job, or the end of the run. Constant nodes are resolved here without a job.
@@ -672,6 +716,11 @@ impl<'a> Execution<'a> {
             return self.failed(Some(&node), &error.code, error.detail);
         }
         if let Some(job) = &self.pending {
+            // A loop runs many jobs for one node: cancellation is checked between them.
+            if self.batch.is_some() && cancel.is_cancelled() {
+                let node = job.node.clone();
+                return self.failed(Some(&node), ToolError::CANCELLED, None);
+            }
             return Step::Run(job.clone());
         }
         while let Some(&position) = self.sequence.get(self.cursor) {
@@ -738,8 +787,8 @@ impl<'a> Execution<'a> {
                 };
                 inputs.insert(edge.to.port.clone(), value);
             }
-            let skip = if name == "merge" && is_logic {
-                inputs.is_empty()
+            let skip = if is_logic && (name == "merge" || name == "template") {
+                inputs.is_empty() && (name == "merge" || !unavailable.is_empty())
             } else {
                 ports
                     .inputs
@@ -756,6 +805,55 @@ impl<'a> Execution<'a> {
                 Ok(params) => params,
                 Err(e) => return self.failed(Some(&node.id), e.code, Some(e.detail)),
             };
+            if is_logic && name == "foreach" {
+                let text = match inputs.get("text") {
+                    Some(Value::Text(t)) => t.clone(),
+                    _ => return self.failed(Some(&node.id), "missing_input", Some("text".into())),
+                };
+                let tool = match params.get("tool") {
+                    Some(Value::Text(t)) => t.clone(),
+                    _ => String::new(),
+                };
+                let max = match params.get("max") {
+                    Some(Value::Int(m)) => usize::try_from((*m).clamp(1, MAX_ITEMS)).unwrap_or(1),
+                    _ => 100,
+                };
+                let spec = self.catalogue.tool(&tool).cloned().unwrap_or_default();
+                let Some((input, output)) = logic::text_io(&spec) else {
+                    return self.failed(Some(&node.id), "bad_param", Some("tool".into()));
+                };
+                let options = match &node.kind {
+                    NodeKind::Logic { params, .. } => {
+                        logic::parse_options(params.get("options").map_or("", String::as_str))
+                    }
+                    _ => BTreeMap::new(),
+                };
+                let inner = match param_values(&options, &spec.params) {
+                    Ok(inner) => inner,
+                    Err(e) => return self.failed(Some(&node.id), e.code, Some(e.detail)),
+                };
+                let lines: VecDeque<String> = text.lines().map(str::to_owned).collect();
+                if lines.len() > max {
+                    return self.failed(Some(&node.id), "too_many_items", Some(max.to_string()));
+                }
+                self.batch = Some(Batch {
+                    node: node.id.clone(),
+                    tool,
+                    port: input,
+                    params: inner,
+                    lines,
+                    done: Vec::new(),
+                    output,
+                });
+                if let Some(job) = self.next_batch_job() {
+                    self.attempt = 0;
+                    self.pending = Some(job.clone());
+                    return Step::Run(job);
+                }
+                // No lines: nothing to run, the result is empty.
+                self.finish_batch();
+                continue;
+            }
             if is_logic && name != "delay" {
                 match logic::eval(&name, &inputs, &params) {
                     Ok(outputs) => {
@@ -792,6 +890,25 @@ impl<'a> Execution<'a> {
             return;
         };
         match result {
+            Ok(outputs) if self.batch.is_some() => {
+                let produced = self
+                    .batch
+                    .as_ref()
+                    .and_then(|b| match outputs.get(&b.output) {
+                        Some(Value::Text(t)) => Some(t.clone()),
+                        _ => None,
+                    });
+                if let Some(batch) = &mut self.batch {
+                    batch.done.push(produced.unwrap_or_default());
+                }
+                self.attempt = 0;
+                if let Some(next) = self.next_batch_job() {
+                    self.pending = Some(next);
+                } else {
+                    self.pending = None;
+                    self.finish_batch();
+                }
+            }
             Ok(outputs) => {
                 self.pending = None;
                 self.cursor += 1;

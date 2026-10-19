@@ -52,7 +52,6 @@ remove = "Retirer"
 button = "Exporter en workflow Flow"
 name = "Plan Mind"
 nothing = "Aucun outil exécuté pour le moment : rien à exporter."
-files = "Ce plan utilise des fichiers : Flow ne sait pas encore les représenter."
 
 [result]
 download = "Enregistrer le fichier"

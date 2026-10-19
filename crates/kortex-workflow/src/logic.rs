@@ -13,7 +13,18 @@ pub const DELAY_TOOL: &str = "flow.delay";
 /// Longest delay a node may ask for.
 pub const MAX_DELAY_MS: i64 = 30_000;
 
-pub const LOGIC_OPS: [&str; 4] = ["condition", "filter", "merge", "delay"];
+pub const LOGIC_OPS: [&str; 6] = [
+    "condition",
+    "filter",
+    "merge",
+    "delay",
+    "template",
+    "foreach",
+];
+/// Most lines a "for each line" node accepts, and the most it can be asked to run.
+pub const MAX_ITEMS: i64 = 200;
+/// Longest text a template may produce.
+pub const MAX_TEMPLATE_CHARS: usize = 1_000_000;
 pub const TESTS: [&str; 7] = [
     "contains",
     "not_contains",
@@ -73,8 +84,112 @@ pub fn logic_ports(op: &str) -> Option<ToolPorts> {
             params: vec![param("ms", PortType::Integer, "1000", &[])],
             outputs: vec![input(TEXT_PORT, false)],
         },
+        "template" => ToolPorts {
+            inputs: vec![input("a", false), input("b", false), input("c", false)],
+            params: vec![param("template", PortType::Text, "{a}", &[])],
+            outputs: vec![input(TEXT_PORT, false)],
+        },
+        "foreach" => ToolPorts {
+            inputs: vec![input(TEXT_PORT, true)],
+            params: vec![
+                param("tool", PortType::Text, "", &[]),
+                param("options", PortType::Text, "", &[]),
+                param("max", PortType::Integer, "100", &[]),
+            ],
+            outputs: vec![input(TEXT_PORT, false)],
+        },
         _ => return None,
     })
+}
+
+/// The text input and text output a tool exposes to a "for each line" node: its single required
+/// input must be text, and it must produce a text.
+#[must_use]
+pub fn text_io(ports: &ToolPorts) -> Option<(String, String)> {
+    let mut required = ports.inputs.iter().filter(|i| i.required);
+    let input = required.next().filter(|i| i.ty == PortType::Text)?;
+    if required.next().is_some() {
+        return None;
+    }
+    let output = ports.outputs.iter().find(|o| o.ty == PortType::Text)?;
+    Some((input.id.clone(), output.id.clone()))
+}
+
+/// `key=value` per line, for the parameters of the tool a loop runs. Blank lines are ignored.
+#[must_use]
+pub fn parse_options(text: &str) -> std::collections::BTreeMap<String, String> {
+    text.lines()
+        .filter_map(|line| line.split_once('='))
+        .map(|(k, v)| (k.trim().to_owned(), v.trim().to_owned()))
+        .filter(|(k, _)| !k.is_empty())
+        .collect()
+}
+
+fn apply_filter(value: &str, filter: &str) -> Option<String> {
+    Some(match filter {
+        "upper" => value.to_uppercase(),
+        "lower" => value.to_lowercase(),
+        "trim" => value.trim().to_owned(),
+        "length" => value.chars().count().to_string(),
+        "lines" => value.lines().count().to_string(),
+        "first_line" => value.lines().next().unwrap_or("").to_owned(),
+        _ => return None,
+    })
+}
+
+/// Fills `{a}`, `{b}`, `{c}` (optionally `{a|trim|upper}`) in a template; `{{` and `}}` are the
+/// braces themselves. Bounded: no loops, no evaluation, output capped.
+///
+/// # Errors
+/// `bad_template` with the offending placeholder, or `too_large`.
+pub fn render(template: &str, inputs: &ValueMap) -> Result<String, RunError> {
+    let bad = |detail: &str| RunError {
+        code: "bad_template".into(),
+        detail: Some(detail.to_owned()),
+    };
+    let mut out = String::new();
+    let mut chars = template.chars().peekable();
+    while let Some(c) = chars.next() {
+        match c {
+            '{' if chars.peek() == Some(&'{') => {
+                chars.next();
+                out.push('{');
+            }
+            '}' if chars.peek() == Some(&'}') => {
+                chars.next();
+                out.push('}');
+            }
+            '{' => {
+                let mut body = String::new();
+                loop {
+                    match chars.next() {
+                        Some('}') => break,
+                        Some(ch) => body.push(ch),
+                        None => return Err(bad("{")),
+                    }
+                }
+                let mut parts = body.split('|').map(str::trim);
+                let name = parts.next().unwrap_or("");
+                if !matches!(name, "a" | "b" | "c") {
+                    return Err(bad(&body));
+                }
+                let mut value = text_of(inputs, name).unwrap_or_default();
+                for filter in parts {
+                    value = apply_filter(&value, filter).ok_or_else(|| bad(&body))?;
+                }
+                out.push_str(&value);
+            }
+            '}' => return Err(bad("}")),
+            other => out.push(other),
+        }
+        if out.chars().count() > MAX_TEMPLATE_CHARS {
+            return Err(RunError {
+                code: "too_large".into(),
+                detail: None,
+            });
+        }
+    }
+    Ok(out)
 }
 
 /// Output port of a file node: a single file or a batch, typed by what it accepts.
@@ -169,6 +284,10 @@ pub fn eval(op: &str, inputs: &ValueMap, params: &ValueMap) -> Result<ValueMap, 
                 Value::Text(parts.join(&p("separator"))),
             )]))
         }
+        "template" => Ok(ValueMap::from([(
+            TEXT_PORT.to_owned(),
+            Value::Text(render(&p("template"), inputs)?),
+        )])),
         other => Err(RunError {
             code: "unknown_logic".into(),
             detail: Some(other.to_owned()),

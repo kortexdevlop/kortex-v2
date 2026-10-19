@@ -147,6 +147,6 @@ fn a_desktop_conversation_runs_real_tools_with_the_real_model() {
         uppercased,
         "the second real tool produced BONJOUR LE MONDE from the first one's output"
     );
-    assert!(conversation.export("x").is_ok());
+    assert!(!conversation.export("x").nodes.is_empty());
     assert!(block_on(credits(&auth)).is_some_and(|c| c.percent <= 100));
 }
