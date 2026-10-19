@@ -26,7 +26,7 @@ class Stmt {
 export function makeEnv(extra: Partial<Env> = {}): { env: Env; raw: DatabaseSync } {
   const raw = new DatabaseSync(':memory:');
   raw.exec('PRAGMA foreign_keys = ON');
-  for (const f of ['0001_init.sql', '0002_ai.sql', '0003_devices.sql', '0004_retention_indexes.sql', '0005_account_security.sql']) raw.exec(readFileSync(join(import.meta.dirname, '../migrations', f), 'utf8'));
+  for (const f of ['0001_init.sql', '0002_ai.sql', '0003_devices.sql', '0004_retention_indexes.sql', '0005_account_security.sql', '0006_client_errors.sql']) raw.exec(readFileSync(join(import.meta.dirname, '../migrations', f), 'utf8'));
   const DB = { prepare: (sql: string) => new Stmt(raw, sql), batch: async (statements: Stmt[]) => {
     raw.exec('BEGIN');
     try { const results = []; for (const statement of statements) results.push(await statement.run()); raw.exec('COMMIT'); return results; }

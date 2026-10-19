@@ -8,6 +8,7 @@ import * as data from './routes/data.ts';
 import * as dev from './routes/devices.ts';
 import * as proxy from './routes/proxy.ts';
 import * as oauth from './routes/oauth.ts';
+import * as telemetry from './routes/telemetry.ts';
 
 type Handler = (ctx: Ctx, params: Record<string, string>) => Promise<Response>;
 const routes: [string, RegExp, Handler][] = [];
@@ -53,6 +54,7 @@ add('POST', '/v1/proxy', proxy.forward);
 add('GET', '/v1/oauth/providers', oauth.providers);
 add('POST', '/v1/oauth/exchange', oauth.exchange);
 add('POST', '/v1/oauth/refresh', oauth.refresh);
+add('POST', '/v1/telemetry', telemetry.report);
 
 const SECURITY_HEADERS = {
   'X-Content-Type-Options': 'nosniff',
@@ -124,7 +126,7 @@ export async function cleanup(env: Env, now = Date.now()): Promise<void> {
   const cutoff = new Date(now - 90 * 86_400_000).toISOString().slice(0, 10);
   await env.DB.prepare('DELETE FROM sessions WHERE expires_at <= ?1').bind(now).run();
   await env.DB.prepare('DELETE FROM rate_limits WHERE window_start < ?1').bind(Math.floor(now / 1000) - 86_400).run();
-  for (const table of ['usage_daily', 'ai_ledger', 'ai_global']) {
+  for (const table of ['usage_daily', 'ai_ledger', 'ai_global', 'client_errors']) {
     await env.DB.prepare(`DELETE FROM ${table} WHERE day < ?1`).bind(cutoff).run();
   }
 }

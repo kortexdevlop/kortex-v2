@@ -172,7 +172,10 @@ pub struct Appearance {
 pub fn use_appearance() -> Appearance {
     // Installable PWA: the offline shell of this app (generated at build time, same-origin only).
     #[cfg(target_arch = "wasm32")]
-    use_hook(|| kortex_platform::offline::register("/sw.js"));
+    use_hook(|| {
+        kortex_platform::offline::register("/sw.js");
+        kortex_platform::offline::report_errors(&format!("https://{}", domain("api")));
+    });
     let lang = use_signal(|| {
         let initial = kortex_platform::document::initial_language();
         let saved = load::<String>("shell", "lang").0;
