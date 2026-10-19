@@ -13,6 +13,10 @@ export interface Env {
   AI_USER_CAP?: string;
   AI_USER_REFILL_3H?: string;
   AI_GLOBAL_DAILY?: string;
+  /** E-mails (comma-separated, a Worker secret) allowed to read the owner's dashboard. */
+  ADMIN_EMAILS?: string;
+  /** Workers version metadata binding: the live version of this Worker. */
+  CF_VERSION_METADATA?: { id: string; tag?: string; timestamp: string };
   /** Neurons one account may spend per UTC day (default 2 500). */
   AI_USER_DAILY?: string;
   /** Comma-separated connector hosts the proxy may call with credentials (suffix match). */

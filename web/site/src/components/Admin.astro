@@ -1,0 +1,133 @@
+---
+import Base from '../layouts/Base.astro';
+import type { Lang } from '../lib/data';
+const { lang } = Astro.props as { lang: Lang };
+const api = (import.meta.env.PUBLIC_API_ORIGIN ?? 'https://api.kortex.site').replace(/\/$/, '');
+const T = {
+  fr: {
+    title: 'Tableau de bord — Kortex', h1: 'Tableau de bord', intro: 'Page privée du propriétaire : santé des sites, erreurs, quota IA, base de données et versions publiées.',
+    refresh: 'Actualiser', auto: 'Actualisation automatique (1 min)', updated: 'Mis à jour',
+    denied: 'Accès réservé. Connectez-vous avec le compte propriétaire (page Compte), puis rechargez.', loading: 'Chargement…', failed: 'Impossible de charger les données.',
+    sites: 'Sites', up: 'en ligne', down: 'hors ligne',
+    ai: 'IA et quota', budget: 'Budget du jour', slowdown: 'Recharge ralentie', requests: 'Requêtes aujourd’hui', accounts: 'Comptes actifs', low: 'Comptes presque à court', apps: 'Par application (7 jours)', top: 'Plus gros consommateurs du jour', days: 'Derniers jours', neurons: 'neurons',
+    errors: 'Erreurs des applications (7 jours)', noErrors: 'Aucune erreur signalée.',
+    database: 'Base de données', users: 'Comptes', sessions: 'Sessions', sync: 'Éléments synchronisés', buckets: 'Réserves de crédits', limiter: 'Limiteurs',
+    releases: 'Versions publiées', releasesHelp: 'D’après le journal du dépôt. Revenir en arrière demande une autorisation : copiez la commande et lancez-la depuis le dépôt.', copy: 'Copier la commande', copied: 'Copié', live: 'Version de l’API en ligne',
+  },
+  en: {
+    title: 'Dashboard — Kortex', h1: 'Dashboard', intro: 'Private owner page: site health, errors, AI quota, database and published versions.',
+    refresh: 'Refresh', auto: 'Auto refresh (1 min)', updated: 'Updated',
+    denied: 'Restricted. Sign in with the owner account (Account page), then reload.', loading: 'Loading…', failed: 'Could not load the data.',
+    sites: 'Sites', up: 'up', down: 'down',
+    ai: 'AI and quota', budget: 'Today’s budget', slowdown: 'Refill slowed down', requests: 'Requests today', accounts: 'Active accounts', low: 'Accounts nearly out', apps: 'Per app (7 days)', top: 'Biggest users today', days: 'Recent days', neurons: 'neurons',
+    errors: 'App errors (7 days)', noErrors: 'No error reported.',
+    database: 'Database', users: 'Accounts', sessions: 'Sessions', sync: 'Synced items', buckets: 'Credit buckets', limiter: 'Rate limiters',
+    releases: 'Published versions', releasesHelp: 'From the repository journal. Rolling back needs an authorization: copy the command and run it from the repository.', copy: 'Copy the command', copied: 'Copied', live: 'Live API version',
+  },
+}[lang];
+---
+<Base title={T.title} description={T.intro} lang={lang} alt={{ fr: '/admin', en: '/en/admin' }} noindex>
+  <div class="admin" data-admin data-api={api} data-t={JSON.stringify(T)}>
+    <div class="admin-head">
+      <div><h1>{T.h1}</h1><p class="k-muted">{T.intro}</p></div>
+      <div class="admin-tools">
+        <label class="admin-auto"><input type="checkbox" data-auto checked /> <span>{T.auto}</span></label>
+        <button class="k-btn" type="button" data-refresh>{T.refresh}</button>
+      </div>
+    </div>
+    <p class="k-muted" role="status" data-status>{T.loading}</p>
+    <div data-board hidden></div>
+  </div>
+</Base>
+<style>
+  .admin { display: grid; gap: var(--k-space-5); }
+  .admin-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--k-space-4); align-items: flex-end; }
+  .admin-tools { display: flex; gap: var(--k-space-4); align-items: center; flex-wrap: wrap; }
+  .admin-auto { display: flex; gap: var(--k-space-2); align-items: center; }
+  .admin section { display: grid; gap: var(--k-space-3); margin-bottom: var(--k-space-5); }
+  .admin h2 { font-size: 1.1rem; }
+  .admin .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: var(--k-space-3); }
+  .admin .tile { padding: var(--k-space-4); border: 1px solid var(--k-border); border-radius: var(--k-radius-field); background: var(--k-surface); display: grid; gap: var(--k-space-1); }
+  .admin .tile strong { font-size: 1.4rem; letter-spacing: -.03em; }
+  .admin .pill { display: inline-block; padding: 0 var(--k-space-2); border-radius: var(--k-radius-control); font-size: .8rem; font-weight: 600; }
+  .admin .pill[data-ok="true"] { background: var(--k-surface-2); color: var(--k-success); }
+  .admin .pill[data-ok="false"] { background: var(--k-surface-2); color: var(--k-danger); }
+  .admin .bar { height: 14px; border-radius: var(--k-radius-control); background: var(--k-surface-2); overflow: hidden; }
+  .admin .bar span { display: block; height: 100%; background: var(--k-accent); }
+  .admin .bar[data-tone="warn"] span { background: var(--k-accent-2); }
+  .admin .bar[data-tone="bad"] span { background: var(--k-danger); }
+  .admin table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+  .admin th, .admin td { text-align: left; padding: var(--k-space-2) var(--k-space-3); border-bottom: 1px solid var(--k-border); }
+  .admin code { font-family: var(--k-type-mono); font-size: .8rem; overflow-wrap: anywhere; }
+  .admin .days { display: flex; align-items: flex-end; gap: var(--k-space-2); height: 90px; }
+  .admin .days div { flex: 1; background: var(--k-accent); border-radius: var(--k-radius-control) var(--k-radius-control) 0 0; min-height: 2px; }
+</style>
+<script>
+  import { barPercent, budgetTone, fmtDuration, rollbackCommand, summarizeErrors } from '../lib/admin-view';
+  const root = document.querySelector<HTMLElement>('[data-admin]');
+  if (root) {
+    const T = JSON.parse(root.dataset.t ?? '{}') as Record<string, string>;
+    const api = root.dataset.api ?? '';
+    const status = root.querySelector<HTMLElement>('[data-status]')!;
+    const board = root.querySelector<HTMLElement>('[data-board]')!;
+    const el = (tag: string, props: Record<string, string> = {}, ...kids: (Node | string)[]): HTMLElement => {
+      const node = document.createElement(tag);
+      for (const [k, v] of Object.entries(props)) node.setAttribute(k, v);
+      for (const kid of kids) node.append(kid);
+      return node;
+    };
+    const tile = (label: string, value: string) => el('div', { class: 'tile' }, el('span', { class: 'k-muted' }, label), el('strong', {}, value));
+    const table = (head: string[], rows: (string | Node)[][]) =>
+      el('table', {}, el('thead', {}, el('tr', {}, ...head.map((h) => el('th', {}, h)))), el('tbody', {}, ...rows.map((r) => el('tr', {}, ...r.map((c) => el('td', {}, c))))));
+    const section = (title: string, ...kids: Node[]) => el('section', {}, el('h2', {}, title), ...kids);
+
+    function render(d: any): void {
+      const parts: Node[] = [];
+      parts.push(section(T.sites!, el('div', { class: 'grid' }, ...d.hosts.map((h: any) =>
+        el('div', { class: 'tile' }, el('code', {}, h.host), el('span', { class: 'pill', 'data-ok': String(h.ok) }, `${h.ok ? T.up : T.down} · ${h.status || '—'} · ${fmtDuration(h.ms)}`))))));
+      const g = d.ai.global;
+      const pct = barPercent(g.used, g.cap);
+      parts.push(section(T.ai!,
+        el('div', { class: 'tile' }, el('span', { class: 'k-muted' }, `${T.budget} — ${g.used} / ${g.cap} ${T.neurons} (${pct} %)${g.factor < 1 ? ` · ${T.slowdown} ×${g.factor}` : ''}`),
+          el('div', { class: 'bar', role: 'img', 'aria-label': `${pct} %`, 'data-tone': budgetTone(pct) }, el('span', { style: `width:${pct}%` }))),
+        el('div', { class: 'grid' }, tile(T.requests!, String(d.ai.today.requests)), tile(T.accounts!, String(d.ai.today.users)), tile(T.low!, String(d.ai.low_credit_users))),
+        el('h3', {}, T.apps!), table(['app', 'requests', T.neurons!], d.ai.apps.map((a: any) => [a.app, String(a.requests), String(a.neurons)])),
+        el('h3', {}, T.top!), table(['id', 'requests', T.neurons!], d.ai.today.top.map((u: any) => [el('code', {}, u.user), String(u.requests), String(u.neurons)])),
+        el('h3', {}, T.days!),
+        el('div', { class: 'days', role: 'img', 'aria-label': T.days! }, ...d.ai.days.map((x: any) => el('div', { title: `${x.day}: ${x.requests}`, style: `height:${Math.max(2, barPercent(x.neurons, Math.max(1, ...d.ai.days.map((y: any) => y.neurons))))}%` })))));
+      const errs = summarizeErrors(d.errors);
+      parts.push(section(T.errors!, errs.length ? table(['app', 'total', 'detail'], errs.map((e) => [e.app, String(e.total), Object.entries(e.kinds).map(([k, n]) => `${k}: ${n}`).join(', ')])) : el('p', { class: 'k-muted' }, T.noErrors!)));
+      const db = d.database;
+      parts.push(section(T.database!, el('div', { class: 'grid' }, tile(T.users!, String(db.users)), tile(T.sessions!, String(db.sessions)), tile(T.sync!, String(db.sync_items)), tile(T.buckets!, String(db.ai_buckets)), tile(T.limiter!, String(db.rate_limits)))));
+      const rel: Node[] = [el('p', { class: 'k-muted' }, T.releasesHelp!)];
+      if (d.api_version) rel.push(el('p', {}, `${T.live}: `, el('code', {}, d.api_version.id)));
+      for (const p of d.releases) {
+        const rows = Object.entries(p.versions as Record<string, string>).map(([worker, id]) => {
+          const cmd = rollbackCommand(worker, id);
+          const button = el('button', { class: 'k-btn', type: 'button' }, T.copy!);
+          if (cmd) button.addEventListener('click', () => { void navigator.clipboard?.writeText(cmd); button.textContent = T.copied!; });
+          else button.setAttribute('disabled', '');
+          return [worker, el('code', {}, id), button];
+        });
+        rel.push(el('h3', {}, `${p.date} — run ${p.run ?? '?'} — ${p.commit ?? ''}`), table(['Worker', 'version', ''], rows));
+      }
+      parts.push(section(T.releases!, ...rel));
+      board.replaceChildren(...parts);
+      board.hidden = false;
+      status.textContent = `${T.updated}: ${new Date(d.generated_at).toLocaleString(document.documentElement.lang)}`;
+    }
+
+    async function load(): Promise<void> {
+      try {
+        const res = await fetch(`${api}/v1/admin/overview`, { credentials: 'include', headers: { 'X-Kortex-Request': '1' }, cache: 'no-store' });
+        if (res.status === 401 || res.status === 404) { board.hidden = true; status.textContent = T.denied!; return; }
+        if (!res.ok) throw new Error(String(res.status));
+        render(await res.json());
+      } catch { status.textContent = T.failed!; }
+    }
+    root.querySelector('[data-refresh]')?.addEventListener('click', () => void load());
+    const auto = root.querySelector<HTMLInputElement>('[data-auto]')!;
+    setInterval(() => { if (auto.checked && !document.hidden) void load(); }, 60_000);
+    void load();
+  }
+</script>

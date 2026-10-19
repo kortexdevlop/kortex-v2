@@ -9,6 +9,7 @@ import * as dev from './routes/devices.ts';
 import * as proxy from './routes/proxy.ts';
 import * as oauth from './routes/oauth.ts';
 import * as telemetry from './routes/telemetry.ts';
+import * as admin from './routes/admin.ts';
 
 type Handler = (ctx: Ctx, params: Record<string, string>) => Promise<Response>;
 const routes: [string, RegExp, Handler][] = [];
@@ -55,6 +56,7 @@ add('GET', '/v1/oauth/providers', oauth.providers);
 add('POST', '/v1/oauth/exchange', oauth.exchange);
 add('POST', '/v1/oauth/refresh', oauth.refresh);
 add('POST', '/v1/telemetry', telemetry.report);
+add('GET', '/v1/admin/overview', admin.overview);
 
 const SECURITY_HEADERS = {
   'X-Content-Type-Options': 'nosniff',

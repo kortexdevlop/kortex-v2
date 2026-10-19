@@ -2,8 +2,11 @@
 import { readFileSync, writeFileSync, mkdirSync, rmSync, cpSync, readdirSync, statSync } from 'node:fs';
 import { publicFeatures } from './public-features.mjs';
 import { createHash } from 'node:crypto';
+import { spawnSync } from 'node:child_process';
 import { resolve, join, basename } from 'node:path';
 const root = resolve(import.meta.dirname, '..');
+// The owner's dashboard lists the recent publications: refresh that data with every deploy.
+spawnSync('node', [join(root, 'scripts/build-admin-data.mjs')], { stdio: 'inherit' });
 const domains = Object.fromEntries([...readFileSync(join(root, 'brand/domains.toml'), 'utf8').matchAll(/^\s*(\w+)\s*=\s*"([^"]+)"/gm)].map(m => [m[1], m[2]]));
 const features = publicFeatures(root);
 const security = JSON.parse(readFileSync(join(root,'brand/security.json'),'utf8'));
