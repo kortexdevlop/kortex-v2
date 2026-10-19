@@ -60,3 +60,8 @@
 .flow-import{margin-bottom:var(--k-space-4)}
 @media(max-width:1100px){.flow-stage{grid-template-columns:200px minmax(0,1fr);height:auto}.flow-canvas{height:520px;grid-column:2}.flow-palette{grid-row:span 2;max-height:620px}.flow-inspector{grid-column:2}}
 @media(max-width:700px){.flow-stage{grid-template-columns:minmax(0,1fr)}.flow-canvas,.flow-inspector{grid-column:1}.flow-palette{grid-row:auto;max-height:260px}}
+.flow-node[data-state=skipped]{opacity:.5;border-style:dashed}
+.flow-node[data-kind=file] .flow-node-head,.flow-node[data-kind=logic] .flow-node-head{background:var(--k-surface-2)}
+.flow-node[data-kind=logic] .flow-node-head{border-bottom-color:var(--k-accent)}
+.flow-minimap{pointer-events:auto;cursor:pointer;touch-action:none}
+.flow-pick[draggable=true]{cursor:grab}

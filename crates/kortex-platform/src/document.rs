@@ -10,6 +10,14 @@ pub fn launch_query() -> Eval {
     )
 }
 
+/// Waits `ms` milliseconds on the page's own timer (browser and WebView alike).
+pub async fn sleep(ms: u32) {
+    let _ = eval(&format!(
+        "await new Promise(r => setTimeout(r, {ms})); return 1;"
+    ))
+    .await;
+}
+
 /// Standard base64 for previews and binary downloads.
 #[must_use]
 pub fn base64(bytes: &[u8]) -> String {

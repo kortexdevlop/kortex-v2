@@ -2,7 +2,6 @@
 use std::collections::BTreeMap;
 use std::sync::OnceLock;
 
-use kortex_contract::PortType;
 use kortex_shell as shell;
 
 use crate::engine::{ParamSpec, Port, ToolPorts};
@@ -60,16 +59,11 @@ pub fn ports() -> &'static BTreeMap<String, ToolPorts> {
     })
 }
 
-/// Tools this version can feed: every required input is text (files need a picker node).
+/// Every tool of the catalogue by display name: file inputs are fed by file nodes, text inputs by
+/// text, logic or other tools.
 pub fn usable_tools(lang: &str) -> Vec<(String, String)> {
     let mut tools: Vec<(String, String)> = shell::catalogue()
         .iter()
-        .filter(|e| {
-            e.inputs
-                .iter()
-                .filter(|i| i.required)
-                .all(|i| i.ty == PortType::Text)
-        })
         .map(|e| (e.tool.id.clone(), shell::name(e, lang)))
         .collect();
     tools.sort_by(|a, b| a.1.cmp(&b.1));

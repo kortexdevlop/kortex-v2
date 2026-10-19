@@ -2,5 +2,6 @@
 pub mod canvas;
 pub mod catalogue;
 pub mod engine;
+pub mod inspector;
 pub mod runner;
 pub mod ui;

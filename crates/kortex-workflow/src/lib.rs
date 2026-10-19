@@ -7,8 +7,13 @@ use kortex_contract::PortType;
 use kortex_runtime::{CancelToken, FileData, Table, ToolError, Value, ValueMap};
 use serde::{Deserialize, Serialize};
 
+pub mod logic;
 #[cfg(not(target_arch = "wasm32"))]
 pub mod process;
+
+pub use logic::{
+    DELAY_TOOL, FILE_PORT, FILES_PORT, LOGIC_OPS, MAX_DELAY_MS, TESTS, file_ports, logic_ports,
+};
 
 /// Version written by this build; older files are migrated, newer ones are refused.
 pub const FORMAT_VERSION: u32 = 1;
@@ -27,6 +32,40 @@ pub enum NodeKind {
         #[serde(default)]
         params: BTreeMap<String, String>,
     },
+    /// A file (or batch) the user picks in the editor. Only its kind is saved: the bytes stay on
+    /// the device and are handed to the run, never written into the workflow.
+    File {
+        /// Mime pattern the node accepts (empty means any).
+        #[serde(default)]
+        accept: String,
+        #[serde(default)]
+        multiple: bool,
+    },
+    /// A built-in text node (condition, filter, merge, delay), see [`logic`].
+    Logic {
+        op: String,
+        #[serde(default)]
+        params: BTreeMap<String, String>,
+    },
+}
+
+/// Ports and params of any node: constants and file nodes by construction, logic nodes from
+/// [`logic_ports`], tools from the catalogue. `None` when the tool or operation is unknown.
+#[must_use]
+pub fn ports_of(kind: &NodeKind, catalogue: &dyn Catalogue) -> Option<ToolPorts> {
+    match kind {
+        NodeKind::Text { .. } => Some(ToolPorts {
+            outputs: vec![Port {
+                id: TEXT_PORT.to_owned(),
+                ty: PortType::Text,
+                required: false,
+            }],
+            ..ToolPorts::default()
+        }),
+        NodeKind::Tool { tool, .. } => catalogue.tool(tool).cloned(),
+        NodeKind::File { accept, multiple } => Some(file_ports(accept, *multiple)),
+        NodeKind::Logic { op, .. } => logic_ports(op),
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -268,19 +307,16 @@ fn output_port(
         .iter()
         .find(|n| n.id == node)
         .ok_or("unknown_node")?;
-    match &found.kind {
-        NodeKind::Text { .. } => (port == TEXT_PORT)
-            .then_some(PortType::Text)
-            .ok_or("unknown_port"),
-        NodeKind::Tool { tool, .. } => catalogue
-            .tool(tool)
-            .ok_or("unknown_tool")?
-            .outputs
-            .iter()
-            .find(|p| p.id == port)
-            .map(|p| p.ty.clone())
-            .ok_or("unknown_port"),
-    }
+    let ports = ports_of(&found.kind, catalogue).ok_or(match found.kind {
+        NodeKind::Tool { .. } => "unknown_tool",
+        _ => "unknown_logic",
+    })?;
+    ports
+        .outputs
+        .iter()
+        .find(|p| p.id == port)
+        .map(|p| p.ty.clone())
+        .ok_or("unknown_port")
 }
 
 /// Everything wrong with `workflow`, in a stable order; empty when it can run.
@@ -292,9 +328,22 @@ pub fn validate(workflow: &Workflow, catalogue: &dyn Catalogue) -> Vec<Issue> {
         if !seen.insert(node.id.as_str()) {
             issues.push(issue(Some(&node.id), "duplicate_node", node.id.clone()));
         }
-        if let NodeKind::Tool { tool, params } = &node.kind {
-            match catalogue.tool(tool) {
-                None => issues.push(issue(Some(&node.id), "unknown_tool", tool.clone())),
+        let named = match &node.kind {
+            NodeKind::Tool { tool, params } => Some((tool.as_str(), params)),
+            NodeKind::Logic { op, params } => Some((op.as_str(), params)),
+            _ => None,
+        };
+        if let Some((name, params)) = named {
+            match ports_of(&node.kind, catalogue) {
+                None => issues.push(issue(
+                    Some(&node.id),
+                    if matches!(node.kind, NodeKind::Tool { .. }) {
+                        "unknown_tool"
+                    } else {
+                        "unknown_logic"
+                    },
+                    name.to_owned(),
+                )),
                 Some(ports) => {
                     if let Err(e) = param_values(params, &ports.params) {
                         issues.push(Issue {
@@ -310,13 +359,10 @@ pub fn validate(workflow: &Workflow, catalogue: &dyn Catalogue) -> Vec<Issue> {
     for edge in &workflow.edges {
         let source = output_port(workflow, catalogue, &edge.from.node, &edge.from.port);
         let target = workflow.nodes.iter().find(|n| n.id == edge.to.node);
-        let target_ty = match target.map(|n| &n.kind) {
-            Some(NodeKind::Tool { tool, .. }) => catalogue
-                .tool(tool)
-                .and_then(|p| p.inputs.iter().find(|i| i.id == edge.to.port))
-                .map(|p| p.ty.clone()),
-            _ => None,
-        };
+        let target_ty = target
+            .and_then(|n| ports_of(&n.kind, catalogue))
+            .and_then(|p| p.inputs.into_iter().find(|i| i.id == edge.to.port))
+            .map(|p| p.ty);
         match (source, target_ty) {
             (Err(code), _) => {
                 issues.push(issue(Some(&edge.from.node), code, edge.from.port.clone()))
@@ -349,10 +395,7 @@ pub fn validate(workflow: &Workflow, catalogue: &dyn Catalogue) -> Vec<Issue> {
         }
     }
     for node in &workflow.nodes {
-        let NodeKind::Tool { tool, .. } = &node.kind else {
-            continue;
-        };
-        let Some(ports) = catalogue.tool(tool) else {
+        let Some(ports) = ports_of(&node.kind, catalogue) else {
             continue;
         };
         for input in ports.inputs.iter().filter(|i| i.required) {
@@ -522,6 +565,8 @@ pub trait Runner {
 pub struct Report {
     pub results: BTreeMap<String, ValueMap>,
     pub journal: Vec<String>,
+    /// Nodes that did not run because a branch they depend on was not taken.
+    pub skipped: Vec<String>,
 }
 
 /// A failed run: where it stopped and what already ran.
@@ -572,11 +617,21 @@ pub struct Execution<'a> {
     pending: Option<Job>,
     failure: Option<(String, RunError)>,
     report: Report,
+    provided: BTreeMap<String, Value>,
 }
 
 impl<'a> Execution<'a> {
+    /// The bytes chosen for each file node (by node id). They are never part of the workflow.
+    #[must_use]
+    pub fn with_files(mut self, provided: BTreeMap<String, Value>) -> Self {
+        self.provided = provided;
+        self
+    }
+
     /// # Errors
     /// `invalid_workflow` (naming the first problem) when the workflow cannot run.
+    // `Failure` carries the partial report; it is built once per run, never in a hot path.
+    #[allow(clippy::result_large_err)]
     pub fn new(workflow: &'a Workflow, catalogue: &'a dyn Catalogue) -> Result<Self, Failure> {
         if let Some(first) = validate(workflow, catalogue).first() {
             return Err(fail(
@@ -603,6 +658,7 @@ impl<'a> Execution<'a> {
             pending: None,
             failure: None,
             report: Report::default(),
+            provided: BTreeMap::new(),
         })
     }
 
@@ -623,27 +679,50 @@ impl<'a> Execution<'a> {
             if cancel.is_cancelled() {
                 return self.failed(Some(&node.id), ToolError::CANCELLED, None);
             }
-            let NodeKind::Tool { tool, params } = &node.kind else {
-                if let NodeKind::Text { value } = &node.kind {
+            let (name, params) = match &node.kind {
+                NodeKind::Text { value } => {
                     self.report.journal.push(format!("{}: ok", node.id));
                     self.report.results.insert(
                         node.id.clone(),
                         ValueMap::from([(TEXT_PORT.to_owned(), Value::Text(value.clone()))]),
                     );
+                    self.cursor += 1;
+                    continue;
                 }
-                self.cursor += 1;
-                continue;
+                NodeKind::File { accept, multiple } => {
+                    let Some(value) = self.provided.get(&node.id).cloned() else {
+                        return self.failed(Some(&node.id), "missing_file", None);
+                    };
+                    let port = file_ports(accept, *multiple).outputs.remove(0).id;
+                    self.report.journal.push(format!("{}: ok", node.id));
+                    self.report
+                        .results
+                        .insert(node.id.clone(), ValueMap::from([(port, value)]));
+                    self.cursor += 1;
+                    continue;
+                }
+                NodeKind::Tool { tool, params } => (tool.clone(), params),
+                NodeKind::Logic { op, params } => (op.clone(), params),
             };
-            let ports = self.catalogue.tool(tool).cloned().unwrap_or_default();
+            let is_logic = matches!(node.kind, NodeKind::Logic { .. });
+            let ports = ports_of(&node.kind, self.catalogue).unwrap_or_default();
             let mut inputs = ValueMap::new();
+            let mut unavailable = Vec::new();
             for edge in self.workflow.edges.iter().filter(|e| e.to.node == node.id) {
-                let Some(produced) = self
+                let produced = self
                     .report
                     .results
                     .get(&edge.from.node)
                     .and_then(|r| r.get(&edge.from.port))
-                    .cloned()
-                else {
+                    .cloned();
+                let Some(produced) = produced else {
+                    // The branch was not taken (or its node was skipped): not a failure.
+                    let branch = self.report.results.contains_key(&edge.from.node)
+                        || self.report.skipped.contains(&edge.from.node);
+                    if branch {
+                        unavailable.push(edge.to.port.clone());
+                        continue;
+                    }
                     return self.failed(
                         Some(&node.id),
                         "missing_input",
@@ -659,9 +738,39 @@ impl<'a> Execution<'a> {
                 };
                 inputs.insert(edge.to.port.clone(), value);
             }
+            let skip = if name == "merge" && is_logic {
+                inputs.is_empty()
+            } else {
+                ports
+                    .inputs
+                    .iter()
+                    .any(|p| p.required && unavailable.contains(&p.id))
+            };
+            if skip {
+                self.report.journal.push(format!("{}: skipped", node.id));
+                self.report.skipped.push(node.id.clone());
+                self.cursor += 1;
+                continue;
+            }
             let params = match param_values(params, &ports.params) {
                 Ok(params) => params,
                 Err(e) => return self.failed(Some(&node.id), e.code, Some(e.detail)),
+            };
+            if is_logic && name != "delay" {
+                match logic::eval(&name, &inputs, &params) {
+                    Ok(outputs) => {
+                        self.report.journal.push(format!("{}: ok", node.id));
+                        self.report.results.insert(node.id.clone(), outputs);
+                        self.cursor += 1;
+                        continue;
+                    }
+                    Err(e) => return self.failed(Some(&node.id), &e.code, e.detail),
+                }
+            }
+            let tool = if is_logic {
+                DELAY_TOOL.to_owned()
+            } else {
+                name
             };
             let job = Job {
                 node: node.id.clone(),
@@ -717,6 +826,7 @@ impl<'a> Execution<'a> {
 ///
 /// # Errors
 /// [`Failure`] with `invalid_workflow`, `cancelled`, or the failing node's error code.
+#[allow(clippy::result_large_err)]
 pub fn run(
     workflow: &Workflow,
     catalogue: &dyn Catalogue,

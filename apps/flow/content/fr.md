@@ -6,4 +6,4 @@ Choisissez un outil dans la palette : il se place à droite du nœud sélectionn
 ### Mes données quittent-elles mon appareil ?
 Non. Chaque outil s’exécute localement : dans le navigateur par son moteur embarqué, sur le bureau par l’outil installé. Le workflow ne conserve que sa structure, les positions et vos textes dans le stockage de votre appareil.
 ### Quels outils puis-je utiliser ?
-Cette version propose les outils dont les entrées obligatoires sont du texte. Les outils qui demandent des fichiers viendront avec les nœuds de fichier.
+Les 38 outils sont proposés. Pour un outil qui demande des fichiers (PDF, images, calcul d’empreinte), ajoutez un nœud Fichier ou Lot de fichiers : le fichier est choisi sur votre appareil, reste en mémoire pour l’exécution et n’est jamais enregistré dans le workflow ni envoyé. Les nœuds intégrés Condition, Filtre de lignes, Fusion et Délai permettent de faire des branches : seule la branche prise s’exécute, l’autre apparaît comme ignorée.

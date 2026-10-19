@@ -15,12 +15,10 @@ fn the_app_exposes_the_shared_engine_and_round_trips_a_workflow() {
 }
 
 #[test]
-fn the_catalogue_offers_every_text_only_tool_and_none_that_needs_a_file() {
+fn the_catalogue_offers_every_tool_since_file_nodes_can_feed_file_inputs() {
     let offered: Vec<String> = usable_tools("fr").into_iter().map(|(id, _)| id).collect();
+    assert_eq!(offered.len(), 38);
     assert!(offered.contains(&"text.cleaner".to_owned()));
-    assert!(
-        !offered.contains(&"pdf.merge".to_owned()),
-        "pdf.merge needs files"
-    );
-    assert!(ports().contains_key("text.cleaner"));
+    assert!(offered.contains(&"pdf.merge".to_owned()));
+    assert!(ports().contains_key("pdf.merge"));
 }

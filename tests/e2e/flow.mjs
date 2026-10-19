@@ -47,8 +47,8 @@ try {
   // Chain by clicking: each added tool lands to the right of the selected node and is linked to it.
   await page.locator('[data-add="text"]').click();
   await page.locator('.flow-inspector textarea').fill('  Hello   Kortex  ');
-  await page.locator('[data-tool="text.cleaner"]').click();
-  await page.locator('[data-tool="text.case-converter"]').click();
+  await page.locator('[data-add="text.cleaner"]').click();
+  await page.locator('[data-add="text.case-converter"]').click();
   assert.equal(await page.locator('[data-node]').count(), 3);
   assert.equal(await page.locator('.flow-link:not(.live)').count(), 2);
   assert.ok((await left(page, 'n1')) < (await left(page, 'n2')) && (await left(page, 'n2')) < (await left(page, 'n3')));
@@ -154,6 +154,95 @@ try {
   await fresh.getByRole('button', { name: 'Importer', exact: true }).click();
   await fresh.locator('.app-note[role="status"]', { hasText: 'version plus récente' }).waitFor();
   checks.push('import (legacy layout) + rejections');
+
+  // Built-in nodes, in a fresh page: drag from the palette, a condition with a skipped branch.
+  const lab = await context.newPage();
+  const labErrors = [];
+  lab.on('pageerror', e => labErrors.push(e.message));
+  await lab.addInitScript(() => localStorage.clear());
+  await lab.goto(origin + '/', { waitUntil: 'networkidle' });
+  const [kx, ky] = await center(lab.locator('#flow-canvas'));
+  await dragTo(lab, lab.locator('[data-add="text"]'), kx - 300, ky - 120);
+  assert.equal(await lab.locator('[data-node="n1"][data-kind="text"]').count(), 1);
+  checks.push('drag a node from the palette');
+  await lab.locator('.flow-inspector textarea').fill('error: disk full');
+  await lab.locator('[data-add="logic.condition"]').click();
+  await lab.locator('.flow-inspector [data-field="value"]').fill('error');
+  await lab.locator('[data-add="text.case-converter"]').click();
+  await node(lab, 'n2').locator('.flow-node-head').click();
+  await lab.locator('[data-add="text.slug-generator"]').click();
+  assert.equal(await lab.locator('[data-edge="n2.then>n4.text"]').count(), 1);
+  // Move that last link to the "else" branch: cut it, then draw it from n2.else.
+  await lab.getByRole('button', { name: 'Tout voir' }).click();
+  await lab.waitForTimeout(150);
+  await lab.locator('[data-edge="n2.then>n4.text"]').hover();
+  await lab.locator('[data-cut="n2.then>n4.text"]').click({ force: true });
+  const [ex, ey] = await center(lab.locator('[data-port="n4.text"][data-side="in"]'));
+  await dragTo(lab, lab.locator('[data-port="n2.else"][data-side="out"]'), ex, ey);
+  assert.equal(await lab.locator('[data-edge="n2.else>n4.text"]').count(), 1);
+  await lab.getByRole('button', { name: /Exécuter/ }).click();
+  await lab.locator('[data-node="n3"][data-state="done"]').waitFor({ timeout: 20000 });
+  await lab.locator('[data-node="n4"][data-state="skipped"]').waitFor();
+  checks.push('condition runs one branch and skips the other');
+
+  // Selection: shift-click two cards, copy, paste, then delete the copies and undo.
+  await node(lab, 'n1').locator('.flow-node-head').click();
+  await node(lab, 'n2').locator('.flow-node-head').click({ modifiers: ['Shift'] });
+  assert.equal(await lab.locator('[data-selected="true"]').count(), 2);
+  await lab.locator('#flow-canvas').focus();
+  await lab.keyboard.press('Control+c');
+  await lab.keyboard.press('Control+v');
+  assert.equal(await lab.locator('[data-node]').count(), 6);
+  assert.equal(await lab.locator('.flow-link').count(), 4, 'the link between the copies came along');
+  await lab.keyboard.press('Delete');
+  assert.equal(await lab.locator('[data-node]').count(), 4);
+  await lab.keyboard.press('Control+z');
+  assert.equal(await lab.locator('[data-node]').count(), 6);
+  checks.push('multi-select, copy/paste, delete, undo');
+
+  // The minimap moves the view when clicked.
+  const viewBefore = await lab.locator('.flow-layer').getAttribute('style');
+  const mini = await lab.locator('#flow-minimap').boundingBox();
+  await lab.mouse.click(mini.x + 8, mini.y + 8);
+  await lab.waitForFunction(b => document.querySelector('.flow-layer').getAttribute('style') !== b, viewBefore);
+  checks.push('clickable minimap');
+
+  // A file node: the bytes come from the user's disk and reach a real tool engine.
+  const files = await context.newPage();
+  await files.addInitScript(() => localStorage.clear());
+  await files.goto(origin + '/', { waitUntil: 'networkidle' });
+  await files.locator('[data-add="file"]').click();
+  await files.getByRole('button', { name: /Exécuter/ }).isDisabled();
+  await files.locator('[data-add="secure.hash-calculator"]').click();
+  assert.equal(await files.locator('[data-edge="n1.file>n2.file"]').count(), 1, 'file output chained to the file input');
+  assert.ok(await files.getByRole('button', { name: /Exécuter/ }).isDisabled(), 'no file chosen yet');
+  await files.locator('[data-node="n1"] .flow-node-head').click();
+  await files.locator('.flow-inspector [data-field="file"]').setInputFiles({ name: 'abc.txt', mimeType: 'text/plain', buffer: Buffer.from('abc') });
+  await files.locator('[data-field="file-status"]', { hasText: 'abc.txt' }).waitFor();
+  await files.getByRole('button', { name: /Exécuter/ }).click();
+  await files.locator('[data-node="n2"][data-state="done"]').waitFor({ timeout: 20000 });
+  await files.locator('[data-node="n2"] .flow-node-head').click();
+  await files.locator('.flow-result', { hasText: 'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad' }).waitFor();
+  // The workflow JSON never carries the bytes.
+  const saved = await files.evaluate(() => Object.values(localStorage).join('\n'));
+  assert.ok(!saved.includes('YWJj') && !saved.includes('abc.txt'));
+  checks.push('file node reaches a real engine, bytes stay out of storage');
+  // The delay node waits on the page's timer, then passes the text on.
+  const wait = await context.newPage();
+  await wait.addInitScript(() => localStorage.clear());
+  await wait.goto(origin + '/', { waitUntil: 'networkidle' });
+  await wait.locator('[data-add="text"]').click();
+  await wait.locator('.flow-inspector textarea').fill('later');
+  await wait.locator('[data-add="logic.delay"]').click();
+  await wait.locator('.flow-inspector [data-field="ms"]').fill('300');
+  const started = Date.now();
+  await wait.getByRole('button', { name: /Exécuter/ }).click();
+  await wait.locator('[data-node="n2"][data-state="done"]').waitFor({ timeout: 20000 });
+  assert.ok(Date.now() - started >= 250, 'the delay really waited');
+  await wait.locator('[data-node="n2"] .flow-node-head').click();
+  await wait.locator('.flow-result', { hasText: 'later' }).waitFor();
+  checks.push('delay node');
+  assert.deepEqual([...labErrors], []);
   assert.deepEqual(errors, []);
   console.log(`flow OK: ${checks.join(', ')}.`);
 } finally {

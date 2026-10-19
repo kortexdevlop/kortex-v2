@@ -1,12 +1,10 @@
 //! Pure model of the Flow canvas: node geometry, ports, links, the view (pan and zoom), editing
 //! rules (connect, chain, move, remove) and undo/redo. No UI here, so every rule is unit-tested.
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 
 use kortex_contract::PortType;
 
-use crate::engine::{
-    Catalogue, Edge, Endpoint, LAYOUT_STEP, Node, NodeKind, Pos, TEXT_PORT, Workflow, order,
-};
+use crate::engine::{Catalogue, Edge, Endpoint, LAYOUT_STEP, Node, NodeKind, Pos, Workflow, order};
 
 pub const NODE_W: f64 = 232.0;
 pub const HEADER_H: f64 = 38.0;
@@ -26,30 +24,20 @@ pub struct PortView {
 /// Input and output ports of a node, from the tool contract (a text node has one output).
 #[must_use]
 pub fn node_ports(node: &Node, catalogue: &dyn Catalogue) -> (Vec<PortView>, Vec<PortView>) {
-    match &node.kind {
-        NodeKind::Text { .. } => (
-            Vec::new(),
-            vec![PortView {
-                id: TEXT_PORT.to_owned(),
-                ty: PortType::Text,
-                required: false,
-            }],
-        ),
-        NodeKind::Tool { tool, .. } => catalogue.tool(tool).map_or_else(
-            || (Vec::new(), Vec::new()),
-            |p| {
-                let view = |port: &crate::engine::Port| PortView {
-                    id: port.id.clone(),
-                    ty: port.ty.clone(),
-                    required: port.required,
-                };
-                (
-                    p.inputs.iter().map(view).collect(),
-                    p.outputs.iter().map(view).collect(),
-                )
-            },
-        ),
-    }
+    let view = |port: &crate::engine::Port| PortView {
+        id: port.id.clone(),
+        ty: port.ty.clone(),
+        required: port.required,
+    };
+    crate::engine::ports_of(&node.kind, catalogue).map_or_else(
+        || (Vec::new(), Vec::new()),
+        |p| {
+            (
+                p.inputs.iter().map(view).collect(),
+                p.outputs.iter().map(view).collect(),
+            )
+        },
+    )
 }
 
 /// Height of a node card: header, one row per port on the busiest side, and a body for text.
@@ -57,10 +45,11 @@ pub fn node_ports(node: &Node, catalogue: &dyn Catalogue) -> (Vec<PortView>, Vec
 pub fn node_height(node: &Node, catalogue: &dyn Catalogue) -> f64 {
     let (inputs, outputs) = node_ports(node, catalogue);
     let rows = inputs.len().max(outputs.len()).max(1);
-    let body = if matches!(node.kind, NodeKind::Text { .. }) {
-        34.0
-    } else {
+    // Built-in nodes show a one-line summary under their ports.
+    let body = if matches!(node.kind, NodeKind::Tool { .. }) {
         0.0
+    } else {
+        34.0
     };
     HEADER_H + BODY_PAD + rows as f64 * ROW_H + body
 }
@@ -424,7 +413,124 @@ pub enum RunState {
     Waiting,
     Running,
     Done,
+    Skipped,
     Failed,
 }
 
 pub type States = BTreeMap<String, RunState>;
+
+/// Moves every node of `ids` by the same distance.
+pub fn shift_nodes(workflow: &mut Workflow, ids: &BTreeSet<String>, dx: i32, dy: i32) {
+    for node in workflow.nodes.iter_mut().filter(|n| ids.contains(&n.id)) {
+        let p = node.pos.unwrap_or(Pos { x: 0, y: 0 });
+        node.pos = Some(Pos {
+            x: p.x + dx,
+            y: p.y + dy,
+        });
+    }
+}
+
+/// Removes several nodes and every link touching them.
+pub fn remove_nodes(workflow: &mut Workflow, ids: &BTreeSet<String>) {
+    workflow.nodes.retain(|n| !ids.contains(&n.id));
+    workflow
+        .edges
+        .retain(|e| !ids.contains(&e.from.node) && !ids.contains(&e.to.node));
+}
+
+/// The part of a workflow to copy: the chosen nodes and the links between them.
+#[must_use]
+pub fn copy_nodes(workflow: &Workflow, ids: &BTreeSet<String>) -> Workflow {
+    Workflow {
+        nodes: workflow
+            .nodes
+            .iter()
+            .filter(|n| ids.contains(&n.id))
+            .cloned()
+            .collect(),
+        edges: workflow
+            .edges
+            .iter()
+            .filter(|e| ids.contains(&e.from.node) && ids.contains(&e.to.node))
+            .cloned()
+            .collect(),
+        ..Workflow::default()
+    }
+}
+
+/// Adds a copy of `clip` shifted by `offset`, with fresh ids and the links between the copies.
+/// Returns the new ids.
+pub fn paste_nodes(workflow: &mut Workflow, clip: &Workflow, offset: (i32, i32)) -> Vec<String> {
+    let mut renamed: BTreeMap<String, String> = BTreeMap::new();
+    for node in &clip.nodes {
+        let id = next_id(workflow);
+        let mut copy = node.clone();
+        copy.id = id.clone();
+        let p = node.pos.unwrap_or(Pos { x: 0, y: 0 });
+        copy.pos = Some(Pos {
+            x: p.x + offset.0,
+            y: p.y + offset.1,
+        });
+        renamed.insert(node.id.clone(), id);
+        workflow.nodes.push(copy);
+    }
+    for edge in &clip.edges {
+        if let (Some(from), Some(to)) = (renamed.get(&edge.from.node), renamed.get(&edge.to.node)) {
+            workflow.edges.push(Edge {
+                from: Endpoint {
+                    node: from.clone(),
+                    port: edge.from.port.clone(),
+                },
+                to: Endpoint {
+                    node: to.clone(),
+                    port: edge.to.port.clone(),
+                },
+            });
+        }
+    }
+    renamed.into_values().collect()
+}
+
+/// Region of the canvas the minimap shows: every node and the visible window, with a margin.
+/// `(x, y, width, height)`; `None` for an empty canvas.
+#[must_use]
+pub fn minimap_region(
+    workflow: &Workflow,
+    catalogue: &dyn Catalogue,
+    view: View,
+    size: (f64, f64),
+) -> Option<(f64, f64, f64, f64)> {
+    let (x1, y1, x2, y2) = bounds(workflow, catalogue)?;
+    let (vx, vy) = view.to_canvas(0.0, 0.0);
+    let (vw, vh) = (size.0 / view.zoom, size.1 / view.zoom);
+    let (minx, miny) = (x1.min(vx) - 40.0, y1.min(vy) - 40.0);
+    let (maxx, maxy) = (x2.max(vx + vw) + 40.0, y2.max(vy + vh) + 40.0);
+    Some((minx, miny, maxx - minx, maxy - miny))
+}
+
+/// Canvas point under a point of the minimap box (`px`, `py` in pixels from its top-left corner),
+/// given the box size; the region is drawn centred and uniformly scaled ("meet").
+#[must_use]
+pub fn minimap_point(
+    region: (f64, f64, f64, f64),
+    box_size: (f64, f64),
+    px: f64,
+    py: f64,
+) -> (f64, f64) {
+    let scale = (box_size.0 / region.2).min(box_size.1 / region.3);
+    let (ox, oy) = (
+        (box_size.0 - region.2 * scale) / 2.0,
+        (box_size.1 - region.3 * scale) / 2.0,
+    );
+    (region.0 + (px - ox) / scale, region.1 + (py - oy) / scale)
+}
+
+/// The view that puts the canvas point (`cx`, `cy`) at the centre of a viewport.
+#[must_use]
+pub fn centered_on(view: View, cx: f64, cy: f64, width: f64, height: f64) -> View {
+    View {
+        x: width / 2.0 - cx * view.zoom,
+        y: height / 2.0 - cy * view.zoom,
+        zoom: view.zoom,
+    }
+}

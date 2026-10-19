@@ -245,3 +245,104 @@ fn history_undoes_redoes_and_drops_the_redo_branch_on_a_new_change() {
     h.record(&back);
     assert!(!h.can_redo(), "a new change ends the redo branch");
 }
+
+#[test]
+fn copy_paste_duplicates_nodes_and_inner_links_with_fresh_ids() {
+    use kortex_flow::canvas::{copy_nodes, paste_nodes, remove_nodes, shift_nodes};
+    use std::collections::BTreeSet;
+    let cat = catalogue();
+    let mut w = Workflow::default();
+    let a = add_node(
+        &mut w,
+        &cat,
+        NodeKind::Text { value: "x".into() },
+        None,
+        None,
+    );
+    let b = add_node(&mut w, &cat, tool("t.upper"), Some(&a), None);
+    let c = add_node(&mut w, &cat, tool("t.upper"), Some(&b), None);
+    let chosen: BTreeSet<String> = [a.clone(), b.clone()].into();
+    let clip = copy_nodes(&w, &chosen);
+    assert_eq!(
+        (clip.nodes.len(), clip.edges.len()),
+        (2, 1),
+        "only the link inside the selection"
+    );
+    let fresh = paste_nodes(&mut w, &clip, (40, 40));
+    assert_eq!(fresh.len(), 2);
+    assert_eq!(w.nodes.len(), 5);
+    assert_eq!(w.edges.len(), 3);
+    assert!(fresh.iter().all(|id| ![&a, &b, &c].contains(&id)));
+    let before = w.nodes[3].pos;
+    let set: BTreeSet<String> = fresh.iter().cloned().collect();
+    shift_nodes(&mut w, &set, 10, -5);
+    assert_ne!(w.nodes[3].pos, before);
+    remove_nodes(&mut w, &set);
+    assert_eq!((w.nodes.len(), w.edges.len()), (3, 2));
+}
+
+#[test]
+fn the_minimap_maps_a_click_back_to_the_canvas() {
+    use kortex_flow::canvas::{centered_on, minimap_point, minimap_region};
+    let cat = catalogue();
+    let mut w = Workflow::default();
+    let a = add_node(
+        &mut w,
+        &cat,
+        NodeKind::Text {
+            value: String::new(),
+        },
+        None,
+        None,
+    );
+    add_node(&mut w, &cat, tool("t.upper"), Some(&a), None);
+    let view = View::default();
+    let region = minimap_region(&w, &cat, view, (800.0, 500.0)).expect("region");
+    // The centre of the box is the centre of the region, whatever the aspect ratio.
+    let (cx, cy) = minimap_point(region, (168.0, 112.0), 84.0, 56.0);
+    assert!((cx - (region.0 + region.2 / 2.0)).abs() < 1e-6);
+    assert!((cy - (region.1 + region.3 / 2.0)).abs() < 1e-6);
+    let moved = centered_on(view, cx, cy, 800.0, 500.0);
+    let back = moved.to_canvas(400.0, 250.0);
+    assert!((back.0 - cx).abs() < 1e-6 && (back.1 - cy).abs() < 1e-6);
+    assert!(minimap_region(&Workflow::default(), &cat, view, (800.0, 500.0)).is_none());
+}
+
+#[test]
+fn built_in_nodes_expose_their_ports_on_the_canvas() {
+    let cat = catalogue();
+    let mut w = Workflow::default();
+    let f = add_node(
+        &mut w,
+        &cat,
+        NodeKind::File {
+            accept: "application/pdf".into(),
+            multiple: true,
+        },
+        None,
+        None,
+    );
+    let c = add_node(
+        &mut w,
+        &cat,
+        NodeKind::Logic {
+            op: "condition".into(),
+            params: BTreeMap::new(),
+        },
+        None,
+        None,
+    );
+    let (ins, outs) = node_ports(&w.nodes[0], &cat);
+    assert!(ins.is_empty());
+    assert_eq!(outs[0].id, "files");
+    let (ins, outs) = node_ports(&w.nodes[1], &cat);
+    assert_eq!(
+        (
+            ins.len(),
+            outs.iter().map(|p| p.id.as_str()).collect::<Vec<_>>()
+        ),
+        (1, vec!["then", "else"])
+    );
+    assert!(port_point(&w.nodes[1], &cat, true, "else").is_some());
+    let _ = (f, c);
+}
