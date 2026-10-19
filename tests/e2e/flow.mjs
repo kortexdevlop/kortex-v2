@@ -23,6 +23,13 @@ const engine = { chromium, firefox, webkit }[process.env.BROWSER ?? 'chromium'];
 assert.ok(engine, 'BROWSER must be chromium, firefox or webkit');
 const browser = await engine.launch({ headless: true, executablePath: engine === chromium ? process.env.CHROME_PATH || undefined : undefined });
 const checks = [];
+// What a failing step looked like: console errors and failed requests of the pages under test.
+const diagnostics = [];
+const watch = (page, label) => {
+  page.on('console', m => { if (['error', 'warning'].includes(m.type())) diagnostics.push(`${label} console ${m.type()}: ${m.text().slice(0, 300)}`); });
+  page.on('requestfailed', r => diagnostics.push(`${label} request failed: ${r.method()} ${r.url().slice(0, 120)} ${r.failure()?.errorText ?? ''}`));
+  page.on('pageerror', e => diagnostics.push(`${label} page error: ${e.message.slice(0, 300)}`));
+};
 const node = (page, id) => page.locator(`[data-node="${id}"]`);
 const left = async (page, id) => parseFloat(await node(page, id).evaluate(e => e.style.left));
 // Drags with real pointer events from one handle (or card header) to another point.
@@ -272,6 +279,7 @@ try {
   checks.push('for-each-line loop runs a real engine per line');
   // The HTTP node goes through the account API's proxy in the browser; secrets stay on the device.
   const net = await context.newPage();
+  watch(net, 'http');
   await net.addInitScript(() => localStorage.clear());
   const proxied = [];
   let answer = { status: 200, json: { status: 201, headers: {}, url: 'https://api.github.com/x', body_base64: Buffer.from('created').toString('base64') } };
@@ -653,6 +661,9 @@ try {
   assert.deepEqual([...labErrors], []);
   assert.deepEqual(errors, []);
   console.log(`flow OK: ${checks.join(', ')}.`);
+} catch (error) {
+  console.error(diagnostics.join('\n'));
+  throw error;
 } finally {
   await browser.close();
   server.close();
