@@ -1,0 +1,27 @@
+{
+  "date": "2026-10-19",
+  "release_run": "39262336661",
+  "release_tag": "manual-39262336661",
+  "repo": "kortexdevlop/kortex-v2 (public)",
+  "assets": 187,
+  "site_version": "0d0e9241-885a-4c90-914d-9dc6ffe9c949",
+  "previous_site_version": "879d8b71-94ac-4a58-8cc3-3d9523a28d6d",
+  "targets": [
+    "x86_64-pc-windows-msvc",
+    "x86_64-unknown-linux-gnu",
+    "aarch64-apple-darwin",
+    "x86_64-apple-darwin"
+  ],
+  "checks": [
+    "anonymous download of index.json, index.json.sig, cli-latest.txt (200)",
+    "published index.json identical to the signed-release-index artifact",
+    "downloaded Linux CLI package SHA-256 equals the cli-latest.txt entry",
+    "kortex.site/install.sh executed in an empty HOME on macOS Intel: CLI installed",
+    "kortex available lists 44 entries; kortex doctor: index signature valid",
+    "kortex.site/telecharger shows install commands; install.sh, install.ps1, /registry/* served"
+  ],
+  "not_verified": [
+    "kortex install apps.flow in the agent sandbox failed with a system keychain error (sandboxed shell cannot reach the user's keychain); to be confirmed by the user on a normal session",
+    "Windows/Linux installs rely on the user's declared validation and the CI keychain runs"
+  ]
+}
