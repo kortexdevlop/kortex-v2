@@ -4,7 +4,7 @@ Autorité : instructions utilisateur récentes, puis `docs/RULES.md` et périmè
 
 ## Périmètre
 - Catalogue gelé à 38 outils. Corriger l’existant ; aucun outil supplémentaire.
-- Budget zéro, Cloudflare gratuit, dépôt privé et licence propriétaire. Aucun secret dans Git.
+- Budget zéro, Cloudflare gratuit, licence propriétaire « tous droits réservés ». Dépôt `kortex-v2` public depuis le 2026-10-19 (décision explicite de l’utilisateur : minutes CI gratuites) ; aucun secret dans Git.
 - Aucune action irréversible hors autorisation explicite et inventaire préalable.
 
 ## Architecture
