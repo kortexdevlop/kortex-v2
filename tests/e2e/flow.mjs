@@ -267,6 +267,94 @@ try {
   await calc.locator('.flow-result', { hasText: 'ALPHA' }).waitFor();
   assert.ok((await calc.locator('.flow-result').first().textContent()).includes('BETA'));
   checks.push('for-each-line loop runs a real engine per line');
+  // The HTTP node goes through the account API's proxy in the browser; secrets stay on the device.
+  const net = await context.newPage();
+  await net.addInitScript(() => localStorage.clear());
+  const proxied = [];
+  let answer = { status: 200, json: { status: 201, headers: {}, url: 'https://api.github.com/x', body_base64: Buffer.from('created').toString('base64') } };
+  await net.route('https://api.kortex.site/v1/proxy', async route => {
+    const request = route.request();
+    const cors = { 'access-control-allow-origin': request.headers().origin ?? '*', 'access-control-allow-credentials': 'true', 'access-control-allow-headers': 'content-type, x-kortex-request, x-kortex-user', 'access-control-allow-methods': 'POST' };
+    if (request.method() === 'OPTIONS') return route.fulfill({ status: 204, headers: cors });
+    proxied.push({ body: JSON.parse(request.postData()), headers: request.headers() });
+    await route.fulfill({ status: answer.status, headers: { ...cors, 'content-type': 'application/json' }, body: JSON.stringify(answer.json) });
+  });
+  await net.goto(origin + '/', { waitUntil: 'networkidle' });
+  await net.locator('[data-panel="secrets"] summary').click();
+  await net.locator('[data-field="secret-name"]').fill('TOKEN');
+  await net.locator('[data-field="secret-value"]').fill('abc123');
+  await net.locator('[data-action="save-secret"]').click();
+  await net.locator('[data-panel="secrets"] code', { hasText: '{secret:TOKEN}' }).waitFor();
+  assert.equal(await net.locator('[data-field="secret-value"]').inputValue(), '', 'the value is cleared after saving');
+  await net.locator('[data-add="text"]').click();
+  await net.locator('.flow-inspector textarea').fill('ping');
+  await net.locator('[data-add="logic.http"]').click();
+  await net.locator('.flow-inspector [data-field="method"]').selectOption('POST');
+  await net.locator('.flow-inspector [data-field="url"]').fill('https://api.github.com/x/{secret:TOKEN}');
+  await net.locator('.flow-inspector [data-field="headers"]').fill('Authorization: Bearer {secret:TOKEN}');
+  await net.getByRole('button', { name: /Exécuter/ }).click();
+  await net.locator('[data-node="n2"][data-state="done"]').waitFor({ timeout: 20000 });
+  assert.equal(proxied.length, 1);
+  assert.deepEqual(proxied[0].body, { url: 'https://api.github.com/x/abc123', method: 'POST', headers: { authorization: 'Bearer abc123' }, body: 'ping' });
+  assert.equal(proxied[0].headers['x-kortex-request'], '1');
+  await net.locator('[data-node="n2"] .flow-node-head').click();
+  await net.locator('.flow-result', { hasText: 'created' }).waitFor();
+  assert.ok((await net.locator('.flow-inspector').textContent()).includes('201'));
+  checks.push('HTTP node through the proxy with a device secret');
+  // The workflow (export and storage) holds the placeholder, never the secret value.
+  const stored = await net.evaluate(() => Object.values(localStorage).find(v => v.includes('"nodes"')) ?? '');
+  assert.ok(stored.includes('{secret:TOKEN}') && !stored.includes('abc123'));
+  // A proxy refusal is explained, not shown as a code.
+  answer = { status: 401, json: { error: 'unauthenticated' } };
+  await net.getByRole('button', { name: /Exécuter/ }).click();
+  await net.locator('[data-node="n2"][data-state="failed"]').waitFor({ timeout: 20000 });
+  await net.locator('.flow-log', { hasText: 'Connectez-vous' }).waitFor();
+  checks.push('proxy errors are translated');
+  // A URL that breaks the policy is caught by validation before any request.
+  await net.locator('[data-node="n2"] .flow-node-head').click();
+  await net.locator('.flow-inspector [data-field="url"]').fill('https://127.0.0.1/admin');
+  await net.locator('.app-note[role="alert"]', { hasText: 'url' }).waitFor();
+  assert.ok(await net.getByRole('button', { name: /Exécuter/ }).isDisabled());
+  assert.equal(proxied.length, 2, 'nothing was sent for the refused URL');
+  checks.push('private URL refused before running');
+  // A connector action: Telegram needs the token as a device secret and a typed chat id; the
+  // previous node's text becomes the message.
+  const tg = await context.newPage();
+  await tg.addInitScript(() => localStorage.clear());
+  const sent = [];
+  await tg.route('https://api.kortex.site/v1/proxy', async route => {
+    const request = route.request();
+    const cors = { 'access-control-allow-origin': request.headers().origin ?? '*', 'access-control-allow-credentials': 'true', 'access-control-allow-headers': 'content-type, x-kortex-request, x-kortex-user', 'access-control-allow-methods': 'POST' };
+    if (request.method() === 'OPTIONS') return route.fulfill({ status: 204, headers: cors });
+    sent.push(JSON.parse(request.postData()));
+    await route.fulfill({ status: 200, headers: { ...cors, 'content-type': 'application/json' }, body: JSON.stringify({ status: 200, headers: {}, url: 'x', body_base64: Buffer.from('{"ok":true}').toString('base64') }) });
+  });
+  await tg.goto(origin + '/', { waitUntil: 'networkidle' });
+  await tg.locator('[data-panel="secrets"] summary').click();
+  await tg.locator('[data-field="secret-name"]').fill('TELEGRAM_TOKEN');
+  await tg.locator('[data-field="secret-value"]').fill('123:ABC');
+  await tg.locator('[data-action="save-secret"]').click();
+  await tg.locator('[data-add="text"]').click();
+  await tg.locator('.flow-inspector textarea').fill('Build "ok"\nall green');
+  await tg.locator('[data-add="connector.telegram.send_message"]').click();
+  assert.equal(await tg.locator('[data-edge="n1.text>n2.chat_id"]').count(), 1, 'the first free input receives the text');
+  await tg.locator('[data-connector-help]').waitFor();
+  // Rewire: the text feeds the message, the chat id is typed in.
+  await tg.locator('[data-edge="n1.text>n2.chat_id"]').hover();
+  await tg.locator('[data-cut="n1.text>n2.chat_id"]').click({ force: true });
+  await tg.getByRole('button', { name: 'Tout voir' }).click();
+  await tg.waitForTimeout(150);
+  const [tx, ty] = await center(tg.locator('[data-port="n2.text"][data-side="in"]'));
+  await dragTo(tg, tg.locator('[data-port="n1.text"][data-side="out"]'), tx, ty);
+  await tg.locator('[data-node="n2"] .flow-node-head').click();
+  await tg.locator('.flow-inspector [data-field="chat_id"]').fill('42');
+  await tg.getByRole('button', { name: /Exécuter/ }).click();
+  await tg.locator('[data-node="n2"][data-state="done"]').waitFor({ timeout: 20000 });
+  assert.equal(sent.length, 1);
+  assert.equal(sent[0].url, 'https://api.telegram.org/bot123:ABC/sendMessage');
+  assert.equal(sent[0].method, 'POST');
+  assert.deepEqual(JSON.parse(sent[0].body), { chat_id: '42', text: 'Build "ok"\nall green' });
+  checks.push('Telegram connector builds its request from node text and a device secret');
   assert.deepEqual([...labErrors], []);
   assert.deepEqual(errors, []);
   console.log(`flow OK: ${checks.join(', ')}.`);

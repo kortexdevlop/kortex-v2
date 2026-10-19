@@ -20,7 +20,7 @@ fn default_text(value: Option<&toml::Value>) -> String {
 pub fn ports() -> &'static BTreeMap<String, ToolPorts> {
     static PORTS: OnceLock<BTreeMap<String, ToolPorts>> = OnceLock::new();
     PORTS.get_or_init(|| {
-        shell::catalogue()
+        let mut all: BTreeMap<String, ToolPorts> = shell::catalogue()
             .iter()
             .map(|entry| {
                 let ports = ToolPorts {
@@ -55,7 +55,14 @@ pub fn ports() -> &'static BTreeMap<String, ToolPorts> {
                 };
                 (entry.tool.id.clone(), ports)
             })
-            .collect()
+            .collect();
+        // Connector actions are tools too: same ports, same params, run by the host.
+        for connector in crate::connectors::all() {
+            for action in &connector.actions {
+                all.insert(connector.tool_id(&action.id), action.ports());
+            }
+        }
+        all
     })
 }
 
@@ -68,4 +75,13 @@ pub fn usable_tools(lang: &str) -> Vec<(String, String)> {
         .collect();
     tools.sort_by(|a, b| a.1.cmp(&b.1));
     tools
+}
+
+/// Connector actions for the palette: tool id and "Connector — action".
+pub fn connector_tools(lang: &str) -> Vec<(String, String)> {
+    crate::connectors::all()
+        .iter()
+        .flat_map(|c| c.actions.iter().map(|a| c.tool_id(&a.id)))
+        .filter_map(|id| crate::connectors::display_name(&id, lang).map(|name| (id, name)))
+        .collect()
 }

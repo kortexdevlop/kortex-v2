@@ -14,7 +14,7 @@ use crate::canvas::{
     self, History, NODE_W, PortView, RunState, States, View, can_connect, connect, fit, node_ports,
     port_point,
 };
-use crate::catalogue::{ports, usable_tools};
+use crate::catalogue::{connector_tools, ports, usable_tools};
 use crate::engine::{
     Endpoint, Execution, Node, NodeKind, Step, Workflow, auto_layout, from_json, to_json, validate,
 };
@@ -57,9 +57,10 @@ pub(crate) const ACCEPTS: [(&str, &str); 4] = [
 pub(crate) fn node_title(node: &Node, l: &kortex_i18n::Catalog, lang: &str) -> String {
     match &node.kind {
         NodeKind::Text { .. } => l.t("ui.text_node").to_owned(),
-        NodeKind::Tool { tool, .. } => {
-            shell::find(tool).map_or_else(|| tool.clone(), |e| shell::name(e, lang))
-        }
+        NodeKind::Tool { tool, .. } => shell::find(tool).map_or_else(
+            || crate::connectors::display_name(tool, lang).unwrap_or_else(|| tool.clone()),
+            |e| shell::name(e, lang),
+        ),
         NodeKind::File { multiple, .. } => l
             .t(if *multiple {
                 "ui.files_node"
@@ -113,6 +114,14 @@ fn node_line(node: &Node, l: &kortex_i18n::Catalog, chosen: Option<&Value>) -> O
                 )
             }
             "merge" => format!("« {} »", param(params, "separator").replace('\n', "↵")),
+            "http" => {
+                let url = param(params, "url");
+                let host = url
+                    .strip_prefix("https://")
+                    .and_then(|r| r.split(['/', '?']).next())
+                    .unwrap_or("…");
+                format!("{} {host}", param(params, "method"))
+            }
             "template" => param(params, "template").replace('\n', "↵"),
             "foreach" => {
                 let tool = param(params, "tool");
@@ -430,6 +439,9 @@ pub fn App() -> Element {
         (ctx.workflow, ctx.history, ctx.selected, ctx.extra);
     let (results, mut note, files, mut clip) = (ctx.results, ctx.note, ctx.files, ctx.clip);
     let mut import_text = use_signal(String::new);
+    let mut secret_names = use_signal(crate::secrets::names);
+    let mut secret_name = use_signal(String::new);
+    let mut secret_value = use_signal(String::new);
     let mut search = use_signal(String::new);
     let log = use_signal(Vec::<String>::new);
     let mut outcome = use_signal(|| None::<bool>);
@@ -442,7 +454,10 @@ pub fn App() -> Element {
     let current = workflow();
     let catalogue = ports();
     let issues = validate(&current, catalogue);
-    let tools = usable_tools(&lang);
+    let tools: Vec<(String, String)> = usable_tools(&lang)
+        .into_iter()
+        .chain(connector_tools(&lang))
+        .collect();
     let issue_text = |code: &str, detail: &str| {
         let key = format!("issues.{code}");
         let text = l.t(&key);
@@ -457,7 +472,9 @@ pub fn App() -> Element {
         .nodes
         .iter()
         .filter_map(|n| match &n.kind {
-            NodeKind::Tool { tool, .. } if shell::installed_binary(tool).is_none() => {
+            NodeKind::Tool { tool, .. }
+                if !tool.starts_with("connector.") && shell::installed_binary(tool).is_none() =>
+            {
                 Some(tool.clone())
             }
             _ => None,
@@ -835,6 +852,66 @@ pub fn App() -> Element {
                 div { class: "app-note", role: if ok { "status" } else { "alert" },
                     strong { if ok { {l.t("ui.run_ok")} } else { {l.t("ui.run_failed")} } }
                     pre { class: "flow-log", "{log.read().join(\"\\n\")}" }
+                }
+            }
+            details { class: "flow-import", "data-panel": "secrets",
+                summary { {l.t("secrets.title")} }
+                p { class: "flow-hint", {l.t("secrets.help")} }
+                for name in secret_names() {
+                    div { key: "{name}", class: "flow-secret",
+                        code { "{{secret:{name}}}" }
+                        button {
+                            class: "k-btn",
+                            "data-variant": "ghost",
+                            r#type: "button",
+                            "data-forget": "{name}",
+                            onclick: move |_| {
+                                crate::secrets::remove(&name);
+                                secret_names.set(crate::secrets::names());
+                            },
+                            {l.t("secrets.forget")}
+                        }
+                    }
+                }
+                div { class: "flow-bar",
+                    label { class: "k-field",
+                        span { class: "k-muted", {l.t("secrets.name")} }
+                        input {
+                            class: "k-input",
+                            "data-field": "secret-name",
+                            value: "{secret_name}",
+                            oninput: move |e| secret_name.set(e.value()),
+                        }
+                    }
+                    label { class: "k-field",
+                        span { class: "k-muted", {l.t("secrets.value")} }
+                        input {
+                            class: "k-input",
+                            r#type: "password",
+                            autocomplete: "off",
+                            "data-field": "secret-value",
+                            value: "{secret_value}",
+                            oninput: move |e| secret_value.set(e.value()),
+                        }
+                    }
+                    button {
+                        class: "k-btn",
+                        r#type: "button",
+                        "data-action": "save-secret",
+                        disabled: secret_name().is_empty() || secret_value().is_empty(),
+                        onclick: move |_| {
+                            match crate::secrets::set(&secret_name(), &secret_value()) {
+                                Ok(()) => {
+                                    secret_name.set(String::new());
+                                    secret_value.set(String::new());
+                                    secret_names.set(crate::secrets::names());
+                                    note.set(String::new());
+                                }
+                                Err(code) => note.set(l.t(&format!("secrets.{code}")).to_owned()),
+                            }
+                        },
+                        {l.t("secrets.save")}
+                    }
                 }
             }
             details { class: "flow-import",

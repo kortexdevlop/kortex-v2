@@ -208,6 +208,8 @@ pub struct HttpRequest<'a> {
 pub struct HttpResponse {
     pub status: u16,
     pub body: Vec<u8>,
+    /// The `Location` header of a redirect (only meaningful for [`http_once`]).
+    pub location: Option<String>,
 }
 #[must_use]
 pub fn is_local_http(url: &str) -> bool {
@@ -279,6 +281,18 @@ pub fn http_stream(
 }
 
 pub fn http(request: HttpRequest<'_>) -> Result<HttpResponse, String> {
+    send(request, None)
+}
+
+/// Like [`http`] but never follows a redirect: the caller checks the `Location` itself.
+///
+/// # Errors
+/// Transport failure, a non-HTTPS remote URL, an unsupported method or a body over the limit.
+pub fn http_once(request: HttpRequest<'_>) -> Result<HttpResponse, String> {
+    send(request, Some(0))
+}
+
+fn send(request: HttpRequest<'_>, redirects: Option<u32>) -> Result<HttpResponse, String> {
     let secure = request.url.starts_with("https://");
     if !secure && !is_local_http(request.url) {
         return Err("unencrypted remote HTTP is forbidden".into());
@@ -287,7 +301,7 @@ pub fn http(request: HttpRequest<'_>) -> Result<HttpResponse, String> {
         .timeout_global(Some(request.timeout))
         .http_status_as_error(false)
         .https_only(secure)
-        .max_redirects(if secure { 10 } else { 0 })
+        .max_redirects(redirects.unwrap_or(if secure { 10 } else { 0 }))
         .build()
         .into();
     let mut response = match request.method {
@@ -302,8 +316,12 @@ pub fn http(request: HttpRequest<'_>) -> Result<HttpResponse, String> {
             }
             builder.call().map_err(|e| e.to_string())?
         }
-        "POST" => {
-            let mut builder = agent.post(request.url);
+        "POST" | "PUT" | "PATCH" => {
+            let mut builder = match request.method {
+                "POST" => agent.post(request.url),
+                "PUT" => agent.put(request.url),
+                _ => agent.patch(request.url),
+            };
             for (name, value) in request.headers {
                 builder = builder.header(*name, *value);
             }
@@ -314,13 +332,22 @@ pub fn http(request: HttpRequest<'_>) -> Result<HttpResponse, String> {
         _ => return Err("unsupported HTTP method".into()),
     };
     let status = response.status().as_u16();
+    let location = response
+        .headers()
+        .get("location")
+        .and_then(|v| v.to_str().ok())
+        .map(str::to_owned);
     let body = response
         .body_mut()
         .with_config()
         .limit(request.max_bytes)
         .read_to_vec()
         .map_err(|e| e.to_string())?;
-    Ok(HttpResponse { status, body })
+    Ok(HttpResponse {
+        status,
+        body,
+        location,
+    })
 }
 
 #[must_use]

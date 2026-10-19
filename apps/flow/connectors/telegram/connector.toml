@@ -1,0 +1,33 @@
+schema = 1
+
+[connector]
+id = "telegram"
+[connector.name]
+fr = "Telegram"
+en = "Telegram"
+[connector.help]
+fr = "Envoie un message par un robot Telegram. Créez le robot avec @BotFather puis enregistrez son jeton comme secret TELEGRAM_TOKEN."
+en = "Sends a message through a Telegram bot. Create the bot with @BotFather, then save its token as the secret TELEGRAM_TOKEN."
+
+[[actions]]
+id = "send_message"
+method = "POST"
+url = "https://api.telegram.org/bot{secret:TELEGRAM_TOKEN}/sendMessage"
+headers = ["content-type: application/json"]
+body = '{"chat_id": {chat_id|json}, "text": {text|json}}'
+[actions.name]
+fr = "Envoyer un message"
+en = "Send a message"
+[[actions.params]]
+id = "chat_id"
+required = true
+[actions.params.label]
+fr = "Identifiant de la conversation"
+en = "Chat id"
+[[actions.params]]
+id = "text"
+required = true
+multiline = true
+[actions.params.label]
+fr = "Message"
+en = "Message"

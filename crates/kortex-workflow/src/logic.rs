@@ -13,13 +13,14 @@ pub const DELAY_TOOL: &str = "flow.delay";
 /// Longest delay a node may ask for.
 pub const MAX_DELAY_MS: i64 = 30_000;
 
-pub const LOGIC_OPS: [&str; 6] = [
+pub const LOGIC_OPS: [&str; 7] = [
     "condition",
     "filter",
     "merge",
     "delay",
     "template",
     "foreach",
+    "http",
 ];
 /// Most lines a "for each line" node accepts, and the most it can be asked to run.
 pub const MAX_ITEMS: i64 = 200;
@@ -97,6 +98,17 @@ pub fn logic_ports(op: &str) -> Option<ToolPorts> {
                 param("max", PortType::Integer, "100", &[]),
             ],
             outputs: vec![input(TEXT_PORT, false)],
+        },
+        "http" => ToolPorts {
+            inputs: vec![input("body", false), input("url", false)],
+            params: vec![
+                param("method", PortType::Enum, "GET", &crate::http::METHODS),
+                param("url", PortType::Text, "", &[]),
+                param("headers", PortType::Text, "", &[]),
+                param("body", PortType::Text, "", &[]),
+                param("fail_on_error", PortType::Bool, "true", &[]),
+            ],
+            outputs: vec![input(TEXT_PORT, false), input("status", false)],
         },
         _ => return None,
     })

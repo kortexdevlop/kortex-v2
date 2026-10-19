@@ -71,6 +71,10 @@ fn fields(node: &Node, pro: bool, l: &kortex_i18n::Catalog, lang: &str) -> Vec<F
         .map(|spec| {
             let label = match &node.kind {
                 NodeKind::Logic { .. } => l.t(&format!("logic.param.{}", spec.id)).to_owned(),
+                NodeKind::Tool { tool, .. } if entry.is_none() => {
+                    crate::connectors::param_label(tool, &spec.id, lang)
+                        .unwrap_or_else(|| spec.id.clone())
+                }
                 _ => entry
                     .and_then(|e| e.params.iter().find(|p| p.id == spec.id))
                     .and_then(|p| p.label.as_ref())
@@ -96,7 +100,17 @@ fn fields(node: &Node, pro: bool, l: &kortex_i18n::Catalog, lang: &str) -> Vec<F
                     .get(&spec.id)
                     .cloned()
                     .unwrap_or_else(|| spec.default.clone()),
-                multiline: matches!(spec.id.as_str(), "template" | "options"),
+                multiline: matches!(
+                    spec.id.as_str(),
+                    "template" | "options" | "headers" | "body"
+                ) || match &node.kind {
+                    NodeKind::Tool { tool, .. } => {
+                        crate::connectors::find(tool).is_some_and(|(_, a)| {
+                            a.params.iter().any(|p| p.id == spec.id && p.multiline)
+                        })
+                    }
+                    _ => false,
+                },
                 id: spec.id,
                 label,
                 ty: spec.ty,
@@ -148,6 +162,11 @@ pub(crate) fn inspector(
     };
     rsx! {
         strong { "{id} · {title}" }
+        if let NodeKind::Tool { tool, .. } = &node.kind {
+            if let Some(help) = crate::connectors::help(tool, lang) {
+                p { class: "flow-hint", "data-connector-help": "{tool}", "{help}" }
+            }
+        }
         match node.kind.clone() {
             NodeKind::Text { value } => {
                 let text_id = id.clone();
@@ -311,6 +330,9 @@ pub(crate) fn inspector(
                                     }
                                     if field.id == "template" {
                                         span { class: "flow-hint", {l.t("logic.help_template")} }
+                                    }
+                                    if field.id == "headers" {
+                                        span { class: "flow-hint", {l.t("logic.help_headers")} }
                                     }
                                     if field.id == "options" {
                                         span { class: "flow-hint", {l.t("logic.help_options")} }

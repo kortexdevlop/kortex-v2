@@ -7,6 +7,8 @@ use kortex_contract::PortType;
 use kortex_runtime::{CancelToken, FileData, Table, ToolError, Value, ValueMap};
 use serde::{Deserialize, Serialize};
 
+pub mod connector;
+pub mod http;
 pub mod logic;
 #[cfg(not(target_arch = "wasm32"))]
 pub mod process;
@@ -320,6 +322,11 @@ fn output_port(
         .ok_or("unknown_port")
 }
 
+/// A URL with every `{secret:NAME}` replaced by a plain word, to check its shape and host.
+fn url_for_check(url: &str) -> String {
+    http::substitute(url, &|_| Some("secret".to_owned())).unwrap_or_else(|_| url.to_owned())
+}
+
 /// Everything wrong with `workflow`, in a stable order; empty when it can run.
 #[must_use]
 pub fn validate(workflow: &Workflow, catalogue: &dyn Catalogue) -> Vec<Issue> {
@@ -351,6 +358,28 @@ pub fn validate(workflow: &Workflow, catalogue: &dyn Catalogue) -> Vec<Issue> {
                             node: Some(node.id.clone()),
                             ..e
                         });
+                    } else if name == "http" && matches!(node.kind, NodeKind::Logic { .. }) {
+                        // Checked with placeholders kept: a secret may stand in the path or a header.
+                        let wired_url = workflow
+                            .edges
+                            .iter()
+                            .any(|e| e.to.node == node.id && e.to.port == "url");
+                        let url = params.get("url").map_or("", String::as_str).trim();
+                        let url_ok = wired_url || http::check_url(&url_for_check(url)).is_ok();
+                        let headers_ok = http::parse_headers(
+                            &http::substitute(
+                                params.get("headers").map_or("", String::as_str),
+                                &|_| Some("secret".to_owned()),
+                            )
+                            .unwrap_or_default(),
+                        )
+                        .is_ok();
+                        if !url_ok {
+                            issues.push(issue(Some(&node.id), "bad_param", "url"));
+                        }
+                        if !headers_ok {
+                            issues.push(issue(Some(&node.id), "bad_param", "headers"));
+                        }
                     } else if name == "foreach" && matches!(node.kind, NodeKind::Logic { .. }) {
                         let chosen = params.get("tool").map_or("", String::as_str);
                         let usable = catalogue
@@ -787,7 +816,10 @@ impl<'a> Execution<'a> {
                 };
                 inputs.insert(edge.to.port.clone(), value);
             }
-            let skip = if is_logic && (name == "merge" || name == "template") {
+            let skip = if is_logic && name == "http" {
+                // A request never goes out with a missing piece: a skipped feeder skips it.
+                !unavailable.is_empty()
+            } else if is_logic && (name == "merge" || name == "template") {
                 inputs.is_empty() && (name == "merge" || !unavailable.is_empty())
             } else {
                 ports
@@ -854,7 +886,7 @@ impl<'a> Execution<'a> {
                 self.finish_batch();
                 continue;
             }
-            if is_logic && name != "delay" {
+            if is_logic && name != "delay" && name != "http" {
                 match logic::eval(&name, &inputs, &params) {
                     Ok(outputs) => {
                         self.report.journal.push(format!("{}: ok", node.id));
@@ -865,10 +897,12 @@ impl<'a> Execution<'a> {
                     Err(e) => return self.failed(Some(&node.id), &e.code, e.detail),
                 }
             }
-            let tool = if is_logic {
-                DELAY_TOOL.to_owned()
-            } else {
+            let tool = if !is_logic {
                 name
+            } else if name == "http" {
+                http::HTTP_TOOL.to_owned()
+            } else {
+                DELAY_TOOL.to_owned()
             };
             let job = Job {
                 node: node.id.clone(),

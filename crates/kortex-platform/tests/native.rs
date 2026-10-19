@@ -111,3 +111,66 @@ fn native_http_preserves_status_headers_and_caps_response_without_remote_redirec
         .is_err()
     );
 }
+
+#[test]
+fn put_and_patch_send_their_body_and_return_status_and_data() {
+    use std::io::{Read, Write};
+    use std::net::TcpListener;
+    use std::time::Duration;
+    let listener = TcpListener::bind("127.0.0.1:0").expect("bind");
+    let address = listener.local_addr().expect("address");
+    let server = std::thread::spawn(move || {
+        let mut seen = Vec::new();
+        for _ in 0..2 {
+            let (mut stream, _) = listener.accept().expect("accept");
+            stream
+                .set_read_timeout(Some(Duration::from_secs(5)))
+                .expect("timeout");
+            let mut raw = Vec::new();
+            let mut byte = [0];
+            while !raw.ends_with(b"\r\n\r\n") {
+                stream.read_exact(&mut byte).expect("headers");
+                raw.push(byte[0]);
+            }
+            let head = String::from_utf8(raw).expect("utf8");
+            let length: usize = head
+                .lines()
+                .find_map(|l| {
+                    l.to_lowercase()
+                        .strip_prefix("content-length: ")
+                        .map(str::to_owned)
+                })
+                .and_then(|v| v.trim().parse().ok())
+                .unwrap_or(0);
+            let mut body = vec![0; length];
+            stream.read_exact(&mut body).expect("body");
+            seen.push((
+                head.lines().next().unwrap_or("").to_owned(),
+                String::from_utf8(body).expect("utf8"),
+            ));
+            stream
+                .write_all(b"HTTP/1.1 200 OK\r\nContent-Length: 2\r\nConnection: close\r\n\r\nok")
+                .expect("response");
+        }
+        seen
+    });
+    let url = format!("http://{address}/item");
+    for (method, body) in [("PUT", "one"), ("PATCH", "two")] {
+        let response = native::http(HttpRequest {
+            method,
+            url: &url,
+            headers: &[("Content-Type", "text/plain")],
+            body: Some(body.as_bytes()),
+            timeout: Duration::from_secs(5),
+            max_bytes: 100,
+        })
+        .expect("request");
+        assert_eq!(
+            (response.status, response.body.as_slice()),
+            (200, &b"ok"[..])
+        );
+    }
+    let seen = server.join().expect("server");
+    assert!(seen[0].0.starts_with("PUT /item") && seen[0].1 == "one");
+    assert!(seen[1].0.starts_with("PATCH /item") && seen[1].1 == "two");
+}

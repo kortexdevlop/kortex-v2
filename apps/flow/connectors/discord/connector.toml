@@ -1,0 +1,27 @@
+schema = 1
+
+[connector]
+id = "discord"
+[connector.name]
+fr = "Discord"
+en = "Discord"
+[connector.help]
+fr = "Poste un message dans un salon par son webhook. Enregistrez l’adresse du webhook comme secret DISCORD_WEBHOOK."
+en = "Posts a message to a channel through its webhook. Save the webhook address as the secret DISCORD_WEBHOOK."
+
+[[actions]]
+id = "send_message"
+method = "POST"
+url = "{secret:DISCORD_WEBHOOK}"
+headers = ["content-type: application/json"]
+body = '{"content": {content|json}}'
+[actions.name]
+fr = "Poster un message"
+en = "Post a message"
+[[actions.params]]
+id = "content"
+required = true
+multiline = true
+[actions.params.label]
+fr = "Message"
+en = "Message"

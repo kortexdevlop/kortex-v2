@@ -238,6 +238,32 @@ pub async fn account_request(
     Ok(reply)
 }
 
+/// Sends one HTTP request through the account API's proxy (`POST {api}/v1/proxy`, session cookie,
+/// signed-in users only). `payload` is the proxy's JSON request; the reply is its JSON envelope.
+/// The cookie never reaches Rust or UI storage.
+///
+/// # Errors
+/// `proxy_invalid_request` (not the proxy route, or a payload over 300 KB) or `proxy_network`.
+pub async fn proxy_request(api: &str, payload: &str) -> crate::Result<AccountResponse> {
+    let url = format!("{api}/v1/proxy");
+    if !cookie_session_supported() {
+        return Err(crate::PlatformError("proxy_native_unavailable".into()));
+    }
+    if !(url.starts_with("https://") || is_dev_origin(&url)) || payload.len() > 300_000 {
+        return Err(crate::PlatformError("proxy_invalid_request".into()));
+    }
+    let args = serde_json::json!([url, "POST", payload, 3_500_000, serde_json::Value::Null]);
+    let reply =
+        eval(&include_str!("account-fetch.js").replace("__KORTEX_ARGS__", &args.to_string()))
+            .join::<AccountResponse>()
+            .await
+            .map_err(|_| crate::PlatformError("proxy_network".into()))?;
+    if reply.status == 0 {
+        return Err(crate::PlatformError("proxy_network".into()));
+    }
+    Ok(reply)
+}
+
 /// One step of a streamed `fetch`.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum FetchEvent {
