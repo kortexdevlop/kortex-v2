@@ -18,6 +18,14 @@ pub async fn sleep(ms: u32) {
     .await;
 }
 
+/// Minutes east of UTC on this device (the page's own clock settings, browser and WebView alike).
+pub async fn utc_offset_minutes() -> i32 {
+    eval("return -new Date().getTimezoneOffset();")
+        .join::<i32>()
+        .await
+        .unwrap_or(0)
+}
+
 /// Standard base64 for previews and binary downloads.
 #[must_use]
 pub fn base64(bytes: &[u8]) -> String {

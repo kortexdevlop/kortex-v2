@@ -198,6 +198,10 @@ pub(crate) struct Ctx {
     pub lib_search: Signal<String>,
     pub confirm_delete: Signal<Option<String>>,
     pub runs: Signal<crate::history::Runs>,
+    pub triggers: Signal<crate::triggers::Triggers>,
+    pub trigger_edit: Signal<Option<String>>,
+    pub auto_busy: Signal<bool>,
+    pub trigger_err: Signal<Option<String>>,
     pub sync_on: Signal<bool>,
     pub sync_state: Signal<crate::sync::State>,
     pub sync_status: Signal<Option<Result<crate::sync::Report, String>>>,
@@ -562,6 +566,8 @@ pub fn App() -> Element {
     let (current_loaded, _) = use_hook(|| shell::load::<Option<String>>("flow", "current-id"));
     let (runs_loaded, _) = use_hook(|| shell::load::<crate::history::Runs>("flow", "runs"));
     let (sync_loaded, _) = use_hook(|| shell::load::<crate::sync::State>("flow", "sync-state"));
+    let (triggers_loaded, _) =
+        use_hook(|| shell::load::<crate::triggers::Triggers>("flow", "triggers"));
     let ctx = Ctx {
         workflow,
         history: use_signal(History::default),
@@ -579,6 +585,10 @@ pub fn App() -> Element {
         lib_search: use_signal(String::new),
         confirm_delete: use_signal(|| None),
         runs: use_signal(move || runs_loaded.clone()),
+        triggers: use_signal(move || triggers_loaded.clone()),
+        trigger_edit: use_signal(|| None),
+        auto_busy: use_signal(|| false),
+        trigger_err: use_signal(|| None),
         sync_on: use_signal(|| crate::secrets::sync_passphrase().is_some()),
         sync_state: use_signal(move || sync_loaded.clone()),
         sync_status: use_signal(|| None),
@@ -635,6 +645,10 @@ pub fn App() -> Element {
     use_effect(move || {
         shell::save("flow", "sync-state", &*ctx.sync_state.read());
     });
+    use_effect(move || {
+        shell::save("flow", "triggers", &*ctx.triggers.read());
+    });
+    crate::scheduler::use_scheduler(ctx);
     // Encrypted sync: a few seconds after the library last changed (and at start-up), if turned on.
     use_effect(move || {
         let _ = ctx.library.read();

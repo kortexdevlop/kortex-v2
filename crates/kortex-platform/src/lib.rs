@@ -10,6 +10,8 @@ pub mod secrets;
 
 #[cfg(not(target_arch = "wasm32"))]
 pub mod native;
+#[cfg(not(target_arch = "wasm32"))]
+pub mod webhook;
 
 #[cfg(target_arch = "wasm32")]
 pub mod offline;

@@ -1,0 +1,10 @@
+# 0031 — Déclencheurs automatiques de Flow
+**Statut** : accepté (2026-10-20), demande de l'utilisateur (« déclencheurs automatiques pour Flow »).
+**Décision** :
+- Un workflow enregistré peut démarrer seul : **toutes les N minutes**, **chaque jour à une heure locale**, **à chaque ouverture de Flow**, ou (application seulement) **par un appel local** `POST http://127.0.0.1:<port>/hook/<jeton>`. Le corps de l'appel arrive dans la carte Entrée nommée `payload`.
+- **Honnêteté sur le fond** : aucun service en arrière-plan. Les déclencheurs ne tournent que tant que Flow est ouvert (onglet ou application) ; un onglet en arrière-plan est ralenti par le navigateur. Le webhook n'existe que dans l'application, qui écoute sur la boucle locale seulement.
+- **Local à l'appareil** : les déclencheurs ne sont ni synchronisés ni exportés (un workflow reçu d'un autre appareil ne se met pas à tourner tout seul). Stockés dans les préférences de Flow.
+- **Garde-fous** : intervalle minimal 5 min sur le web, 1 min sur ordinateur, **15 min** si le workflow contient un nœud Agent IA (crédits partagés, ADR 0029) ; l'IA exige le consentement déjà donné, sinon l'exécution échoue avec `consent_required` ; un seul workflow automatique à la fois ; file de webhooks bornée à 20 ; un déclencheur se coupe après 5 échecs de suite ; un déclencheur disparaît avec son workflow supprimé.
+- **Webhook** : adresse 127.0.0.1 uniquement, jeton aléatoire de 128 bits dans le chemin, requêtes avec `Origin` (toute page web) ou `Host` étranger refusées (DNS rebinding), corps limité à 64 Ko. Implémenté dans `kortex-platform::webhook` (règle : accès plateforme par la couche commune).
+- Les exécutions automatiques passent par le même moteur et les mêmes exécuteurs qu'un clic sur Exécuter (`headless`), et sont inscrites dans l'historique (préfixe ⏱, jamais de données).
+**Alternatives** : planificateur système ou service de fond (écarté : promesse impossible sur le web, surface d'installation lourde) ; webhook public via Cloudflare (écarté : il faudrait stocker des données utilisateur côté serveur).

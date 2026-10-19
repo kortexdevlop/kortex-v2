@@ -22,6 +22,18 @@ pub fn set_consent(agreed: bool) {
     CONSENT.store(agreed, Ordering::SeqCst);
 }
 
+/// Whether the user agreed to send Agent text to the model.
+#[must_use]
+pub fn consented() -> bool {
+    CONSENT.load(Ordering::SeqCst)
+}
+
+/// The interface language last set.
+#[must_use]
+pub fn lang() -> String {
+    LANG.lock().map(|l| l.clone()).unwrap_or_default()
+}
+
 /// Interface language, for the wording of the instructions sent to the model.
 pub fn set_lang(lang: &str) {
     if let Ok(mut current) = LANG.lock() {

@@ -137,6 +137,24 @@ pub(crate) fn library_panel(ctx: Ctx, l: &'static kortex_i18n::Catalog, lang: &s
                                     },
                                     {l.t("lib.duplicate")}
                                 }
+                                button {
+                                    class: "k-btn",
+                                    "data-variant": "ghost",
+                                    r#type: "button",
+                                    "data-action": "triggers",
+                                    "data-active": "{ctx.triggers.read().items.contains_key(&item.id)}",
+                                    onclick: {
+                                        let id = item.id.clone();
+                                        move |_| {
+                                            let mut edit = ctx.trigger_edit;
+                                            let open = edit.peek().as_deref() == Some(id.as_str());
+                                            edit.set(if open { None } else { Some(id.clone()) });
+                                            let mut err = ctx.trigger_err;
+                                            err.set(None);
+                                        }
+                                    },
+                                    {l.t("trigger.button")}
+                                }
                                 if confirm_delete().as_deref() == Some(item.id.as_str()) {
                                     button {
                                         class: "k-btn",
@@ -167,6 +185,9 @@ pub(crate) fn library_panel(ctx: Ctx, l: &'static kortex_i18n::Catalog, lang: &s
                                         {l.t("lib.delete")}
                                     }
                                 }
+                            }
+                            if ctx.trigger_edit.read().as_deref() == Some(item.id.as_str()) {
+                                {trigger_editor(ctx, l, &item.id, crate::scheduler::has_ai(&item.workflow))}
                             }
                         }
                     }
@@ -410,5 +431,206 @@ fn sync_error(l: &kortex_i18n::Catalog, code: &str) -> String {
         format!("{} ({code})", l.t("sync.err_other"))
     } else {
         text.to_owned()
+    }
+}
+
+fn token() -> String {
+    let mut bytes = [0_u8; 16];
+    let _ = kortex_platform::fill_random(&mut bytes);
+    bytes.iter().map(|b| format!("{b:02x}")).collect()
+}
+
+fn trigger_error(l: &kortex_i18n::Catalog, code: &str) -> String {
+    let key = format!("trigger.err_{code}");
+    let text = l.t(&key);
+    if text == key {
+        code.to_owned()
+    } else {
+        text.to_owned()
+    }
+}
+
+/// Starts a workflow by itself: every N minutes, daily, when Flow opens, or from a local webhook.
+fn trigger_editor(ctx: Ctx, l: &'static kortex_i18n::Catalog, id: &str, has_ai: bool) -> Element {
+    use crate::triggers::{Config, Kind, check, min_every};
+    let desktop = !cfg!(target_arch = "wasm32");
+    let (mut triggers, mut err) = (ctx.triggers, ctx.trigger_err);
+    let config = triggers.read().items.get(id).cloned();
+    let kind = config.as_ref().map(|c| c.kind.clone());
+    let current = match &kind {
+        None => "none",
+        Some(Kind::Every { .. }) => "every",
+        Some(Kind::Daily { .. }) => "daily",
+        Some(Kind::Open) => "open",
+        Some(Kind::Webhook { .. }) => "webhook",
+    };
+    let apply = {
+        let id = id.to_owned();
+        move |next: Kind| match check(&next, has_ai, desktop) {
+            Err(code) => err.set(Some(code.to_owned())),
+            Ok(()) => {
+                err.set(None);
+                let mut all = triggers.write();
+                match all.items.get_mut(&id) {
+                    Some(c) => {
+                        c.kind = next;
+                        c.failures = 0;
+                    }
+                    None => {
+                        all.items
+                            .insert(id.clone(), Config::new(next, kortex_platform::now_ms()));
+                    }
+                }
+            }
+        }
+    };
+    let pick = {
+        let id = id.to_owned();
+        let mut apply = apply.clone();
+        move |e: FormEvent| match e.value().as_str() {
+            "none" => {
+                triggers.write().items.remove(&id);
+                err.set(None);
+            }
+            "every" => apply(Kind::Every {
+                minutes: min_every(has_ai, desktop).max(15),
+            }),
+            "daily" => apply(Kind::Daily { hour: 9, minute: 0 }),
+            "open" => apply(Kind::Open),
+            "webhook" => apply(Kind::Webhook {
+                port: 47_821,
+                token: token(),
+            }),
+            _ => {}
+        }
+    };
+    let status = config.as_ref().and_then(|c| c.last.clone());
+    let failures = config.as_ref().map_or(0, |c| c.failures);
+    let enabled = config.as_ref().is_some_and(|c| c.enabled);
+    let listening = crate::scheduler::listening(id);
+    rsx! {
+        div { class: "flow-triggers", "data-panel": "triggers",
+            p { class: "flow-hint", {l.t("trigger.help")} }
+            label { class: "k-field",
+                span { class: "k-muted", {l.t("trigger.kind")} }
+                select { class: "k-input", "data-field": "trigger-kind", value: "{current}", onchange: pick,
+                    option { value: "none", selected: current == "none", {l.t("trigger.none")} }
+                    option { value: "every", selected: current == "every", {l.t("trigger.every")} }
+                    option { value: "daily", selected: current == "daily", {l.t("trigger.daily")} }
+                    option { value: "open", selected: current == "open", {l.t("trigger.open")} }
+                    if desktop {
+                        option { value: "webhook", selected: current == "webhook", {l.t("trigger.webhook")} }
+                    }
+                }
+            }
+            match kind.clone() {
+                Some(Kind::Every { minutes }) => rsx! {
+                    label { class: "k-field",
+                        span { class: "k-muted", {l.t("trigger.minutes")} }
+                        input {
+                            class: "k-input",
+                            r#type: "number",
+                            min: "{min_every(has_ai, desktop)}",
+                            "data-field": "trigger-minutes",
+                            value: "{minutes}",
+                            onchange: {
+                                let mut apply = apply.clone();
+                                move |e| {
+                                    if let Ok(m) = e.value().trim().parse::<u32>() {
+                                        apply(Kind::Every { minutes: m });
+                                    }
+                                }
+                            },
+                        }
+                    }
+                    if has_ai {
+                        p { class: "flow-hint", {l.t("trigger.ai_min")} }
+                    }
+                },
+                Some(Kind::Daily { hour, minute }) => rsx! {
+                    label { class: "k-field",
+                        span { class: "k-muted", {l.t("trigger.time")} }
+                        input {
+                            class: "k-input",
+                            r#type: "time",
+                            "data-field": "trigger-time",
+                            value: "{hour:02}:{minute:02}",
+                            onchange: {
+                                let mut apply = apply.clone();
+                                move |e| {
+                                    let value = e.value();
+                                    if let Some((h, m)) = value.split_once(':')
+                                        && let (Ok(hour), Ok(minute)) = (h.parse::<u8>(), m.parse::<u8>())
+                                    {
+                                        apply(Kind::Daily { hour, minute });
+                                    }
+                                }
+                            },
+                        }
+                    }
+                },
+                Some(Kind::Webhook { port, token }) => rsx! {
+                    label { class: "k-field",
+                        span { class: "k-muted", {l.t("trigger.port")} }
+                        input {
+                            class: "k-input",
+                            r#type: "number",
+                            min: "1024",
+                            max: "65535",
+                            "data-field": "trigger-port",
+                            value: "{port}",
+                            onchange: {
+                                let (mut apply, token) = (apply.clone(), token.clone());
+                                move |e| {
+                                    if let Ok(p) = e.value().trim().parse::<u16>() {
+                                        apply(Kind::Webhook { port: p.max(1024), token: token.clone() });
+                                    }
+                                }
+                            },
+                        }
+                    }
+                    p { class: "flow-hint", {l.t("trigger.webhook_help")} }
+                    if let Some(url) = config.as_ref().and_then(Config::webhook_url) {
+                        code { "data-trigger-url": "", "{url}" }
+                    }
+                    p { class: "flow-hint", "data-trigger-listening": "{listening}",
+                        {if listening { l.t("trigger.listening") } else { l.t("trigger.not_listening") }}
+                    }
+                },
+                _ => rsx! {},
+            }
+            if config.is_some() {
+                label { class: "flow-check",
+                    input {
+                        r#type: "checkbox",
+                        "data-field": "trigger-enabled",
+                        checked: enabled,
+                        onchange: {
+                            let id = id.to_owned();
+                            move |e| {
+                                if let Some(c) = triggers.write().items.get_mut(&id) {
+                                    c.enabled = e.checked();
+                                    c.failures = 0;
+                                }
+                            }
+                        },
+                    }
+                    " "
+                    {l.t("trigger.enabled")}
+                }
+                p { class: "flow-hint", {l.t("trigger.open_only")} }
+            }
+            if let Some(last) = status {
+                p { class: "flow-hint", "data-trigger-last": "{last.ok}", role: "status",
+                    {format!("{} {} — {}", l.t("trigger.last"), crate::history::utc_label(last.at), if last.ok { l.t("trigger.ok").to_owned() } else { last.error.unwrap_or_default() })}
+                }
+            }
+            if config.is_some() && !enabled && failures >= crate::triggers::MAX_FAILURES {
+                p { class: "flow-hint", role: "alert", "data-trigger-off": "", {l.t("trigger.auto_off")} }
+            }
+            if let Some(code) = err() {
+                p { class: "flow-hint", role: "alert", "data-trigger-error": "{code}", {trigger_error(l, &code)} }
+            }
+        }
     }
 }
