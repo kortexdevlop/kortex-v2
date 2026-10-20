@@ -69,7 +69,6 @@ pub(crate) fn fingerprint(id: &str) -> Result<String, String> {
     let base = crate::build::source_fingerprint(&root, &root.join("apps").join(name))?;
     let mut paths = vec![
         "brand",
-        "registry/contracts.json",
         "web/shell",
         "design/tokens",
         "xtask/src/pwa.rs",

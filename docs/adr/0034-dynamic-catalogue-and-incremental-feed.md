@@ -73,3 +73,10 @@ Ordre, réévalué à chaque démarrage, jamais un document non vérifié :
 - Le web d'un outil nouveau est visible dès la publication du catalogue ; son installation desktop dès l'index. Les deux partagent la séquence, mais un outil peut être publié en web avant que toutes ses cibles desktop soient présentes : le Store ne propose que les cibles réellement listées.
 - Le renommage `registry/index.json` → `registry/contracts.json` touche xtask, le site (`sync.mjs`), `prepare-publish.mjs`, `kortex-shell` et les contrôles.
 - Les preuves restent distinctes (RULES §7.1) : tests, compilation web, compilation native, recette et publication ; « disponible partout » n'est déclaré qu'avec la recette de `image.compress` web et desktop (PLAN 19.13). Ce 39e outil, autorisé explicitement, est publié en production comme tout lot terminé.
+
+## Mise en œuvre (2026-10-21) — écarts constatés par rapport au texte ci-dessus
+- `ProcessRunner` reste dans `kortex-workflow` (déjà partagé par Flow et Mind) ; la CLI en dépend au lieu de le déplacer dans `kortex-runtime`. La CLI interroge chaque binaire installé par la méthode `contract` du protocole `--engine` (déjà prévue) : `list`, `info`, `search` et `run` n'exigent ni catalogue ni liaison statique.
+- `xtask catalog` n'existe pas : `release-index` produit `index.json` et `catalog.json` ensemble (même `sequence`, même `channel`) et vérifie les deux avec la clé publique des clients avant de les écrire.
+- Un seul workflow `feed.yml` (plan, web, native, publish) remplace les jobs séparés envisagés ; `xtask feed-plan` décide, `xtask package-web` et `xtask restore-web` portent les archives web (`target = "web"` dans l'index).
+- Les registres ne déclenchent plus la reconstruction des apps (`registry/` retiré de `xtask changed` et de l'empreinte des apps) ; `bundles_engines = false` pour Flow et Mind.
+- Hors périmètre de ce lot, restés ouverts : raccourci Windows `.lnk` (10.7), cache hors ligne du service worker de l'hôte de moteurs.

@@ -413,26 +413,23 @@ fn errors_are_clear_for_unknown_and_malicious_ids() {
 }
 
 #[test]
-fn engine_commands_still_work_without_any_package_environment() {
-    let mut out = Vec::new();
-    kortex_cli::execute_with(
+fn commands_without_a_package_environment_explain_what_is_missing() {
+    // The CLI links no tool: running one needs an installation (ADR 0034).
+    let err = kortex_cli::execute_with(
         &[
             "run".to_owned(),
             ID.to_owned(),
             "--input".to_owned(),
             "text=abc".to_owned(),
-            "--param".to_owned(),
-            "algorithm=md5".to_owned(),
         ],
-        &mut out,
+        &mut Vec::new(),
         None,
     )
-    .expect("run");
-    assert!(
-        String::from_utf8(out)
-            .expect("utf8")
-            .contains("900150983cd24fb0d6963f7d28e17f72")
-    );
+    .expect_err("not installed");
+    assert!(err.contains("kortex install"), "{err}");
+    let mut out = Vec::new();
+    kortex_cli::execute_with(&["version".to_owned()], &mut out, None).expect("version");
+    assert!(String::from_utf8(out).expect("utf8").starts_with("kortex "));
     assert!(
         kortex_cli::execute_with(
             &["install".to_owned(), ID.to_owned()],

@@ -75,6 +75,24 @@ jobs:
       - run: pnpm --filter @kortex/shared test
       - run: pnpm --filter @kortex/api typecheck
       - run: pnpm --filter @kortex/api test
+  # ADR 0034: a tool, app or CLI whose code (or a shared crate it uses) changed since the published
+  # release must carry a higher version, otherwise `kortex update` and the Store would never offer it.
+  versions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: rustup show
+      - uses: Swatinem/rust-cache@v2
+      - name: Changed ids have a new version
+        run: |
+          set -euo pipefail
+          mkdir -p .kortex/previous
+          curl -fsSL https://kortex.site/registry/index.json -o .kortex/previous/index.json
+          curl -fsSL https://kortex.site/registry/index.json.sig -o .kortex/previous/index.json.sig
+          cargo xtask feed-plan --previous-dir .kortex/previous
   # Pull requests only: compile just the web bundles the change can affect (MASTER_PROMPT §11).
   # Selection comes from `cargo xtask changed` (crate dependency closure; toolchain, lockfile,
   # design tokens and bundle generators select everything). Linux only; releases stay on tags.

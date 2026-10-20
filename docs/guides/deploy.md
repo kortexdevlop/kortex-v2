@@ -1,6 +1,8 @@
 # Static publication
 
-The current public scope is the Astro site and the 38 existing web tools. The account API is deployed with D1. Desktop downloads have been public since 2026-10-19 (`desktop_releases = true`): build the site with `KORTEX_RELEASE_DIR` pointing at the files of the current public GitHub Release, never at a local test index (`web/site/scripts/sync.mjs` refuses it). No new tool may be added (user decision, 2026-10-16).
+> **Voie nominale (ADR 0034)** : `feed.yml` publie les hôtes statiques depuis l'index signé fusionné (`xtask restore-web`), avec les secrets GitHub `CLOUDFLARE_API_TOKEN` et `CLOUDFLARE_ACCOUNT_ID`, sans recompiler. Le reste de ce guide décrit le secours local reproductible et la voie `deploy.yml` (manuelle, depuis un run `release.yml`).
+
+The current public scope is the Astro site, the web tools of the signed catalogue and the Rust apps. The account API is deployed with D1. Desktop downloads have been public since 2026-10-19 (`desktop_releases = true`): build the site with `KORTEX_RELEASE_DIR` pointing at the files of the current public GitHub Release, never at a local test index (`web/site/scripts/sync.mjs` refuses it). The tool catalogue is frozen except for explicit user authorisations (RULES §2.1).
 
 1. Build only changed tool bundles with `cargo xtask build <id…>` when engine/UI sources changed.
 2. Provide Cloudflare credentials through Wrangler's normal authentication or `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`. Never save credentials in source files.

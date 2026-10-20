@@ -183,7 +183,7 @@ pub fn App() -> Element {
         style { {include_str!("market.css")} }
         Frame { title:"Kortex Store", subtitle:if fr{"Vos outils. Votre appareil. Vos données."}else{"Your tools. Your device. Your data."},
             section { class:"store-hero k-card",
-                p { class:"app-badge store-count", if fr{"38 outils gratuits et locaux"}else{"38 free, local tools"} }
+                p { class:"app-badge store-count", if fr{"{catalogue.len()} outils gratuits et locaux"}else{"{catalogue.len()} free, local tools"} }
                 h2 { if fr{"Tout ce qu’il vous faut, à portée de main."}else{"Everything you need, within reach."} }
                 p {class:"k-muted",if fr{"Explorez les outils, vérifiez leurs permissions et ouvrez-les sans envoyer vos fichiers."}else{"Explore tools, review their permissions and open them without uploading your files."}}
                 a {class:"k-btn k-btn-ghost",href:format!("{}{}",url("root",&lang),if fr{"compte"}else{"account"}),if fr{"Gérer mon compte et mes appareils"}else{"Manage my account and devices"}}
@@ -237,7 +237,7 @@ pub fn App() -> Element {
             }
             section { class:"store-catalogue", "aria-label":"Catalogue",
                 div {class:"store-filters",
-                    input {class:"k-input",r#type:"search",value:query(),placeholder:if fr{"Rechercher parmi les 38 outils"}else{"Search all 38 tools"},"aria-label":if fr{"Rechercher un outil"}else{"Search tools"},oninput:move |e|query.set(e.value())}
+                    input {class:"k-input",r#type:"search",value:query(),placeholder:if fr{"Rechercher parmi les {catalogue.len()} outils"}else{"Search all {catalogue.len()} tools"},"aria-label":if fr{"Rechercher un outil"}else{"Search tools"},oninput:move |e|query.set(e.value())}
                     select {class:"k-input",value:universe(),"aria-label":if fr{"Univers"}else{"Universe"},onchange:move |e|universe.set(e.value()),
                         option {value:"",if fr{"Tous les univers"}else{"All universes"}}
                         for u in universes {option {value:u.clone(),"{u}"}}

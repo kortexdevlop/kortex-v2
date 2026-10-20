@@ -1,10 +1,19 @@
 use std::fs;
 use std::path::PathBuf;
 
-fn run(args: &[&str]) -> Result<String, String> {
-    let args: Vec<String> = args.iter().map(|s| (*s).to_owned()).collect();
-    let mut out = Vec::new();
-    kortex_cli::execute(&args, &mut out).map(|()| String::from_utf8(out).expect("utf8"))
+use kortex_cli::pkgcmd::PkgEnv;
+use kortex_pkg::{Home, InstalledTool, Registry};
+
+/// Desktop binaries built by `cargo xtask build-desktop <id>` (skipped when absent): the CLI links
+/// no tool, so these tests install the real binaries into a temporary home.
+fn built(id: &str) -> Option<PathBuf> {
+    let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../dist/desktop");
+    let target = kortex_pkg::current_target()?;
+    let path = root
+        .join(target)
+        .join(id)
+        .join(kortex_pkg::binary_name(id, target));
+    path.is_file().then_some(path)
 }
 
 fn tmp(name: &str) -> PathBuf {
@@ -14,55 +23,123 @@ fn tmp(name: &str) -> PathBuf {
     d
 }
 
-#[test]
-fn every_registered_tool_is_linked_into_the_cli() {
-    // registry/contracts.json is the source of truth; the CLI list is generated from the same tools.
-    let registry = fs::read_to_string(concat!(
-        env!("CARGO_MANIFEST_DIR"),
-        "/../../registry/contracts.json"
-    ))
-    .expect("registry");
-    let ids: Vec<&str> = registry
-        .lines()
-        .filter_map(|l| l.trim().strip_prefix("\"id\": \""))
-        .filter_map(|l| l.split('"').next())
-        .filter(|id| id.contains('.')) // tool ids only (`universe.name`)
-        .collect();
-    assert!(!ids.is_empty());
-    let listed = run(&["list", "--lang", "en"]).expect("list");
+/// A home with the given tools installed from the local builds; `None` if one is not built.
+fn installed(name: &str, ids: &[&str]) -> Option<PkgEnv> {
+    let dir = tmp(name);
+    let target = kortex_pkg::current_target()?;
+    let home = Home::at(dir.join(".kortex"), &dir);
+    let mut registry = Registry {
+        schema: 1,
+        tools: Default::default(),
+    };
     for id in ids {
-        assert!(
-            listed.lines().any(|l| l.starts_with(&format!("{id}\t"))),
-            "{id} missing from `kortex list`"
+        let binary = built(id)?;
+        let rel = format!("tools/{id}/1.0.0/{}", kortex_pkg::binary_name(id, target));
+        let to = home.root().join(&rel);
+        fs::create_dir_all(to.parent().expect("parent")).expect("dirs");
+        fs::copy(binary, &to).expect("copy binary");
+        registry.tools.insert(
+            (*id).to_owned(),
+            InstalledTool {
+                version: "1.0.0".into(),
+                installed_at: 0,
+                binary: rel,
+            },
         );
     }
+    home.save_registry(&registry).expect("registry");
+    Some(PkgEnv {
+        channel: "stable".into(),
+        home,
+        index_src: dir
+            .join("no-index/index.json")
+            .to_string_lossy()
+            .into_owned(),
+        public_key: String::new(),
+        target: Some(target.to_owned()),
+        api: String::new(),
+    })
+}
+
+fn run_in(env: &PkgEnv, args: &[&str]) -> Result<String, String> {
+    let args: Vec<String> = args.iter().map(|s| (*s).to_owned()).collect();
+    let mut out = Vec::new();
+    kortex_cli::execute_with(&args, &mut out, Some(env))
+        .map(|()| String::from_utf8(out).expect("utf8"))
+}
+
+#[test]
+fn the_cli_links_no_tool_crate() {
+    let manifest =
+        fs::read_to_string(concat!(env!("CARGO_MANIFEST_DIR"), "/Cargo.toml")).expect("manifest");
+    assert!(
+        !manifest
+            .lines()
+            .any(|l| l.trim_start().starts_with("tool-")),
+        "a tool crate is linked into the CLI: it would be rebuilt for every tool change"
+    );
+}
+
+#[test]
+fn a_tool_that_is_not_installed_says_how_to_install_it() {
+    let dir = tmp("none");
+    let env = PkgEnv {
+        channel: "stable".into(),
+        home: Home::at(dir.join(".kortex"), &dir),
+        index_src: dir
+            .join("no-index/index.json")
+            .to_string_lossy()
+            .into_owned(),
+        public_key: String::new(),
+        target: kortex_pkg::current_target().map(str::to_owned),
+        api: String::new(),
+    };
+    let err = run_in(
+        &env,
+        &["run", "secure.hash-calculator", "--input", "text=a"],
+    )
+    .expect_err("not installed");
+    assert!(
+        err.contains("kortex install secure.hash-calculator"),
+        "{err}"
+    );
+    assert!(run_in(&env, &["list"]).expect("empty list").is_empty());
 }
 
 #[test]
 fn run_text_tool_and_typed_params() {
-    let out = run(&[
-        "run",
-        "secure.hash-calculator",
-        "--input",
-        "text=abc",
-        "--param",
-        "algorithm=md5",
-    ])
+    let Some(env) = installed("text", &["secure.hash-calculator"]) else {
+        return;
+    };
+    let out = run_in(
+        &env,
+        &[
+            "run",
+            "secure.hash-calculator",
+            "--input",
+            "text=abc",
+            "--param",
+            "algorithm=md5",
+        ],
+    )
     .expect("run");
     assert!(
         out.contains("hash: 900150983cd24fb0d6963f7d28e17f72"),
         "{out}"
     );
-    let upper = run(&[
-        "run",
-        "secure.hash-calculator",
-        "--input",
-        "text=abc",
-        "--param",
-        "algorithm=md5",
-        "--param",
-        "uppercase=true",
-    ])
+    let upper = run_in(
+        &env,
+        &[
+            "run",
+            "secure.hash-calculator",
+            "--input",
+            "text=abc",
+            "--param",
+            "algorithm=md5",
+            "--param",
+            "uppercase=true",
+        ],
+    )
     .expect("run");
     assert!(
         upper.contains("900150983CD24FB0D6963F7D28E17F72"),
@@ -72,27 +149,36 @@ fn run_text_tool_and_typed_params() {
 
 #[test]
 fn file_inputs_via_at_path_and_text_from_file() {
-    let d = tmp("files");
+    let Some(env) = installed("files", &["secure.hash-calculator"]) else {
+        return;
+    };
+    let d = tmp("files-data");
     fs::write(d.join("a.txt"), "abc").expect("write");
-    let by_file = run(&[
-        "run",
-        "secure.hash-calculator",
-        "--input",
-        &format!("file=@{}", d.join("a.txt").display()),
-        "--param",
-        "algorithm=sha1",
-    ])
+    let by_file = run_in(
+        &env,
+        &[
+            "run",
+            "secure.hash-calculator",
+            "--input",
+            &format!("file=@{}", d.join("a.txt").display()),
+            "--param",
+            "algorithm=sha1",
+        ],
+    )
     .expect("run");
     assert!(
         by_file.contains("a9993e364706816aba3e25717850c26c9cd0d89d"),
         "{by_file}"
     );
-    let by_text_file = run(&[
-        "run",
-        "secure.hash-calculator",
-        "--input",
-        &format!("text=@{}", d.join("a.txt").display()),
-    ])
+    let by_text_file = run_in(
+        &env,
+        &[
+            "run",
+            "secure.hash-calculator",
+            "--input",
+            &format!("text=@{}", d.join("a.txt").display()),
+        ],
+    )
     .expect("run");
     assert!(
         by_text_file.contains("ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"),
@@ -101,43 +187,22 @@ fn file_inputs_via_at_path_and_text_from_file() {
 }
 
 #[test]
-fn file_outputs_are_written_and_never_overwritten() {
-    let d = tmp("out");
-    let args = [
-        "run",
-        "qr.generator",
-        "--input",
-        "content=hello",
-        "--param",
-        "format=svg",
-        "--out",
-        d.to_str().expect("path"),
-    ];
-    let first = run(&args).expect("run");
-    let second = run(&args).expect("run");
-    assert!(
-        first.contains("qrcode.svg") && second.contains("qrcode (2).svg"),
-        "{first} / {second}"
-    );
-    assert!(
-        fs::read_to_string(d.join("qrcode.svg"))
-            .expect("svg")
-            .starts_with("<svg")
-    );
-    assert!(d.join("qrcode (2).svg").exists());
-}
-
-#[test]
 fn json_output_is_machine_readable() {
-    let out = run(&[
-        "run",
-        "secure.hash-calculator",
-        "--input",
-        "text=a\"b",
-        "--param",
-        "algorithm=md5",
-        "--json",
-    ])
+    let Some(env) = installed("json", &["secure.hash-calculator"]) else {
+        return;
+    };
+    let out = run_in(
+        &env,
+        &[
+            "run",
+            "secure.hash-calculator",
+            "--input",
+            "text=a\"b",
+            "--param",
+            "algorithm=md5",
+            "--json",
+        ],
+    )
     .expect("run");
     let line = out.trim();
     assert!(
@@ -148,100 +213,71 @@ fn json_output_is_machine_readable() {
 }
 
 #[test]
-fn multi_file_input_and_pdf_merge_from_the_command_line() {
-    let d = tmp("pdf");
-    // Tiny valid PDFs (hand-written, same as the browser test).
-    let pdf = |label: &str| {
-        let content = format!("BT /F1 24 Tf 50 700 Td ({label}) Tj ET");
-        let objs = [
-            "<< /Type /Catalog /Pages 2 0 R >>".to_owned(),
-            "<< /Type /Pages /Kids [3 0 R] /Count 1 >>".to_owned(),
-            "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>".to_owned(),
-            format!("<< /Length {} >>\nstream\n{content}\nendstream", content.len()),
-            "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>".to_owned(),
-        ];
-        let mut out = String::from("%PDF-1.4\n");
-        let mut offs = Vec::new();
-        for (i, o) in objs.iter().enumerate() {
-            offs.push(out.len());
-            out.push_str(&format!("{} 0 obj\n{o}\nendobj\n", i + 1));
-        }
-        let x = out.len();
-        out.push_str(&format!(
-            "xref\n0 {}\n0000000000 65535 f \n",
-            objs.len() + 1
-        ));
-        for o in offs {
-            out.push_str(&format!("{o:010} 00000 n \n"));
-        }
-        out.push_str(&format!(
-            "trailer\n<< /Size {} /Root 1 0 R >>\nstartxref\n{x}\n%%EOF\n",
-            objs.len() + 1
-        ));
-        out
+fn list_search_info_and_errors_come_from_the_installed_tools() {
+    let Some(env) = installed("info", &["secure.hash-calculator", "text.cleaner"]) else {
+        return;
     };
-    fs::write(d.join("a.pdf"), pdf("FIRST")).expect("write");
-    fs::write(d.join("b.pdf"), pdf("SECOND")).expect("write");
-    let out = run(&[
-        "run",
-        "pdf.merge",
-        "--input",
-        &format!("files=@{}", d.join("b.pdf").display()),
-        "--input",
-        &format!("files=@{}", d.join("a.pdf").display()),
-        "--out",
-        d.join("o").to_str().expect("path"),
-    ])
-    .expect("merge");
-    assert!(out.contains("merged.pdf"), "{out}");
-    let merged = fs::read(d.join("o/merged.pdf")).expect("merged file");
-    assert!(merged.starts_with(b"%PDF-"));
-    let text = String::from_utf8_lossy(&merged);
+    let listed = run_in(&env, &["list", "--lang", "en"]).expect("list");
     assert!(
-        text.find("SECOND").expect("second") < text.find("FIRST").expect("first"),
-        "order must follow the arguments"
+        listed
+            .lines()
+            .any(|l| l.starts_with("secure.hash-calculator\t")),
+        "{listed}"
     );
-}
-
-#[test]
-fn search_info_and_errors() {
     assert!(
-        run(&["search", "mot", "de", "passe", "--lang", "fr"])
+        listed.lines().any(|l| l.starts_with("text.cleaner\t")),
+        "{listed}"
+    );
+    assert_eq!(listed.lines().count(), 2, "only installed tools: {listed}");
+    assert!(
+        run_in(&env, &["search", "hash"])
             .expect("search")
-            .contains("secure.password-generator")
-    );
-    assert!(run(&["search", "zzzzqq"]).expect("search").is_empty());
-    let info = run(&["info", "pdf.merge"]).expect("info");
-    assert!(info.contains("files<application/pdf>") && info.contains("(requis)"));
-    assert!(run(&["run", "nope.nope"]).is_err_and(|e| e.contains("outil inconnu")));
-    assert!(
-        run(&["run", "secure.hash-calculator", "--param", "bogus=1"])
-            .is_err_and(|e| e.contains("paramètre inconnu"))
+            .contains("secure.hash-calculator")
     );
     assert!(
-        run(&[
-            "run",
-            "secure.hash-calculator",
-            "--input",
-            "text=a",
-            "--param",
-            "uppercase=maybe"
-        ])
+        run_in(&env, &["search", "zzzzqq"])
+            .expect("search")
+            .is_empty()
+    );
+    let info = run_in(&env, &["info", "secure.hash-calculator"]).expect("info");
+    assert!(
+        info.contains("param") && info.contains("algorithm"),
+        "{info}"
+    );
+    assert!(run_in(&env, &["info", "nope.nope"]).is_err_and(|e| e.contains("outil inconnu")));
+    assert!(
+        run_in(
+            &env,
+            &["run", "secure.hash-calculator", "--param", "bogus=1"]
+        )
+        .is_err_and(|e| e.contains("paramètre inconnu"))
+    );
+    assert!(
+        run_in(
+            &env,
+            &[
+                "run",
+                "secure.hash-calculator",
+                "--input",
+                "text=a",
+                "--param",
+                "uppercase=maybe"
+            ]
+        )
         .is_err_and(|e| e.contains("booléen"))
     );
     assert!(
-        run(&["run", "calc.gross-net-salary", "--param", "amount=abc"])
-            .is_err_and(|e| e.contains("nombre"))
-    );
-    assert!(
-        run(&[
-            "run",
-            "pdf.merge",
-            "--input",
-            "files=@/definitely/missing.pdf"
-        ])
+        run_in(
+            &env,
+            &[
+                "run",
+                "secure.hash-calculator",
+                "--input",
+                "file=@/definitely/missing.bin"
+            ]
+        )
         .is_err_and(|e| e.contains("impossible"))
     );
-    assert!(run(&["frobnicate"]).is_err());
-    assert!(run(&[]).expect("usage").contains("Usage"));
+    assert!(run_in(&env, &["frobnicate"]).is_err());
+    assert!(run_in(&env, &[]).expect("usage").contains("Usage"));
 }

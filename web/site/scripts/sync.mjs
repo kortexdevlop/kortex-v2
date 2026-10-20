@@ -35,6 +35,8 @@ if (desktopReleases) {
   for (const f of ['install.sh', 'install.ps1']) cpSync(join(root, 'installers', f), join(out, 'public', f));
   mkdirSync(join(out, 'public/registry'), { recursive: true });
   for (const f of ['index.json', 'index.json.sig', 'cli-latest.txt']) cpSync(join(rel, f), join(out, 'public/registry', f));
+  // Signed contract catalogue (ADR 0034): apps fetch it at runtime, so a new tool needs no app rebuild.
+  for (const f of ['catalog.json', 'catalog.json.sig']) if (existsSync(join(rel, f))) cpSync(join(rel, f), join(out, 'public/registry', f));
 }
 
 const registry = JSON.parse(readFileSync(join(root, 'registry/contracts.json'), 'utf8'));

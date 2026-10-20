@@ -10,13 +10,19 @@ pub const TIMEOUT_MS: u32 = 120_000;
 
 #[cfg(target_arch = "wasm32")]
 pub async fn run(call: &PlannedCall) -> Result<ValueMap, RunError> {
-    let url = format!("/engines/{}/worker.js", call.tool);
-    kortex_platform::worker::run(&url, call.inputs.clone(), call.params.clone(), TIMEOUT_MS)
-        .await
-        .map_err(|e| RunError {
-            code: e.code,
-            detail: e.detail,
-        })
+    let origin = format!("https://{}", kortex_shell::domain("run"));
+    kortex_platform::worker::run_hosted(
+        &origin,
+        &call.tool,
+        call.inputs.clone(),
+        call.params.clone(),
+        TIMEOUT_MS,
+    )
+    .await
+    .map_err(|e| RunError {
+        code: e.code,
+        detail: e.detail,
+    })
 }
 
 /// Stops the tool currently running (the browser terminates its Worker immediately).

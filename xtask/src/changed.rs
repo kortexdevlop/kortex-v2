@@ -150,6 +150,28 @@ pub fn bundle_crates<'a>(krates: &'a [Krate], dir: &str) -> Vec<&'a Krate> {
         .collect()
 }
 
+/// Whether a change to `files` can alter the crate `name` (it or a dependency changed, or a global
+/// path such as the toolchain or the lockfile).
+#[must_use]
+pub fn touches(files: &[String], krates: &[Krate], name: &str) -> bool {
+    if files.iter().any(|file| {
+        GLOBAL_PATHS
+            .iter()
+            .any(|p| file == p || (p.ends_with('/') && file.starts_with(p)))
+    }) {
+        return true;
+    }
+    let graph: BTreeMap<&str, &Krate> = krates.iter().map(|k| (k.name.as_str(), k)).collect();
+    let deps = closure(name, &graph);
+    files.iter().any(|file| {
+        krates
+            .iter()
+            .filter(|k| !k.dir.is_empty() && file.starts_with(&format!("{}/", k.dir)))
+            .max_by_key(|k| k.dir.len())
+            .is_some_and(|owner| deps.contains(&owner.name))
+    })
+}
+
 #[must_use]
 pub fn affected(files: &[String], krates: &[Krate]) -> Affected {
     let mut result = Affected::default();
@@ -162,8 +184,9 @@ pub fn affected(files: &[String], krates: &[Krate]) -> Affected {
         {
             result.all = true;
         }
-        if file.starts_with("registry/")
-            || file.starts_with("web/shell/")
+        // `registry/` is deliberately absent: apps read the signed catalogue at runtime, so a new
+        // or changed tool never rebuilds them (ADR 0034).
+        if file.starts_with("web/shell/")
             || file == "xtask/src/pwa.rs"
             || file == "xtask/src/icons.rs"
         {
@@ -211,9 +234,13 @@ pub fn affected(files: &[String], krates: &[Krate]) -> Affected {
     result
 }
 
-fn git_files(base: &str) -> Result<Vec<String>, String> {
+pub(crate) fn git_files(base: &str) -> Result<Vec<String>, String> {
+    git_files_between(base, "HEAD")
+}
+
+pub(crate) fn git_files_between(base: &str, head: &str) -> Result<Vec<String>, String> {
     let out = Command::new("git")
-        .args(["diff", "--name-only", &format!("{base}...HEAD")])
+        .args(["diff", "--name-only", &format!("{base}...{head}")])
         .output()
         .map_err(|e| e.to_string())?;
     if !out.status.success() {
@@ -293,11 +320,7 @@ mod tests {
             krate("kortex-platform", "crates/kortex-platform", &[]),
             krate("kortex-contract", "crates/kortex-contract", &[]),
             krate("kortex-i18n", "crates/kortex-i18n", &[]),
-            krate(
-                "kortex-cli",
-                "crates/kortex-cli",
-                &["tool-text-a", "tool-calc-b"],
-            ),
+            krate("kortex-cli", "crates/kortex-cli", &["kortex-pkg"]),
             krate("kortex", "crates/kortex", &["kortex-runtime"]),
             krate("tool-text-a", "tools/text/a", &["kortex"]),
             krate(
@@ -360,12 +383,30 @@ mod tests {
     }
 
     #[test]
-    fn registry_and_web_shell_changes_only_touch_apps() {
-        for path in ["registry/contracts.json", "web/shell/index.html"] {
-            let r = affected(&files(&[path]), &workspace());
-            assert!(r.tools.is_empty(), "{path}");
-            assert_eq!(r.apps.len(), 1, "{path}");
-        }
+    fn the_web_shell_only_touches_apps_and_the_registry_touches_nothing() {
+        let r = affected(&files(&["web/shell/index.html"]), &workspace());
+        assert!(r.tools.is_empty());
+        assert_eq!(r.apps.len(), 1);
+        // A tool added to the registry never rebuilds the apps: they read the signed catalogue.
+        let r = affected(&files(&["registry/contracts.json"]), &workspace());
+        assert!(r.tools.is_empty() && r.apps.is_empty() && !r.all, "{r:?}");
+    }
+
+    #[test]
+    fn touches_follows_the_dependency_closure() {
+        let ws = workspace();
+        assert!(touches(
+            &files(&["crates/kortex-pkg/src/lib.rs"]),
+            &ws,
+            "kortex-cli"
+        ));
+        // The CLI links no tool: a tool change never rebuilds it (ADR 0034).
+        assert!(!touches(
+            &files(&["tools/text/a/src/lib.rs"]),
+            &ws,
+            "kortex-cli"
+        ));
+        assert!(touches(&files(&["Cargo.lock"]), &ws, "kortex-cli"));
     }
 
     #[test]

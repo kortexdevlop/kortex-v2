@@ -1,0 +1,276 @@
+name: feed
+
+# Incremental publication (ADR 0034): after a green `ci` on main (or by hand), rebuild ONLY what
+# changed since the published release - web bundle and the four desktop targets of each changed
+# tool or app - publish a GitHub Release holding just those packages, a new signed index (merged
+# with the previous entries, monotonic sequence) and the signed contract catalogue, then redeploy the
+# static hosts from the merged index. Apps and the CLI are rebuilt only when their own code or a
+# shared crate changed. No pull_request_target and no secret exposed to pull requests (ADR 0024).
+on:
+  workflow_run:
+    workflows: [ci]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: 'stable = production feed; test = prerelease for the recette (never touches the production index or hosts)'
+        type: choice
+        options: [stable, test]
+        default: stable
+      force_all:
+        description: 'Rebuild everything (shared change not detected, or bootstrap)'
+        type: boolean
+        default: false
+      publish:
+        description: 'Create the release and deploy (false: build and package only)'
+        type: boolean
+        default: true
+
+concurrency:
+  group: feed-${{ inputs.channel || 'stable' }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  CHANNEL: ${{ inputs.channel || 'stable' }}
+  SOURCE_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+jobs:
+  plan:
+    # Automatic runs after `ci` are enabled with the repository variable FEED_AUTO=true, once a manual
+    # run (test channel, then stable) has proved the chain; a manual dispatch always works.
+    if: github.event_name == 'workflow_dispatch' || (vars.FEED_AUTO == 'true' && github.event.workflow_run.conclusion == 'success')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      nothing: ${{ steps.plan.outputs.nothing }}
+      web_tools: ${{ steps.plan.outputs.web_tools }}
+      web_apps: ${{ steps.plan.outputs.web_apps }}
+      native_tools: ${{ steps.plan.outputs.native_tools }}
+      native_apps: ${{ steps.plan.outputs.native_apps }}
+      cli: ${{ steps.plan.outputs.cli }}
+      native: ${{ steps.plan.outputs.native }}
+      reason: ${{ steps.plan.outputs.reason }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.SOURCE_SHA }}
+          fetch-depth: 0
+      - run: rustup show
+      - uses: Swatinem/rust-cache@v2
+      - name: Published index (what production serves today)
+        run: |
+          mkdir -p .kortex/previous
+          curl -fsSL https://kortex.site/registry/index.json -o .kortex/previous/index.json
+          curl -fsSL https://kortex.site/registry/index.json.sig -o .kortex/previous/index.json.sig
+      - name: What changed since the published commit
+        id: plan
+        run: |
+          set -euo pipefail
+          force=""; [ "${{ inputs.force_all }}" = "true" ] && force="--force-all"
+          cargo xtask feed-plan --previous-dir .kortex/previous $force | tee plan.txt
+          cat plan.txt >> "$GITHUB_OUTPUT"
+          if grep -qE '^(native_tools|native_apps)=.+' plan.txt || grep -q '^cli=true' plan.txt; then echo native=true >> "$GITHUB_OUTPUT"; else echo native=false >> "$GITHUB_OUTPUT"; fi
+          cat .kortex/feed-plan.json
+
+  web:
+    needs: plan
+    if: needs.plan.outputs.nothing != 'true' && (needs.plan.outputs.web_tools != '' || needs.plan.outputs.web_apps != '')
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.SOURCE_SHA }}
+      - run: rustup show
+      - uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+          workspaces: |
+            .
+          cache-directories: |
+            .kortex/target
+            .kortex/target-worker
+            .kortex/target-apps
+            ~/.cache/dioxus
+      - name: Existing Dioxus compiler (official pinned binary)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/dioxus"
+          gh release download v0.7.10 --repo DioxusLabs/dioxus --pattern 'dx-x86_64-unknown-linux-gnu.tar.gz' --pattern 'dx-x86_64-unknown-linux-gnu.sha256' --dir "$RUNNER_TEMP/dioxus"
+          cd "$RUNNER_TEMP/dioxus"
+          sha256sum --check --ignore-missing dx-x86_64-unknown-linux-gnu.sha256
+          tar -xzf dx-x86_64-unknown-linux-gnu.tar.gz
+          find "$RUNNER_TEMP/dioxus" -type f -name dx -exec chmod +x {} \;
+          find "$RUNNER_TEMP/dioxus" -type f -name dx -printf '%h\n' >> "$GITHUB_PATH"
+      - name: Existing wasm-bindgen compiler (pinned to the worker contract)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/wasm-bindgen"
+          gh release download 0.2.129 --repo wasm-bindgen/wasm-bindgen --pattern 'wasm-bindgen-0.2.129-x86_64-unknown-linux-musl.tar.gz' --dir "$RUNNER_TEMP/wasm-bindgen"
+          cd "$RUNNER_TEMP/wasm-bindgen"
+          echo '82d12bb940e2d4e72e0d5605387fc1b8ca179044e012b620f0ce4e7440e8320e  wasm-bindgen-0.2.129-x86_64-unknown-linux-musl.tar.gz' | sha256sum --check
+          tar -xzf wasm-bindgen-0.2.129-x86_64-unknown-linux-musl.tar.gz
+          find "$RUNNER_TEMP/wasm-bindgen" -type f -name wasm-bindgen -printf '%h\n' >> "$GITHUB_PATH"
+      - name: Compile the changed bundles for WebAssembly and package them
+        env:
+          DX_CLI_TELEMETRY: 'false'
+          WEB_TOOLS: ${{ needs.plan.outputs.web_tools }}
+          WEB_APPS: ${{ needs.plan.outputs.web_apps }}
+        run: |
+          set -euo pipefail
+          cargo xtask tokens
+          cargo xtask check
+          if [ -n "$WEB_TOOLS" ]; then cargo xtask build $WEB_TOOLS; fi
+          for id in $WEB_APPS; do cargo xtask build-app "$id" --web; done
+          cargo xtask package-web $WEB_TOOLS $WEB_APPS
+          ls -la dist/release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: web-packages
+          path: dist/release/web-*.tar.gz
+          if-no-files-found: error
+          retention-days: 7
+
+  native:
+    needs: plan
+    if: needs.plan.outputs.nothing != 'true' && needs.plan.outputs.native == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {os: ubuntu-latest, name: linux, targets: x86_64-unknown-linux-gnu}
+          - {os: macos-15-intel, name: macos, targets: aarch64-apple-darwin x86_64-apple-darwin}
+          - {os: windows-latest, name: windows, targets: x86_64-pc-windows-msvc}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 120
+    env:
+      CARGO_PROFILE_RELEASE_LTO: thin
+      CARGO_PROFILE_RELEASE_CODEGEN_UNITS: 8
+      NATIVE_TOOLS: ${{ needs.plan.outputs.native_tools }}
+      NATIVE_APPS: ${{ needs.plan.outputs.native_apps }}
+      BUILD_CLI: ${{ needs.plan.outputs.cli }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.SOURCE_SHA }}
+      - run: rustup show
+      - name: Linux system libraries (webview and tray)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libgtk-3-dev libxdo-dev libayatana-appindicator3-dev
+      - uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+          workspaces: |
+            .
+          cache-directories: |
+            .kortex/target-desktop
+      - name: Apple targets
+        if: runner.os == 'macOS'
+        run: rustup target add aarch64-apple-darwin x86_64-apple-darwin
+      - run: cargo xtask tokens
+      - run: cargo xtask check
+      - name: Build, sign (macOS ad hoc) and package only the changed ids
+        run: |
+          set -euo pipefail
+          for target in ${{ matrix.targets }}; do
+            if [ "$BUILD_CLI" = "true" ]; then cargo xtask build-cli --target "$target"; fi
+            for id in $NATIVE_APPS; do cargo xtask build-app "$id" --target "$target"; done
+            for id in $NATIVE_TOOLS; do cargo xtask build-desktop "$id" --target "$target"; done
+            if [ "$RUNNER_OS" = "macOS" ]; then
+              # Free ad hoc signature, required on Apple Silicon (same as release.yml).
+              while IFS= read -r -d '' binary; do
+                codesign --force --sign - "$binary"
+                codesign --verify --strict "$binary"
+              done < <(find "dist/desktop/$target" -type f -perm -u+x -print0)
+            fi
+            if [ "$BUILD_CLI" = "true" ]; then cargo xtask package cli --target "$target"; fi
+            for id in $NATIVE_APPS $NATIVE_TOOLS; do cargo xtask package "$id" --target "$target"; done
+          done
+          ls -la dist/release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: packages-${{ matrix.name }}
+          path: dist/release/*.tar.gz
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    needs: [plan, web, native]
+    if: always() && needs.plan.result == 'success' && needs.plan.outputs.nothing != 'true' && !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled') && (github.event_name != 'workflow_dispatch' || inputs.publish)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: write
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      KORTEX_SIGNING_KEY: ${{ secrets.KORTEX_SIGNING_KEY }}
+      GH_TOKEN: ${{ github.token }}
+      WRANGLER_SEND_METRICS: 'false'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.SOURCE_SHA }}
+      - run: rustup show
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: '{web-packages,packages-*}'
+          merge-multiple: true
+          path: dist/release
+      - name: Published index
+        run: |
+          mkdir -p .kortex/previous
+          curl -fsSL https://kortex.site/registry/index.json -o .kortex/previous/index.json
+      - name: Release tag and sequence
+        id: rel
+        run: |
+          set -euo pipefail
+          prev=$(python3 -c 'import json; print(json.load(open(".kortex/previous/index.json")).get("sequence", 0))')
+          if [ "$CHANNEL" = "stable" ]; then
+            seq=$((prev + 1)); echo "tag=feed-$seq" >> "$GITHUB_OUTPUT"; echo "args=--previous .kortex/previous/index.json" >> "$GITHUB_OUTPUT"
+          else
+            seq=${GITHUB_RUN_NUMBER}; echo "tag=test-feed-$seq" >> "$GITHUB_OUTPUT"; echo "args=--sequence $seq" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Signed index and contract catalogue
+        run: |
+          test -n "$KORTEX_SIGNING_KEY" || { echo "::error::secret KORTEX_SIGNING_KEY missing"; exit 1; }
+          cargo xtask release-index --base-url "https://github.com/${{ github.repository }}/releases/download/${{ steps.rel.outputs.tag }}" --channel "$CHANNEL" --source-commit "$SOURCE_SHA" ${{ steps.rel.outputs.args }}
+          ls -la dist/release
+      - name: GitHub Release (only the rebuilt packages, the index and the catalogue)
+        run: |
+          flags=""; [ "$CHANNEL" = "test" ] && flags="--prerelease"
+          gh release create "${{ steps.rel.outputs.tag }}" dist/release/* --repo "${{ github.repository }}" --target "$SOURCE_SHA" --title "${{ steps.rel.outputs.tag }}" $flags \
+            --notes "Incremental feed ($CHANNEL): rebuilt packages, signed index and signed contract catalogue. Source commit $SOURCE_SHA."
+      - uses: pnpm/action-setup@v4
+        if: env.CHANNEL == 'stable'
+      - uses: actions/setup-node@v4
+        if: env.CHANNEL == 'stable'
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Rebuild the static hosts from the merged index (no recompilation) and deploy
+        if: env.CHANNEL == 'stable'
+        run: |
+          set -euo pipefail
+          test -n "$CLOUDFLARE_API_TOKEN" && test -n "$CLOUDFLARE_ACCOUNT_ID" || { echo "::error::Cloudflare secrets missing"; exit 1; }
+          pnpm install --frozen-lockfile
+          rm -rf dist/run dist/apps
+          cargo xtask restore-web --index dist/release/index.json
+          cargo xtask tokens
+          cargo xtask registry
+          cargo xtask icons
+          KORTEX_RELEASE_DIR="$PWD/dist/release" pnpm site:build
+          node scripts/prepare-publish.mjs
+          npm exec --yes --package=wrangler@4.151.0 -- node scripts/publish.mjs --static-only

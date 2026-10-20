@@ -4,9 +4,9 @@ mod build;
 mod changed;
 mod check;
 mod ci_budget;
-mod cli_gen;
 mod compat;
 mod dev;
+mod feed;
 mod icons;
 mod new_app;
 mod new_tool;
@@ -23,7 +23,7 @@ mod worker;
 
 use std::process::ExitCode;
 
-const USAGE: &str = "Commandes : tokens | registry | check [id] | stats | icons | cli-gen | keygen | build-desktop | build-cli | build-app | list-tools | package | release-index | build <id…|all> | new-tool --universe U --name N [--custom] | new-app --name N | dev <id> [--desktop] | ci-budget | changed --base REF | schema <id|all> [--lang fr|en] | fingerprint <id> | build-engine <id…|all>";
+const USAGE: &str = "Commandes : tokens | registry | check [id] | stats | icons | keygen | build-desktop | build-cli | build-app | list-tools | package | feed-plan | package-web | restore-web | release-index | build <id…|all> | new-tool --universe U --name N [--custom] | new-app --name N | dev <id> [--desktop] | ci-budget | changed --base REF | schema <id|all> [--lang fr|en] | fingerprint <id> | build-engine <id…|all>";
 
 /// Path for embedding in generated TOML/Rust source: forward slashes work on every OS, while
 /// Windows backslashes would be read as (invalid) escape sequences.
@@ -50,8 +50,10 @@ fn main() -> ExitCode {
         Some("build-app") => release::build_app(&args[1..]),
         Some("build-cli") => release::build_cli(&args[1..]),
         Some("package") => release::package(&args[1..]),
+        Some("feed-plan") => feed::plan(&args[1..]),
+        Some("package-web") => feed::package_web(&args[1..]),
+        Some("restore-web") => feed::restore_web(&args[1..]),
         Some("release-index") => release::release_index(&args[1..]),
-        Some("cli-gen") => cli_gen::run(),
         Some("icons") => icons::run(),
         Some("stats") => stats::run(),
         Some("new-tool") => new_tool::run(&args[1..]),

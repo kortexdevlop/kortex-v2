@@ -8,7 +8,13 @@ Release publique courante : [`manual-39454686081`](https://github.com/kortexdevl
 
 Une compilation n’établit ni une installation fonctionnelle ni une recette de l’interface native : voir les limites plus bas.
 
-## Workflow GitHub
+## Publication incrémentale (`feed.yml`, ADR 0034)
+
+Voie nominale : après une CI verte sur `main`, `feed.yml` ne reconstruit que ce qui a changé depuis le commit source du dernier index signé publié (`xtask feed-plan`), publie une release `feed-<sequence>` ne contenant que ces paquets (archives desktop, archives `web-<id>-<version>.tar.gz`), l'index signé fusionné (URLs absolues vers les releases précédentes, `sequence` + 1, `channel`) et le catalogue de contrats signé `catalog.json`, puis redéploie `run`, les apps et le site depuis les archives web de l'index fusionné. Une release référencée par l'index courant ne doit jamais être supprimée. Le canal `test` (dispatch manuel) crée une prerelease `test-feed-<n>` sans toucher à la production. Premier passage : les archives web n'existent pas encore, il construit tout le web et réutilise les paquets desktop publiés.
+
+Anti-retour (ferme 10.2) : clients (CLI, Store, apps) conservent le plancher `(sequence, sha256)` de l'index et du catalogue acceptés par canal (`~/.kortex/floors.json`, cache web) et refusent une séquence antérieure, un contenu différent à séquence égale ou un autre canal.
+
+## Workflow GitHub (release complète manuelle)
 
 `release.yml` compile les mêmes sources Rust/Dioxus pour Linux, macOS ARM/Intel et Windows, ainsi que les 38 outils et trois apps web. Les apps sont découvertes depuis leurs contrats. Les paramètres manuels sont `tools=all`, `only=all|linux|macos|windows|web`, `intel_mac` et `publish=false` par défaut.
 
@@ -32,9 +38,9 @@ Le vérificateur impose l’inventaire sélectionné, deux fichiers réguliers p
 
 - Recette Windows, Linux et macOS ARM par l’agent absente ; l’utilisateur a déclaré l’installation validée sur les trois systèmes le 19 octobre (non rejouée).
 - Binaires macOS signés ad hoc et Windows non signés : avertissements Gatekeeper / SmartScreen attendus.
-- L’index n’a pas encore de protection contre le retour à une ancienne release (10.2).
+- Anti-retour de l’index : fait côté clients (séquence, canal, plancher) ; vaut pour les clients contenant ce code.
 - Windows : lanceur `.cmd`, pas le raccourci `.lnk` demandé (10.7).
-- La CLI publiée reste en 0.1.0 et `kortex update --self` ne la remplace pas (lot 36).
+- La CLI publiée est en 0.1.0 : `kortex update --self` la remplace dès qu’un index propose une version supérieure (0.2.0 : CLI sans outils liés).
 - Connexion au compte depuis le Store absente : passer par `kortex login`.
 - Consentement par permission déclarée, annulation et dossiers explicites à l’installation restent ouverts (10.4).
 

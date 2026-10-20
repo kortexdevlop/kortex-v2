@@ -398,7 +398,7 @@ pub fn build_app(args: &[String]) -> Result<(), String> {
     Ok(())
 }
 
-fn cli_version() -> Result<String, String> {
+pub(crate) fn cli_version() -> Result<String, String> {
     let toml = fs::read_to_string("crates/kortex-cli/Cargo.toml").map_err(|e| e.to_string())?;
     toml.lines()
         .find_map(|l| {
@@ -552,7 +552,12 @@ fn read_manifest(archive: &[u8]) -> Result<Manifest, String> {
     Err("manifest.json absent du paquet".into())
 }
 
-/// `cargo xtask release-index [--base-url URL] [--key-file F]`: builds and signs `dist/release/index.json`.
+/// `cargo xtask release-index [--base-url URL] [--key-file F] [--channel stable|test]
+/// [--previous index.json] [--sequence N] [--source-commit SHA]`: builds and signs
+/// `dist/release/index.json` and the contract catalogue `dist/release/catalog.json` (ADR 0034).
+/// With `--previous` (the index currently published, already verified by the caller) the packages
+/// of this run replace their entries and every other entry is kept with its absolute URLs, so a
+/// release can carry only what changed; the sequence is the previous one plus one.
 /// The private key comes from `KORTEX_SIGNING_KEY` (CI secret) or `--key-file`.
 pub fn release_index(args: &[String]) -> Result<(), String> {
     let base = flag(args, "--base-url").map(|b| b.trim_end_matches('/').to_owned());
@@ -602,7 +607,7 @@ pub fn release_index(args: &[String]) -> Result<(), String> {
             sha256: sha256_hex(&bytes),
             size: bytes.len() as u64,
         };
-        if !TARGETS.contains(&m.target.as_str()) {
+        if m.target != "web" && !TARGETS.contains(&m.target.as_str()) {
             return Err(format!("{file} : cible inconnue {}", m.target));
         }
         if m.id == "cli" {
@@ -648,11 +653,23 @@ pub fn release_index(args: &[String]) -> Result<(), String> {
                 .duration_since(UNIX_EPOCH)
                 .map_or(0, |d| d.as_secs())
         });
+    let channel = flag(args, "--channel").unwrap_or_else(|| "stable".into());
+    if !["stable", "test"].contains(&channel.as_str()) {
+        return Err(format!("canal inconnu : {channel} (stable ou test)"));
+    }
+    let source_commit = flag(args, "--source-commit");
+    let (cli, tool_map, sequence) = merge_previous(args, &channel, cli, tool_map)?;
+    let sequence = match flag(args, "--sequence") {
+        Some(s) => s
+            .parse::<u64>()
+            .map_err(|_| "--sequence : entier attendu")?,
+        None => sequence,
+    };
     let index = Index {
         schema: 1,
-        channel: "stable".into(),
-        sequence: 0,
-        source_commit: None,
+        channel: channel.clone(),
+        sequence,
+        source_commit: source_commit.clone(),
         generated: iso_date(secs),
         cli,
         tools: tool_map,
@@ -674,16 +691,210 @@ pub fn release_index(args: &[String]) -> Result<(), String> {
     }
     fs::write("dist/release/index.json", &bytes).map_err(|e| e.to_string())?;
     fs::write("dist/release/index.json.sig", &sig).map_err(|e| e.to_string())?;
+    let catalog = catalog_document(
+        &channel,
+        sequence,
+        source_commit.as_deref(),
+        index.generated.clone(),
+    )?;
+    let catalog_sig = sign_bytes(&seed, catalog.as_bytes());
+    parse_verified_catalog(&catalog, &catalog_sig, public.trim())?;
+    fs::write("dist/release/catalog.json", &catalog).map_err(|e| e.to_string())?;
+    fs::write("dist/release/catalog.json.sig", &catalog_sig).map_err(|e| e.to_string())?;
     println!(
-        "✓ dist/release/index.json + .sig ({} outil(s), CLI : {})",
+        "✓ dist/release/index.json + catalog.json + .sig ({} outil(s), CLI : {}, canal {channel}, séquence {sequence})",
         index.tools.len(),
         index.cli.as_ref().map_or("non", |_| "oui")
     );
     Ok(())
 }
 
+/// CLI release, tool releases and sequence of a merged index.
+type Merged = (Option<CliRelease>, BTreeMap<String, ToolRelease>, u64);
+
+/// Entries of the index published before this run, kept unless this run rebuilt them. Returns the
+/// merged CLI and tools plus the next sequence (previous + 1, or 1 without a previous index).
+fn merge_previous(
+    args: &[String],
+    channel: &str,
+    cli: Option<CliRelease>,
+    mut tools: BTreeMap<String, ToolRelease>,
+) -> Result<Merged, String> {
+    let Some(path) = flag(args, "--previous") else {
+        return Ok((cli, tools, 1));
+    };
+    let text = fs::read_to_string(&path).map_err(|e| format!("{path} : {e}"))?;
+    let previous: Index = serde_json::from_str(&text).map_err(|e| format!("{path} : {e}"))?;
+    if previous.channel != channel {
+        return Err(format!(
+            "l'index précédent est du canal {} (attendu {channel})",
+            previous.channel
+        ));
+    }
+    for (id, release) in &previous.tools {
+        if release
+            .targets
+            .values()
+            .any(|a| !a.url.starts_with("https://"))
+        {
+            return Err(format!(
+                "{id} : l'index précédent contient une URL relative"
+            ));
+        }
+        match tools.get_mut(id) {
+            None => {
+                tools.insert(id.clone(), release.clone());
+            }
+            // Same version rebuilt for other targets only (e.g. the first web archives): keep the
+            // targets published earlier. A new version replaces the old entry as a whole.
+            Some(new) if new.version == release.version => {
+                for (target, artifact) in &release.targets {
+                    new.targets
+                        .entry(target.clone())
+                        .or_insert_with(|| artifact.clone());
+                }
+            }
+            Some(_) => {}
+        }
+    }
+    let cli = match (cli, previous.cli) {
+        (Some(mut new), Some(old)) if new.version == old.version => {
+            for (target, artifact) in old.targets {
+                new.targets.entry(target).or_insert(artifact);
+            }
+            Some(new)
+        }
+        (Some(new), _) => Some(new),
+        (None, old) => old,
+    };
+    Ok((cli, tools, previous.sequence + 1))
+}
+
+/// The signed contract catalogue: every contract of `registry/contracts.json`.
+fn catalog_document(
+    channel: &str,
+    sequence: u64,
+    source_commit: Option<&str>,
+    generated: String,
+) -> Result<String, String> {
+    let registry: serde_json::Value =
+        serde_json::from_str(&crate::registry::build()?).map_err(|e| e.to_string())?;
+    let mut document = serde_json::json!({
+        "schema": 1,
+        "channel": channel,
+        "sequence": sequence,
+        "generated": generated,
+        "tools": registry["tools"],
+    });
+    if let Some(commit) = source_commit {
+        document["source_commit"] = commit.into();
+    }
+    serde_json::to_string_pretty(&document).map_err(|e| e.to_string())
+}
+
+/// Never publish a catalogue that the key embedded in the clients would reject.
+fn parse_verified_catalog(document: &str, sig: &str, public: &str) -> Result<(), String> {
+    kortex_catalog::check(
+        document.as_bytes(),
+        sig,
+        public,
+        serde_json::from_str::<serde_json::Value>(document).map_err(|e| e.to_string())?["channel"]
+            .as_str()
+            .unwrap_or("stable"),
+        None,
+    )
+    .map(|_| ())
+    .map_err(|e| format!("catalogue refusé par la clé publique des clients : {e}"))
+}
+
 #[cfg(test)]
 mod tests {
+    use super::*;
+
+    fn release(version: &str, url: &str) -> ToolRelease {
+        ToolRelease {
+            name: BTreeMap::new(),
+            universe: "text".into(),
+            version: version.into(),
+            targets: BTreeMap::from([(
+                "x86_64-apple-darwin".to_owned(),
+                Artifact {
+                    url: url.into(),
+                    sha256: "00".into(),
+                    size: 1,
+                },
+            )]),
+        }
+    }
+
+    #[test]
+    fn an_incremental_index_keeps_unchanged_entries_with_absolute_urls_and_counts_up() {
+        let previous = Index {
+            schema: 1,
+            channel: "stable".into(),
+            sequence: 7,
+            source_commit: None,
+            generated: "2026-10-20".into(),
+            cli: None,
+            tools: BTreeMap::from([
+                (
+                    "text.a".to_owned(),
+                    release("1.0.0", "https://example.test/rel-1/a.tar.gz"),
+                ),
+                (
+                    "text.b".to_owned(),
+                    release("1.0.0", "https://example.test/rel-1/b.tar.gz"),
+                ),
+            ]),
+        };
+        let path = std::env::temp_dir().join(format!("kortex-prev-{}.json", std::process::id()));
+        fs::write(&path, serde_json::to_vec(&previous).expect("json")).expect("write");
+        let args = vec!["--previous".to_owned(), path.to_string_lossy().into_owned()];
+        let rebuilt = BTreeMap::from([(
+            "text.a".to_owned(),
+            release("1.0.1", "https://example.test/rel-2/a.tar.gz"),
+        )]);
+        let (_, merged, sequence) =
+            merge_previous(&args, "stable", None, rebuilt.clone()).expect("merged");
+        assert_eq!(sequence, 8);
+        assert_eq!(
+            merged["text.a"].version, "1.0.1",
+            "rebuilt entries replace the old ones"
+        );
+        assert_eq!(merged["text.b"].version, "1.0.0", "other entries are kept");
+        assert!(
+            merged["text.b"].targets["x86_64-apple-darwin"]
+                .url
+                .starts_with("https://example.test/rel-1/")
+        );
+        assert!(
+            merge_previous(&args, "test", None, rebuilt).is_err(),
+            "another channel is refused"
+        );
+        // Same version, new target only (first web archives): earlier targets are kept.
+        let web_only = BTreeMap::from([(
+            "text.b".to_owned(),
+            ToolRelease {
+                targets: BTreeMap::from([(
+                    "web".to_owned(),
+                    Artifact {
+                        url: "https://example.test/rel-2/web-b.tar.gz".into(),
+                        sha256: "11".into(),
+                        size: 2,
+                    },
+                )]),
+                ..release("1.0.0", "")
+            },
+        )]);
+        let (_, merged, _) = merge_previous(&args, "stable", None, web_only).expect("merged");
+        assert_eq!(
+            merged["text.b"].targets.len(),
+            2,
+            "desktop target kept next to the new web one"
+        );
+        let _ = fs::remove_file(path);
+    }
+
     #[test]
     fn desktop_builders_share_a_resolved_cache_root() {
         let root = std::env::current_dir().expect("current directory");
@@ -700,8 +911,6 @@ mod tests {
             root
         );
     }
-
-    use super::*;
 
     #[test]
     fn iso_dates() {

@@ -18,11 +18,37 @@ const server = createServer((request, response) => {
 });
 await new Promise(done => server.listen(0, '127.0.0.1', done));
 const origin = `http://127.0.0.1:${server.address().port}`;
+// The tool origin: tool engines are not bundled with the app; it runs them through the engine host
+// of the `run` origin (ADR 0034). Local stand-in: dist/run (engine of each tool) + the host page.
+const runDist = resolve(import.meta.dirname, '../../dist/run');
+const engineDist = resolve(import.meta.dirname, '../../dist/engines');
+const runServer = createServer((request, response) => {
+  const pathname = decodeURIComponent(new URL(request.url, 'http://x').pathname);
+  const send = (path, extra = {}) => response.writeHead(200, { 'content-type': types[extname(path)] ?? 'application/octet-stream', ...extra }).end(readFileSync(path));
+  if (pathname === '/engines/host.html') return send(resolve(import.meta.dirname, '../../web/run-host/host.html'));
+  if (pathname === '/engines/host.js') {
+    const source = readFileSync(resolve(import.meta.dirname, '../../web/run-host/host.js'), 'utf8').replace('__ALLOWED_ORIGINS__', JSON.stringify([origin]));
+    return response.writeHead(200, { 'content-type': 'text/javascript' }).end(source);
+  }
+  const m = pathname.match(/^\/([a-z0-9]+\.[a-z0-9-]+)\/engine\/(engine\.js|engine_bg\.wasm|worker\.js)$/);
+  if (!m) return response.writeHead(404).end();
+  const bundled = resolve(runDist, m[1], 'engine', m[2]);
+  const built = existsSync(bundled) ? bundled : resolve(engineDist, m[1], m[2]);
+  if (!existsSync(built)) return response.writeHead(404).end();
+  send(built);
+});
+await new Promise(done => runServer.listen(0, '127.0.0.1', done));
+const runOrigin = `http://127.0.0.1:${runServer.address().port}`;
 // BROWSER=firefox|webkit runs the same recipe on another engine (CI: .github/workflows/browsers.yml).
 const engine = { chromium, firefox, webkit }[process.env.BROWSER ?? 'chromium'];
 assert.ok(engine, 'BROWSER must be chromium, firefox or webkit');
 const browser = await engine.launch({ headless: true, executablePath: engine === chromium ? process.env.CHROME_PATH || undefined : undefined });
 const checks = [];
+const newContext = async options => {
+  const context = await browser.newContext(options);
+  await context.addInitScript(runOrigin => { globalThis.__KORTEX_RUN_ORIGIN = runOrigin; }, runOrigin);
+  return context;
+};
 // A real local API for one page: the app opens with ?api=<url> (the localhost-only development
 // override), so CORS, credentials and fetch behave as in production on every engine.
 const apis = [];
@@ -62,7 +88,7 @@ const center = async locator => {
   return [b.x + b.width / 2, b.y + b.height / 2];
 };
 try {
-  const context = await browser.newContext({ locale: 'fr-FR', acceptDownloads: true, viewport: { width: 1440, height: 900 } });
+  const context = await newContext({ locale: 'fr-FR', acceptDownloads: true, viewport: { width: 1440, height: 900 } });
   const page = await context.newPage();
   const errors = [];
   page.on('pageerror', e => errors.push(e.message));
@@ -605,7 +631,7 @@ try {
     }
     return { status: 404, body: {} };
   });
-  const deviceA = await browser.newContext({ locale: 'fr-FR', viewport: { width: 1440, height: 900 } });
+  const deviceA = await newContext({ locale: 'fr-FR', viewport: { width: 1440, height: 900 } });
   const a = await deviceA.newPage();
   await a.goto(syncUrl, { waitUntil: 'networkidle' });
   await a.locator('[data-add="text"]').click();
@@ -623,7 +649,7 @@ try {
   assert.ok(onServer.includes('flow.vault') && /flow\.w[0-9a-f]{12}/.test(onServer));
   assert.ok(!onServer.includes('Facture') && !onServer.includes('confidentiel') && !onServer.includes('secrète'), 'the store holds only ciphertext');
   checks.push(`sync: first device uploads encrypted in ${syncMs} ms, nothing readable on the server`);
-  const deviceB = await browser.newContext({ locale: 'fr-FR', viewport: { width: 1440, height: 900 } });
+  const deviceB = await newContext({ locale: 'fr-FR', viewport: { width: 1440, height: 900 } });
   const bDevice = await deviceB.newPage();
   await bDevice.goto(syncUrl, { waitUntil: 'networkidle' });
   await bDevice.locator('[data-action="library"]').click();
@@ -641,7 +667,7 @@ try {
   await a.locator('[data-saved]', { hasText: 'Facture renommée sur B' }).waitFor({ timeout: 30000 });
   checks.push('sync: an edit travels back to the first device');
   // A third device with another passphrase is refused and changes nothing.
-  const deviceC = await browser.newContext({ locale: 'fr-FR', viewport: { width: 1440, height: 900 } });
+  const deviceC = await newContext({ locale: 'fr-FR', viewport: { width: 1440, height: 900 } });
   const c = await deviceC.newPage();
   await c.goto(syncUrl, { waitUntil: 'networkidle' });
   const sizeBefore = store.size;
@@ -668,7 +694,7 @@ try {
     }
     return { status: 404, body: {} };
   });
-  const maker = await browser.newContext({ locale: 'fr-FR', viewport: { width: 1440, height: 900 } });
+  const maker = await newContext({ locale: 'fr-FR', viewport: { width: 1440, height: 900 } });
   const draft = await maker.newPage();
   await draft.goto(builderUrl, { waitUntil: 'networkidle' });
   await draft.locator('[data-action="library"]').click();
@@ -691,7 +717,7 @@ try {
   checks.push('builder: consent first, catalogue shown to the model, one repair round, opens unrun and unsaved');
   await maker.close();
   // Automatic triggers: "when Flow opens" runs the saved workflow by itself and records it.
-  const auto = await browser.newContext({ locale: 'fr-FR', viewport: { width: 1440, height: 900 } });
+  const auto = await newContext({ locale: 'fr-FR', viewport: { width: 1440, height: 900 } });
   const timer = await auto.newPage();
   await timer.goto(origin + '/', { waitUntil: 'networkidle' });
   await timer.locator('[data-add="text"]').click();
@@ -725,4 +751,5 @@ try {
   for (const srv of apis) srv.close();
   await browser.close();
   server.close();
+  runServer.close();
 }

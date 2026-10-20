@@ -499,7 +499,7 @@ impl Conversation {
     }
 }
 
-/// Tools worth offering the model for a request, most relevant first. Offering all 38 would cost
+/// Tools worth offering the model for a request, most relevant first. Offering every tool would cost
 /// tokens and confuse the model, so Seek's search engine picks a handful; when the request matches
 /// almost nothing the most popular tools pad the list so the model can still help.
 #[must_use]

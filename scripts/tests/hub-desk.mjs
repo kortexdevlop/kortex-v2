@@ -6,6 +6,7 @@ import {readFileSync, existsSync, statSync, mkdirSync, writeFileSync} from 'node
 import {resolve, extname, sep} from 'node:path';
 const {chromium}=createRequire(import.meta.url)('playwright');
 const root=resolve(import.meta.dirname,'../..');
+const toolCount=JSON.parse(readFileSync(resolve(root,'registry/contracts.json'),'utf8')).tools.length;
 const domains=Object.fromEntries([...readFileSync(resolve(root,'brand/domains.toml'),'utf8').matchAll(/^\s*(\w+)\s*=\s*"([^"]+)"/gm)].map(m=>[m[1],m[2]]));
 const published=process.argv.includes('--public');
 const browser=await chromium.launch({headless:true,executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',args:process.env.KORTEX_QA_HOST_RULES?[`--host-resolver-rules=${process.env.KORTEX_QA_HOST_RULES}`]:[]});
@@ -30,7 +31,7 @@ try {
  const url=(name,lang='fr')=>`https://${domains[name]}/${lang==='en'?'en/':''}`;
  await page.goto(url('hub'),{waitUntil:'networkidle'});
  await page.locator('[data-widget="catalogue"] [data-tool]').first().waitFor();
- assert.equal(await page.locator('[data-widget="catalogue"] [data-tool]').count(),38);
+ assert.equal(await page.locator('[data-widget="catalogue"] [data-tool]').count(),toolCount);
  const hashRow=page.locator('[data-widget="catalogue"] [data-tool="secure.hash-calculator"]');
  await hashRow.getByRole('button',{name:'Ajouter aux favoris'}).click();
  assert.equal(await page.locator('[data-widget="favorites"] [data-tool="secure.hash-calculator"]').count(),1);

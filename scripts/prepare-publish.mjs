@@ -47,6 +47,14 @@ for (const [name, source, host] of targets) {
   rmSync(dest, {recursive: true, force: true});
   mkdirSync(dest, {recursive: true});
   cpSync(join(root, source), dest, {recursive: true, filter: path => !basename(path).startsWith('.')});
+  // Engine host: apps run the headless engine of any tool through it (ADR 0034), so a tool
+  // published later works in Flow and Mind without rebuilding them.
+  if (name === 'run') {
+    const allowed = ['flow', 'mind'].map(app => `https://${domains[app]}`);
+    mkdirSync(join(dest, 'engines'), {recursive: true});
+    cpSync(join(root, 'web/run-host/host.html'), join(dest, 'engines/host.html'));
+    writeFileSync(join(dest, 'engines/host.js'), readFileSync(join(root, 'web/run-host/host.js'), 'utf8').replace('__ALLOWED_ORIGINS__', JSON.stringify(allowed)));
+  }
   // Release test artifacts must never become a public distribution feed.
   if (name === 'site' && !features.desktop) {
     for (const file of ['registry', 'install.sh', 'install.ps1']) rmSync(join(dest, file), {recursive: true, force: true});
@@ -78,7 +86,7 @@ for (const [name, source, host] of targets) {
   const csp = name === 'site'
     ? `default-src 'self'; script-src 'self' ${[...scriptHashes].join(' ')}${turnstile}; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://${domains.run}${features.account ? ` https://${domains.api}` : ''}; frame-src https://${domains.run}${turnstile}; worker-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'self'; form-action 'self'`
     : name !== 'run' ? `default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://${domains.api} https://${domains.root}; frame-src https://${domains.run}; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'`
-    : `default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors https://${domains.root} https://${domains.desk} https://${domains.hub}; form-action 'none'`;
+    : `default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors https://${domains.root} https://${domains.desk} https://${domains.hub} https://${domains.flow} https://${domains.mind}; form-action 'none'`;
   writeFileSync(join(dest, '_headers'), `/*\n  Content-Security-Policy: ${csp}\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: no-referrer\n  Strict-Transport-Security: max-age=31536000\n  Permissions-Policy: camera=(), microphone=(), geolocation=()\n\n/sw.js\n  Cache-Control: no-cache\n\n/*/sw.js\n  Cache-Control: no-cache\n${name === 'site' ? registryHeaders : ''}${immutable[name === 'site' ? 'site' : name === 'run' ? 'run' : 'app']}`);
   if (count > 20000) throw new Error(`Too many assets: ${count}`);
   mkdirSync(join(root, `services/${name}`), {recursive: true});

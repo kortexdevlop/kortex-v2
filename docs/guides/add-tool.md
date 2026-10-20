@@ -1,6 +1,6 @@
 # Ajouter un outil (recette)
 
-> **Catalogue gelé à 38 outils** (RULES.md §2.1, décision de l'utilisateur du 2026-10-16). Cette recette ne s'applique qu'après une levée explicite du gel par l'utilisateur ; elle sert aussi de référence pour corriger les outils existants.
+> **Catalogue gelé à 38 outils + `image.compress`** (RULES.md §2.1). Cette recette ne s'applique à un nouvel outil qu'après une autorisation explicite de l'utilisateur ; elle sert aussi de référence pour corriger les outils existants.
 
 Écrit pour qu'une IA (ou toi) puisse suivre la procédure sans connaissance préalable du dépôt.
 
@@ -15,12 +15,11 @@ Puis, dans `tools/pdf/merge/` :
 5. **`tests/engine.rs`** : au moins un test nominal et un test d'erreur.
 
 ```bash
-cargo xtask registry                 # régénère registry/index.json (à committer)
-cargo xtask cli-gen                  # relie l'outil à la CLI `kortex` (crates/kortex-cli, à committer)
+cargo xtask registry                 # régénère registry/contracts.json (à committer)
 cargo xtask check <univers>.<nom>    # garde-fous
 cargo test -p tool-<univers>-<nom>
 ```
-Vérifier l'outil en ligne de commande : `cargo run -p kortex-cli -- run <univers>.<nom> --input … --param …`.
+Vérifier l'outil en ligne de commande : `cargo xtask build-desktop <univers>.<nom>`, l'installer dans un `KORTEX_HOME` de test, puis `kortex run <univers>.<nom> --input … --param …`. La CLI ne lie aucun outil : elle lance le binaire installé en mode `--engine` (ADR 0034).
 
 ## UI sur mesure (`ui = "custom"`)
 
@@ -40,13 +39,19 @@ Pour compiler un lot web sans reconstruire les autres outils : `cargo xtask buil
 
 Les builds web conservent désormais un reçu local dans `.kortex/build/<id>/build-receipt.json`. Si les sources, les bibliothèques partagées, la configuration et tous les fichiers produits sont inchangés, `xtask build` évite la compilation. Un fichier de sortie supprimé ou modifié invalide également le reçu. Le cache concerne les builds réalisés après cette mise à jour.
 
-## Publication et disponibilité (état au 2026-10-20)
+## Publication et disponibilité (ADR 0034)
 
-Aucune étape n'est automatique après `git push` : `ci.yml` vérifie `main` sans publier.
+Ajouter ou modifier un outil ne demande **aucune recompilation des apps ni de la CLI**.
 
-1. **Web** : lancer `release.yml` avec `only=web` (bundles outils et apps vérifiés par reçus), puis `deploy.yml` avec `source_run=<ce run>` et `publish=true` ; secours local : `docs/guides/deploy.md`.
-2. **Desktop** : lancer `release.yml` avec `publish=true` ; la GitHub Release reçoit les archives `<id>-<version>-<cible>.tar.gz` des quatre cibles et l'index signé. Republier ensuite le site avec `KORTEX_RELEASE_DIR` pointant vers les fichiers de cette release, pour que kortex.site serve le nouvel index (`docs/guides/release.md`).
-3. **Apps** : `crates/kortex-shell` embarque `registry/index.json` à la compilation (`include_str!` dans `catalogue()`). Hub, Desk, Store, Seek, Flow et Mind ne voient donc un nouvel outil qu'après recompilation et republication, sur le web comme sur desktop (où `available()` filtre ce catalogue embarqué par les outils installés).
-4. **Machines installées** : `kortex install <id>` ou le Store desktop installent l'outil depuis l'index signé ; `kortex update` propose une nouvelle version seulement si la version du contrat a été montée.
+1. Écrire l'outil (contrat, moteur, glyphe, locales, contenu, tests), puis `cargo xtask registry` et `cargo xtask check <id>`. Pour une modification, **monter `version`** dans `tool.toml` : la CI (`versions`) refuse un outil modifié dont la version n'a pas changé.
+2. Pousser sur `main`. Après la CI verte, `feed.yml` s'enchaîne seul :
+   - `cargo xtask feed-plan` compare au dernier index signé publié (commit source, sequence) et ne retient que les outils touchés ; une crate partagée (plateforme, UI, runtime, bus, contrat), le verrou ou la toolchain retiennent tout, par fermeture des dépendances ;
+   - web : bundle (UI + moteur `engine/`) de ces seuls outils ; desktop : binaires de ces seuls outils pour Linux, Windows, macOS ARM et Intel ;
+   - release GitHub `feed-<sequence>` : uniquement les paquets reconstruits, le nouvel index signé (fusionné avec les entrées précédentes, URLs absolues) et le catalogue de contrats signé `catalog.json` ;
+   - les hôtes statiques (`run`, apps, site) sont reconstitués à partir des archives web de l'index fusionné, sans recompilation, puis publiés.
+3. Web : l'outil apparaît dans Workspace, Hub, Seek, Store, Flow et Mind au prochain chargement (ils lisent `kortex.site/registry/catalog.json`, vérifié par signature, avec cache hors ligne et repli sur les contrats embarqués). Flow et Mind exécutent son moteur par l'hôte de moteurs de l'origine `run` (`/engines/host.html`).
+4. Machines installées : le Store et `kortex install <id>` installent l'outil depuis l'index signé ; `kortex update` propose les versions supérieures ; les apps desktop découvrent l'outil par son `contract.json`.
 
-Les reçus de build évitent de recompiler les outils inchangés ; seule une modification d'une crate partagée (plateforme, UI, runtime, bus, contrat) invalide tous les bundles.
+Manuellement : `feed.yml` (`workflow_dispatch`) avec `channel=test` publie une prerelease sans toucher à l'index ni aux hôtes de production (recette). `release.yml` reste la voie complète manuelle.
+
+Les reçus de build évitent de recompiler les outils inchangés ; seule une modification d'une crate partagée invalide tous les bundles.

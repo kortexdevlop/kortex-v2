@@ -81,8 +81,9 @@ impl PkgEnv {
         self.try_save_contract(id, version).is_some()
     }
 
-    fn try_save_contract(&self, id: &str, version: &str) -> Option<()> {
-        crate::home::check_id(id).ok()?;
+    /// Contracts of the signed catalogue published next to the index (verified: key, channel and
+    /// anti-rollback floor), or `None` when it is unreachable, refused or absent.
+    pub fn load_catalog(&self) -> Option<Vec<serde_json::Value>> {
         let url = resolve(&self.index_src, "catalog.json");
         let bytes = fetch(&url, 8 << 20).ok()?;
         let sig = String::from_utf8(fetch(&format!("{url}.sig"), 4096).ok()?).ok()?;
@@ -100,7 +101,13 @@ impl PkgEnv {
             self.home.save_floor(&key, accepted.floor).ok()?;
         }
         let document: serde_json::Value = serde_json::from_slice(&bytes).ok()?;
-        let contract = document["tools"].as_array()?.iter().find(|t| {
+        document["tools"].as_array().cloned()
+    }
+
+    fn try_save_contract(&self, id: &str, version: &str) -> Option<()> {
+        crate::home::check_id(id).ok()?;
+        let tools = self.load_catalog()?;
+        let contract = tools.iter().find(|t| {
             t["tool"]["id"].as_str() == Some(id) && t["tool"]["version"].as_str() == Some(version)
         })?;
         let dir = self.home.tools_dir().join(id).join(version);

@@ -20,12 +20,12 @@ export const apps = [
     title: { fr: 'Vos outils, aussi sur votre ordinateur.', en: 'Your tools, also on your computer.' },
     status: { fr: 'Bêta sur ordinateur', en: 'Desktop beta' },
     description: {
-      fr: 'Explorez les 38 outils dans le Store Rust/Dioxus : recherche, univers, fiches et permissions. Sur ordinateur, il installe, met à jour et supprime les outils et les apps Kortex à partir d’un catalogue signé ; un compte Kortex gratuit est nécessaire pour installer.',
-      en: 'Explore the 38 tools in the Rust/Dioxus Store: search, universes, details and permissions. On your computer, it installs, updates and removes Kortex tools and apps from a signed catalogue; a free Kortex account is required to install.',
+      fr: 'Explorez tous les outils dans le Store Rust/Dioxus : recherche, univers, fiches et permissions. Sur ordinateur, il installe, met à jour et supprime les outils et les apps Kortex à partir d’un catalogue signé ; un compte Kortex gratuit est nécessaire pour installer.',
+      en: 'Explore every tool in the Rust/Dioxus Store: search, universes, details and permissions. On your computer, it installs, updates and removes Kortex tools and apps from a signed catalogue; a free Kortex account is required to install.',
     },
     features: {
-      fr: ['Catalogue Rust de 38 outils avec fiches détaillées.', 'Recherche et filtres par univers.', 'Installation vérifiée (signature et empreinte) sur ordinateur.'],
-      en: ['Rust catalogue with 38 detailed tool listings.', 'Search and universe filters.', 'Verified installation (signature and checksum) on your computer.'],
+      fr: ['Catalogue Rust de tous les outils avec fiches détaillées.', 'Recherche et filtres par univers.', 'Installation vérifiée (signature et empreinte) sur ordinateur.'],
+      en: ['Rust catalogue of every tool with detailed listings.', 'Search and universe filters.', 'Verified installation (signature and checksum) on your computer.'],
     },
     next: { fr: 'Bêta : l’installation est vérifiée sur macOS ; la recette complète sous Windows et Linux et la connexion au compte depuis le Store restent à terminer (connexion par la commande kortex login).', en: 'Beta: installation is verified on macOS; full Windows and Linux acceptance checks and signing in from the Store remain to be completed (sign in with the kortex login command).' },
   },
@@ -58,7 +58,7 @@ export const apps = [
     title: { fr: 'Votre tableau de bord Kortex.', en: 'Your Kortex dashboard.' },
     status: { fr: 'Première version', en: 'First release' },
     description: { fr: 'Retrouvez vos favoris, vos outils récents et votre activité locale dans un tableau de bord personnalisable.', en: 'Find your favourites, recent tools and local activity in a customizable dashboard.' },
-    features: { fr: ['Widgets réorganisables, masquables et largeur réglable.', 'Favoris et ouvertures récentes enregistrés localement.', 'Recherche dans les 38 outils du catalogue web.'], en: ['Reorder, hide and resize dashboard widgets.', 'Locally saved favourites and recent launches.', 'Search the 38 tools in the web catalogue.'] },
+    features: { fr: ['Widgets réorganisables, masquables et largeur réglable.', 'Favoris et ouvertures récentes enregistrés localement.', 'Recherche dans tous les outils du catalogue web.'], en: ['Reorder, hide and resize dashboard widgets.', 'Locally saved favourites and recent launches.', 'Search every tool of the web catalogue.'] },
     next: { fr: 'Première version Rust/Dioxus. Le compte reste accessible sur le site. Session du site reconnue et sauvegarde manuelle des métadonnées disponibles. Connexion native et synchronisation automatique restent à terminer. Version ordinateur en bêta, installable depuis Kortex Store.', en: 'First Rust/Dioxus version. Your account remains available on the site. Website session recognition and manual metadata backup are available. Native sign-in and automatic sync remain to be completed. Desktop version in beta, installable from Kortex Store.' },
   },
 ] as const;

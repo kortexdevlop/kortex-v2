@@ -3465,53 +3465,16 @@ dependencies = [
 
 [[package]]
 name = "kortex-cli"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "flate2",
  "kortex-contract",
  "kortex-pkg",
  "kortex-platform",
  "kortex-runtime",
+ "kortex-workflow",
  "serde_json",
  "tar",
- "tool-calc-age",
- "tool-calc-average",
- "tool-calc-compound-interest",
- "tool-calc-date-add",
- "tool-calc-date-difference",
- "tool-calc-fuel-cost",
- "tool-calc-gross-net-salary",
- "tool-calc-loan",
- "tool-calc-percentage",
- "tool-calc-rule-of-three",
- "tool-calc-tip",
- "tool-calc-unit-price",
- "tool-calc-vat",
- "tool-code-base64",
- "tool-code-chmod",
- "tool-code-html-entities",
- "tool-code-json-formatter",
- "tool-code-markdown-table",
- "tool-code-number-base",
- "tool-code-url-encoder",
- "tool-code-uuid-generator",
- "tool-color-contrast-checker",
- "tool-color-converter",
- "tool-convert-timestamp",
- "tool-convert-units",
- "tool-image-convert",
- "tool-pdf-merge",
- "tool-qr-generator",
- "tool-secure-hash-calculator",
- "tool-secure-password-generator",
- "tool-text-case-converter",
- "tool-text-cleaner",
- "tool-text-deduplicate",
- "tool-text-find-replace",
- "tool-text-lorem-ipsum",
- "tool-text-slug-generator",
- "tool-text-sort-lines",
- "tool-text-word-counter",
 ]
 
 [[package]]
@@ -6936,6 +6899,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "tool-image-compress"
+version = "0.1.0"
+dependencies = [
+ "color_quant",
+ "image",
+ "kortex",
+ "png 0.18.1",
+]
+
+[[package]]
 name = "tool-image-convert"
 version = "0.1.0"
 dependencies = [
@@ -8221,6 +8194,7 @@ version = "0.0.0"
 dependencies = [
  "flate2",
  "getrandom 0.3.4",
+ "kortex-catalog",
  "kortex-contract",
  "kortex-pkg",
  "resvg",

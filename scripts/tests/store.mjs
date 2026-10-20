@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {createRequire} from 'node:module';
 import {readFileSync,existsSync,statSync,mkdirSync,writeFileSync} from 'node:fs';
 import {resolve,extname,sep} from 'node:path';
+const toolCount=JSON.parse(readFileSync(new URL('../../registry/contracts.json',import.meta.url),'utf8')).tools.length;
 const {chromium}=createRequire(import.meta.url)('playwright');
 const root=resolve(import.meta.dirname,'../..');
 const published=process.argv.includes('--public');
@@ -22,7 +23,7 @@ try {
  page.on('pageerror',error=>errors.push(error.message));
  await page.goto(`https://${host}/`,{waitUntil:'networkidle'});
  await page.locator('[data-tool]').first().waitFor();
- assert.equal(await page.locator('[data-tool]').count(),38);checks.push('38 real tools');
+ assert.equal(await page.locator('[data-tool]').count(),toolCount);checks.push(`${toolCount} real tools`);
  await page.getByRole('searchbox').fill('générateur mot');
  await page.waitForTimeout(100);
  assert.equal(await page.locator('[data-tool="secure.password-generator"]').count(),1);

@@ -109,11 +109,10 @@ fn build_one(id: &str) -> Result<(), String> {
     fs::create_dir_all(work.join("src")).map_err(|e| e.to_string())?;
     fs::create_dir_all(work.join("assets")).map_err(|e| e.to_string())?;
     let contract = tool.contract.as_ref().map_err(|e| e.to_string())?;
-    let worker = if contract.tool.web_worker {
-        Some(crate::worker::build(&root, &tool_dir, id)?)
-    } else {
-        None
-    };
+    // Every tool ships its headless engine in its own bundle (`<id>/engine/`): Flow and Mind run
+    // it through the engine host of the `run` origin, so a new tool needs no change in the apps.
+    let engine = crate::worker::build(&root, &tool_dir, id)?;
+    let worker = contract.tool.web_worker.then(|| engine.clone());
     let runner_body = if let Some((_, folder, codes)) = &worker {
         let timeout = contract
             .limits
@@ -275,6 +274,13 @@ fn App() -> Element {{
         copy_dir(&source, &dest.join(folder))?;
     }
     write_offline_cache(&dest, id)?;
+    // Not part of the offline inventory: the engine is fetched when an app asks for it.
+    let engine_dest = dest.join("engine");
+    fs::create_dir_all(&engine_dest).map_err(|e| e.to_string())?;
+    for name in ["engine.js", "engine_bg.wasm", "worker.js"] {
+        fs::copy(engine.0.join(name), engine_dest.join(name))
+            .map_err(|e| format!("{id} : moteur {name} : {e}"))?;
+    }
     fs::write(
         &receipt,
         serde_json::json!({"source": source, "output": tree_fingerprint(&dest)?}).to_string(),

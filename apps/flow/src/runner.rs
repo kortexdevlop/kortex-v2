@@ -32,13 +32,19 @@ pub async fn run_tool(job: &Job) -> Result<ValueMap, RunError> {
     if job.tool.starts_with("workflow.") {
         return crate::subflow::run(job.clone()).await;
     }
-    let url = format!("/engines/{}/worker.js", job.tool);
-    kortex_platform::worker::run(&url, job.inputs.clone(), job.params.clone(), TIMEOUT_MS)
-        .await
-        .map_err(|e| RunError {
-            code: e.code,
-            detail: e.detail,
-        })
+    let origin = format!("https://{}", kortex_shell::domain("run"));
+    kortex_platform::worker::run_hosted(
+        &origin,
+        &job.tool,
+        job.inputs.clone(),
+        job.params.clone(),
+        TIMEOUT_MS,
+    )
+    .await
+    .map_err(|e| RunError {
+        code: e.code,
+        detail: e.detail,
+    })
 }
 
 /// Stops the tool currently running (the browser terminates its Worker immediately).
