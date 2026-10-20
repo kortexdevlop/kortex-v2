@@ -46,20 +46,20 @@ const T = {
   .admin-auto { display: flex; gap: var(--k-space-2); align-items: center; min-height: 44px; }
   .admin-auto input { width: 20px; height: 20px; accent-color: var(--k-accent); }
   .admin section { display: grid; gap: var(--k-space-3); margin-bottom: var(--k-space-5); }
-  .admin h2 { font-size: 1.1rem; }
+  .admin h2 { font-size: var(--k-type-scale-1); margin: 0; }
   .admin .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: var(--k-space-3); }
-  .admin .tile { padding: var(--k-space-4); border: 1px solid var(--k-glass-edge); border-radius: var(--k-radius-field); background: var(--k-glass); box-shadow: var(--k-shadow-inset), var(--k-shadow-1); display: grid; gap: var(--k-space-1); }
-  .admin .tile strong { font-size: var(--k-type-scale-2); letter-spacing: var(--k-type-tracking-display); font-weight: var(--k-type-weight-medium); font-variant-numeric: tabular-nums; }
-  .admin .pill { display: inline-block; padding: 0 var(--k-space-2); border-radius: var(--k-radius-pill); font-size: .8rem; font-weight: 600; }
-  .admin .pill[data-ok="true"] { background: var(--k-surface-2); color: var(--k-success); }
-  .admin .pill[data-ok="false"] { background: var(--k-surface-2); color: var(--k-danger); }
-  .admin .bar { height: 10px; border-radius: var(--k-radius-pill); box-shadow: var(--k-shadow-inset); background: var(--k-surface-2); overflow: hidden; }
+  .admin .tile { padding: var(--k-space-5); border: 1px solid var(--k-border); border-radius: var(--k-radius-card); background: var(--k-surface); display: grid; gap: var(--k-space-1); }
+  .admin .tile strong { font-family: var(--k-type-display); font-size: var(--k-type-scale-2); letter-spacing: var(--k-type-tracking-display); font-weight: var(--k-type-weight-strong); font-variant-numeric: tabular-nums; }
+  .admin .pill { display: inline-flex; align-items: center; min-height: 24px; padding: 0 var(--k-space-3); border-radius: var(--k-radius-pill); font-size: var(--k-type-scale-sm); font-weight: var(--k-type-weight-medium); }
+  .admin .pill[data-ok="true"] { background: color-mix(in oklab, var(--k-success) 12%, transparent); color: var(--k-success); }
+  .admin .pill[data-ok="false"] { background: color-mix(in oklab, var(--k-danger) 12%, transparent); color: var(--k-danger); }
+  .admin .bar { height: 6px; border-radius: var(--k-radius-pill); background: var(--k-surface-3); overflow: hidden; }
   .admin .bar span { display: block; height: 100%; background: var(--k-accent); }
   .admin .bar[data-tone="warn"] span { background: var(--k-accent-2); }
   .admin .bar[data-tone="bad"] span { background: var(--k-danger); }
   .admin table { width: 100%; border-collapse: collapse; font-size: var(--k-type-scale-sm); font-variant-numeric: tabular-nums; }
   .admin th, .admin td { text-align: left; padding: var(--k-space-2) var(--k-space-3); border-bottom: 1px solid var(--k-border); }
-  .admin code { font-family: var(--k-type-mono); font-size: .8rem; overflow-wrap: anywhere; }
+  .admin code { font-family: var(--k-type-mono); font-size: var(--k-type-scale-sm); overflow-wrap: anywhere; }
   .admin .days { display: flex; align-items: flex-end; gap: var(--k-space-2); height: 90px; }
   .admin .days div { flex: 1; background: var(--k-accent); border-radius: var(--k-radius-control) var(--k-radius-control) 0 0; min-height: 2px; }
 </style>

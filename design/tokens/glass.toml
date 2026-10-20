@@ -1,5 +1,5 @@
-# Frosted-glass material: blur radii and saturation for backdrop-filter.
+# Frosted-glass material for floating chrome only: blur radii and saturation for backdrop-filter.
 blur-sm = "12px"
-blur-md = "24px"
-blur-lg = "40px"
+blur-md = "20px"
+blur-lg = "32px"
 saturate = "180%"

@@ -211,27 +211,79 @@ pub fn Frame(title: String, subtitle: String, children: Element) -> Element {
     let mut appearance = use_context::<Appearance>();
     let lang = (appearance.lang)();
     let fr = lang == "fr";
+    let mode = (appearance.mode)();
+    let dark = (appearance.theme)() == "dark";
+    let links = [
+        (url("hub", &lang), "Kortex Hub", "hub"),
+        (url("desk", &lang), "Kortex Desk", "desk"),
+        (
+            format!("{}{}", url("root", &lang), if fr { "outils" } else { "tools" }),
+            if fr { "Tous les outils" } else { "All tools" },
+            "tools",
+        ),
+        (
+            format!("{}{}", url("root", &lang), if fr { "compte" } else { "account" }),
+            if fr { "Compte" } else { "Account" },
+            "account",
+        ),
+    ];
     rsx! {
      style { {include_str!("../../../design/dist/kortex.css")} }
         style { "{CSS}" }
      div {class:"k-ambient","aria-hidden":"true"}
      div {class:"app-shell",
       aside {class:"app-rail",
-       a {class:"app-brand",href:url("root",&lang), "Kortex"}
+       a {class:"app-brand",href:url("root",&lang),
+        span {class:"app-brand-mark","aria-hidden":"true",
+         svg {view_box:"0 0 64 64",fill:"none",stroke:"currentColor",stroke_width:"5",stroke_linecap:"round",stroke_linejoin:"round",
+          path {d:"M22 13V51M22 33C30 33 37 28 43 15C46 25 40 32 33 36C41 38 46 44 47 51"}
+         }
+        }
+        "Kortex"
+       }
        nav { "aria-label":if fr{"Applications"}else{"Apps"},
-        a { href:url("hub",&lang), "Kortex Hub" }
-        a { href:url("desk",&lang), "Kortex Desk" }
-        a { href:format!("{}{}",url("root",&lang),if fr{"outils"}else{"tools"}), if fr{"Tous les outils"}else{"All tools"} }
-        a { href:format!("{}{}",url("root",&lang),if fr{"compte"}else{"account"}), if fr{"Compte"}else{"Account"} }
+        for (href , label , icon) in links {
+         a { key:"{icon}", href:"{href}",
+          svg {class:"app-nav-icon",view_box:"0 0 24 24","aria-hidden":"true",
+           match icon {
+            "hub" => rsx!{ rect{x:"4",y:"4",width:"7",height:"9",rx:"2"} rect{x:"13",y:"4",width:"7",height:"5",rx:"2"} rect{x:"4",y:"15",width:"7",height:"5",rx:"2"} rect{x:"13",y:"11",width:"7",height:"9",rx:"2"} },
+            "desk" => rsx!{ rect{x:"3.5",y:"5",width:"17",height:"12",rx:"2.5"} path{d:"M8 20h8M12 17v3"} },
+            "tools" => rsx!{ rect{x:"4",y:"4",width:"6.5",height:"6.5",rx:"2"} rect{x:"13.5",y:"4",width:"6.5",height:"6.5",rx:"2"} rect{x:"4",y:"13.5",width:"6.5",height:"6.5",rx:"2"} rect{x:"13.5",y:"13.5",width:"6.5",height:"6.5",rx:"3.25"} },
+            _ => rsx!{ circle{cx:"12",cy:"9",r:"3.5"} path{d:"M5.5 19.5c1.3-3 3.6-4.5 6.5-4.5s5.2 1.5 6.5 4.5"} },
+           }
+          }
+          span {"{label}"}
+         }
+        }
        }
        p {class:"app-rail-note k-muted",if fr{"Vos fichiers restent sur cet appareil."}else{"Your files stay on this device."}}
       }
       main {class:"app-main",
-       header {class:"app-header",div {p{class:"app-eyebrow",if fr{"KORTEX · FICHIERS LOCAUX"}else{"KORTEX · LOCAL FIRST"}} h1{"{title}"} p{class:"k-muted","{subtitle}"}}
+       header {class:"app-header",
+        div {class:"app-heading", h1{"{title}"} p{class:"k-muted","{subtitle}"}}
         div {class:"app-settings",
-         select {class:"k-input","aria-label":"Mode",value:(appearance.mode)(),onchange:move|e|appearance.mode.set(e.value()),option{value:"simple","Simple"}option{value:"medium","Medium"}option{value:"pro","Pro"}}
-         Button {ghost:true,onclick:move |_| {let next=if (appearance.theme)()=="dark"{"light"}else{"dark"};appearance.theme.set(next.into());},if fr{"Thème"}else{"Theme"}}
-         Button {ghost:true,onclick:move |_|{let next=if (appearance.lang)()=="fr"{"en"}else{"fr"};appearance.lang.set(next.into());},if fr{"EN"}else{"FR"}}
+         div {class:"k-segmented",role:"radiogroup","aria-label":"Mode",
+          for (id , label) in [("simple","Simple"),("medium","Medium"),("pro","Pro")] {
+           button {key:"{id}",class:"k-segment",r#type:"button",role:"radio","aria-checked":"{mode == id}",
+            onclick:move |_| { let mut m = appearance.mode; m.set(id.into()); },
+            "{label}"
+           }
+          }
+         }
+         button {class:"k-icon-btn app-icon",r#type:"button","aria-label":if fr{"Thème"}else{"Theme"},title:if fr{"Thème"}else{"Theme"},
+          onclick:move |_| {let next=if (appearance.theme)()=="dark"{"light"}else{"dark"};appearance.theme.set(next.into());},
+          svg {view_box:"0 0 24 24","aria-hidden":"true",
+           if dark {
+            circle{cx:"12",cy:"12",r:"4"} path{d:"M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"}
+           } else {
+            path{d:"M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z"}
+           }
+          }
+         }
+         button {class:"k-icon-btn app-icon app-lang",r#type:"button",lang:if fr{"en"}else{"fr"},
+          onclick:move |_|{let next=if (appearance.lang)()=="fr"{"en"}else{"fr"};appearance.lang.set(next.into());},
+          if fr{"EN"}else{"FR"}
+         }
         }
        }
        {children}

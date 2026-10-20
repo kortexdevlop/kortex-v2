@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import Stage from './Stage.astro';
-import { toolPath, variantPath, ui, type Lang, type ToolEntry } from '../lib/data';
+import { toolPath, variantPath, universePath, universes, ui, type Lang, type ToolEntry } from '../lib/data';
 const { t, lang, variant } = Astro.props as { t: ToolEntry; lang: Lang; variant?: ToolEntry['variants'][number] };
 const L = ui[lang];
 const name = variant ? variant.name[lang] : t.tool.name[lang];
@@ -13,32 +13,89 @@ const jsonLd = [
   { '@context': 'https://schema.org', '@type': 'SoftwareApplication', name, applicationCategory: 'UtilitiesApplication', operatingSystem: 'Web, Windows, macOS, Linux', offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' } },
   ...(faq.length ? [{ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) }] : []),
 ];
+const universe = universes.find((u) => u.id === t.tool.universe);
+const fr = lang === 'fr';
 ---
 <Base title={`${name} — Kortex`} description={t.tool.tagline[lang]} lang={lang} alt={{ fr: path('fr'), en: path('en') }} jsonLd={jsonLd} ogImage={`/og/${lang}/${t.tool.slug[lang]}.png`}>
-  <section class="hero tool-hero">
-    <img class="tool-icon" src={`/icons/${t.tool.id}.svg`} width="72" height="72" alt="" />
-    <h1>{name}</h1>
-    <p class="k-muted">{t.tool.tagline[lang]}</p>
-    <div class="badges">
-      <span class="badge">{L.local}</span>
-      {t.tool.offline && <span class="badge">{L.offline}</span>}
-      <span class="badge">{L.free}</span>
+  <nav class="crumbs" aria-label={fr ? 'Fil d’Ariane' : 'Breadcrumb'}>
+    <a href={fr ? '/outils' : '/en/tools'}>{L.tools}</a>
+    {universe && <><span aria-hidden="true">/</span><a href={universePath(universe, lang)}>{universe.name}</a></>}
+    {variant && <><span aria-hidden="true">/</span><a href={toolPath(t, lang)}>{t.tool.name[lang]}</a></>}
+  </nav>
+  <section class="hero tool-hero" style={`--hue:${universe?.hue ?? 250}`}>
+    <img class="tool-icon" src={`/icons/${t.tool.id}.svg`} width="80" height="80" alt="" />
+    <div class="tool-hero-copy">
+      <h1>{name}</h1>
+      <p class="lead">{t.tool.tagline[lang]}</p>
+      <div class="tool-hero-actions">
+        <Stage toolId={t.tool.id} name={name} lang={lang} variantId={variant?.id} label={L.open} />
+        <div class="badges">
+          <span class="badge" data-tone="success">{L.local}</span>
+          {t.tool.offline && <span class="badge">{L.offline}</span>}
+          <span class="badge">{L.free}</span>
+        </div>
+      </div>
     </div>
-    <Stage toolId={t.tool.id} name={name} lang={lang} variantId={variant?.id} label={L.open} />
   </section>
-  <div class="prose">
-    {content.map((s) => (
-      <section>
-        <h2>{s.title}</h2>
-        {s.text && <div style="white-space: pre-line">{s.text}</div>}
-        {s.faq.map((f) => <details><summary>{f.q}</summary><p>{f.a}</p></details>)}
-      </section>
-    ))}
-    {!variant && t.variants.length > 0 && (
-      <section>
-        <h2>{L.related}</h2>
-        <ul>{t.variants.map((v) => <li><a href={variantPath(t, v, lang)}>{v.name[lang]}</a></li>)}</ul>
-      </section>
-    )}
+  <div class="tool-body">
+    <div class="prose">
+      {content.map((s) => (
+        <section>
+          <h2>{s.title}</h2>
+          {s.text && <div style="white-space: pre-line">{s.text}</div>}
+          {s.faq.map((f) => <details><summary>{f.q}</summary><p>{f.a}</p></details>)}
+        </section>
+      ))}
+    </div>
+    <aside class="tool-aside">
+      <div class="aside-card">
+        <p class="aside-title">{fr ? 'En bref' : 'At a glance'}</p>
+        <ul class="aside-facts">
+          <li><span>{fr ? 'Traitement' : 'Processing'}</span><strong>{L.local}</strong></li>
+          {t.tool.offline && <li><span>{fr ? 'Connexion' : 'Connection'}</span><strong>{L.offline}</strong></li>}
+          <li><span>{fr ? 'Prix' : 'Price'}</span><strong>{L.free}</strong></li>
+          {!t.tool.ai && <li><span>{fr ? 'Compte' : 'Account'}</span><strong>{fr ? 'Inutile' : 'Not needed'}</strong></li>}
+        </ul>
+      </div>
+      {!variant && t.variants.length > 0 && (
+        <div class="aside-card">
+          <p class="aside-title">{L.related}</p>
+          <ul class="aside-links">{t.variants.map((v) => <li><a href={variantPath(t, v, lang)}>{v.name[lang]}</a></li>)}</ul>
+        </div>
+      )}
+    </aside>
   </div>
 </Base>
+<style is:global>
+  .tool-hero { --c: oklch(var(--k-hue-l) var(--k-hue-c) var(--hue)); display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: start; gap: var(--k-space-6); margin-top: var(--k-space-4); padding: var(--k-space-7);
+    border: 1px solid var(--k-border); border-radius: var(--k-radius-panel);
+    background: radial-gradient(60% 120% at 0% 0%, color-mix(in oklab, var(--c) 14%, transparent), transparent 70%), var(--k-surface); }
+  /* No backdrop-filter or transform here: it would become the containing block of the fixed Stage inside the hero. */
+  .tool-hero .tool-icon { width: 80px; height: 80px; border-radius: var(--k-radius-sheet); }
+  .tool-hero-copy { display: grid; gap: var(--k-space-3); }
+  .tool-hero h1 { margin: 0; font-size: clamp(2rem, 4.2vw, var(--k-type-scale-5)); }
+  .tool-hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--k-space-4); margin-top: var(--k-space-3); }
+  .tool-body { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: var(--k-space-8); align-items: start; margin-top: var(--k-space-6); }
+  .tool-body .prose section:first-child h2 { margin-top: var(--k-space-5); }
+  .tool-aside { position: sticky; top: calc(var(--site-bar) + var(--k-space-5)); display: grid; gap: var(--k-space-4); margin-top: var(--k-space-5); }
+  .aside-card { padding: var(--k-space-5); border-radius: var(--k-radius-card); background: var(--k-surface-2); }
+  .aside-title { margin: 0 0 var(--k-space-3); font-weight: var(--k-type-weight-strong); }
+  .aside-facts, .aside-links { list-style: none; margin: 0; padding: 0; }
+  .aside-facts li { display: flex; justify-content: space-between; gap: var(--k-space-3); padding: var(--k-space-2) 0; font-size: var(--k-type-scale-sm); }
+  .aside-facts li + li { border-top: 1px solid var(--k-border); }
+  .aside-facts span { color: var(--k-text-2); }
+  .aside-facts strong { font-weight: var(--k-type-weight-medium); text-align: right; }
+  .aside-links a { display: flex; align-items: center; min-height: 44px; color: var(--k-text); text-decoration: none; font-size: 0.9375rem; border-top: 1px solid var(--k-border); }
+  .aside-links li:first-child a { border-top: 0; }
+  .aside-links a:hover { color: var(--k-accent); }
+  @media (max-width: 899px) {
+    .tool-body { grid-template-columns: 1fr; gap: 0; }
+    .tool-aside { position: static; grid-row: 1; margin-top: var(--k-space-5); }
+  }
+  @media (max-width: 599px) {
+    .tool-hero { grid-template-columns: 1fr; gap: var(--k-space-4); padding: var(--k-space-5); border-radius: var(--k-radius-sheet); }
+    .tool-hero .tool-icon { width: 64px; height: 64px; }
+    .tool-hero-actions { display: grid; }
+    .tool-hero-actions .stage-open { width: 100%; }
+  }
+</style>

@@ -18,24 +18,31 @@ const t = lang === 'fr'
   </div>
 </dialog>
 <style is:global>
-  .seek-trigger { display: inline-flex; align-items: center; gap: var(--k-space-2); min-height: 44px; min-width: 44px; padding: 0 var(--k-space-2) 0 var(--k-space-3); border: 1px solid var(--k-glass-edge); border-radius: var(--k-radius-pill);
-    background: var(--k-glass-strong); color: var(--k-text-2); font: inherit; cursor: pointer; box-shadow: var(--k-shadow-inset); transition: box-shadow var(--k-motion-base) var(--k-motion-ease), color var(--k-motion-base) var(--k-motion-ease); }
-  .seek-trigger:hover { box-shadow: var(--k-shadow-inset), var(--k-shadow-2); color: var(--k-text); }
-  .seek-trigger kbd { padding: 0 var(--k-space-2); border-radius: var(--k-radius-pill); background: var(--k-surface-2); line-height: 1.7; }
-  @media (max-width: 767px) { .seek-label, .seek-trigger kbd { display: none; } .seek-trigger { justify-content: center; padding: 0; } }
-  dialog.seek { width: min(640px, calc(100vw - 2 * var(--k-space-4))); margin: 12vh auto auto; padding: 0; border: 1px solid var(--k-glass-edge); border-radius: var(--k-radius-sheet);
-    background: linear-gradient(180deg, var(--k-glass-highlight), transparent 20%), var(--k-glass-strong); color: var(--k-text); box-shadow: var(--k-shadow-inset), var(--k-shadow-5);
+  .seek-trigger { display: inline-flex; align-items: center; gap: var(--k-space-2); min-height: 44px; min-width: 44px; width: 232px; padding: 0 var(--k-space-2) 0 var(--k-space-3); border: 1px solid var(--k-border); border-radius: var(--k-radius-pill);
+    background: var(--k-surface-2); color: var(--k-text-2); font: inherit; font-size: var(--k-type-scale-sm); cursor: pointer; transition: border-color var(--k-motion-base) var(--k-motion-ease), color var(--k-motion-base) var(--k-motion-ease), background-color var(--k-motion-base) var(--k-motion-ease); }
+  .seek-trigger:hover { border-color: var(--k-border-strong); color: var(--k-text); background: var(--k-surface); }
+  .seek-trigger .seek-label { flex: 1; text-align: left; }
+  .seek-trigger kbd { padding: 0 var(--k-space-2); border-radius: var(--k-radius-control); background: var(--k-surface); border: 1px solid var(--k-border); line-height: 1.6; }
+  @media (max-width: 1239px) { .seek-trigger { width: auto; } .seek-trigger .seek-label { flex: none; } }
+  @media (max-width: 1099px) { .seek-label, .seek-trigger kbd { display: none; } .seek-trigger { justify-content: center; width: 44px; padding: 0; border-color: transparent; background: transparent; } .seek-trigger:hover { background: var(--k-surface-2); } .seek-trigger svg { width: 20px; height: 20px; } }
+  dialog.seek { width: min(640px, calc(100vw - 2 * var(--k-space-4))); max-height: min(560px, 76vh); margin: 12vh auto auto; padding: 0; border: 1px solid var(--k-glass-edge); border-radius: var(--k-radius-sheet);
+    background: var(--k-glass-strong); color: var(--k-text); box-shadow: var(--k-shadow-inset), var(--k-shadow-5); overflow: hidden;
     -webkit-backdrop-filter: blur(var(--k-glass-blur-lg)) saturate(var(--k-glass-saturate)); backdrop-filter: blur(var(--k-glass-blur-lg)) saturate(var(--k-glass-saturate)); }
   dialog.seek[open] { animation: k-appear var(--k-motion-slow) var(--k-motion-out) both; }
-  dialog.seek::backdrop { background: var(--k-overlay); -webkit-backdrop-filter: blur(var(--k-glass-blur-sm)); backdrop-filter: blur(var(--k-glass-blur-sm)); }
-  .seek-box { padding: var(--k-space-4); display: grid; gap: var(--k-space-3); }
-  .seek-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--k-space-1); max-height: 50vh; overflow: auto; }
-  .seek-item a { display: grid; grid-template-columns: 32px 1fr; gap: var(--k-space-3); align-items: center; min-height: 44px; padding: var(--k-space-3); border-radius: var(--k-radius-field); color: inherit; text-decoration: none; transition: background-color var(--k-motion-fast) var(--k-motion-ease); }
-  .seek-item[aria-selected="true"] a, .seek-item a:hover { background: var(--k-glass-strong); box-shadow: var(--k-shadow-inset), var(--k-shadow-1); }
-  .seek-item svg { width: 28px; height: 28px; color: var(--k-accent); }
-  .seek-item small { display: block; color: var(--k-text-2); }
+  dialog.seek::backdrop { background: var(--k-overlay); }
+  .seek-box { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; max-height: inherit; }
+  .seek-box .k-input { min-height: 60px; padding: 0 var(--k-space-5); border: 0; border-bottom: 1px solid var(--k-border); border-radius: 0; background: transparent; font-size: 1.0625rem; box-shadow: none; }
+  .seek-box .k-input:focus { box-shadow: none; border-color: var(--k-border); }
+  .seek-list { list-style: none; margin: 0; padding: var(--k-space-2); display: grid; align-content: start; gap: 2px; overflow: auto; }
+  .seek-item a { display: grid; grid-template-columns: 36px 1fr; gap: var(--k-space-3); align-items: center; min-height: 52px; padding: var(--k-space-2) var(--k-space-3); border-radius: var(--k-radius-field); color: inherit; text-decoration: none; transition: background-color var(--k-motion-fast) var(--k-motion-ease); }
+  .seek-item a > span:first-child { display: grid; place-items: center; width: 36px; height: 36px; border-radius: var(--k-radius-control); background: var(--k-surface-2); }
+  .seek-item[aria-selected="true"] a, .seek-item a:hover { background: var(--k-surface-2); }
+  .seek-item[aria-selected="true"] a > span:first-child { background: var(--k-surface); }
+  .seek-item svg { width: 22px; height: 22px; color: var(--k-text); }
+  .seek-item strong { font-weight: var(--k-type-weight-medium); }
+  .seek-item small { display: block; color: var(--k-text-2); font-size: var(--k-type-scale-sm); }
+  .seek-hint { margin: 0; padding: var(--k-space-3) var(--k-space-5); border-top: 1px solid var(--k-border); font-size: var(--k-type-scale-sm); }
   @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) { dialog.seek { background: var(--k-surface); -webkit-backdrop-filter: none; backdrop-filter: none; } }
-  .seek-hint { margin: 0; font-size: var(--k-type-scale-sm); }
 </style>
 <script>
   import { search, type SeekEntry } from '../lib/site-search';

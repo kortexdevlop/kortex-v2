@@ -1,7 +1,8 @@
 ---
 import Base from '../layouts/Base.astro';
 import ToolCard from './ToolCard.astro';
-import { tools, universes, byPriority, universePath, type Lang } from '../lib/data';
+import { tools, universes, byPriority, universePath, toolPath, prefix, type Lang } from '../lib/data';
+import { apps } from '../lib/apps';
 const { lang } = Astro.props as { lang: Lang };
 const T = {
   fr: {
@@ -16,7 +17,9 @@ const T = {
       ['Aucun envoi', 'Vos documents, photos et mots de passe ne quittent jamais votre appareil.'],
       ['Hors ligne', 'Après un premier chargement, les outils fonctionnent sans connexion.'],
     ],
-    emptyTools: 'Les premiers outils arrivent bientôt.',
+    device: 'Votre appareil', server: 'Serveur de fichiers', none: 'aucun',
+    emptyTools: 'Les premiers outils arrivent bientôt.', try: 'Essayez',
+    apps: 'Les applications', appsSub: 'Les mêmes moteurs, réunis pour chercher, organiser et automatiser.', appsAll: 'Toutes les applications', appsHref: '/applications',
   },
   en: {
     title: 'Kortex — free, fast, private tools',
@@ -30,43 +33,91 @@ const T = {
       ['Nothing uploaded', 'Your documents, photos and passwords never leave your device.'],
       ['Works offline', 'After a first load, tools work without a connection.'],
     ],
-    emptyTools: 'The first tools are coming soon.',
+    device: 'Your device', server: 'File server', none: 'none',
+    emptyTools: 'The first tools are coming soon.', try: 'Try',
+    apps: 'The apps', appsSub: 'The same engines, brought together to find, arrange and automate.', appsAll: 'All apps', appsHref: '/en/apps',
   },
 }[lang];
 const popular = [...tools].filter((x) => x.tool.status !== 'draft').sort(byPriority).slice(0, 12);
+// One tool per universe first, so the hero mosaic shows the breadth of the catalogue.
+const ranked = [...tools].filter((x) => x.tool.status !== 'draft').sort(byPriority);
+const firsts = universes.map((u) => ranked.find((x) => x.tool.universe === u.id)).filter((x): x is (typeof ranked)[number] => !!x);
+const mosaic = [...firsts, ...ranked.filter((x) => !firsts.includes(x))].slice(0, 9);
+const quick = popular.slice(0, 4);
 const counts = (id: string) => tools.filter((x) => x.tool.universe === id).length;
+const hueOf = (id: string) => universes.find((u) => u.id === id)?.hue ?? 250;
+const files = ['facture.pdf', 'photo.heic', 'notes.md'];
 ---
 <Base title={T.title} description={T.sub} lang={lang} alt={{ fr: '/', en: '/en' }}>
-  <section class="hero home-hero" data-glow>
-    <div class="home-stage" aria-hidden="true">
-      <div class="home-plane home-plane-a k-glass"><span></span><span></span><span></span></div>
-      <div class="home-plane home-plane-b k-glass"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.5" /><circle cx="18" cy="18" r="15.5" pathLength="100" /></svg></div>
-      <div class="home-plane home-plane-c k-glass"><svg viewBox="0 0 120 40" preserveAspectRatio="none"><path d="M0 32 C 18 30, 26 12, 44 18 S 72 34, 86 16 S 110 6, 120 8" /></svg></div>
+  <section class="home-hero">
+    <div class="home-copy">
+      <h1>{T.h1a}<br /><span class="home-h1-2">{T.h1b}</span></h1>
+      <p class="lead">{T.sub}</p>
+      <button class="home-search" type="button" data-seek-open>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
+        <span>{T.cta}</span><kbd data-seek-kbd>⌘K</kbd>
+      </button>
+      {quick.length > 0 && (
+        <p class="home-quick"><span class="k-muted">{T.try}</span>{quick.map((x) => <a href={toolPath(x, lang)}>{x.tool.name[lang]}</a>)}</p>
+      )}
     </div>
-    <svg class="home-mark" width="72" height="72" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <path pathLength="1" d="M22 13V51M22 33C30 33 37 28 43 15C46 25 40 32 33 36C41 38 46 44 47 51" />
-    </svg>
-    <h1>{T.h1a}<br /><span class="home-grad">{T.h1b}</span></h1>
-    <p class="home-sub">{T.sub}</p>
-    <button class="home-search" type="button" data-seek-open>
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
-      <span>{T.cta}</span><kbd data-seek-kbd>⌘K</kbd>
-    </button>
+    {mosaic.length > 0 && (
+      <div class="home-mosaic" aria-hidden="true">
+        {mosaic.map((x, i) => (
+          <a class="home-tile" href={toolPath(x, lang)} tabindex="-1" style={`--hue:${hueOf(x.tool.universe)};--i:${i}`}>
+            <img src={`/icons/${x.tool.id}.svg`} width="52" height="52" alt="" />
+            <span>{x.tool.name[lang]}</span>
+          </a>
+        ))}
+      </div>
+    )}
   </section>
 
-  <section class="reveal home-section">
-    <div class="home-head"><h2>{T.popular}</h2><a href={T.allHref}>{T.all} →</a></div>
+  <section class="section home-privacy reveal" aria-labelledby="privacy-title">
+    <div class="section-head">
+      <div><h2 id="privacy-title">{T.privacyTitle}</h2><p>{T.privacySub}</p></div>
+    </div>
+    <div class="bento">
+      <article class="bento-card bento-local">
+        <div class="bento-text"><h3>{T.points[0][0]}</h3><p>{T.points[0][1]}</p></div>
+        <div class="device" aria-hidden="true">
+          <div class="device-frame">
+            <span class="device-label">{T.device}</span>
+            <ul>{files.map((f) => <li><span class="device-file"></span>{f}</li>)}</ul>
+          </div>
+          <div class="device-link"></div>
+          <div class="device-server"><span>{T.server}</span><strong>{T.none}</strong></div>
+        </div>
+      </article>
+      <article class="bento-card bento-upload">
+        <svg class="bento-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V5M7.5 9.5 12 5l4.5 4.5" /><path d="M5 19.5h14" /><path d="M4 4l16 16" /></svg>
+        <h3>{T.points[1][0]}</h3><p>{T.points[1][1]}</p>
+      </article>
+      <article class="bento-card bento-offline">
+        <svg class="bento-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 9a14 14 0 0 1 19 0M5.5 12.5a9.5 9.5 0 0 1 13 0M8.8 16a5 5 0 0 1 6.4 0" /><circle cx="12" cy="19.2" r="1" fill="currentColor" /><path d="M3 3l18 18" /></svg>
+        <h3>{T.points[2][0]}</h3><p>{T.points[2][1]}</p>
+      </article>
+      <a class="bento-card bento-count" href={T.allHref}>
+        <span class="bento-num">{tools.length}</span>
+        <span class="bento-cap">{T.toolsN}</span>
+        <span class="more">{T.all}</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="section reveal" aria-labelledby="popular-title">
+    <div class="section-head"><h2 id="popular-title">{T.popular}</h2><a class="more" href={T.allHref}>{T.all}</a></div>
     {popular.length === 0
       ? <p class="k-muted">{T.emptyTools}</p>
       : <div class="grid">{popular.map((x) => <ToolCard t={x} lang={lang} />)}</div>}
   </section>
 
-  <section class="reveal home-section">
-    <h2>{T.universes}</h2>
-    <div class="grid home-universes">
+  <section class="section reveal" aria-labelledby="universes-title">
+    <div class="section-head"><h2 id="universes-title">{T.universes}</h2></div>
+    <div class="universe-list">
       {universes.map((u) => (
-        <a class="k-card home-universe" style={`--hue:${u.hue}`} href={universePath(u, lang)} data-tilt>
-          <span class="home-dot" aria-hidden="true"></span>
+        <a class="universe-row" style={`--hue:${u.hue}`} href={universePath(u, lang)} data-empty={counts(u.id) ? undefined : ''}>
+          <span class="universe-dot" aria-hidden="true"></span>
           <strong>{u.name}</strong>
           <span class="k-muted">{counts(u.id) ? `${counts(u.id)} ${counts(u.id) > 1 ? T.toolsN : T.tool}` : T.soon}</span>
         </a>
@@ -74,82 +125,111 @@ const counts = (id: string) => tools.filter((x) => x.tool.universe === id).lengt
     </div>
   </section>
 
-  <section class="home-section home-privacy">
-    <div class="home-pin">
-      <h2>{T.privacyTitle}</h2>
-      <p class="k-muted">{T.privacySub}</p>
+  <section class="section reveal" aria-labelledby="apps-title">
+    <div class="section-head"><div><h2 id="apps-title">{T.apps}</h2><p>{T.appsSub}</p></div><a class="more" href={T.appsHref}>{T.appsAll}</a></div>
+    <div class="home-apps">
+      {apps.map((a) => (
+        <a class="home-app" href={`${prefix(lang)}/${a.id}`}>
+          <strong>{a.name}</strong>
+          <span>{a.title[lang]}</span>
+        </a>
+      ))}
     </div>
-    <div class="home-points">{T.points.map(([h, p], i) => <div class="k-card reveal"><span class="home-num" aria-hidden="true">{`0${i + 1}`}</span><strong>{h}</strong><p class="k-muted">{p}</p></div>)}</div>
   </section>
 </Base>
 
 <style is:global>
-  .home-hero { position: relative; text-align: center; padding: var(--k-space-8) 0 var(--k-space-7); isolation: isolate; perspective: 1200px; }
-  /* Floating glass planes in depth behind the headline; they follow the pointer (--gx/--gy) and drift slowly. */
-  .home-stage { position: absolute; inset: 0; z-index: -1; pointer-events: none; transform-style: preserve-3d;
-    transform: rotateX(calc((var(--gy, 50) - 50) * -0.06deg)) rotateY(calc((var(--gx, 50) - 50) * 0.08deg)); transition: transform var(--k-motion-slower) var(--k-motion-out); }
-  .home-plane { position: absolute; display: grid; place-items: center; border-radius: var(--k-radius-card); animation: k-float 9s var(--k-motion-ease) infinite alternate; }
-  .home-plane-a { left: 0; top: 14%; width: 180px; height: 128px; padding: var(--k-space-4); gap: var(--k-space-2); place-items: stretch; align-content: center; transform: translateZ(-60px) rotate(-8deg); }
-  .home-plane-a span { height: 8px; border-radius: var(--k-radius-pill); background: var(--k-surface-2); }
-  .home-plane-a span:first-child { width: 60%; background: var(--k-accent); opacity: 0.7; }
-  .home-plane-b { right: 2%; top: 6%; width: 132px; height: 132px; border-radius: var(--k-radius-panel); transform: translateZ(-20px) rotate(6deg); animation-delay: -3s; }
-  .home-plane-b svg { width: 72px; height: 72px; transform: rotate(-90deg); }
-  .home-plane-b circle { fill: none; stroke-width: 3; stroke: var(--k-surface-2); }
-  .home-plane-b circle + circle { stroke: var(--k-accent-2); stroke-linecap: round; stroke-dasharray: 68 100; }
-  .home-plane-c { right: 8%; bottom: 4%; width: 200px; height: 88px; padding: var(--k-space-3) var(--k-space-4); transform: translateZ(-100px) rotate(-4deg); animation-delay: -6s; }
-  .home-plane-c svg { width: 100%; height: 100%; }
-  .home-plane-c path { fill: none; stroke: var(--k-accent); stroke-width: 2.5; stroke-linecap: round; vector-effect: non-scaling-stroke; }
-  @keyframes k-float { from { translate: 0 0; } to { translate: 0 -14px; } }
-  @media (max-width: 599px) { .home-hero { padding-top: var(--k-space-6); } }
-  @media (max-width: 899px) { .home-plane-a, .home-plane-c { display: none; } .home-plane-b { width: 88px; height: 88px; right: -12px; top: 0; } .home-plane-b svg { width: 48px; height: 48px; } }
-  .home-mark { color: var(--k-accent); margin-bottom: var(--k-space-5); filter: drop-shadow(0 6px 18px var(--k-glow)); }
-  .home-mark path { stroke-dasharray: 1; stroke-dashoffset: 1; animation: k-draw 1.4s var(--k-motion-ease) 0.15s forwards; }
-  @keyframes k-draw { to { stroke-dashoffset: 0; } }
-  .home-hero h1 { font-weight: var(--k-type-weight-strong); }
-  .home-grad { background: linear-gradient(90deg, var(--k-accent), var(--k-accent-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .home-sub { max-width: 34em; margin: 0 auto var(--k-space-6); color: var(--k-text-2); font-size: var(--k-type-scale-1); line-height: 1.5; }
-  .home-search { display: inline-flex; align-items: center; gap: var(--k-space-3); min-height: 56px; padding: 0 var(--k-space-3) 0 var(--k-space-5); width: min(560px, 100%); border: 1px solid var(--k-glass-edge); border-radius: var(--k-radius-pill);
-    background: linear-gradient(180deg, var(--k-glass-highlight), transparent 50%), var(--k-glass-strong); color: var(--k-text-2); font: inherit; font-size: 1.05rem; cursor: pointer; box-shadow: var(--k-shadow-inset), var(--k-shadow-3);
-    -webkit-backdrop-filter: blur(var(--k-glass-blur-md)) saturate(var(--k-glass-saturate)); backdrop-filter: blur(var(--k-glass-blur-md)) saturate(var(--k-glass-saturate));
-    transition: transform var(--k-motion-slow) var(--k-motion-out), box-shadow var(--k-motion-base) var(--k-motion-ease), color var(--k-motion-base) var(--k-motion-ease); }
-  .home-search:hover { transform: translateY(-2px); box-shadow: var(--k-shadow-inset), var(--k-shadow-glow); color: var(--k-text); }
+  /* Hero: copy on the left, a live mosaic of the real tools on the right. */
+  .home-hero { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); align-items: center; gap: var(--k-space-8); padding: var(--k-space-7) 0 var(--k-space-6); }
+  .home-copy { display: grid; justify-items: start; gap: var(--k-space-5); }
+  .home-hero h1 { margin: 0; font-size: clamp(2.5rem, 5.4vw, var(--k-type-scale-6)); line-height: 1.02; }
+  .home-h1-2 { color: var(--k-text-2); }
+  .home-search { display: inline-flex; align-items: center; gap: var(--k-space-3); width: min(480px, 100%); min-height: 56px; padding: 0 var(--k-space-3) 0 var(--k-space-5);
+    border: 1px solid var(--k-border-strong); border-radius: var(--k-radius-pill); background: var(--k-surface); color: var(--k-text-2); font: inherit; cursor: pointer; box-shadow: var(--k-shadow-2);
+    transition: border-color var(--k-motion-base) var(--k-motion-ease), box-shadow var(--k-motion-slow) var(--k-motion-out), color var(--k-motion-base) var(--k-motion-ease); }
+  .home-search:hover { border-color: var(--k-text-2); color: var(--k-text); box-shadow: var(--k-shadow-3); }
   .home-search span { flex: 1; text-align: left; }
-  .home-search kbd { padding: 0 var(--k-space-2); border-radius: var(--k-radius-pill); background: var(--k-surface-2); line-height: 1.8; }
-  .home-section { margin-top: var(--k-space-9); }
-  .home-head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--k-space-4); flex-wrap: wrap; }
-  .home-head a { display: inline-flex; align-items: center; min-height: 44px; color: var(--k-accent); text-decoration: none; font-weight: var(--k-type-weight-medium); }
-  .home-universes { grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); }
-  .home-universe { display: grid; gap: var(--k-space-1); }
-  .home-dot { --c: oklch(var(--k-hue-l) var(--k-hue-c) var(--hue)); width: 12px; height: 12px; margin-bottom: var(--k-space-2); border-radius: var(--k-radius-round); background: var(--c); outline: 4px solid color-mix(in oklab, var(--c) 22%, transparent); }
-  /* Pinned section: the heading stays while the three points scroll past (wide screens). */
-  .home-privacy { display: grid; gap: var(--k-space-5); }
-  .home-points { display: grid; gap: var(--k-space-4); }
-  .home-points .k-card { display: grid; gap: var(--k-space-2); }
-  .home-points p { margin: 0; }
-  .home-num { font-size: var(--k-type-scale-sm); font-weight: var(--k-type-weight-strong); font-variant-numeric: tabular-nums; color: var(--k-accent); }
-  @media (min-width: 900px) {
-    .home-privacy { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); align-items: start; gap: var(--k-space-7); }
-    .home-pin { position: sticky; top: calc(var(--k-space-9) + var(--k-space-5)); }
-    .home-pin h2 { font-size: var(--k-type-scale-4); margin-top: 0; }
-    .home-points { gap: var(--k-space-5); }
-    .home-points .k-card { min-height: 200px; align-content: center; padding: var(--k-space-6); }
+  .home-search kbd { padding: 0 var(--k-space-2); border-radius: var(--k-radius-control); border: 1px solid var(--k-border); background: var(--k-surface-2); line-height: 1.7; }
+  .home-quick { display: flex; flex-wrap: wrap; align-items: center; gap: var(--k-space-1) var(--k-space-2); margin: 0; font-size: var(--k-type-scale-sm); }
+  .home-quick span { margin-right: var(--k-space-1); }
+  .home-quick a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 var(--k-space-3); border-radius: var(--k-radius-pill); background: var(--k-surface-2); color: var(--k-text); text-decoration: none; font-weight: var(--k-type-weight-medium);
+    transition: background-color var(--k-motion-base) var(--k-motion-ease); }
+  .home-quick a:hover { background: var(--k-surface-3); }
+  .home-mosaic { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--k-space-3); }
+  .home-tile { --c: oklch(var(--k-hue-l) var(--k-hue-c) var(--hue)); display: grid; justify-items: center; align-content: center; gap: var(--k-space-2); aspect-ratio: 1; padding: var(--k-space-3);
+    border: 1px solid var(--k-border); border-radius: var(--k-radius-card); color: var(--k-text-2); text-decoration: none; text-align: center; font-size: var(--k-type-scale-sm); line-height: 1.3;
+    background: color-mix(in oklab, var(--c) 7%, var(--k-surface-2));
+    animation: k-tile-in var(--k-motion-slower) var(--k-motion-out) both; animation-delay: calc(var(--i) * 40ms + 80ms); }
+  .home-tile:nth-child(2n) { translate: 0 var(--k-space-4); }
+  .home-tile span { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  @keyframes k-tile-in { from { transform: translateY(12px) scale(0.96); } }
+  @media (max-width: 959px) {
+    .home-hero { grid-template-columns: 1fr; gap: var(--k-space-7); padding-top: var(--k-space-4); }
+    .home-mosaic { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 520px; }
+    .home-tile:nth-child(2n) { translate: none; }
+    .home-tile:nth-child(n + 7) { display: none; }
   }
-  @media (prefers-reduced-motion: reduce) { .home-mark path { animation: none; stroke-dashoffset: 0; } .home-plane, .home-stage { animation: none; transform: none; transition: none; } }
-  @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) { .home-search { background: var(--k-surface); -webkit-backdrop-filter: none; backdrop-filter: none; } }
+  @media (max-width: 479px) { .home-tile span { display: none; } .home-tile img { width: 36px; height: 36px; } }
+
+  /* Privacy bento: one wide demonstration, two short facts, one catalogue count. */
+  .bento { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); grid-auto-rows: auto; gap: var(--k-space-4); }
+  .bento-card { display: grid; align-content: start; gap: var(--k-space-2); padding: var(--k-space-6); border: 1px solid var(--k-border); border-radius: var(--k-radius-card); background: var(--k-surface); color: inherit; text-decoration: none; }
+  .bento-card h3 { margin: 0; font-size: var(--k-type-scale-1); }
+  .bento-card p { margin: 0; color: var(--k-text-2); line-height: 1.6; max-width: 46ch; }
+  .bento-local { grid-column: span 4; grid-row: span 2; grid-template-rows: auto 1fr; gap: var(--k-space-6); background: var(--k-surface); }
+  .bento-upload, .bento-offline { grid-column: span 2; min-height: 200px; }
+  .bento-count { grid-column: span 6; grid-template-columns: auto 1fr auto; align-items: baseline; align-content: center; gap: var(--k-space-3); padding-block: var(--k-space-5);
+    background: var(--k-ink); color: var(--k-ink-text); border-color: transparent; transition: transform var(--k-motion-slow) var(--k-motion-out); }
+  .bento-count:hover { transform: translateY(-2px); }
+  .bento-count .more { color: inherit; }
+  .bento-num { font-family: var(--k-type-display); font-size: var(--k-type-scale-4); font-weight: var(--k-type-weight-strong); letter-spacing: var(--k-type-tracking-display); line-height: 1; font-variant-numeric: tabular-nums; }
+  .bento-cap { font-size: var(--k-type-scale-1); font-weight: var(--k-type-weight-medium); opacity: 0.8; }
+  .bento-glyph { width: 28px; height: 28px; margin-bottom: var(--k-space-3); fill: none; stroke: var(--k-text); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  /* The local-processing diagram: files inside the device, nothing on the server side. */
+  .device { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(48px, 0.6fr) minmax(0, 1fr); align-items: center; align-self: end; }
+  .device-frame { display: grid; gap: var(--k-space-3); padding: var(--k-space-4); border-radius: var(--k-radius-field); background: var(--k-surface-2); }
+  .device-label { font-size: var(--k-type-scale-sm); font-weight: var(--k-type-weight-strong); }
+  .device ul { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--k-space-2); }
+  .device li { display: flex; align-items: center; gap: var(--k-space-2); min-height: 36px; padding: 0 var(--k-space-3); border-radius: var(--k-radius-control); background: var(--k-surface); font-family: var(--k-type-mono); font-size: var(--k-type-scale-sm); }
+  .device-file { width: 10px; height: 12px; background: var(--k-accent); opacity: 0.85; }
+  .device-link { height: 0; border-top: 1.5px dashed var(--k-border-strong); position: relative; }
+  .device-link::after { content: ""; position: absolute; left: 50%; top: -9px; width: 16px; height: 16px; margin-left: -8px; border-radius: var(--k-radius-round); background: var(--k-surface); box-shadow: var(--k-shadow-hairline);
+    background-image: linear-gradient(45deg, transparent 45%, var(--k-danger) 45%, var(--k-danger) 55%, transparent 55%), linear-gradient(-45deg, transparent 45%, var(--k-danger) 45%, var(--k-danger) 55%, transparent 55%); }
+  .device-server { display: grid; gap: var(--k-space-1); justify-items: center; padding: var(--k-space-4); border: 1.5px dashed var(--k-border-strong); border-radius: var(--k-radius-field); text-align: center; font-size: var(--k-type-scale-sm); color: var(--k-text-2); }
+  .device-server strong { color: var(--k-text); font-size: var(--k-type-scale-1); }
+  @media (max-width: 899px) {
+    .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .bento-local, .bento-count { grid-column: span 2; grid-row: auto; }
+    .bento-upload, .bento-offline { grid-column: span 1; }
+  }
+  @media (max-width: 599px) {
+    .bento { grid-template-columns: 1fr; grid-auto-rows: auto; }
+    .bento-local, .bento-count, .bento-upload, .bento-offline { grid-column: auto; }
+    .bento-card { padding: var(--k-space-5); }
+    .device { grid-template-columns: 1fr; gap: var(--k-space-4); }
+    .device-link { display: none; }
+    .bento-count { grid-template-columns: auto 1fr; }
+    .bento-count .more { grid-column: 1 / -1; }
+  }
+
+  /* Universes: a compact index, not a wall of cards. */
+  .universe-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); border-top: 1px solid var(--k-border); column-gap: var(--k-space-6); }
+  .universe-row { --c: oklch(var(--k-hue-l) var(--k-hue-c) var(--hue)); display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: var(--k-space-3); min-height: 60px; border-bottom: 1px solid var(--k-border); color: inherit; text-decoration: none;
+    transition: padding var(--k-motion-slow) var(--k-motion-out); }
+  .universe-row:hover { padding-left: var(--k-space-2); }
+  .universe-row strong { font-weight: var(--k-type-weight-medium); }
+  .universe-row .k-muted { font-size: var(--k-type-scale-sm); font-variant-numeric: tabular-nums; }
+  .universe-row[data-empty] strong { color: var(--k-text-2); }
+  .universe-dot { width: 10px; height: 10px; border-radius: var(--k-radius-round); background: var(--c); outline: 4px solid color-mix(in oklab, var(--c) 18%, transparent); }
+
+  /* Apps strip. */
+  .home-apps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--k-space-4); }
+  .home-app { display: grid; gap: var(--k-space-1); align-content: start; min-height: 120px; padding: var(--k-space-5); border-radius: var(--k-radius-card); background: var(--k-surface-2); color: inherit; text-decoration: none;
+    transition: background-color var(--k-motion-base) var(--k-motion-ease); }
+  .home-app:hover { background: var(--k-surface-3); }
+  .home-app strong { font-size: var(--k-type-scale-1); font-weight: var(--k-type-weight-strong); }
+  .home-app span { color: var(--k-text-2); line-height: 1.5; }
+  @media (max-width: 899px) { .home-apps { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 479px) { .home-apps { grid-template-columns: 1fr; } }
+  @media (prefers-reduced-motion: reduce) { .home-tile { animation: none; } }
 </style>
-<script>
-  // The glass planes follow the pointer over the hero (skipped for reduced motion / touch).
-  const hero = document.querySelector<HTMLElement>('[data-glow]');
-  const stage = hero?.querySelector<HTMLElement>('.home-stage');
-  if (hero && stage && !matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(hover: hover)').matches) {
-    let raf = 0;
-    hero.addEventListener('pointermove', (e) => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => {
-        const r = hero.getBoundingClientRect();
-        stage.style.setProperty('--gx', String(((e.clientX - r.left) / r.width) * 100));
-        stage.style.setProperty('--gy', String(((e.clientY - r.top) / r.height) * 100));
-      });
-    }, { passive: true });
-  }
-</script>

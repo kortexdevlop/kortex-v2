@@ -11,10 +11,17 @@ const description = account
 ---
 <Base lang={lang} title={`${title} — Kortex`} description={description} noindex={account}
   alt={account ? {fr:'/compte',en:'/en/account'} : {fr:'/telecharger',en:'/en/download'}}>
-  <section class="k-card k-stack">
-    <p class="k-muted">{fr ? 'En préparation' : 'In preparation'}</p>
-    <h1>{title}</h1><p>{description}</p>
-    <p><a class="k-btn" href={fr ? '/outils' : '/en/tools'}>{fr ? 'Utiliser les outils web' : 'Use the web tools'}</a></p>
-    <p><a href={fr ? '/applications' : '/en/apps'}>{fr ? 'Voir l’état des applications' : 'See app availability'}</a></p>
+  <section class="unavail">
+    <span class="badge">{fr ? 'En préparation' : 'In preparation'}</span>
+    <h1>{title}</h1><p class="lead">{description}</p>
+    <div class="unavail-actions">
+      <a class="k-btn" data-size="lg" href={fr ? '/outils' : '/en/tools'}>{fr ? 'Utiliser les outils web' : 'Use the web tools'}</a>
+      <a class="k-btn" data-variant="ghost" data-size="lg" href={fr ? '/applications' : '/en/apps'}>{fr ? 'Voir l’état des applications' : 'See app availability'}</a>
+    </div>
   </section>
 </Base>
+<style>
+  .unavail { display: grid; justify-items: start; gap: var(--k-space-4); max-width: 720px; padding: var(--k-space-8) 0; }
+  .unavail h1 { margin: 0; font-size: clamp(2.25rem, 4.6vw, var(--k-type-scale-5)); }
+  .unavail-actions { display: flex; flex-wrap: wrap; gap: var(--k-space-2); margin-top: var(--k-space-2); }
+</style>

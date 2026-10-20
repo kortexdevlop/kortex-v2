@@ -3,23 +3,22 @@ import Base from '../layouts/Base.astro';
 const space = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 const shadows = ['1', '2', '3', '4', '5', 'glow'];
 const radii = ['control', 'field', 'card', 'sheet', 'panel', 'pill'];
-const colors = ['bg', 'surface', 'surface-2', 'text', 'text-2', 'accent', 'accent-2', 'success', 'danger'];
+const colors = ['bg', 'surface', 'surface-2', 'surface-3', 'text', 'text-2', 'ink', 'accent', 'accent-2', 'success', 'danger', 'warning'];
 const glass = ['glass', 'glass-strong', 'glass-border', 'glass-edge', 'glass-highlight', 'glow'];
 const scale = ['5', '4', '3', '2', '1', '0', 'sm'];
 const motion = ['ease', 'out', 'spring'];
 ---
-<Base title="Design — Kortex" description="Kortex design system: Liquid Glass tokens and components" lang="fr" noindex>
-  <section class="hero">
-    <p class="k-muted">Kortex · Liquid Glass</p>
+<Base title="Design — Kortex" description="Kortex design system: Porcelain tokens and components" lang="fr" noindex>
+  <section class="page-head">
     <h1>Design system</h1>
-    <p class="k-muted ds-lead">Catalogue vivant : chaque élément ci-dessous utilise uniquement les tokens de <code>design/tokens</code> et les composants de <code>design/components.css</code>. Basculez le thème et le mode pour l’auditer.</p>
+    <p class="lead">Catalogue vivant : chaque élément ci-dessous utilise uniquement les tokens de <code>design/tokens</code> et les composants de <code>design/components.css</code>. Basculez le thème et le mode pour l’auditer.</p>
   </section>
 
   <section class="ds-section">
     <h2>Matière</h2>
     <div class="ds-material">
-      <div class="k-glass ds-pane"><strong>k-glass</strong><span class="k-muted">Flou, saturation, reflet haut, contour fin</span></div>
-      <div class="k-glass-strong ds-pane"><strong>k-glass-strong</strong><span class="k-muted">Surfaces de saisie, menus, dialogues</span></div>
+      <div class="k-card ds-pane"><strong>k-card</strong><span class="k-muted">Plan opaque, contour fin, aucune ombre au repos</span></div>
+      <div class="k-glass ds-pane"><strong>k-glass</strong><span class="k-muted">Réservé aux éléments flottants : barres, palettes, menus</span></div>
       <div class="k-card ds-pane" data-active="true"><strong>État actif</strong><span class="k-muted">Lueur <code>--k-shadow-glow</code></span></div>
     </div>
   </section>
@@ -40,8 +39,8 @@ const motion = ['ease', 'out', 'spring'];
 
   <section class="ds-section">
     <h2>Rayons et ombres</h2>
-    <div class="grid">{radii.map((r) => <div class="k-glass ds-radius" style={`border-radius:var(--k-radius-${r})`}><code>radius-{r}</code></div>)}</div>
-    <div class="grid ds-shadows">{shadows.map((s) => <div class="ds-shadow" style={`box-shadow:var(--k-shadow-inset),var(--k-shadow-${s})`}><code>shadow-{s}</code></div>)}</div>
+    <div class="grid">{radii.map((r) => <div class="k-card ds-radius" style={`border-radius:var(--k-radius-${r})`}><code>radius-{r}</code></div>)}</div>
+    <div class="grid ds-shadows">{shadows.map((s) => <div class="ds-shadow" style={`box-shadow:var(--k-shadow-${s})`}><code>shadow-{s}</code></div>)}</div>
   </section>
 
   <section class="ds-section">
@@ -49,6 +48,8 @@ const motion = ['ease', 'out', 'spring'];
     <div class="ds-row">
       <button class="k-btn" type="button">Principal</button>
       <button class="k-btn" data-variant="ghost" type="button">Secondaire</button>
+      <button class="k-btn" data-variant="accent" type="button">Accent</button>
+      <button class="k-btn" data-variant="danger" type="button">Supprimer</button>
       <button class="k-btn" data-variant="icon" type="button" aria-label="Rechercher" data-tooltip="Rechercher"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5" /><path d="m16 16 4 4" /></svg></button>
       <button class="k-btn" type="button" disabled>Désactivé</button>
       <button class="k-icon-btn" type="button" aria-label="Fermer"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg></button>
@@ -64,7 +65,7 @@ const motion = ['ease', 'out', 'spring'];
       <label class="k-switch"><input type="checkbox" role="switch" checked /><span>Interrupteur</span></label>
       <label class="k-field"><span class="k-muted">Curseur</span><input class="k-range" type="range" min="0" max="100" value="62" style="--k-range:62%" /></label>
       <div class="k-segmented" role="radiogroup" aria-label="Mode"><button class="k-segment" type="button" role="radio" aria-checked="false">Simple</button><button class="k-segment" type="button" role="radio" aria-checked="true">Medium</button><button class="k-segment" type="button" role="radio" aria-checked="false">Pro</button></div>
-      <div class="k-tabbar k-glass" role="tablist" aria-label="Exemple d’onglets"><button type="button" role="tab" aria-selected="true">Vue</button><button type="button" role="tab" aria-selected="false">Historique</button><button type="button" role="tab" aria-selected="false">Réglages</button></div>
+      <div class="k-tabbar" role="tablist" aria-label="Exemple d’onglets"><button type="button" role="tab" aria-selected="true">Vue</button><button type="button" role="tab" aria-selected="false">Historique</button><button type="button" role="tab" aria-selected="false">Réglages</button></div>
     </div>
   </section>
 
@@ -95,12 +96,12 @@ const motion = ['ease', 'out', 'spring'];
     <h2>Fichiers</h2>
     <div class="k-dropzone" tabindex="0"><strong>Déposer un fichier</strong><span class="k-muted">ou cliquer pour choisir</span></div>
     <ul class="k-files ds-files"><li class="k-file-row"><span>rapport.pdf</span><span class="k-file-actions"><button class="k-icon-btn" type="button" aria-label="Monter">↑</button><button class="k-icon-btn" type="button" aria-label="Retirer">×</button></span></li></ul>
-    <div class="ds-row"><span class="k-badge">100 % local</span><span class="k-badge">Hors ligne</span><span class="k-kbd">⌘K</span><span class="k-error">Erreur traduite</span><span class="k-success">Succès</span></div>
+    <div class="ds-row"><span class="k-badge" data-tone="success">100 % local</span><span class="k-badge" data-tone="accent">Bêta</span><span class="k-badge">Hors ligne</span><span class="k-kbd">⌘K</span><span class="k-error">Erreur traduite</span><span class="k-success">Succès</span></div>
   </section>
 
   <section class="ds-section">
     <h2>Mouvement</h2>
-    <div class="grid">{motion.map((m) => <div class="k-card ds-motion" style={`--curve:var(--k-motion-${m})`} data-tilt><span></span><code>motion-{m}</code></div>)}</div>
+    <div class="grid">{motion.map((m) => <div class="k-card ds-motion" style={`--curve:var(--k-motion-${m})`}><span></span><code>motion-{m}</code></div>)}</div>
   </section>
 
   <section class="ds-section">
@@ -113,7 +114,7 @@ const motion = ['ease', 'out', 'spring'];
   .ds-section { margin-top: var(--k-space-8); display: grid; gap: var(--k-space-4); }
   .ds-section h2 { margin: 0; }
   .ds-material { display: grid; gap: var(--k-space-4); grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); padding: var(--k-space-6); border-radius: var(--k-radius-panel);
-    background: radial-gradient(60% 80% at 20% 20%, var(--k-ambient-1), transparent), radial-gradient(60% 80% at 90% 80%, var(--k-ambient-3), transparent), var(--k-surface-2); }
+    background: var(--k-surface-2); }
   .ds-pane { display: grid; gap: var(--k-space-1); min-height: 140px; align-content: end; padding: var(--k-space-5); border-radius: var(--k-radius-card); }
   .ds-swatches { grid-template-columns: repeat(auto-fill, minmax(min(100%, 160px), 1fr)); }
   .ds-swatch { display: grid; gap: var(--k-space-2); padding: var(--k-space-3); }
@@ -130,7 +131,7 @@ const motion = ['ease', 'out', 'spring'];
   .ds-gauge { display: flex; align-items: center; gap: var(--k-space-5); }
   .ds-table, .ds-output, .ds-files { margin-top: var(--k-space-2); }
   .ds-motion { display: grid; gap: var(--k-space-3); }
-  .ds-motion span { width: 24px; height: 24px; border-radius: var(--k-radius-round); background: var(--k-accent); box-shadow: var(--k-shadow-glow); transition: transform var(--k-motion-slower) var(--curve); }
+  .ds-motion span { width: 24px; height: 24px; border-radius: var(--k-radius-round); background: var(--k-accent); transition: transform var(--k-motion-slower) var(--curve); }
   .ds-motion:hover span { transform: translateX(120px); }
   .ds-space { display: grid; grid-template-columns: 10ch 1fr; align-items: center; gap: var(--k-space-3); margin: var(--k-space-1) 0; }
   .ds-space span { display: block; height: 12px; border-radius: var(--k-radius-pill); background: var(--k-accent); }

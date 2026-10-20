@@ -97,7 +97,7 @@ pub fn App() -> Element {
         style { {include_str!("market.css")} }
         Frame { title:"Kortex Store", subtitle:if fr{"Vos outils. Votre appareil. Vos données."}else{"Your tools. Your device. Your data."},
             section { class:"store-hero k-card",
-                p { class:"app-eyebrow", if fr{"38 OUTILS · GRATUITS · LOCAUX"}else{"38 TOOLS · FREE · LOCAL"} }
+                p { class:"app-badge store-count", if fr{"38 outils gratuits et locaux"}else{"38 free, local tools"} }
                 h2 { if fr{"Tout ce qu’il vous faut, à portée de main."}else{"Everything you need, within reach."} }
                 p {class:"k-muted",if fr{"Explorez les outils, vérifiez leurs permissions et ouvrez-les sans envoyer vos fichiers."}else{"Explore tools, review their permissions and open them without uploading your files."}}
                 a {class:"k-btn k-btn-ghost",href:format!("{}{}",url("root",&lang),if fr{"compte"}else{"account"}),if fr{"Gérer mon compte et mes appareils"}else{"Manage my account and devices"}}
@@ -126,7 +126,7 @@ pub fn App() -> Element {
                 div {class:"store-grid",
                     for entry in items {
                         article {class:"k-card store-tool",key:"{entry.tool.id}","data-tool":entry.tool.id.clone(),
-                            span {class:"app-eyebrow","{entry.tool.universe}"}
+                            span {class:"app-badge store-universe","{entry.tool.universe}"}
                             h2 {"{name(entry,&lang)}"}
                             p {class:"k-muted","{entry.tool.tagline.get(&lang).cloned().unwrap_or_default()}"}
                             div {class:"store-badges",span {if fr{"Gratuit"}else{"Free"}}span {"Rust"}span {"v{entry.tool.version}"}}

@@ -47,59 +47,115 @@ const T = {
 }[lang];
 ---
 <Base title={T.title} description={T.intro} lang={lang} alt={{ fr: '/compte', en: '/en/account' }} noindex>
-  <h1>{T.h1}</h1>
-  <p class="k-muted">{T.intro}</p>
+  <header class="page-head acct-head">
+    <h1>{T.h1}</h1>
+    <p class="lead">{T.intro}</p>
+  </header>
   <div data-account data-api={api} data-lang={lang} data-sitekey={security.turnstile_site_key} data-t={JSON.stringify(T)}>
-    <section class="k-card k-stack" data-view="auth" hidden>
-      <h2 data-title>{T.login}</h2>
-      <form class="k-stack" data-form novalidate>
-        <label class="k-field"><span class="k-muted">{T.email}</span><input class="k-input" type="email" name="email" autocomplete="username" required /></label>
-        <label class="k-field"><span class="k-muted">{T.password}</span><input class="k-input" type="password" name="password" autocomplete="current-password" required /></label>
-        <div data-turnstile hidden></div>
-        <p class="k-error" role="alert" data-error hidden></p>
-        <button class="k-btn" type="submit" data-submit>{T.login}</button>
-      </form>
-      <button class="k-btn" data-variant="ghost" type="button" data-passkey-login>{T.passkeyLogin}</button>
-      <button class="acct-link" type="button" data-switch>{T.switchToRegister}</button>
-      <p class="k-muted acct-note">{T.note}</p>
+    <section class="acct-auth" data-view="auth" hidden>
+      <div class="acct-auth-form k-stack">
+        <h2 data-title>{T.login}</h2>
+        <form class="k-stack" data-form novalidate>
+          <label class="k-field"><span class="k-muted">{T.email}</span><input class="k-input" type="email" name="email" autocomplete="username" required /></label>
+          <label class="k-field"><span class="k-muted">{T.password}</span><input class="k-input" type="password" name="password" autocomplete="current-password" required /></label>
+          <div data-turnstile hidden></div>
+          <p class="k-error" role="alert" data-error hidden></p>
+          <button class="k-btn" type="submit" data-submit>{T.login}</button>
+        </form>
+        <div class="acct-or" aria-hidden="true"></div>
+        <button class="k-btn" data-variant="ghost" type="button" data-passkey-login>
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="9" r="3.5" /><path d="M2.5 19c.8-3 2.9-4.5 5.5-4.5 1.2 0 2.3.3 3.2.9" /><circle cx="17" cy="13" r="2.5" /><path d="M17 15.5V21l1.5-1.2M17 18.5h1.5" /></svg>
+          {T.passkeyLogin}
+        </button>
+        <button class="acct-link" type="button" data-switch>{T.switchToRegister}</button>
+      </div>
+      <aside class="acct-auth-side">
+        <svg class="acct-lock" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5" /><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" /><path d="M12 14.5v2" /></svg>
+        <p class="acct-note">{T.note}</p>
+      </aside>
     </section>
-    <section class="k-card k-stack" data-view="me" hidden>
-      <p>{T.signedAs} <strong data-email></strong></p>
-      <div class="k-stack" data-credits>
+    <section class="acct-grid" data-view="me" hidden>
+      <article class="acct-card acct-profile">
+        <span class="acct-avatar" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="9" r="3.5" /><path d="M5.5 19.5c1.3-3 3.6-4.5 6.5-4.5s5.2 1.5 6.5 4.5" /></svg></span>
+        <div class="acct-who"><span class="k-muted">{T.signedAs}</span> <strong data-email></strong></div>
+        <button class="k-btn" data-variant="ghost" type="button" data-logout>{T.logout}</button>
+      </article>
+      <article class="acct-card acct-credits" data-credits>
         <h2>{T.credits}</h2>
         <div class="k-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" data-gauge><div class="k-progress-bar" data-bar style="width:0"></div></div>
-        <p class="k-muted" data-credits-text></p>
-      </div>
-      <div class="k-stack" data-devices-box>
+        <p class="k-muted acct-note" data-credits-text></p>
+      </article>
+      <article class="acct-card">
         <h2>{T.devices}</h2>
         <ul class="k-files" data-devices></ul>
+      </article>
+      <article class="acct-card">
         <h2>{T.installs}</h2>
         <ul class="k-files" data-installs></ul>
-        <label class="k-switch"><input type="checkbox" role="switch" data-confirm-install disabled /><span>{T.confirmInstall}</span></label>
+      </article>
+      <article class="acct-card">
+        <label class="k-switch acct-switch"><span>{T.confirmInstall}</span><input type="checkbox" role="switch" data-confirm-install disabled /></label>
         <p class="k-muted acct-note">{T.confirmHint}</p>
-      </div>
+      </article>
       <AccountSecurity lang={lang} />
-      <h2>{T.data}</h2>
-      <div class="acct-actions">
-        <button class="k-btn" data-variant="ghost" type="button" data-export>{T.export}</button>
-        <button class="k-btn" data-variant="ghost" type="button" data-logout>{T.logout}</button>
-        <button class="k-btn" data-variant="ghost" type="button" data-del-open>{T.del}</button>
-      </div>
-      <form class="k-stack" data-del-form hidden novalidate>
-        <p class="k-muted">{T.delConfirm}</p>
-        <input class="k-input" type="password" name="password" autocomplete="current-password" required />
-        <p class="k-error" role="alert" data-del-error hidden></p>
-        <div class="acct-actions"><button class="k-btn" type="submit">{T.delBtn}</button><button class="k-btn" data-variant="ghost" type="button" data-del-cancel>{T.cancel}</button></div>
-      </form>
+      <article class="acct-card acct-data">
+        <div>
+          <h2>{T.data}</h2>
+        </div>
+        <div class="acct-actions">
+          <button class="k-btn" data-variant="ghost" type="button" data-export>{T.export}</button>
+          <button class="k-btn" data-variant="danger" type="button" data-del-open>{T.del}</button>
+        </div>
+        <form class="k-stack acct-del" data-del-form hidden novalidate>
+          <p class="k-muted">{T.delConfirm}</p>
+          <input class="k-input" type="password" name="password" autocomplete="current-password" required aria-label={T.delConfirm} />
+          <p class="k-error" role="alert" data-del-error hidden></p>
+          <div class="acct-actions"><button class="k-btn" data-variant="danger" type="submit">{T.delBtn}</button><button class="k-btn" data-variant="ghost" type="button" data-del-cancel>{T.cancel}</button></div>
+        </form>
+      </article>
     </section>
   </div>
 </Base>
 <style is:global>
-  .acct-link { justify-self: start; min-height: 44px; border: 0; background: none; color: var(--k-accent); font: inherit; font-weight: var(--k-type-weight-medium); cursor: pointer; padding: 0; }
+  [data-account] { min-height: 420px; }
+  .acct-head { padding-bottom: var(--k-space-6); }
+  .acct-link { justify-self: center; min-height: 44px; border: 0; background: none; color: var(--k-accent); font: inherit; font-weight: var(--k-type-weight-medium); cursor: pointer; padding: 0 var(--k-space-2); }
   .acct-link:hover { text-decoration: underline; }
-  .acct-note { font-size: var(--k-type-scale-sm); margin: 0; }
-  .acct-actions { display: flex; gap: var(--k-space-3); flex-wrap: wrap; }
-  [data-account] { max-width: 520px; margin-top: var(--k-space-6); min-height: 420px; }
+  .acct-note { font-size: var(--k-type-scale-sm); margin: 0; line-height: 1.6; }
+  .acct-actions { display: flex; gap: var(--k-space-2); flex-wrap: wrap; }
+  /* Sign-in: the form beside a quiet explanation of what the server never sees. */
+  .acct-auth { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr); max-width: 880px; border: 1px solid var(--k-border); border-radius: var(--k-radius-panel); background: var(--k-surface); overflow: hidden; }
+  .acct-auth-form { padding: var(--k-space-7); align-content: start; }
+  .acct-auth-form h2 { margin: 0; font-size: var(--k-type-scale-2); }
+  .acct-auth-form form .k-btn { width: 100%; }
+  .acct-auth-form > .k-btn { width: 100%; }
+  .acct-auth-form .k-btn svg { stroke: currentColor; }
+  .acct-or { height: 1px; background: var(--k-border); }
+  .acct-auth-side { display: grid; align-content: end; gap: var(--k-space-4); padding: var(--k-space-7); background: var(--k-surface-2); border-left: 1px solid var(--k-border); }
+  .acct-auth-side .acct-note { font-size: var(--k-type-scale-0); color: var(--k-text-2); max-width: 32ch; }
+  .acct-lock { width: 40px; height: 40px; stroke: var(--k-text); }
+  @media (max-width: 719px) { .acct-auth { grid-template-columns: 1fr; } .acct-auth-side { border-left: 0; border-top: 1px solid var(--k-border); padding: var(--k-space-5); } .acct-auth-form { padding: var(--k-space-5); } }
+  /* Dashboard: cards of different weights on a three-column grid. */
+  .acct-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--k-space-4); align-items: start; }
+  .acct-card { display: grid; gap: var(--k-space-4); align-content: start; min-width: 0; padding: var(--k-space-5); border: 1px solid var(--k-border); border-radius: var(--k-radius-card); background: var(--k-surface); }
+  .acct-card h2, .acct-card h3 { margin: 0; font-size: var(--k-type-scale-0); font-weight: var(--k-type-weight-strong); }
+  .acct-card > .k-btn, .acct-card form .k-btn { justify-self: start; }
+  .acct-profile { grid-column: span 2; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; align-self: stretch; }
+  .acct-avatar { display: grid; place-items: center; width: 56px; height: 56px; border-radius: var(--k-radius-round); background: var(--k-surface-2); }
+  .acct-avatar svg { width: 28px; height: 28px; stroke: var(--k-text-2); }
+  .acct-who { display: grid; gap: 2px; min-width: 0; }
+  .acct-who strong { font-size: var(--k-type-scale-1); font-weight: var(--k-type-weight-strong); overflow-wrap: anywhere; }
+  .acct-credits { align-self: stretch; }
+  .acct-switch { justify-content: space-between; width: 100%; font-weight: var(--k-type-weight-medium); }
+  .acct-data { grid-column: 1 / -1; grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
+  .acct-data .acct-del { grid-column: 1 / -1; max-width: 480px; padding-top: var(--k-space-4); border-top: 1px solid var(--k-border); }
+  @media (max-width: 959px) { .acct-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .acct-profile { grid-column: 1 / -1; } }
+  @media (max-width: 599px) {
+    .acct-grid { grid-template-columns: 1fr; }
+    .acct-profile { grid-template-columns: auto minmax(0, 1fr); }
+    .acct-profile .k-btn { grid-column: 1 / -1; }
+    .acct-data { grid-template-columns: 1fr; }
+  }
 </style>
 <script>
   import { setupSecurity } from '../lib/account-security';

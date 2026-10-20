@@ -38,45 +38,93 @@ const unix = 'curl -fsSL https://kortex.site/install.sh | sh';
 const win = 'irm https://kortex.site/install.ps1 | iex';
 ---
 <Base title={`${T.title} — Kortex`} description={T.intro} lang={lang} alt={{ fr: '/telecharger', en: '/en/download' }}>
-  <h1>{T.h1}</h1>
-  <p class="k-muted">{T.intro}</p>
+  <header class="page-head">
+    <h1>{T.h1}</h1>
+    <p class="lead">{T.intro}</p>
+  </header>
 
-  <h2>{T.step1}</h2>
-  <div class="dl-grid">
-    <section class="k-card k-stack" data-os="unix" data-tilt><h3>{T.mac}</h3><pre class="dl-cmd" tabindex="0"><code>{unix}</code></pre><button class="k-btn" data-variant="ghost" type="button" data-copy={unix}>Copier / Copy</button></section>
-    <section class="k-card k-stack" data-os="win" data-tilt><h3>{T.win}</h3><pre class="dl-cmd" tabindex="0"><code>{win}</code></pre><button class="k-btn" data-variant="ghost" type="button" data-copy={win}>Copier / Copy</button></section>
-  </div>
-
-  <h2>{T.step2}</h2>
-  <p class="k-muted">{T.step2text}</p>
-  <pre class="dl-cmd" tabindex="0"><code>kortex available
+  <ol class="dl-steps">
+    <li class="dl-step">
+      <h2>{T.step1}</h2>
+      <div class="dl-grid">
+        <section class="dl-os" data-os="unix">
+          <div class="dl-os-head"><h3>{T.mac}</h3><span class="badge" data-tone="success">{T.detected}</span></div>
+          <pre class="dl-cmd" tabindex="0"><code>{unix}</code></pre>
+          <button class="k-btn" data-variant="ghost" type="button" data-copy={unix}>Copier / Copy</button>
+        </section>
+        <section class="dl-os" data-os="win">
+          <div class="dl-os-head"><h3>{T.win}</h3><span class="badge" data-tone="success">{T.detected}</span></div>
+          <pre class="dl-cmd" tabindex="0"><code>{win}</code></pre>
+          <button class="k-btn" data-variant="ghost" type="button" data-copy={win}>Copier / Copy</button>
+        </section>
+      </div>
+    </li>
+    <li class="dl-step">
+      <h2>{T.step2}</h2>
+      <p class="k-muted">{T.step2text}</p>
+      <pre class="dl-cmd" tabindex="0"><code>kortex available
 kortex install secure.password-generator
 kortex install --all</code></pre>
+    </li>
+  </ol>
 
-  <h2>{T.commands}</h2>
-  <pre class="dl-cmd" tabindex="0"><code>kortex installed          kortex update --all
+  <div class="dl-more">
+    <div class="dl-main">
+      <section>
+        <h2>{T.commands}</h2>
+        <pre class="dl-cmd" tabindex="0"><code>kortex installed          kortex update --all
 kortex update --self      kortex open &lt;tool&gt;
 kortex login              kortex doctor</code></pre>
-
-  <h2>{T.verifyTitle}</h2>
-  <p class="k-muted">{T.verifyT}</p>
-  <pre class="dl-cmd" tabindex="0"><code>kortex doctor</code></pre>
-
-  <h2>{T.manualTitle}</h2>
-  <p class="k-muted">{T.manualIntro}</p>
-  <div class="grid">
-    <div class="k-card"><strong>{T.winH}</strong><p class="k-muted">{T.winT}</p></div>
-    <div class="k-card"><strong>{T.macH}</strong><p class="k-muted">{T.macT}</p></div>
-    <div class="k-card"><strong>{T.linH}</strong><p class="k-muted">{T.linT}</p></div>
+      </section>
+      <section>
+        <h2>{T.verifyTitle}</h2>
+        <p class="k-muted">{T.verifyT}</p>
+        <pre class="dl-cmd" tabindex="0"><code>kortex doctor</code></pre>
+      </section>
+      <section>
+        <h2>{T.removeTitle}</h2>
+        <p class="k-muted">{T.removeT}</p>
+      </section>
+    </div>
+    <aside class="dl-aside">
+      <h2>{T.manualTitle}</h2>
+      <p class="k-muted">{T.manualIntro}</p>
+      <ul class="dl-warn">
+        <li><strong>{T.winH}</strong><p class="k-muted">{T.winT}</p></li>
+        <li><strong>{T.macH}</strong><p class="k-muted">{T.macT}</p></li>
+        <li><strong>{T.linH}</strong><p class="k-muted">{T.linT}</p></li>
+      </ul>
+    </aside>
   </div>
-
-  <h2>{T.removeTitle}</h2>
-  <p class="k-muted">{T.removeT}</p>
 </Base>
 <style is:global>
-  .dl-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: var(--k-space-4); }
-  .dl-cmd { margin: 0; padding: var(--k-space-4); border-radius: var(--k-radius-field); background: var(--k-glass-strong); border: 1px solid var(--k-glass-edge); box-shadow: var(--k-shadow-inset); overflow-x: auto; font-family: var(--k-type-mono); font-size: 0.9rem; line-height: 1.6; }
-  [data-os][data-detected] { border-color: var(--k-accent); box-shadow: var(--k-shadow-inset), var(--k-shadow-glow); }
+  .dl-steps { list-style: none; margin: 0; padding: 0; counter-reset: dl; display: grid; gap: var(--k-space-7); }
+  .dl-step { counter-increment: dl; display: grid; gap: var(--k-space-4); padding-left: var(--k-space-8); position: relative; }
+  .dl-step::before { content: ""; position: absolute; left: 12px; top: 9px; width: 12px; height: 12px; border-radius: var(--k-radius-round); background: var(--k-ink); outline: 4px solid var(--k-bg); }
+  .dl-step:not(:last-child)::after { content: ""; position: absolute; left: 17.5px; top: 30px; bottom: calc(-1 * var(--k-space-6)); width: 1px; background: var(--k-border-strong); }
+  .dl-step h2 { margin: var(--k-space-1) 0 0; font-size: var(--k-type-scale-1); }
+  .dl-step p { margin: 0; max-width: 64ch; line-height: 1.6; }
+  .dl-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: var(--k-space-4); }
+  .dl-os { display: grid; gap: var(--k-space-3); align-content: start; padding: var(--k-space-5); border: 1px solid var(--k-border); border-radius: var(--k-radius-card); background: var(--k-surface); transition: border-color var(--k-motion-base) var(--k-motion-ease); }
+  .dl-os-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--k-space-3); min-height: 28px; }
+  .dl-os h3 { margin: 0; font-size: var(--k-type-scale-0); }
+  .dl-os .badge { display: none; }
+  .dl-os[data-detected] { border-color: var(--k-accent); box-shadow: var(--k-shadow-ring); }
+  .dl-os[data-detected] .badge { display: inline-flex; }
+  .dl-os .k-btn { justify-self: start; }
+  .dl-cmd { margin: 0; padding: var(--k-space-4); border-radius: var(--k-radius-field); background: var(--k-surface-2); overflow-x: auto; font-family: var(--k-type-mono); font-size: 0.875rem; line-height: 1.7; }
+  .dl-cmd:focus-visible { outline-offset: 2px; }
+  .dl-more { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 380px); gap: var(--k-space-8); margin-top: var(--k-space-9); padding-top: var(--k-space-7); border-top: 1px solid var(--k-border); align-items: start; }
+  .dl-main { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--k-space-7); min-width: 0; }
+  .dl-cmd code { font-size: inherit; }
+  .dl-main h2, .dl-aside h2 { margin: 0 0 var(--k-space-3); font-size: var(--k-type-scale-1); }
+  .dl-main p, .dl-aside > p { margin: 0 0 var(--k-space-4); line-height: 1.6; }
+  .dl-aside { padding: var(--k-space-6); border-radius: var(--k-radius-card); background: var(--k-surface-2); }
+  .dl-warn { list-style: none; margin: 0; padding: 0; display: grid; }
+  .dl-warn li { padding: var(--k-space-4) 0; border-top: 1px solid var(--k-border); }
+  .dl-warn p { margin: var(--k-space-1) 0 0; font-size: var(--k-type-scale-sm); line-height: 1.6; }
+  @media (max-width: 899px) { .dl-more { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 599px) { .dl-step { padding-left: 0; } .dl-step::before, .dl-step::after { display: none; } .dl-aside { padding: var(--k-space-5); } }
 </style>
 <script>
   // Highlight the command for the visitor's system and make the buttons copy it.

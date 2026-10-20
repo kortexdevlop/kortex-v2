@@ -34,6 +34,26 @@
       ],
       "port": 4340,
       "autoPort": true
+    },
+    {
+      "name": "app-mind",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "python3 -m http.server $PORT --directory dist/apps/apps.mind"
+      ],
+      "port": 4351,
+      "autoPort": true
+    },
+    {
+      "name": "app-store",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "python3 -m http.server $PORT --directory dist/apps/apps.store"
+      ],
+      "port": 4352,
+      "autoPort": true
     }
   ]
 }
