@@ -101,7 +101,7 @@
         },
         "ui": "auto",
         "universe": "calc",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "viral_priority": 1,
         "web_worker": false
       },
@@ -218,7 +218,7 @@
         },
         "ui": "auto",
         "universe": "calc",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "viral_priority": 1,
         "web_worker": false
       },
@@ -366,7 +366,7 @@
         },
         "ui": "auto",
         "universe": "calc",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "viral_priority": 1,
         "web_worker": false
       },
@@ -481,7 +481,7 @@
         },
         "ui": "auto",
         "universe": "calc",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "viral_priority": 1,
         "web_worker": false
       },
@@ -599,7 +599,7 @@
         },
         "ui": "auto",
         "universe": "calc",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "viral_priority": 1,
         "web_worker": false
       },
@@ -774,7 +774,7 @@
         },
         "ui": "auto",
         "universe": "calc",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "viral_priority": 1,
         "web_worker": false
       },
@@ -973,7 +973,7 @@
         },
         "ui": "auto",
         "universe": "calc",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "viral_priority": 1,
         "web_worker": false
       },
@@ -1190,7 +1190,7 @@
         },
         "ui": "auto",
         "universe": "calc",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "viral_priority": 1,
         "web_worker": false
       },
@@ -1314,7 +1314,7 @@
         },
         "ui": "auto",
         "universe": "calc",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "viral_priority": 1,
         "web_worker": false
       },
@@ -1450,7 +1450,7 @@
         },
         "ui": "auto",
         "universe": "calc",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "viral_priority": 1,
         "web_worker": false
       },
@@ -1583,7 +1583,7 @@
         },
         "ui": "auto",
         "universe": "calc",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "viral_priority": 1,
         "web_worker": false
       },
@@ -1731,7 +1731,7 @@
         },
         "ui": "auto",
         "universe": "calc",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "viral_priority": 1,
         "web_worker": false
       },
@@ -1864,7 +1864,7 @@
         },
         "ui": "auto",
         "universe": "calc",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "viral_priority": 1,
         "web_worker": false
       },
@@ -2012,7 +2012,7 @@
         },
         "ui": "auto",
         "universe": "code",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "viral_priority": 2,
         "web_worker": false
       },
@@ -2144,7 +2144,7 @@
         },
         "ui": "auto",
         "universe": "code",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "viral_priority": 1,
         "web_worker": false
       },
@@ -2247,7 +2247,7 @@
         },
         "ui": "auto",
         "universe": "code",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "viral_priority": 1,
         "web_worker": false
       },
@@ -2394,7 +2394,7 @@
         },
         "ui": "auto",
         "universe": "code",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "viral_priority": 1,
         "web_worker": false
       },
@@ -2555,7 +2555,7 @@
         },
         "ui": "auto",
         "universe": "code",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "viral_priority": 1,
         "web_worker": false
       },
@@ -2685,7 +2685,7 @@
         },
         "ui": "auto",
         "universe": "code",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "viral_priority": 1,
         "web_worker": false
       },
@@ -2823,7 +2823,7 @@
         },
         "ui": "auto",
         "universe": "code",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "viral_priority": 2,
         "web_worker": false
       },
@@ -2992,7 +2992,7 @@
         },
         "ui": "auto",
         "universe": "code",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "viral_priority": 2,
         "web_worker": false
       },
@@ -3159,7 +3159,7 @@
         },
         "ui": "auto",
         "universe": "color",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "viral_priority": 1,
         "web_worker": false
       },
@@ -3288,7 +3288,7 @@
         },
         "ui": "auto",
         "universe": "color",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "viral_priority": 1,
         "web_worker": false
       },
@@ -3406,7 +3406,7 @@
         },
         "ui": "auto",
         "universe": "convert",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "viral_priority": 1,
         "web_worker": false
       },
@@ -3601,7 +3601,7 @@
         },
         "ui": "auto",
         "universe": "convert",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "viral_priority": 1,
         "web_worker": false
       },
@@ -3752,7 +3752,7 @@
         },
         "ui": "auto",
         "universe": "image",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "viral_priority": 1,
         "web_worker": true
       },
@@ -3948,7 +3948,7 @@
         },
         "ui": "auto",
         "universe": "pdf",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "viral_priority": 1,
         "web_worker": true
       },
@@ -4135,7 +4135,7 @@
         },
         "ui": "auto",
         "universe": "qr",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "viral_priority": 1,
         "web_worker": false
       },
@@ -4323,7 +4323,7 @@
         },
         "ui": "auto",
         "universe": "secure",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "viral_priority": 1,
         "web_worker": true
       },
@@ -4511,7 +4511,7 @@
         },
         "ui": "auto",
         "universe": "secure",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "viral_priority": 1,
         "web_worker": false
       },
@@ -4663,7 +4663,7 @@
         },
         "ui": "auto",
         "universe": "text",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "viral_priority": 1,
         "web_worker": false
       },
@@ -4830,7 +4830,7 @@
         },
         "ui": "auto",
         "universe": "text",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "viral_priority": 1,
         "web_worker": false
       },
@@ -4960,7 +4960,7 @@
         },
         "ui": "auto",
         "universe": "text",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "viral_priority": 1,
         "web_worker": false
       },
@@ -5090,7 +5090,7 @@
         },
         "ui": "auto",
         "universe": "text",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "viral_priority": 1,
         "web_worker": false
       },
@@ -5229,7 +5229,7 @@
         },
         "ui": "auto",
         "universe": "text",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "viral_priority": 1,
         "web_worker": false
       },
@@ -5359,7 +5359,7 @@
         },
         "ui": "auto",
         "universe": "text",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "viral_priority": 1,
         "web_worker": false
       },
@@ -5533,7 +5533,7 @@
         },
         "ui": "auto",
         "universe": "text",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "viral_priority": 2,
         "web_worker": false
       },
@@ -5711,7 +5711,7 @@
         },
         "ui": "auto",
         "universe": "text",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "viral_priority": 1,
         "web_worker": false
       },

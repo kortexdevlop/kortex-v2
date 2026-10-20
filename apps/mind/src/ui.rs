@@ -548,14 +548,13 @@ pub fn App() -> Element {
                         label: l.t("attach.drop"),
                         hint: l.t("attach.drop_hint"),
                         multiple: true,
-                        onfiles: move |picked: Vec<dioxus::html::FileData>| {
-                            spawn(async move {
-                                for file in picked {
-                                    if let Ok(file) = kortex_platform::document::read_selected(&file).await {
-                                        conversation.write().attach_file(&file.name, &file.mime, file.bytes);
-                                    }
-                                }
-                            });
+                        onfiles: move |picked: kortex_ui::Picked| {
+                            if picked.failed {
+                                note.set(locale(&lang_signal()).t("attach.read_failed").to_owned());
+                            }
+                            for file in picked.files {
+                                conversation.write().attach_file(&file.name, &file.mime, file.bytes);
+                            }
                         },
                     }
                 }

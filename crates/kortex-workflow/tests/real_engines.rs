@@ -135,3 +135,39 @@ fn a_tool_error_stops_the_run_with_its_own_code_and_node() {
     assert!(failure.report.results.contains_key("n1"));
     assert!(!failure.report.results.contains_key("n3"));
 }
+
+/// A file chosen in Flow desktop reaches the installed engine byte for byte (PLAN 15.11).
+#[test]
+fn a_file_value_reaches_a_native_engine_intact() {
+    use kortex_runtime::FileData;
+    use kortex_workflow::Runner;
+    let Some(path) = binary("secure.hash-calculator") else {
+        eprintln!("skipped: secure.hash-calculator desktop binary not built");
+        return;
+    };
+    let runner = ProcessRunner {
+        binaries: BTreeMap::from([("secure.hash-calculator".to_owned(), path)]),
+        timeout: Duration::from_secs(60),
+    };
+    // Every byte value, so an encoding that is not binary-safe would show.
+    let bytes: Vec<u8> = (0..=255).collect();
+    let inputs = kortex_runtime::ValueMap::from([(
+        "file".to_owned(),
+        Value::File(FileData {
+            name: "all-bytes.bin".into(),
+            mime: "application/octet-stream".into(),
+            bytes,
+        }),
+    )]);
+    let params =
+        kortex_runtime::ValueMap::from([("algorithm".to_owned(), Value::Text("sha256".into()))]);
+    let out = runner
+        .run("secure.hash-calculator", inputs, params)
+        .unwrap_or_else(|e| unreachable!("{e:?}"));
+    assert_eq!(
+        out.get("hash"),
+        Some(&Value::Text(
+            "40aff2e9d2d8922e47afd4648e6967497158785fbd1da870e7110266bf944880".into()
+        ))
+    );
+}

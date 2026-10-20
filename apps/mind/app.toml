@@ -2,7 +2,7 @@ schema = 1
 
 [app]
 id = "apps.mind"
-version = "0.1.1"
+version = "0.1.2"
 universe = "apps"
 status = "beta"
 bundles_engines = true

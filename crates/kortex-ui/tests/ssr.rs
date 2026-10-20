@@ -1,6 +1,6 @@
 use dioxus::prelude::*;
 use kortex_runtime::ValueMap;
-use kortex_ui::{AutoTool, Button, Progress, RunFuture, Runner, ToolHost, use_tool};
+use kortex_ui::{AutoTool, Button, DropZone, Progress, RunFuture, Runner, ToolHost, use_tool};
 
 fn noop_runner(_: ValueMap, _: ValueMap) -> RunFuture {
     Box::pin(async { Ok(ValueMap::new()) })
@@ -20,6 +20,28 @@ fn button_renders_with_design_class() {
     let html = render(app, ());
     assert!(html.contains("k-btn"), "{html}");
     assert!(html.contains("Go"));
+}
+
+/// Desktop never relies on the WebView's file input: on macOS it cannot offer every file and fails
+/// with "The open file operation failed" for most MIME types (Flow desktop bug, PLAN 15.11).
+#[test]
+fn desktop_drop_zone_opens_the_native_dialog_instead_of_a_file_input() {
+    fn app(_: ()) -> Element {
+        rsx! {
+            DropZone {
+                label: "Drop".to_owned(),
+                hint: "or click".to_owned(),
+                accept: Some("application/pdf".to_owned()),
+                onfiles: |_| {},
+            }
+        }
+    }
+    let html = render(app, ());
+    assert!(
+        html.contains("<button") && html.contains("k-dropzone"),
+        "{html}"
+    );
+    assert!(!html.contains("type=\"file\""), "{html}");
 }
 
 #[test]

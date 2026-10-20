@@ -192,6 +192,8 @@
     transition: transform var(--k-motion-slow) var(--k-motion-out), background-color var(--k-motion-base) var(--k-motion-ease); }
   .k-dropzone:hover::before { transform: translateY(-2px); background: var(--k-text); }
   .k-dropzone[data-over="true"]::before { background: var(--k-accent); transform: translateY(-3px); }
+  /* Desktop renders the drop zone as a button (native file dialog): keep the label look. */
+  button.k-dropzone { width: 100%; font: inherit; color: inherit; }
   .k-dropzone strong { font-weight: var(--k-type-weight-strong); }
   .k-dropzone:hover { border-color: var(--k-text-2); }
   .k-dropzone[data-over="true"] { border-color: var(--k-accent); background: var(--k-accent-soft); transform: scale(1.01); }

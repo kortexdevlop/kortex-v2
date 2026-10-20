@@ -95,6 +95,7 @@ pub(crate) fn clipboard_operation(
 }
 
 /// A file explicitly selected by the user in a browser or native WebView.
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SelectedFile {
     pub name: String,
     pub mime: String,
@@ -105,11 +106,157 @@ pub async fn read_selected(file: &dioxus::html::FileData) -> crate::Result<Selec
         .read_bytes()
         .await
         .map_err(|_| crate::PlatformError("file_read_failed".into()))?;
+    let name = file.name();
+    let mime = file
+        .content_type()
+        .filter(|m| !m.is_empty())
+        .unwrap_or_else(|| mime_from_name(&name).to_owned());
     Ok(SelectedFile {
-        name: file.name(),
-        mime: file.content_type().unwrap_or_default(),
+        name,
+        mime,
         bytes: bytes.to_vec(),
     })
+}
+
+/// File extensions per MIME type, used by native pickers (they filter by extension) and to name
+/// the type of a file picked natively. Kept small: engines still check files by signature.
+const EXTENSIONS: &[(&str, &[&str])] = &[
+    ("image/png", &["png"]),
+    ("image/jpeg", &["jpg", "jpeg"]),
+    ("image/gif", &["gif"]),
+    ("image/webp", &["webp"]),
+    ("image/bmp", &["bmp"]),
+    ("image/tiff", &["tif", "tiff"]),
+    ("image/avif", &["avif"]),
+    ("image/heic", &["heic"]),
+    ("image/svg+xml", &["svg"]),
+    ("image/x-icon", &["ico"]),
+    ("application/pdf", &["pdf"]),
+    ("application/json", &["json"]),
+    ("application/zip", &["zip"]),
+    ("text/plain", &["txt", "text", "log"]),
+    ("text/markdown", &["md", "markdown"]),
+    ("text/csv", &["csv"]),
+    ("text/tab-separated-values", &["tsv"]),
+    ("text/html", &["html", "htm"]),
+    ("text/css", &["css"]),
+    ("text/javascript", &["js", "mjs"]),
+    ("text/xml", &["xml"]),
+    ("text/yaml", &["yaml", "yml"]),
+    ("text/x-toml", &["toml"]),
+    ("audio/mpeg", &["mp3"]),
+    ("audio/wav", &["wav"]),
+    ("audio/ogg", &["ogg", "oga", "opus"]),
+    ("audio/flac", &["flac"]),
+    ("audio/mp4", &["m4a", "aac"]),
+    ("video/mp4", &["mp4", "m4v"]),
+    ("video/webm", &["webm"]),
+    ("video/quicktime", &["mov"]),
+    ("video/x-matroska", &["mkv"]),
+];
+
+/// Extensions a native picker should offer for an `accept` list of MIME patterns
+/// (`image/*,application/pdf`). `None` means every file: an empty list, `*/*`, or a type we cannot
+/// map. A native panel given an empty or unknown list greys out every file, or fails outright on
+/// macOS, so this never returns an empty list.
+#[must_use]
+pub fn accept_extensions(accept: &str) -> Option<Vec<&'static str>> {
+    let mut found: Vec<&'static str> = Vec::new();
+    for pattern in accept.split(',').map(str::trim).filter(|p| !p.is_empty()) {
+        let pattern = pattern.to_ascii_lowercase();
+        if pattern == "*/*" || pattern == "*" {
+            return None;
+        }
+        let matching: Vec<&'static str> = match pattern.strip_suffix("/*") {
+            Some(family) => EXTENSIONS
+                .iter()
+                .filter(|(mime, _)| mime.split('/').next() == Some(family))
+                .flat_map(|(_, ext)| ext.iter().copied())
+                .collect(),
+            None => EXTENSIONS
+                .iter()
+                .filter(|(mime, _)| *mime == pattern)
+                .flat_map(|(_, ext)| ext.iter().copied())
+                .collect(),
+        };
+        if matching.is_empty() {
+            return None;
+        }
+        for ext in matching {
+            if !found.contains(&ext) {
+                found.push(ext);
+            }
+        }
+    }
+    (!found.is_empty()).then_some(found)
+}
+
+/// MIME type of a file from its name (`application/octet-stream` when unknown).
+#[must_use]
+pub fn mime_from_name(name: &str) -> &'static str {
+    let ext = name
+        .rsplit_once('.')
+        .map(|(_, e)| e.to_ascii_lowercase())
+        .unwrap_or_default();
+    EXTENSIONS
+        .iter()
+        .find(|(_, exts)| exts.contains(&ext.as_str()))
+        .map_or("application/octet-stream", |(mime, _)| mime)
+}
+
+/// Opens the system file dialog and reads the chosen files (desktop). The WebView's own
+/// `<input type="file">` cannot offer "every file" on macOS, so native hosts use this instead.
+/// Cancelling returns an empty list; an unreadable file is `file_read_failed`.
+#[cfg(not(target_arch = "wasm32"))]
+pub async fn pick_files(accept: &str, multiple: bool) -> crate::Result<Vec<SelectedFile>> {
+    let mut dialog = rfd::AsyncFileDialog::new();
+    if let Some(extensions) = accept_extensions(accept) {
+        let label = extensions
+            .iter()
+            .map(|e| format!("*.{e}"))
+            .collect::<Vec<_>>()
+            .join(", ");
+        dialog = dialog.add_filter(label, &extensions);
+    }
+    let handles = if multiple {
+        dialog.pick_files().await.unwrap_or_default()
+    } else {
+        dialog.pick_file().await.into_iter().collect()
+    };
+    let paths: Vec<std::path::PathBuf> = handles.iter().map(|h| h.path().to_path_buf()).collect();
+    if paths.is_empty() {
+        return Ok(Vec::new());
+    }
+    // Reading may take a while for large files: off the UI thread.
+    let slot = crate::native::task::Slot::new();
+    let remote = slot.clone();
+    crate::native::task::spawn("kortex-pick-files", move || {
+        remote.complete(read_paths(&paths));
+    })
+    .map_err(|_| crate::PlatformError("file_read_failed".into()))?;
+    slot.wait()
+        .await
+        .unwrap_or_else(|| Err(crate::PlatformError("file_read_failed".into())))
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+fn read_paths(paths: &[std::path::PathBuf]) -> crate::Result<Vec<SelectedFile>> {
+    paths
+        .iter()
+        .map(|path| {
+            let bytes = crate::native::fs::read(path)
+                .map_err(|_| crate::PlatformError("file_read_failed".into()))?;
+            let name = path
+                .file_name()
+                .map(|n| n.to_string_lossy().into_owned())
+                .unwrap_or_default();
+            Ok(SelectedFile {
+                mime: mime_from_name(&name).to_owned(),
+                name,
+                bytes,
+            })
+        })
+        .collect()
 }
 
 /// Non-secret app preferences; backends share the same Storage contract.
@@ -523,6 +670,45 @@ pub fn fetch_stream(url: &str, body: &str, user: Option<&str>) -> crate::Result<
     Ok(FetchStream(eval(
         &include_str!("fetch-stream.js").replace("__KORTEX_ARGS__", &args.to_string()),
     )))
+}
+
+#[cfg(test)]
+mod picker_tests {
+    use super::{accept_extensions, mime_from_name};
+
+    #[test]
+    fn every_file_means_no_filter_never_an_empty_one() {
+        for accept in [
+            "",
+            "*/*",
+            " * ",
+            "application/x-unknown",
+            "image/*,application/x-unknown",
+        ] {
+            assert_eq!(accept_extensions(accept), None, "{accept:?}");
+        }
+    }
+
+    #[test]
+    fn mime_patterns_become_extensions() {
+        assert_eq!(accept_extensions("application/pdf"), Some(vec!["pdf"]));
+        let images = accept_extensions("image/*").unwrap_or_default();
+        assert!(images.contains(&"png") && images.contains(&"jpeg") && images.contains(&"svg"));
+        let text = accept_extensions("text/*, application/pdf").unwrap_or_default();
+        assert!(text.contains(&"txt") && text.contains(&"csv") && text.ends_with(&["pdf"]));
+        assert_eq!(accept_extensions("IMAGE/PNG,image/png"), Some(vec!["png"]));
+    }
+
+    #[test]
+    fn names_give_their_type() {
+        assert_eq!(mime_from_name("Rapport.PDF"), "application/pdf");
+        assert_eq!(mime_from_name("photo.jpeg"), "image/jpeg");
+        assert_eq!(mime_from_name("notes"), "application/octet-stream");
+        assert_eq!(
+            mime_from_name("archive.tar.zst"),
+            "application/octet-stream"
+        );
+    }
 }
 
 #[cfg(test)]

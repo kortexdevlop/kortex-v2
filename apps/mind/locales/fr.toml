@@ -47,6 +47,7 @@ drop_hint = "ou cliquer pour choisir (désignés par @fichierN)"
 share = "Partager le contenu avec Gemma"
 never_shared = "contenu jamais partagé"
 remove = "Retirer"
+read_failed = "Impossible de lire un des fichiers choisis. Vérifiez qu’il existe encore et que vous pouvez l’ouvrir."
 
 [export]
 button = "Exporter en workflow Flow"

@@ -218,38 +218,7 @@ pub(crate) fn inspector(
                     }
                     label { class: "k-field",
                         span { class: "k-muted", {l.t(if multiple { "ui.pick_files" } else { "ui.pick_file" })} }
-                        input {
-                            class: "k-input",
-                            r#type: "file",
-                            "data-field": "file",
-                            multiple,
-                            accept: if accept_attr == "*/*" { String::new() } else { accept_attr },
-                            onchange: move |e| {
-                                let picked = e.files();
-                                let node = pick_id.clone();
-                                spawn(async move {
-                                    let mut read: Vec<FileData> = Vec::new();
-                                    for file in &picked {
-                                        if let Ok(f) = kortex_platform::document::read_selected(file).await {
-                                            read.push(FileData { name: f.name, mime: f.mime, bytes: f.bytes });
-                                        }
-                                    }
-                                    let value = if multiple {
-                                        (!read.is_empty()).then_some(Value::Files(read))
-                                    } else {
-                                        read.into_iter().next().map(Value::File)
-                                    };
-                                    match value {
-                                        Some(v) => {
-                                            files.write().insert(node, v);
-                                        }
-                                        None => {
-                                            files.write().remove(&node);
-                                        }
-                                    }
-                                });
-                            },
-                        }
+                        {file_picker(files, note, pick_id, accept_attr, multiple, l)}
                     }
                     p { class: "flow-hint", "data-field": "file-status",
                         {match &chosen {
@@ -418,6 +387,105 @@ pub(crate) fn inspector(
 }
 
 /// Keyboard-friendly alternative to dragging: pick the upstream output of an input from a list.
+/// Picks the files of a File node. The browser uses its file input; desktop opens the system
+/// dialog through `kortex-platform`, since the WebView's input cannot offer every file on macOS.
+fn file_picker(
+    files: Signal<std::collections::BTreeMap<String, Value>>,
+    note: Signal<String>,
+    node: String,
+    accept: String,
+    multiple: bool,
+    l: &'static kortex_i18n::Catalog,
+) -> Element {
+    #[cfg(target_arch = "wasm32")]
+    {
+        rsx! {
+            input {
+                class: "k-input",
+                r#type: "file",
+                "data-field": "file",
+                multiple,
+                accept: if accept == "*/*" { String::new() } else { accept },
+                onchange: move |e| {
+                    let picked = e.files();
+                    let node = node.clone();
+                    spawn(async move {
+                        let mut read = Vec::new();
+                        let mut failed = false;
+                        for file in &picked {
+                            match kortex_platform::document::read_selected(file).await {
+                                Ok(f) => read.push(f),
+                                Err(_) => failed = true,
+                            }
+                        }
+                        keep_files(files, note, node, multiple, read, failed, l);
+                    });
+                },
+            }
+        }
+    }
+    #[cfg(not(target_arch = "wasm32"))]
+    {
+        rsx! {
+            button {
+                class: "k-btn",
+                "data-variant": "ghost",
+                r#type: "button",
+                "data-field": "file",
+                onclick: move |_| {
+                    let (node, accept) = (node.clone(), accept.clone());
+                    spawn(async move {
+                        match kortex_platform::document::pick_files(&accept, multiple).await {
+                            Ok(read) if read.is_empty() => {}
+                            Ok(read) => keep_files(files, note, node, multiple, read, false, l),
+                            Err(_) => keep_files(files, note, node, multiple, Vec::new(), true, l),
+                        }
+                    });
+                },
+                {l.t(if multiple { "ui.pick_files" } else { "ui.pick_file" })}
+            }
+        }
+    }
+}
+
+/// Keeps the files read for a node. An unreadable file shows a translated note and leaves the
+/// previous choice in place instead of failing silently; an emptied browser input clears it.
+fn keep_files(
+    mut files: Signal<std::collections::BTreeMap<String, Value>>,
+    mut note: Signal<String>,
+    node: String,
+    multiple: bool,
+    read: Vec<kortex_platform::document::SelectedFile>,
+    failed: bool,
+    l: &'static kortex_i18n::Catalog,
+) {
+    if failed {
+        note.set(l.t("ui.file_read_failed").to_owned());
+    }
+    let read: Vec<FileData> = read
+        .into_iter()
+        .map(|f| FileData {
+            name: f.name,
+            mime: f.mime,
+            bytes: f.bytes,
+        })
+        .collect();
+    let value = if multiple {
+        (!read.is_empty()).then_some(Value::Files(read))
+    } else {
+        read.into_iter().next().map(Value::File)
+    };
+    match value {
+        Some(v) => {
+            files.write().insert(node, v);
+        }
+        None if !failed => {
+            files.write().remove(&node);
+        }
+        None => {}
+    }
+}
+
 fn wire(
     node_id: &str,
     input: &str,

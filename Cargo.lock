@@ -3523,7 +3523,7 @@ version = "0.1.0"
 
 [[package]]
 name = "kortex-desk"
-version = "0.2.1"
+version = "0.2.2"
 dependencies = [
  "dioxus",
  "kortex-i18n",
@@ -3538,7 +3538,7 @@ dependencies = [
 
 [[package]]
 name = "kortex-flow"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "dioxus",
  "kortex-ai",
@@ -3558,7 +3558,7 @@ dependencies = [
 
 [[package]]
 name = "kortex-hub"
-version = "0.2.1"
+version = "0.2.2"
 dependencies = [
  "dioxus",
  "kortex-i18n",
@@ -3592,7 +3592,7 @@ dependencies = [
 
 [[package]]
 name = "kortex-mind"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "dioxus",
  "kortex-ai",
@@ -3636,6 +3636,7 @@ dependencies = [
  "keyring",
  "objc2-app-kit",
  "objc2-foundation",
+ "rfd",
  "rpassword",
  "serde",
  "serde-wasm-bindgen",
@@ -3660,7 +3661,7 @@ version = "0.1.0"
 
 [[package]]
 name = "kortex-seek"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "dioxus",
  "kortex-i18n",
@@ -3689,7 +3690,7 @@ dependencies = [
 
 [[package]]
 name = "kortex-store"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "dioxus",
  "dioxus-ssr",

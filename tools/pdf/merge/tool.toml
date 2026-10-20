@@ -2,7 +2,7 @@ schema = 1
 
 [tool]
 id = "pdf.merge"
-version = "1.0.1"
+version = "1.0.2"
 universe = "pdf"
 status = "beta"
 ui = "auto"

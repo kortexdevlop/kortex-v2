@@ -28,6 +28,7 @@
 | `@simplewebauthn/browser` 14.0.0 | web/site account | matching JSON/binary conversion and native credential API handling for registration/authentication | manual conversions (fragile browser compatibility) | account bundle only; no third-party hosted script |
 
 | `ureq` 3 (rustls, gzip) | kortex-platform native backend | existing native HTTP transport moved out of package/auth clients; bounded responses, TLS and timeout handling | OS-specific HTTP implementations | native only; absent from browser dependency graph |
+| `rfd` 0.17.2 (sans features par défaut, `xdg-portal`) | kortex-platform natif (feature `document`) | dialogue système de choix de fichiers sur desktop : le champ fichier de la WebView ne peut pas proposer « tous les fichiers » sur macOS et échoue (« open and save panel service ») pour la plupart des types MIME (PLAN 15.11) | champ fichier Dioxus (défaut constaté), appel AppKit/Win32/portail direct (trois implémentations à maintenir) | aucun nouveau code : même version et mêmes features que la dépendance existante de dioxus-desktop |
 | `rpassword` 7 | kortex-platform native terminal backend | existing hidden terminal password input moved behind platform boundary | manual terminal-mode handling (unsafe portability) | native only |
 
 | `getrandom` 0.3, `js-sys` 0.3 | kortex-platform | move runtime entropy/clock OS bindings behind platform, preserving injected test sources | callbacks required at every engine call (fragile) | existing dependencies moved, no new ecosystem |

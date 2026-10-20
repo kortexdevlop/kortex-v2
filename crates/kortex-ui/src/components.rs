@@ -138,39 +138,97 @@ pub fn Progress(value: f32, #[props(default)] indeterminate: bool) -> Element {
     }
 }
 
-/// Drop target for files (drag & drop or file picker). Calls `onfiles` with the chosen files.
+/// Files chosen in a [`DropZone`]. `failed` is set when a file could not be read, so the host
+/// can show a translated error instead of failing silently.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct Picked {
+    pub files: Vec<kortex_platform::document::SelectedFile>,
+    pub failed: bool,
+}
+
+async fn read_all(list: Vec<dioxus::html::FileData>) -> Picked {
+    let mut picked = Picked::default();
+    for file in &list {
+        match kortex_platform::document::read_selected(file).await {
+            Ok(f) => picked.files.push(f),
+            Err(_) => picked.failed = true,
+        }
+    }
+    picked
+}
+
+/// Drop target for files (drag & drop or file picker). Calls `onfiles` with the files read.
+/// `accept` lists MIME patterns (`image/*,application/pdf`); `None` accepts every file.
+/// Desktop opens the system dialog through `kortex-platform`: the WebView's file input cannot
+/// offer every file on macOS.
 #[component]
 pub fn DropZone(
     label: String,
     hint: String,
     #[props(default)] multiple: bool,
     accept: Option<String>,
-    onfiles: EventHandler<Vec<dioxus::html::FileData>>,
+    onfiles: EventHandler<Picked>,
 ) -> Element {
     let mut over = use_signal(|| false);
-    rsx! {
-        label {
-            class: "k-dropzone",
-            "data-over": "{over}",
-            ondragover: move |e| {
-                e.prevent_default();
-                over.set(true);
-            },
-            ondragleave: move |_| over.set(false),
-            ondrop: move |e| {
-                e.prevent_default();
-                over.set(false);
-                onfiles.call(e.data_transfer().files());
-            },
-            input {
-                class: "k-visually-hidden",
-                r#type: "file",
-                multiple,
-                accept,
-                onchange: move |e| onfiles.call(e.files()),
+    let ondrop = move |e: DragEvent| {
+        e.prevent_default();
+        over.set(false);
+        let list = e.data_transfer().files();
+        spawn(async move { onfiles.call(read_all(list).await) });
+    };
+    #[cfg(target_arch = "wasm32")]
+    {
+        rsx! {
+            label {
+                class: "k-dropzone",
+                "data-over": "{over}",
+                ondragover: move |e| {
+                    e.prevent_default();
+                    over.set(true);
+                },
+                ondragleave: move |_| over.set(false),
+                ondrop,
+                input {
+                    class: "k-visually-hidden",
+                    r#type: "file",
+                    multiple,
+                    accept,
+                    onchange: move |e| {
+                        let list = e.files();
+                        spawn(async move { onfiles.call(read_all(list).await) });
+                    },
+                }
+                strong { "{label}" }
+                span { class: "k-muted", "{hint}" }
             }
-            strong { "{label}" }
-            span { class: "k-muted", "{hint}" }
+        }
+    }
+    #[cfg(not(target_arch = "wasm32"))]
+    {
+        rsx! {
+            button {
+                class: "k-dropzone",
+                r#type: "button",
+                "data-over": "{over}",
+                ondragover: move |e| {
+                    e.prevent_default();
+                    over.set(true);
+                },
+                ondragleave: move |_| over.set(false),
+                ondrop,
+                onclick: move |_| {
+                    let accept = accept.clone().unwrap_or_default();
+                    spawn(async move {
+                        match kortex_platform::document::pick_files(&accept, multiple).await {
+                            Ok(files) if files.is_empty() => {}
+                            Ok(files) => onfiles.call(Picked { files, failed: false }),
+                            Err(_) => onfiles.call(Picked { files: Vec::new(), failed: true }),
+                        }
+                    });
+                },
+                strong { "{label}" }
+                span { class: "k-muted", "{hint}" }
+            }
         }
     }
 }

@@ -77,6 +77,9 @@ fn s(lang: &str, key: &str) -> &'static str {
         }
         ("fr", "drop") => "Déposer un fichier",
         ("fr", "drop_hint") => "ou cliquer pour choisir",
+        ("fr", "file_read_failed") => {
+            "Impossible de lire ce fichier. Vérifiez qu’il existe encore et que vous pouvez l’ouvrir."
+        }
         ("fr", "result") => "Résultat",
         ("fr", "download") => "Télécharger",
         ("fr", "saved") => "Enregistré :",
@@ -103,6 +106,9 @@ fn s(lang: &str, key: &str) -> &'static str {
         (_, "copy_failed") => "Copy failed. Select the result to copy it manually.",
         (_, "drop") => "Drop a file",
         (_, "drop_hint") => "or click to choose",
+        (_, "file_read_failed") => {
+            "This file could not be read. Check that it still exists and that you can open it."
+        }
         (_, "result") => "Result",
         (_, "download") => "Download",
         (_, "saved") => "Saved:",
@@ -361,6 +367,7 @@ pub fn AutoTool(
     let mut running = use_signal(|| false);
     let mut result = use_signal(|| None::<Result<ValueMap, ToolError>>);
     let mut saved_note = use_signal(|| None::<String>);
+    let mut file_error = use_signal(|| false);
 
     let file_inputs: Vec<_> = contract
         .inputs
@@ -447,29 +454,29 @@ pub fn AutoTool(
                                 hint: s(&lang, "drop_hint").to_owned(),
                                 multiple,
                                 accept,
-                                onfiles: move |picked: Vec<dioxus::html::FileData>| {
+                                onfiles: move |picked: crate::Picked| {
+                                    file_error.set(picked.failed);
+                                    let mut read: Vec<FileData> = picked
+                                        .files
+                                        .into_iter()
+                                        .map(|f| FileData { name: f.name, mime: f.mime, bytes: f.bytes })
+                                        .collect();
+                                    if !multiple {
+                                        read.truncate(1);
+                                    }
+                                    if read.is_empty() {
+                                        return;
+                                    }
                                     let id = id.clone();
-                                    spawn(async move {
-                                        let mut read = Vec::new();
-                                        for f in picked {
-                                            if let Ok(file) = kortex_platform::document::read_selected(&f).await {
-                                                read.push(FileData {
-                                                    name: file.name,
-                                                    mime: file.mime,
-                                                    bytes: file.bytes,
-                                                });
-                                            }
-                                        }
-                                        if !multiple {
-                                            read.truncate(1);
-                                        }
-                                        if multiple {
-                                            files.write().entry(id).or_default().extend(read);
-                                        } else {
-                                            files.write().insert(id, read);
-                                        }
-                                    });
+                                    if multiple {
+                                        files.write().entry(id).or_default().extend(read);
+                                    } else {
+                                        files.write().insert(id, read);
+                                    }
                                 },
+                            }
+                            if file_error() {
+                                p { class: "k-error", role: "alert", {s(&lang, "file_read_failed")} }
                             }
                             ul { class: "k-files",
                                 for (idx , n) in names.into_iter().enumerate() {

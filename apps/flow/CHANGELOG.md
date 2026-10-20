@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.1.2
+- Desktop: choosing a file opens the system dialog instead of failing with "The open file operation failed"; an unreadable file shows a translated error.
+
 ## 0.1.1
 - Desktop release rebuilt with the current Kortex design and features.
 

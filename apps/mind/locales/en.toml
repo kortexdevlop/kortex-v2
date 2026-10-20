@@ -47,6 +47,7 @@ drop_hint = "or click to choose (named @fichierN)"
 share = "Share the content with Gemma"
 never_shared = "content never shared"
 remove = "Remove"
+read_failed = "One of the chosen files could not be read. Check that it still exists and that you can open it."
 
 [export]
 button = "Export as a Flow workflow"

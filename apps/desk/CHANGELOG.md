@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.2.2
+- Desktop: rebuilt with the shared file-picker fix of the Kortex UI.
+
 ## 0.2.1
 - Desktop release rebuilt with the current Kortex design and features.
 

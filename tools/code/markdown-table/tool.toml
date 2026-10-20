@@ -1,7 +1,7 @@
 schema = 1
 [tool]
 id = "code.markdown-table"
-version = "1.0.1"
+version = "1.0.2"
 universe = "code"
 status = "beta"
 ui = "auto"
