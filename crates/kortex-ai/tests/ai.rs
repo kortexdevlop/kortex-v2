@@ -15,7 +15,7 @@ use kortex_workflow::{catalogue_of, contracts_from_registry, validate};
 use serde_json::{Value as Json, json};
 
 fn contracts() -> BTreeMap<String, ToolContract> {
-    contracts_from_registry(include_str!("../../../registry/index.json"))
+    contracts_from_registry(include_str!("../../../registry/contracts.json"))
         .unwrap_or_default()
         .into_iter()
         .map(|c| (c.tool.id.clone(), c))

@@ -1,6 +1,6 @@
 //! Tool ports and params of the whole catalogue, read from the registry contracts.
 use std::collections::BTreeMap;
-use std::sync::{OnceLock, RwLock};
+use std::sync::{Mutex, OnceLock, RwLock};
 
 use kortex_shell as shell;
 
@@ -16,17 +16,46 @@ fn default_text(value: Option<&toml::Value>) -> String {
     }
 }
 
-/// The tools a workflow can use: the registry's tools and the connector actions (fixed), plus the
+/// The tools a workflow can use: the catalogue's tools and the connector actions, plus the
 /// workflows the user saved that have inputs or outputs (they come and go while the app runs).
+/// The catalogue part follows the catalogue in use: a newer verified catalogue (ADR 0034) adds its
+/// tools without rebuilding Flow.
 pub struct Catalog {
-    base: BTreeMap<String, ToolPorts>,
+    base: RwLock<&'static BTreeMap<String, ToolPorts>>,
+    seen: Mutex<Option<shell::Catalogue>>,
     extra: RwLock<BTreeMap<String, &'static ToolPorts>>,
 }
 
 impl Catalog {
+    fn base(&self) -> &'static BTreeMap<String, ToolPorts> {
+        *self
+            .base
+            .read()
+            .unwrap_or_else(std::sync::PoisonError::into_inner)
+    }
+
+    /// Rebuilds the fixed tools when the catalogue in use changed (once per new catalogue; the
+    /// previous map is leaked on purpose so references handed out earlier stay valid).
+    fn sync(&self) {
+        let current = shell::catalogue();
+        let mut seen = self
+            .seen
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
+        if seen.as_ref().is_some_and(|s| s.same(&current)) {
+            return;
+        }
+        let map: &'static BTreeMap<String, ToolPorts> = Box::leak(Box::new(build(&current)));
+        *self
+            .base
+            .write()
+            .unwrap_or_else(std::sync::PoisonError::into_inner) = map;
+        *seen = Some(current);
+    }
+
     #[must_use]
     pub fn get(&self, id: &str) -> Option<&ToolPorts> {
-        self.base
+        self.base()
             .get(id)
             .or_else(|| self.extra.read().ok().and_then(|e| e.get(id).copied()))
     }
@@ -38,7 +67,7 @@ impl Catalog {
 
     /// The fixed tools (registry and connectors), not the saved workflows.
     pub fn iter(&self) -> impl Iterator<Item = (&String, &ToolPorts)> {
-        self.base.iter()
+        self.base().iter()
     }
 }
 
@@ -86,9 +115,9 @@ pub fn workflow_name(tool: &str) -> Option<String> {
         .and_then(|n| n.get(tool).cloned())
 }
 
-fn build() -> BTreeMap<String, ToolPorts> {
+fn build(catalogue: &shell::Catalogue) -> BTreeMap<String, ToolPorts> {
     {
-        let mut all: BTreeMap<String, ToolPorts> = shell::catalogue()
+        let mut all: BTreeMap<String, ToolPorts> = catalogue
             .iter()
             .map(|entry| {
                 let ports = ToolPorts {
@@ -134,13 +163,17 @@ fn build() -> BTreeMap<String, ToolPorts> {
     }
 }
 
-/// Tool ports and params for the whole catalogue, from the registry contracts.
+/// Tool ports and params for the whole catalogue in use, plus connectors and saved workflows.
 pub fn ports() -> &'static Catalog {
     static PORTS: OnceLock<Catalog> = OnceLock::new();
-    PORTS.get_or_init(|| Catalog {
-        base: build(),
+    static EMPTY: OnceLock<BTreeMap<String, ToolPorts>> = OnceLock::new();
+    let catalog = PORTS.get_or_init(|| Catalog {
+        base: RwLock::new(EMPTY.get_or_init(BTreeMap::new)),
+        seen: Mutex::new(None),
         extra: RwLock::new(BTreeMap::new()),
-    })
+    });
+    catalog.sync();
+    catalog
 }
 
 /// Every tool of the catalogue by display name: file inputs are fed by file nodes, text inputs by

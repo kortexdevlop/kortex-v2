@@ -116,6 +116,7 @@ fn install_one(
     };
     let t = install(&env.home, index, &env.index_src, id, target, &mut note)
         .map_err(|e| e.to_string())?;
+    env.save_contract(id, &t.version);
     writeln!(
         out,
         "✓ {id} {} installé : {}",
@@ -247,6 +248,7 @@ pub fn run(
                     .map_err(|e| e.to_string())?
                 {
                     Some(t) => {
+                        env.save_contract(&id, &t.version);
                         writeln!(out, "✓ {id} mis à jour en {}", t.version).map_err(w)?;
                         if let Some(c) = &creds {
                             let _ = kortex_pkg::record_install(c, &id, &t.version, &target);

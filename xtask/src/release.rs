@@ -99,7 +99,7 @@ fn b64(bytes: &[u8]) -> String {
 }
 
 /// `cargo xtask keygen --out <file>`: new Ed25519 release key. The seed goes to `<file>` (0600),
-/// the public half to `crates/kortex-pkg/release.pub` (committed, embedded in every client).
+/// the public half to `crates/kortex-catalog/release.pub` (committed, embedded in every client).
 pub fn keygen(args: &[String]) -> Result<(), String> {
     let out = flag(args, "--out").ok_or("usage : cargo xtask keygen --out <fichier-privé>")?;
     if Path::new(&out).exists() && !args.iter().any(|a| a == "--force") {
@@ -116,11 +116,11 @@ pub fn keygen(args: &[String]) -> Result<(), String> {
         fs::set_permissions(&out, fs::Permissions::from_mode(0o600)).map_err(|e| e.to_string())?;
     }
     let public = public_key_b64(&seed);
-    fs::write("crates/kortex-pkg/release.pub", &public).map_err(|e| e.to_string())?;
+    fs::write("crates/kortex-catalog/release.pub", &public).map_err(|e| e.to_string())?;
     println!(
         "✓ clé privée écrite dans {out} (NE JAMAIS la committer ; secret CI : KORTEX_SIGNING_KEY)"
     );
-    println!("✓ clé publique : {public}  (crates/kortex-pkg/release.pub, à committer)");
+    println!("✓ clé publique : {public}  (crates/kortex-catalog/release.pub, à committer)");
     Ok(())
 }
 
@@ -650,6 +650,9 @@ pub fn release_index(args: &[String]) -> Result<(), String> {
         });
     let index = Index {
         schema: 1,
+        channel: "stable".into(),
+        sequence: 0,
+        source_commit: None,
         generated: iso_date(secs),
         cli,
         tools: tool_map,
@@ -657,8 +660,9 @@ pub fn release_index(args: &[String]) -> Result<(), String> {
     let bytes = serde_json::to_vec_pretty(&index).map_err(|e| e.to_string())?;
     let sig = sign_bytes(&seed, &bytes);
     // Never publish an index that this repository's embedded public key would reject.
-    let public = fs::read_to_string("crates/kortex-pkg/release.pub").map_err(|e| e.to_string())?;
-    parse_verified(&bytes, &sig, public.trim()).map_err(|e| format!("la clé de signature ne correspond pas à crates/kortex-pkg/release.pub ({e}) : lance `cargo xtask keygen`"))?;
+    let public =
+        fs::read_to_string("crates/kortex-catalog/release.pub").map_err(|e| e.to_string())?;
+    parse_verified(&bytes, &sig, public.trim()).map_err(|e| format!("la clé de signature ne correspond pas à crates/kortex-catalog/release.pub ({e}) : lance `cargo xtask keygen`"))?;
     // Plain-text pointer for the shell/PowerShell installers (no JSON parser needed): "<target> <sha256> <url>".
     if let Some(c) = &index.cli {
         let lines: String = c

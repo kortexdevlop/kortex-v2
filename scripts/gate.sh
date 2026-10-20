@@ -7,10 +7,10 @@ cargo xtask tokens            # embedded by the Store and desktop apps
 cargo fmt --all -- --check
 cargo clippy --workspace --all-targets -- -D warnings
 cargo test --workspace
-before=$(cat design/dist/kortex.css registry/index.json | shasum)
+before=$(cat design/dist/kortex.css registry/contracts.json | shasum)
 cargo xtask tokens
 cargo xtask registry
-after=$(cat design/dist/kortex.css registry/index.json | shasum)
+after=$(cat design/dist/kortex.css registry/contracts.json | shasum)
 [ "$before" = "$after" ] || { echo "✗ design/dist ou registry était périmé : régénéré, relance le gate"; exit 1; }
 cargo xtask check
 pnpm --filter @kortex/site test

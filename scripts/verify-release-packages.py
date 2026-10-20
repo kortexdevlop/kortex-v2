@@ -11,7 +11,7 @@ parser.add_argument('--tools', required=True)
 parser.add_argument('--targets', required=True)
 args = parser.parse_args()
 root = Path(__file__).resolve().parent.parent
-catalogue = json.loads((root / 'registry/index.json').read_text(encoding="utf-8"))['tools']
+catalogue = json.loads((root / 'registry/contracts.json').read_text(encoding="utf-8"))['tools']
 apps = json.loads((root / 'registry/apps.json').read_text(encoding="utf-8"))['apps']
 versions = {entry['tool']['id']: entry['tool']['version'] for entry in catalogue}
 requested = set(versions) if args.tools == 'all' else set(args.tools.split())

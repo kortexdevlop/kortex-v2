@@ -16,10 +16,10 @@ fn tmp(name: &str) -> PathBuf {
 
 #[test]
 fn every_registered_tool_is_linked_into_the_cli() {
-    // registry/index.json is the source of truth; the CLI list is generated from the same tools.
+    // registry/contracts.json is the source of truth; the CLI list is generated from the same tools.
     let registry = fs::read_to_string(concat!(
         env!("CARGO_MANIFEST_DIR"),
-        "/../../registry/index.json"
+        "/../../registry/contracts.json"
     ))
     .expect("registry");
     let ids: Vec<&str> = registry

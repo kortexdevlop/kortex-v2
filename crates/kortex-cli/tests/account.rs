@@ -146,6 +146,9 @@ fn fx(name: &str, api: &str) -> Fx {
     };
     let index = serde_json::to_vec_pretty(&Index {
         schema: 1,
+        channel: "stable".into(),
+        sequence: 0,
+        source_commit: None,
         generated: "x".into(),
         cli: None,
         tools: BTreeMap::from([(ID.into(), tool)]),
@@ -154,6 +157,7 @@ fn fx(name: &str, api: &str) -> Fx {
     std::fs::write(dir.join("rel/index.json"), &index).expect("index");
     std::fs::write(dir.join("rel/index.json.sig"), sign_bytes(&SEED, &index)).expect("sig");
     let env = PkgEnv {
+        channel: "stable".into(),
         home: Home::at(dir.join("home/.kortex"), dir.join("home")).with_secret_store(
             std::sync::Arc::new(kortex_platform::secrets::MemorySecretStore::default()),
         ),

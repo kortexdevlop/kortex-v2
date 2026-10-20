@@ -351,7 +351,7 @@ pub fn run(filter: Option<&str>) -> Result<(), String> {
     }
 
     if filter.is_none() {
-        let current = fs::read_to_string("registry/index.json").unwrap_or_default();
+        let current = fs::read_to_string("registry/contracts.json").unwrap_or_default();
         let (cli_manifest, cli_code) = crate::cli_gen::build()?;
         if fs::read_to_string("crates/kortex-cli/Cargo.toml").unwrap_or_default() != cli_manifest
             || fs::read_to_string("crates/kortex-cli/src/generated.rs").unwrap_or_default()
@@ -360,7 +360,7 @@ pub fn run(filter: Option<&str>) -> Result<(), String> {
             errors.push("✗ crates/kortex-cli périmé — lance `cargo xtask cli-gen`".into());
         }
         if current != registry::build()? {
-            errors.push("✗ registry/index.json périmé — lance `cargo xtask registry`".into());
+            errors.push("✗ registry/contracts.json périmé — lance `cargo xtask registry`".into());
         }
     } else if count == 0 {
         errors.push(format!(

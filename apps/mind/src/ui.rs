@@ -35,16 +35,9 @@ fn locale(lang: &str) -> &'static kortex_i18n::Catalog {
     }
 }
 
-/// Every tool contract, read once from the generated registry.
-fn contracts() -> &'static BTreeMap<String, ToolContract> {
-    static CONTRACTS: OnceLock<BTreeMap<String, ToolContract>> = OnceLock::new();
-    CONTRACTS.get_or_init(|| {
-        kortex_workflow::contracts_from_registry(include_str!("../../../registry/index.json"))
-            .unwrap_or_default()
-            .into_iter()
-            .map(|c| (c.tool.id.clone(), c))
-            .collect()
-    })
+/// Contracts of every tool of the catalogue in use (signed catalogue or embedded, ADR 0034).
+fn contracts() -> std::sync::Arc<BTreeMap<String, ToolContract>> {
+    kortex_shell::contracts()
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -71,8 +64,9 @@ struct Shared {
 fn definitions(ids: &[String], used: &[String], lang: &str) -> Vec<serde_json::Value> {
     let mut all: Vec<&String> = ids.iter().collect();
     all.extend(used.iter().filter(|u| !ids.contains(u)));
+    let contracts = contracts();
     all.into_iter()
-        .filter_map(|id| contracts().get(id))
+        .filter_map(|id| contracts.get(id))
         .map(|c| tools::definition(c, lang))
         .collect()
 }
@@ -116,7 +110,7 @@ async fn drive(mut s: Shared) {
                 if credits.is_some() {
                     s.credits.set(credits);
                 }
-                let next = s.conversation.write().receive(turn, contracts());
+                let next = s.conversation.write().receive(turn, &contracts());
                 match next {
                     Next::Ask => {}
                     Next::AwaitApproval => {
@@ -213,6 +207,8 @@ fn save_file(name: &str, mime: &str, bytes: &[u8]) -> String {
 #[component]
 pub fn App() -> Element {
     let appearance = shell::use_appearance();
+    // Fetches the signed catalogue once and re-renders when a newer verified one arrives.
+    let _ = shell::use_catalogue();
     let lang = (appearance.lang)();
     let l = locale(&lang);
     let (saved, _) = use_hook(|| shell::load::<Saved>("mind", "conversation"));
@@ -318,7 +314,12 @@ pub fn App() -> Element {
         if conversation.write().submit(&text) {
             let (mut draft, mut tool_ids) = (draft, tool_ids);
             draft.set(String::new());
-            tool_ids.set(select_tools(contracts(), &text, &lang_signal(), TOOL_LIMIT));
+            tool_ids.set(select_tools(
+                &contracts(),
+                &text,
+                &lang_signal(),
+                TOOL_LIMIT,
+            ));
             spawn(drive(shared));
         }
     };
@@ -575,7 +576,7 @@ fn entry_view(
     lang: &str,
 ) -> Element {
     let tool_name =
-        |id: &str| shell::find(id).map_or_else(|| id.to_owned(), |e| shell::name(e, lang));
+        |id: &str| shell::find(id).map_or_else(|| id.to_owned(), |e| shell::name(&e, lang));
     match entry {
         Entry::User(text) => {
             rsx! { div { key: "{index}", class: "mind-bubble mind-user", "{text}" } }

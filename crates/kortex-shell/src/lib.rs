@@ -5,10 +5,12 @@ use serde::Deserialize;
 use std::sync::OnceLock;
 
 pub mod account;
+pub mod catalog;
 pub use account::AccountSync;
+pub use catalog::{Catalogue, Source};
 
 pub const CSS: &str = include_str!("shell.css");
-#[derive(Clone, Deserialize)]
+#[derive(Clone, PartialEq, Deserialize)]
 pub struct Entry {
     pub tool: kortex_contract::ToolMeta,
     pub search: kortex_contract::Search,
@@ -20,18 +22,15 @@ pub struct Entry {
     pub params: Vec<kortex_contract::Param>,
     #[serde(default)]
     pub outputs: Vec<kortex_contract::Output>,
+    #[serde(default)]
+    pub permissions: Option<kortex_contract::Permissions>,
 }
-#[derive(Deserialize)]
-struct Registry {
-    tools: Vec<Entry>,
-}
-pub fn catalogue() -> &'static [Entry] {
-    static ITEMS: OnceLock<Vec<Entry>> = OnceLock::new();
-    ITEMS.get_or_init(|| {
-        serde_json::from_str::<Registry>(include_str!("../../../registry/index.json"))
-            .map(|r| r.tools)
-            .unwrap_or_default()
-    })
+/// The catalogue in use: verified published catalogue, else its verified offline copy, else the
+/// contracts compiled into this build (ADR 0034). Components should call [`use_catalogue`] to
+/// re-render when a newer verified catalogue arrives.
+#[must_use]
+pub fn catalogue() -> Catalogue {
+    catalog::current()
 }
 pub fn name(entry: &Entry, lang: &str) -> String {
     entry
@@ -41,9 +40,66 @@ pub fn name(entry: &Entry, lang: &str) -> String {
         .cloned()
         .unwrap_or_else(|| entry.tool.id.clone())
 }
-pub fn find(id: &str) -> Option<&'static Entry> {
-    catalogue().iter().find(|e| e.tool.id == id)
+/// Full contracts of the catalogue in use, by id; recomputed only when the catalogue changes.
+#[must_use]
+pub fn contracts()
+-> std::sync::Arc<std::collections::BTreeMap<String, kortex_contract::ToolContract>> {
+    type Map = std::collections::BTreeMap<String, kortex_contract::ToolContract>;
+    static MEMO: std::sync::Mutex<Option<(Catalogue, std::sync::Arc<Map>)>> =
+        std::sync::Mutex::new(None);
+    let current = catalogue();
+    let mut memo = MEMO
+        .lock()
+        .unwrap_or_else(std::sync::PoisonError::into_inner);
+    if let Some((seen, map)) = memo.as_ref()
+        && seen.same(&current)
+    {
+        return std::sync::Arc::clone(map);
+    }
+    let map: std::sync::Arc<Map> = std::sync::Arc::new(
+        current
+            .contracts()
+            .into_iter()
+            .map(|c| (c.tool.id.clone(), c))
+            .collect(),
+    );
+    *memo = Some((current, std::sync::Arc::clone(&map)));
+    map
 }
+#[must_use]
+pub fn find(id: &str) -> Option<Entry> {
+    catalogue().find(id).cloned()
+}
+/// Bumped when a newer verified catalogue replaces the one in use.
+static REVISION: GlobalSignal<u64> = Signal::global(|| 0);
+/// The catalogue in use, re-rendering the component when a newer verified one arrives. The first
+/// call fetches the published catalogue once, in the background; failures keep the current one.
+pub fn use_catalogue() -> Catalogue {
+    use std::sync::atomic::{AtomicBool, Ordering};
+    static STARTED: AtomicBool = AtomicBool::new(false);
+    use_hook(|| {
+        if !STARTED.swap(true, Ordering::SeqCst) {
+            dioxus::core::spawn_forever(async {
+                if let Some(next) = catalog::fetch().await
+                    && catalog::replace(next)
+                {
+                    *REVISION.write() += 1;
+                }
+            });
+        }
+    });
+    let _ = REVISION();
+    catalogue()
+}
+/// Number of catalogue replacements so far; reading it inside a memo or effect re-runs it when a
+/// newer verified catalogue arrives.
+#[must_use]
+pub fn catalogue_revision() -> u64 {
+    REVISION()
+}
+/// Tools an app may offer: the whole catalogue on the web; on desktop only the tools really
+/// installed (RULES §4.7), including ones this build does not know, described by the contract
+/// saved with their package.
 pub fn available() -> Vec<Entry> {
     #[cfg(target_arch = "wasm32")]
     {
@@ -51,12 +107,38 @@ pub fn available() -> Vec<Entry> {
     }
     #[cfg(not(target_arch = "wasm32"))]
     {
-        catalogue()
+        let catalogue = catalogue();
+        let Some(registry) = kortex_pkg::Home::from_env()
+            .ok()
+            .and_then(|h| h.load_registry().ok().map(|r| (h, r)))
+        else {
+            return Vec::new();
+        };
+        let (home, registry) = registry;
+        registry
+            .tools
             .iter()
-            .filter(|e| installed_path(&e.tool.id).is_some())
-            .cloned()
+            .filter(|(id, _)| installed_path(id).is_some())
+            .filter_map(|(id, item)| {
+                catalogue
+                    .find(id)
+                    .cloned()
+                    .or_else(|| installed_contract(&home, id, &item.version))
+            })
             .collect()
     }
+}
+/// Contract saved next to an installed package (`contract.json`, written at installation).
+#[cfg(not(target_arch = "wasm32"))]
+fn installed_contract(home: &kortex_pkg::Home, id: &str, version: &str) -> Option<Entry> {
+    let path = home
+        .tools_dir()
+        .join(id)
+        .join(version)
+        .join("contract.json");
+    let bytes = kortex_platform::native::fs::read(path).ok()?;
+    let entry: Entry = serde_json::from_slice(&bytes).ok()?;
+    (entry.tool.id == id).then_some(entry)
 }
 #[cfg(not(target_arch = "wasm32"))]
 fn installed_path(id: &str) -> Option<std::path::PathBuf> {
@@ -344,7 +426,7 @@ pub fn ToolHost(id: String, frame: u64) -> Element {
     let appearance = use_context::<Appearance>();
     let lang = (appearance.lang)();
     let entry = find(&id);
-    let title = entry.map(|e| name(e, &lang)).unwrap_or_else(|| id.clone());
+    let title = entry.map(|e| name(&e, &lang)).unwrap_or_else(|| id.clone());
     #[cfg(target_arch = "wasm32")]
     {
         let origin = format!("https://{}", domain("run"));
@@ -391,10 +473,16 @@ mod tests {
     use super::*;
     #[test]
     fn catalogue_and_search_are_real_and_local() {
-        assert_eq!(catalogue().len(), 38);
+        let registry: serde_json::Value =
+            serde_json::from_str(include_str!("../../../registry/contracts.json"))
+                .unwrap_or_default();
+        assert_eq!(
+            catalogue().len(),
+            registry["tools"].as_array().map_or(0, Vec::len)
+        );
         let e = find("secure.hash-calculator").expect("tool");
-        assert!(matches(e, "hash", "en"));
-        assert!(!matches(e, "nonexistentneedle", "fr"));
+        assert!(matches(&e, "hash", "en"));
+        assert!(!matches(&e, "nonexistentneedle", "fr"));
         assert!(!domain("desk").is_empty());
     }
 }

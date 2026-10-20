@@ -3454,6 +3454,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "kortex-catalog"
+version = "0.1.0"
+dependencies = [
+ "ed25519-dalek",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+]
+
+[[package]]
 name = "kortex-cli"
 version = "0.1.0"
 dependencies = [
@@ -3618,6 +3628,7 @@ dependencies = [
  "ed25519-dalek",
  "flate2",
  "hmac 0.12.1",
+ "kortex-catalog",
  "kortex-platform",
  "pbkdf2",
  "serde",
@@ -3677,6 +3688,7 @@ dependencies = [
  "dioxus",
  "kortex-auth",
  "kortex-bus",
+ "kortex-catalog",
  "kortex-contract",
  "kortex-i18n",
  "kortex-pkg",
@@ -3694,6 +3706,7 @@ version = "0.3.1"
 dependencies = [
  "dioxus",
  "dioxus-ssr",
+ "kortex-contract",
  "kortex-i18n",
  "kortex-pkg",
  "kortex-platform",

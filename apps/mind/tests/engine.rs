@@ -9,7 +9,7 @@ use kortex_runtime::{Value, ValueMap};
 use kortex_workflow::{RunError, catalogue_of, validate};
 
 fn contracts() -> BTreeMap<String, ToolContract> {
-    kortex_workflow::contracts_from_registry(include_str!("../../../registry/index.json"))
+    kortex_workflow::contracts_from_registry(include_str!("../../../registry/contracts.json"))
         .unwrap_or_default()
         .into_iter()
         .map(|c| (c.tool.id.clone(), c))

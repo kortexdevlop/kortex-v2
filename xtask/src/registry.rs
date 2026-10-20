@@ -1,4 +1,4 @@
-//! `registry/index.json`: generated from every `tool.toml`.
+//! `registry/contracts.json`: generated from every `tool.toml`.
 use std::fs;
 
 use crate::tools;
@@ -22,8 +22,8 @@ pub fn build() -> Result<String, String> {
 pub fn run() -> Result<(), String> {
     let json = build()?;
     fs::create_dir_all("registry").map_err(|e| e.to_string())?;
-    fs::write("registry/index.json", &json).map_err(|e| e.to_string())?;
+    fs::write("registry/contracts.json", &json).map_err(|e| e.to_string())?;
     fs::write("registry/apps.json", crate::apps::registry()?).map_err(|e| e.to_string())?;
-    println!("✓ registry/index.json et registry/apps.json générés");
+    println!("✓ registry/contracts.json et registry/apps.json générés");
     Ok(())
 }

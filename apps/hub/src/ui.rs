@@ -25,7 +25,13 @@ pub fn App() -> Element {
     let lang = (appearance.lang)();
     let l = locale(&lang);
     let error = use_signal(|| shell::load::<Dashboard>("hub", "dashboard").1);
-    let items = use_hook(shell::available);
+    // Recomputed when a newer verified catalogue arrives (installed tools only on desktop).
+    let _ = shell::use_catalogue();
+    let items = use_memo(|| {
+        let _ = shell::catalogue_revision();
+        shell::available()
+    });
+    let items = items();
     let mut state = use_signal(|| {
         let mut s = shell::load::<Dashboard>("hub", "dashboard").0;
         s.reconcile(&items.iter().map(|i| i.tool.id.clone()).collect::<Vec<_>>());

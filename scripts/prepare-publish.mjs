@@ -11,7 +11,7 @@ const domains = Object.fromEntries([...readFileSync(join(root, 'brand/domains.to
 const features = publicFeatures(root);
 const security = JSON.parse(readFileSync(join(root,'brand/security.json'),'utf8'));
 const turnstile = security.turnstile_site_key ? ' https://challenges.cloudflare.com' : '';
-const registry = JSON.parse(readFileSync(join(root, 'registry/index.json'), 'utf8'));
+const registry = JSON.parse(readFileSync(join(root, 'registry/contracts.json'), 'utf8'));
 for (const {tool} of registry.tools) {
   for (const file of ['index.html', 'sw.js']) statSync(join(root, 'dist/run', tool.id, file));
 }
@@ -72,11 +72,14 @@ for (const [name, source, host] of targets) {
     }
   }
   inspect(dest);
+  // Signed index and contract catalogue: public data the apps fetch without cookies (ADR 0034);
+  // their signature, not the transport, is what clients trust.
+  const registryHeaders = '\n/registry/*\n  Access-Control-Allow-Origin: *\n  Cache-Control: no-cache\n';
   const csp = name === 'site'
     ? `default-src 'self'; script-src 'self' ${[...scriptHashes].join(' ')}${turnstile}; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://${domains.run}${features.account ? ` https://${domains.api}` : ''}; frame-src https://${domains.run}${turnstile}; worker-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'self'; form-action 'self'`
-    : name !== 'run' ? `default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://${domains.api}; frame-src https://${domains.run}; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'`
+    : name !== 'run' ? `default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://${domains.api} https://${domains.root}; frame-src https://${domains.run}; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'`
     : `default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors https://${domains.root} https://${domains.desk} https://${domains.hub}; form-action 'none'`;
-  writeFileSync(join(dest, '_headers'), `/*\n  Content-Security-Policy: ${csp}\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: no-referrer\n  Strict-Transport-Security: max-age=31536000\n  Permissions-Policy: camera=(), microphone=(), geolocation=()\n\n/sw.js\n  Cache-Control: no-cache\n\n/*/sw.js\n  Cache-Control: no-cache\n${immutable[name === 'site' ? 'site' : name === 'run' ? 'run' : 'app']}`);
+  writeFileSync(join(dest, '_headers'), `/*\n  Content-Security-Policy: ${csp}\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: no-referrer\n  Strict-Transport-Security: max-age=31536000\n  Permissions-Policy: camera=(), microphone=(), geolocation=()\n\n/sw.js\n  Cache-Control: no-cache\n\n/*/sw.js\n  Cache-Control: no-cache\n${name === 'site' ? registryHeaders : ''}${immutable[name === 'site' ? 'site' : name === 'run' ? 'run' : 'app']}`);
   if (count > 20000) throw new Error(`Too many assets: ${count}`);
   mkdirSync(join(root, `services/${name}`), {recursive: true});
   writeFileSync(join(root, `services/${name}/wrangler.jsonc`), JSON.stringify({

@@ -24,6 +24,7 @@ fn fx(name: &str) -> Fx {
     std::fs::create_dir_all(dir.join("rel")).expect("dirs");
     let api = installation_account();
     let env = PkgEnv {
+        channel: "stable".into(),
         home: Home::at(dir.join("home/.kortex"), dir.join("home")).with_secret_store(
             std::sync::Arc::new(kortex_platform::secrets::MemorySecretStore::default()),
         ),
@@ -113,6 +114,10 @@ fn package(id: &str, version: &str, bin: &[u8]) -> Vec<u8> {
 }
 
 fn publish(f: &Fx, version: &str, bin: &[u8]) {
+    publish_at(f, version, bin, 0);
+}
+
+fn publish_at(f: &Fx, version: &str, bin: &[u8], sequence: u64) {
     let bytes = package(ID, version, bin);
     let file = format!("p-{version}.tar.gz");
     std::fs::write(f.dir.join("rel").join(&file), &bytes).expect("pkg");
@@ -134,6 +139,9 @@ fn publish(f: &Fx, version: &str, bin: &[u8]) {
     };
     let index = Index {
         schema: 1,
+        channel: "stable".into(),
+        sequence,
+        source_commit: None,
         generated: "2026-10-16".into(),
         cli: None,
         tools: BTreeMap::from([(ID.into(), tool)]),
@@ -277,6 +285,87 @@ fn an_index_not_signed_by_our_key_is_refused_before_anything_is_downloaded() {
     let err = kortex_cli::execute_with(&args, &mut Vec::new(), Some(&env)).expect_err("refused");
     assert!(err.contains("signature"), "{err}");
     assert!(env.home.load_registry().expect("registry").tools.is_empty());
+}
+
+/// A genuine but older signed index (a replayed release) is refused once a newer one was seen,
+/// and the newer one keeps working (ADR 0034, PLAN 10.2/19.7).
+#[test]
+fn a_replayed_older_index_is_refused_without_losing_the_newer_one() {
+    let f = fx("rollback");
+    publish_at(&f, "1.1.0", b"new", 5);
+    assert!(run(&f, &["available"]).expect("seq 5").contains("1.1.0"));
+    publish_at(&f, "1.0.0", b"old", 4);
+    let err = run(&f, &["available"]).expect_err("replayed index refused");
+    assert!(err.contains("retour en arrière"), "{err}");
+    publish_at(&f, "1.1.0", b"new", 5);
+    assert!(
+        run(&f, &["available"])
+            .expect("same index again")
+            .contains("1.1.0")
+    );
+    publish_at(&f, "1.2.0", b"newer", 6);
+    assert!(run(&f, &["available"]).expect("seq 6").contains("1.2.0"));
+}
+
+fn publish_catalog(f: &Fx, version: &str, sequence: u64, seed: &[u8; 32]) {
+    let text = serde_json::json!({
+        "schema": 1, "channel": "stable", "sequence": sequence, "generated": "2026-10-20",
+        "tools": [{"tool": {"id": ID, "version": version}, "search": {}}],
+    })
+    .to_string();
+    std::fs::write(f.dir.join("rel/catalog.json"), &text).expect("catalog");
+    std::fs::write(
+        f.dir.join("rel/catalog.json.sig"),
+        sign_bytes(seed, text.as_bytes()),
+    )
+    .expect("sig");
+}
+
+fn saved_contract(f: &Fx, version: &str) -> Option<serde_json::Value> {
+    let path = f
+        .env
+        .home
+        .tools_dir()
+        .join(ID)
+        .join(version)
+        .join("contract.json");
+    serde_json::from_slice(&std::fs::read(path).ok()?).ok()
+}
+
+/// The signed catalogue's contract is kept with the package, so apps built before a tool existed
+/// can still list it (ADR 0034, PLAN 19.6). A forged catalogue is ignored.
+#[test]
+fn installing_keeps_the_signed_contract_next_to_the_package() {
+    let f = fx("contract");
+    publish(&f, "1.0.0", b"x");
+    publish_catalog(&f, "1.0.0", 1, &SEED);
+    run(&f, &["install", ID]).expect("installed");
+    let contract = saved_contract(&f, "1.0.0").expect("contract.json");
+    assert_eq!(contract["tool"]["id"], ID);
+
+    let g = fx("contract-forged");
+    publish(&g, "1.0.0", b"x");
+    publish_catalog(&g, "1.0.0", 1, &[5; 32]);
+    run(&g, &["install", ID]).expect("installed without a contract");
+    assert!(saved_contract(&g, "1.0.0").is_none());
+}
+
+#[test]
+fn a_test_feed_is_refused_by_a_stable_client() {
+    let f = fx("channel");
+    publish_at(&f, "1.0.0", b"x", 1);
+    let p = f.dir.join("rel/index.json");
+    let text = std::fs::read_to_string(&p)
+        .expect("read")
+        .replace("\"channel\": \"stable\"", "\"channel\": \"test\"");
+    std::fs::write(&p, &text).expect("write");
+    std::fs::write(
+        f.dir.join("rel/index.json.sig"),
+        sign_bytes(&SEED, text.as_bytes()),
+    )
+    .expect("sig");
+    let err = run(&f, &["available"]).expect_err("test feed refused");
+    assert!(err.contains("canal"), "{err}");
 }
 
 #[test]

@@ -3,6 +3,7 @@
 use std::collections::BTreeMap;
 
 pub mod clipboard;
+pub mod public;
 pub mod storage;
 
 #[cfg(all(feature = "secret-store", not(target_arch = "wasm32")))]

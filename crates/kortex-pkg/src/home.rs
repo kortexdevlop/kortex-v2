@@ -129,6 +129,41 @@ impl Home {
     }
 
     /// Atomic write (temp file + rename): a crash never leaves a half-written registry.
+    fn floors_path(&self) -> PathBuf {
+        self.root.join("floors.json")
+    }
+
+    fn floors(&self) -> BTreeMap<String, kortex_catalog::Floor> {
+        kortex_platform::native::fs::read(self.floors_path())
+            .ok()
+            .and_then(|b| serde_json::from_slice(&b).ok())
+            .unwrap_or_default()
+    }
+
+    /// Last signed document of `key` (`index:stable`, `catalog:stable`…) accepted here.
+    #[must_use]
+    pub fn floor(&self, key: &str) -> Option<kortex_catalog::Floor> {
+        self.floors().remove(key)
+    }
+
+    /// Remembers an accepted document so older ones are refused afterwards (written atomically).
+    pub fn save_floor(&self, key: &str, floor: kortex_catalog::Floor) -> Result<()> {
+        let mut all = self.floors();
+        all.insert(key.to_owned(), floor);
+        kortex_platform::native::fs::create_dir_all(&self.root)?;
+        let tmp = self.root.join(format!(
+            ".floors.{}.tmp",
+            kortex_platform::native::process_id()
+        ));
+        kortex_platform::native::fs::write(
+            &tmp,
+            serde_json::to_vec_pretty(&all)
+                .map_err(|e| PkgError::new(Kind::Parse, e.to_string()))?,
+        )?;
+        kortex_platform::native::fs::rename(&tmp, self.floors_path())?;
+        Ok(())
+    }
+
     pub fn save_registry(&self, r: &Registry) -> Result<()> {
         kortex_platform::native::fs::create_dir_all(&self.root)?;
         let tmp = self.root.join(format!(

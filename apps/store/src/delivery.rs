@@ -99,6 +99,7 @@ fn run(id: &str, action: Action, password: Option<&str>) -> Result<Outcome, kort
             let index = env.load_index()?;
             let t =
                 kortex_pkg::install(&env.home, &index, &env.index_src, id, &target, &mut quiet)?;
+            env.save_contract(id, &t.version);
             // The installation itself succeeded; the account record is informative only.
             let _ = kortex_pkg::record_install(&c, id, &t.version, &target);
             Ok(Outcome::Done)
@@ -107,9 +108,11 @@ fn run(id: &str, action: Action, password: Option<&str>) -> Result<Outcome, kort
             let index = env.load_index()?;
             if let Some(t) =
                 kortex_pkg::update(&env.home, &index, &env.index_src, id, &target, &mut quiet)?
-                && let Some(c) = &creds
             {
-                let _ = kortex_pkg::record_install(c, id, &t.version, &target);
+                env.save_contract(id, &t.version);
+                if let Some(c) = &creds {
+                    let _ = kortex_pkg::record_install(c, id, &t.version, &target);
+                }
             }
             Ok(Outcome::Done)
         }

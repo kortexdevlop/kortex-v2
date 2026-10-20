@@ -1,42 +1,14 @@
 //! Shared Store application: catalogue and permissions everywhere; signed installation on desktop.
 use dioxus::prelude::*;
-use kortex_shell::{Frame, catalogue, matches, name, url, use_appearance};
+use kortex_shell::{Frame, matches, name, url, use_appearance, use_catalogue};
 use kortex_ui::Button;
 
 use crate::engine::{Action, Outcome, Snapshot, ToolStatus, primary_action};
 use crate::ui::text;
 
-#[derive(Clone, serde::Deserialize)]
-struct Permissions {
-    network: bool,
-    filesystem: String,
-    clipboard: String,
-    sensitive: bool,
-}
-fn permissions(id: &str) -> Option<Permissions> {
-    #[derive(serde::Deserialize)]
-    struct Tool {
-        id: String,
-    }
-    #[derive(serde::Deserialize)]
-    struct Entry {
-        tool: Tool,
-        permissions: Permissions,
-    }
-    #[derive(serde::Deserialize)]
-    struct Registry {
-        tools: Vec<Entry>,
-    }
-    static REGISTRY: std::sync::OnceLock<Vec<Entry>> = std::sync::OnceLock::new();
-    REGISTRY
-        .get_or_init(|| {
-            serde_json::from_str::<Registry>(include_str!("../../../registry/index.json"))
-                .map(|r| r.tools)
-                .unwrap_or_default()
-        })
-        .iter()
-        .find(|e| e.tool.id == id)
-        .map(|e| e.permissions.clone())
+/// Permissions declared by a tool's contract, from the catalogue in use.
+fn permissions(id: &str) -> Option<kortex_contract::Permissions> {
+    kortex_shell::find(id).and_then(|e| e.permissions)
 }
 
 /// Loads this device's package state (always empty on the web, where nothing is installed).
@@ -180,13 +152,11 @@ pub fn App() -> Element {
     let on_package = move |(id, action): (String, Action)| act.call((id, action, None));
     let snap = snapshot.read().clone().unwrap_or_default();
     let status_of = |id: &str| snap.items.iter().find(|s| s.id == id).cloned();
-    let mut universes: Vec<_> = catalogue()
-        .iter()
-        .map(|e| e.tool.universe.clone())
-        .collect();
+    let catalogue = use_catalogue();
+    let mut universes: Vec<_> = catalogue.iter().map(|e| e.tool.universe.clone()).collect();
     universes.sort();
     universes.dedup();
-    let items: Vec<_> = catalogue()
+    let items: Vec<_> = catalogue
         .iter()
         .filter(|e| {
             matches(e, &query(), &lang)
@@ -203,7 +173,7 @@ pub fn App() -> Element {
         .collect();
     let installed_count = snap.items.iter().filter(|s| s.installed.is_some()).count();
     let busy_id = busy();
-    let detail = selected().and_then(|id| kortex_shell::find(&id));
+    let detail = selected().and_then(|id| catalogue.find(&id).cloned());
     let download = format!(
         "{}{}",
         url("root", &lang),
@@ -282,7 +252,7 @@ pub fn App() -> Element {
                     for entry in items {
                         article {class:"k-card store-tool",key:"{entry.tool.id}","data-tool":entry.tool.id.clone(),
                             span {class:"app-badge store-universe","{entry.tool.universe}"}
-                            h2 {"{name(entry,&lang)}"}
+                            h2 {"{name(&entry,&lang)}"}
                             p {class:"k-muted","{entry.tool.tagline.get(&lang).cloned().unwrap_or_default()}"}
                             div {class:"store-badges",span {if fr{"Gratuit"}else{"Free"}}span {"Rust"}span {"v{entry.tool.version}"}}
                             if let Some(status) = status_of(&entry.tool.id) {
@@ -300,7 +270,7 @@ pub fn App() -> Element {
             if let Some(entry)=detail {
                 section {class:"k-card store-detail",role:"region","aria-label":if fr{"Fiche de l’outil"}else{"Tool details"},"data-detail":entry.tool.id.clone(),
                     Button {ghost:true,onclick:move |_|selected.set(None),if fr{"Fermer la fiche"}else{"Close details"}}
-                    h2 {"{name(entry,&lang)}"}
+                    h2 {"{name(&entry,&lang)}"}
                     p {"{entry.tool.tagline.get(&lang).cloned().unwrap_or_default()}"}
                     dl {
                         dt {if fr{"Identifiant"}else{"Identifier"}}dd {"{entry.tool.id}"}

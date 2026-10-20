@@ -64,7 +64,7 @@ pub(crate) fn node_title(node: &Node, l: &kortex_i18n::Catalog, lang: &str) -> S
                     .or_else(|| crate::catalogue::workflow_name(tool))
                     .unwrap_or_else(|| tool.clone())
             },
-            |e| shell::name(e, lang),
+            |e| shell::name(&e, lang),
         ),
         NodeKind::File { multiple, .. } => l
             .t(if *multiple {
@@ -147,7 +147,7 @@ fn node_line(node: &Node, l: &kortex_i18n::Catalog, chosen: Option<&Value>) -> O
                 } else {
                     format!(
                         "↻ {}",
-                        shell::find(&tool).map_or(tool.clone(), |e| shell::name(e, "en"))
+                        shell::find(&tool).map_or(tool.clone(), |e| shell::name(&e, "en"))
                     )
                 }
             }
@@ -556,6 +556,8 @@ fn show_all(mut ctx: Ctx) {
 #[component]
 pub fn App() -> Element {
     let appearance = shell::use_appearance();
+    // Fetches the signed catalogue once and re-renders when a newer verified one arrives.
+    let _ = shell::use_catalogue();
     let lang = (appearance.lang)();
     let l = locale(&lang);
     let pro = (appearance.mode)() == "pro";

@@ -227,7 +227,7 @@ impl ToolPorts {
     }
 }
 
-/// Contracts and ports of every tool of a generated `registry/index.json`.
+/// Contracts and ports of every tool of a generated `registry/contracts.json`.
 ///
 /// # Errors
 /// The text is not a registry.

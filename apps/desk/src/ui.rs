@@ -33,7 +33,13 @@ pub fn App() -> Element {
     let appearance = shell::use_appearance();
     let lang = (appearance.lang)();
     let l = locale(&lang);
-    let items = use_hook(shell::available);
+    // Recomputed when a newer verified catalogue arrives (installed tools only on desktop).
+    let _ = shell::use_catalogue();
+    let items = use_memo(|| {
+        let _ = shell::catalogue_revision();
+        shell::available()
+    });
+    let items = items();
     let allowed = items.iter().map(|e| e.tool.id.clone()).collect::<Vec<_>>();
     let restored = use_hook(|| {
         let (mut s, mut failed) = shell::load::<Workspace>("desk", "workspace");
@@ -107,7 +113,7 @@ pub fn App() -> Element {
         onpointerleave:move |_|{if drag.take().is_some(){persist(state,error);}},
         if !windows.iter().any(|w|w.space==active&&!w.minimized){div{class:"desk-empty",h2{{l.t("ui.empty_workspace")}}p{class:"k-muted",{l.t("ui.empty_hint")}}}}
         for window in windows.iter(){
-         {let id=window.id;let name=shell::find(&window.tool).map(|e|shell::name(e,&lang)).unwrap_or_else(||window.tool.clone());let rect=window.rect;
+         {let id=window.id;let name=shell::find(&window.tool).map(|e|shell::name(&e,&lang)).unwrap_or_else(||window.tool.clone());let rect=window.rect;
           let style=format!("left:calc({}% + var(--k-space-1));top:calc({}% + var(--k-space-1));width:calc({}% - var(--k-space-2));height:calc({}% - var(--k-space-2));z-index:{}",rect.x,rect.y,rect.width,rect.height,window.z);
           rsx!{
            section {key:"{id}",class:"desk-window",style,hidden:window.space!=active||window.minimized,"data-window":"{id}","aria-label":"{name}",
@@ -139,7 +145,7 @@ pub fn App() -> Element {
       }
       nav {class:"desk-dock","aria-label":l.t("ui.dock"),
        for window in windows.iter(){
-        {let id=window.id;let title=shell::find(&window.tool).map(|e|shell::name(e,&lang)).unwrap_or_else(||window.tool.clone());rsx!{button {key:"{id}",class:"k-btn","data-variant":"ghost","data-minimized":window.minimized,r#type:"button",onclick:move |_|{state.write().focus(id);persist(state,error);},"{title}"}}}
+        {let id=window.id;let title=shell::find(&window.tool).map(|e|shell::name(&e,&lang)).unwrap_or_else(||window.tool.clone());rsx!{button {key:"{id}",class:"k-btn","data-variant":"ghost","data-minimized":window.minimized,r#type:"button",onclick:move |_|{state.write().focus(id);persist(state,error);},"{title}"}}}
        }
       }
       p {class:"desk-footer k-muted",{l.t("ui.restore_note")}}

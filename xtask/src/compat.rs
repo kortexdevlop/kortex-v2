@@ -1,6 +1,6 @@
 //! Contract compatibility against a baseline revision (MASTER_PROMPT §12.2): a tool id never
 //! changes or disappears, versions never go down, and a breaking contract change requires a new
-//! major version. The baseline is the generated `registry/index.json` of another git revision.
+//! major version. The baseline is the generated `registry/contracts.json` of another git revision.
 use std::collections::BTreeMap;
 use std::process::Command;
 
@@ -108,16 +108,20 @@ pub fn compare_registry(
 #[must_use]
 pub fn baseline_registry() -> Option<(String, String)> {
     let reference = std::env::var("KORTEX_BASELINE_REF").unwrap_or_else(|_| "origin/main".into());
-    let output = Command::new("git")
-        .args(["show", &format!("{reference}:registry/index.json")])
-        .output()
-        .ok()?;
-    output.status.success().then(|| {
-        (
-            reference,
-            String::from_utf8_lossy(&output.stdout).into_owned(),
-        )
-    })
+    // Revisions before ADR 0034 named the file `registry/index.json`.
+    ["registry/contracts.json", "registry/index.json"]
+        .iter()
+        .find_map(|path| {
+            let output = Command::new("git")
+                .args(["show", &format!("{reference}:{path}")])
+                .output()
+                .ok()?;
+            output
+                .status
+                .success()
+                .then(|| String::from_utf8_lossy(&output.stdout).into_owned())
+        })
+        .map(|text| (reference, text))
 }
 
 #[cfg(test)]
@@ -199,7 +203,7 @@ privacy = "local"
 
     #[test]
     fn roundtrips_the_real_generated_registry_as_baseline() {
-        let json = std::fs::read_to_string("../registry/index.json").unwrap_or_default();
+        let json = std::fs::read_to_string("../registry/contracts.json").unwrap_or_default();
         if json.is_empty() {
             return;
         }

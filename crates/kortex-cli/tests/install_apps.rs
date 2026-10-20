@@ -154,6 +154,9 @@ fn built_apps_install_through_the_signed_index_and_launch() {
     }
     let index = Index {
         schema: 1,
+        channel: "stable".into(),
+        sequence: 0,
+        source_commit: None,
         generated: "2026-10-18".into(),
         cli: None,
         tools: tools
@@ -167,6 +170,7 @@ fn built_apps_install_through_the_signed_index_and_launch() {
 
     let api = account();
     let env = PkgEnv {
+        channel: "stable".into(),
         home: Home::at(dir.join("home/.kortex"), dir.join("home")).with_secret_store(
             std::sync::Arc::new(kortex_platform::secrets::MemorySecretStore::default()),
         ),

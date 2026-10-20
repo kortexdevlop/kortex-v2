@@ -361,7 +361,7 @@ mod tests {
 
     #[test]
     fn registry_and_web_shell_changes_only_touch_apps() {
-        for path in ["registry/index.json", "web/shell/index.html"] {
+        for path in ["registry/contracts.json", "web/shell/index.html"] {
             let r = affected(&files(&[path]), &workspace());
             assert!(r.tools.is_empty(), "{path}");
             assert_eq!(r.apps.len(), 1, "{path}");

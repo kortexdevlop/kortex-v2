@@ -6,7 +6,7 @@ import {resolve} from 'node:path';
 const {chromium}=createRequire(import.meta.url)('playwright');
 const root=resolve(import.meta.dirname,'../..');
 const domains=Object.fromEntries([...readFileSync(resolve(root,'brand/domains.toml'),'utf8').matchAll(/^\s*(\w+)\s*=\s*"([^"]+)"/gm)].map(m=>[m[1],m[2]]));
-const tool=JSON.parse(readFileSync(resolve(root,'registry/index.json'))).tools.find(entry=>entry.tool.id==='secure.hash-calculator').tool;
+const tool=JSON.parse(readFileSync(resolve(root,'registry/contracts.json'))).tools.find(entry=>entry.tool.id==='secure.hash-calculator').tool;
 const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH||'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',args:process.env.KORTEX_QA_HOST_RULES?[`--host-resolver-rules=${process.env.KORTEX_QA_HOST_RULES}`]:[]});
 try{
  const context=await browser.newContext({permissions:['clipboard-read','clipboard-write']});

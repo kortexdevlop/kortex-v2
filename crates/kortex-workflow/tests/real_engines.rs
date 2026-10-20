@@ -17,7 +17,7 @@ fn ports() -> &'static std::collections::BTreeMap<String, kortex_workflow::ToolP
     PORTS.get_or_init(|| {
         let registry = std::fs::read_to_string(concat!(
             env!("CARGO_MANIFEST_DIR"),
-            "/../../registry/index.json"
+            "/../../registry/contracts.json"
         ))
         .unwrap_or_default();
         kortex_workflow::catalogue_of(

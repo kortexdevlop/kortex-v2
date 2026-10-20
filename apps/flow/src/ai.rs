@@ -3,8 +3,8 @@
 //! the answer back as text and, for the table format, a table. What is sent and how an answer is
 //! read lives in `kortex_ai::agent`; consent is checked here and again by the UI before a run.
 use std::collections::BTreeMap;
+use std::sync::Mutex;
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::{Mutex, OnceLock};
 
 use kortex_ai::agent::{Agent, AgentError, Format, Next, Spec, Task};
 use kortex_ai::credits::Credits;
@@ -46,16 +46,9 @@ pub fn last_credits() -> Option<Credits> {
     CREDITS.lock().ok().and_then(|c| *c)
 }
 
-/// Contracts of every tool, for the tool-using mode.
-pub fn contracts() -> &'static BTreeMap<String, ToolContract> {
-    static ALL: OnceLock<BTreeMap<String, ToolContract>> = OnceLock::new();
-    ALL.get_or_init(|| {
-        kortex_workflow::contracts_from_registry(include_str!("../../../registry/index.json"))
-            .unwrap_or_default()
-            .into_iter()
-            .map(|c| (c.tool.id.clone(), c))
-            .collect()
-    })
+/// Contracts of every tool of the catalogue in use (signed catalogue or embedded, ADR 0034).
+pub fn contracts() -> std::sync::Arc<BTreeMap<String, ToolContract>> {
+    kortex_shell::contracts()
 }
 
 /// Tools an agent may call: one text in, a text out, and nothing that reaches the network, writes
@@ -178,8 +171,8 @@ pub async fn run(job: &Job) -> Result<ValueMap, RunError> {
         _ => 4,
     };
     let format = spec.format;
-    let mut agent =
-        Agent::new(spec, contracts(), &tools, max_steps).map_err(|e| agent_error(&e))?;
+    let contracts = contracts();
+    let mut agent = Agent::new(spec, &contracts, &tools, max_steps).map_err(|e| agent_error(&e))?;
     let Account::Ready { auth, .. } = kortex_ai_client::account().await else {
         return Err(failure("ai_signin", None));
     };

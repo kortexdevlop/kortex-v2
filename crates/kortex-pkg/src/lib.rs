@@ -23,8 +23,8 @@ pub use env::{DEFAULT_INDEX, PkgEnv};
 pub use error::{Kind, PkgError};
 pub use home::{Home, InstalledTool, Registry};
 pub use index::{
-    Artifact, CliRelease, Index, Manifest, ToolRelease, parse_verified, public_key_b64, sha256_hex,
-    sign_bytes,
+    Artifact, CliRelease, Index, Manifest, ToolRelease, check_index, parse_verified,
+    public_key_b64, sha256_hex, sign_bytes,
 };
 pub use install::{
     Check, ToolStatus, binary_name_cli, doctor, install, installed_binary, remove, self_update,
@@ -64,6 +64,4 @@ pub fn binary_name(id: &str, target: &str) -> String {
     format!("kortex-{}{ext}", id.replace('.', "-"))
 }
 
-/// Public key of the release signing key (Ed25519, raw 32 bytes, base64).
-/// Regenerate with `cargo xtask keygen`; the private half never enters the repository.
-pub const RELEASE_PUBLIC_KEY: &str = include_str!("../release.pub");
+pub use kortex_catalog::RELEASE_PUBLIC_KEY;

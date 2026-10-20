@@ -22,38 +22,35 @@ fn locale(lang: &str) -> &'static kortex_i18n::Catalog {
     }
 }
 
-/// Search documents for every tool and each of its SEO variants, built once from the registry.
-fn docs() -> &'static [Doc] {
-    static DOCS: OnceLock<Vec<Doc>> = OnceLock::new();
-    DOCS.get_or_init(|| {
-        let mut docs = Vec::new();
-        for entry in shell::catalogue() {
-            let base = Doc {
-                id: entry.tool.id.clone(),
-                variant: None,
-                universe: entry.tool.universe.clone(),
-                names: entry.tool.name.clone(),
-                tool_names: Default::default(),
-                keywords: entry.search.keywords.clone(),
-                intents: entry.search.intents.clone(),
-            };
-            for variant in &entry.variants {
-                docs.push(Doc {
-                    variant: Some(variant.id.clone()),
-                    names: variant.name.clone(),
-                    tool_names: entry.tool.name.clone(),
-                    ..base.clone()
-                });
-            }
-            docs.push(base);
+/// Search documents for every tool and each of its SEO variants of a catalogue.
+fn docs(catalogue: &shell::Catalogue) -> Vec<Doc> {
+    let mut docs = Vec::new();
+    for entry in catalogue.iter() {
+        let base = Doc {
+            id: entry.tool.id.clone(),
+            variant: None,
+            universe: entry.tool.universe.clone(),
+            names: entry.tool.name.clone(),
+            tool_names: Default::default(),
+            keywords: entry.search.keywords.clone(),
+            intents: entry.search.intents.clone(),
+        };
+        for variant in &entry.variants {
+            docs.push(Doc {
+                variant: Some(variant.id.clone()),
+                names: variant.name.clone(),
+                tool_names: entry.tool.name.clone(),
+                ..base.clone()
+            });
         }
-        docs
-    })
+        docs.push(base);
+    }
+    docs
 }
 
 /// Example requests taken from the most popular tools' own declared intents.
-fn suggestions(lang: &str) -> Vec<String> {
-    let mut entries: Vec<_> = shell::catalogue().iter().collect();
+fn suggestions(catalogue: &shell::Catalogue, lang: &str) -> Vec<String> {
+    let mut entries: Vec<_> = catalogue.iter().collect();
     entries.sort_by_key(|e| (e.tool.viral_priority, e.tool.id.clone()));
     entries
         .into_iter()
@@ -96,7 +93,13 @@ pub fn App() -> Element {
     let l = locale(&lang);
     let mut query = use_signal(String::new);
     let mut launch_error = use_signal(|| false);
-    let hits = search(docs(), &query(), &lang, RESULT_LIMIT);
+    let catalogue = shell::use_catalogue();
+    // Rebuilt only when a newer verified catalogue replaces the one in use.
+    let index = use_memo(move || {
+        let _ = shell::catalogue_revision();
+        docs(&shell::catalogue())
+    });
+    let hits = search(&index.read(), &query(), &lang, RESULT_LIMIT);
     let rows: Vec<Row> = hits.iter().filter_map(|h| row(h, &lang)).collect();
     let typed = !query().trim().is_empty();
     let count = rows.len().to_string();
@@ -123,7 +126,7 @@ pub fn App() -> Element {
             if !typed {
                 div { class: "seek-hints",
                     span { class: "k-muted", {l.t("ui.try")} }
-                    for hint in suggestions(&lang) {
+                    for hint in suggestions(&catalogue, &lang) {
                         button {
                             class: "k-btn",
                             "data-variant": "ghost",

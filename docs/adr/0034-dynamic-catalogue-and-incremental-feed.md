@@ -19,7 +19,7 @@
 | `catalog.json` + `catalog.json.sig` | **Catalogue de contrats publié** : contrats des outils dont le bundle web est réellement publié | `https://kortex.site/registry/catalog.json` |
 | `index.json` + `index.json.sig` | Index de paquets (inchangé pour les clients installés), artefacts desktop **et** web | `https://kortex.site/registry/index.json` |
 
-- Même clé Ed25519 que l'index (`crates/kortex-pkg/release.pub`, secret CI `KORTEX_SIGNING_KEY`) : aucun nouveau secret.
+- Même clé Ed25519 que l'index (`crates/kortex-catalog/release.pub`, secret CI `KORTEX_SIGNING_KEY`) : aucun nouveau secret.
 - Champs signés communs : `schema = 1`, `channel` (`stable` | `test`), `sequence` (entier monotone, **identique** dans les deux documents d'une même publication), `generated`, `source_commit`. L'index garde `schema = 1` et ajoute ces champs, ignorés par les anciens clients.
 - L'index ajoute la cible `web` dans `targets` de chaque outil/app : archive `web-<id>-<version>.tar.gz` du bundle publié (sert à la reconstruction, §5). Les anciens clients ne lisent que leur cible native.
 

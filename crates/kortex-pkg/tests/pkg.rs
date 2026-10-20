@@ -99,6 +99,9 @@ fn tool(version: &str, a: Artifact) -> ToolRelease {
 fn publish(e: &Env, tools: BTreeMap<String, ToolRelease>, cli: Option<CliRelease>) -> Index {
     let index = Index {
         schema: 1,
+        channel: "stable".into(),
+        sequence: 0,
+        source_commit: None,
         generated: "2026-10-16".into(),
         cli,
         tools,

@@ -67,6 +67,7 @@ fn fields(node: &Node, pro: bool, l: &kortex_i18n::Catalog, lang: &str) -> Vec<F
         .into_iter()
         .filter(|spec| {
             entry
+                .as_ref()
                 .and_then(|e| e.params.iter().find(|p| p.id == spec.id))
                 .is_none_or(|p| pro || p.level != Some(ParamLevel::Pro))
         })
@@ -79,6 +80,7 @@ fn fields(node: &Node, pro: bool, l: &kortex_i18n::Catalog, lang: &str) -> Vec<F
                         .unwrap_or_else(|| spec.id.clone())
                 }
                 _ => entry
+                    .as_ref()
                     .and_then(|e| e.params.iter().find(|p| p.id == spec.id))
                     .and_then(|p| p.label.as_ref())
                     .and_then(|m| m.get(lang).or_else(|| m.get("en")))
@@ -285,7 +287,7 @@ pub(crate) fn inspector(
                                             option { key: "{option}", value: "{option}",
                                                 {
                                                     if field.id == "tool" {
-                                                        if option.is_empty() { "—".to_owned() } else { shell::find(&option).map_or(option.clone(), |e| shell::name(e, lang)) }
+                                                        if option.is_empty() { "—".to_owned() } else { shell::find(&option).map_or(option.clone(), |e| shell::name(&e, lang)) }
                                                     } else if is_logic && !is_bool {
                                                         options_label(kind_key, &option)
                                                     } else {
@@ -607,7 +609,7 @@ fn tools_picker(
             p { class: "flow-hint", {l.t("ai.tools_help")} }
             for tool in all {
                 {
-                    let name = shell::find(&tool).map_or(tool.clone(), |e| shell::name(e, &lang));
+                    let name = shell::find(&tool).map_or(tool.clone(), |e| shell::name(&e, &lang));
                     let on = chosen.contains(&tool);
                     let (id, toggled, current) = (node_id.to_owned(), tool.clone(), chosen.clone());
                     rsx! {

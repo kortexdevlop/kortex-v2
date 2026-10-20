@@ -87,7 +87,7 @@ fn a_desktop_conversation_runs_real_tools_with_the_real_model() {
     assert_eq!(block_on(credits(&auth)).map(|c| c.percent), Some(100));
 
     let contracts: BTreeMap<String, ToolContract> =
-        kortex_workflow::contracts_from_registry(include_str!("../../../registry/index.json"))
+        kortex_workflow::contracts_from_registry(include_str!("../../../registry/contracts.json"))
             .unwrap_or_default()
             .into_iter()
             .map(|c| (c.tool.id.clone(), c))

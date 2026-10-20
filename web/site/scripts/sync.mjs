@@ -37,7 +37,7 @@ if (desktopReleases) {
   for (const f of ['index.json', 'index.json.sig', 'cli-latest.txt']) cpSync(join(rel, f), join(out, 'public/registry', f));
 }
 
-const registry = JSON.parse(readFileSync(join(root, 'registry/index.json'), 'utf8'));
+const registry = JSON.parse(readFileSync(join(root, 'registry/contracts.json'), 'utf8'));
 const read = (p) => (existsSync(p) ? readFileSync(p, 'utf8') : '');
 
 // "## Title" sections; "### Question" lines inside become FAQ entries (question + answer).
