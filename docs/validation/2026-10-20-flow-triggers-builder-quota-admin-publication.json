@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-20",
+  "release_run": "39343540301",
+  "commit": "e99241f435cfcb267358e3246b0645dfcbca5040",
+  "versions": {
+    "kortex-api": "8f00c47c-01d1-446f-b4b0-a9d3fb273618",
+    "kortex-run": "ae5e000f-f08d-4ce5-8905-c8986189061d",
+    "kortex-desk": "6f2f15e5-1730-4787-b41e-1447a6c087ce",
+    "kortex-flow": "b06428e2-70bd-410a-823d-fd23a1bfebd2",
+    "kortex-hub": "896d9dc3-7afe-442b-9b64-800e3d47a3f2",
+    "kortex-mind": "6066aac7-9489-4cbc-88dc-61aa0c9ecb04",
+    "kortex-seek": "e8311e9b-c516-4740-bdf0-1296fa99e57e",
+    "kortex-store": "11ff0ccf-211a-433a-8add-64e85f8fa75b",
+    "kortex-site": "a2ac6895-f826-4988-8dd4-c279d29bae22"
+  },
+  "previous_versions_file": "2026-10-20-flow-library-sync-quality-publication.json",
+  "previous_api": "651da94e-ea3f-4afe-b6b9-ce2634a2d5bc",
+  "migration": "0007_ai_usage.sql applied (additive tables)",
+  "checks": [
+    "api health ok",
+    "admin route 404 without ADMIN_EMAILS",
+    "headers audit ok",
+    "flow.kortex.site loads, builder panel present, 0 page errors"
+  ]
+}
