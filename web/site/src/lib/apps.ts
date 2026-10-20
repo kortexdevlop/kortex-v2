@@ -2,18 +2,18 @@ import { appNames, domains } from './data';
 
 export const apps = [
   {
-    id: 'seek', name: appNames.seek, available: false,
+    id: 'seek', name: appNames.seek, available: true, launchUrl: `https://${domains.seek}`,
     title: { fr: 'Trouvez le bon outil, en quelques mots.', en: 'Find the right tool in a few words.' },
-    status: { fr: 'Recherche du site — application Rust à réaliser', en: 'Site search — Rust app pending' },
+    status: { fr: 'Première version', en: 'First release' },
     description: {
-      fr: 'Décrivez votre besoin dans la recherche du site. Le moteur local retrouve les outils et leurs variantes en français ou en anglais, sans compte.',
-      en: 'Describe what you need in site search. The local engine finds tools and variants in French or English without an account.',
+      fr: 'Décrivez votre besoin en quelques mots. Seek retrouve les outils et leurs variantes en français ou en anglais, localement et sans compte. La même recherche reste disponible sur le site.',
+      en: 'Describe what you need in a few words. Seek finds tools and variants in French or English, locally and without an account. The same search remains available on the site.',
     },
     features: {
-      fr: ['Recherche locale, sans envoyer vos mots-clés.', 'Accents, préfixes, synonymes et petites fautes pris en charge.', 'Ouverture avec ⌘K sur Mac ou Ctrl+K sur Windows et Linux.'],
-      en: ['Local search without sending your keywords.', 'Supports accents, prefixes, synonyms and small typos.', 'Open with ⌘K on Mac or Ctrl+K on Windows and Linux.'],
+      fr: ['Recherche locale, sans envoyer vos mots-clés.', 'Accents, préfixes, synonymes et petites fautes pris en charge.', 'Résultats qui ouvrent directement l’outil ou sa variante.'],
+      en: ['Local search without sending your keywords.', 'Supports accents, prefixes, synonyms and small typos.', 'Results open the tool or its variant directly.'],
     },
-    next: { fr: 'La recherche par IA et le préremplissage intelligent sont prévus pour une prochaine étape.', en: 'AI search and intelligent parameter presets are planned for a later stage.' },
+    next: { fr: 'Première version Rust/Dioxus. La recherche par IA, le préremplissage intelligent et la distribution bureau restent à terminer.', en: 'First Rust/Dioxus version. AI search, intelligent parameter presets and desktop distribution remain to be completed.' },
   },
   {
     id: 'store', name: appNames.store, available: true, launchUrl: `https://${domains.store}`,
@@ -38,20 +38,20 @@ export const apps = [
     next: { fr: 'Première version Rust/Dioxus. Les fichiers et résultats ne sont pas restaurés après rechargement. Sauvegarde manuelle du compte disponible. Synchronisation automatique, liaisons entre outils et distribution bureau restent à terminer.', en: 'First Rust/Dioxus version. Files and results are not restored after reload. Manual account backup is available. Automatic sync, tool connections and desktop distribution remain to be completed.' },
   },
   {
-    id: 'flow', name: appNames.flow, available: false,
+    id: 'flow', name: appNames.flow, available: true, launchUrl: `https://${domains.flow}`,
     title: { fr: 'Composez des traitements réutilisables.', en: 'Compose reusable processing workflows.' },
-    status: { fr: 'En préparation', en: 'In preparation' },
-    description: { fr: 'Flow permettra de relier des outils dans un graphe pour répéter une suite de traitements avec un déroulement visible.', en: 'Flow will connect tools in a graph so you can repeat a sequence of steps with visible execution.' },
-    features: { fr: ['Workflows locaux et inspection de chaque étape.', 'Entrées et sorties définies par les contrats d’outils.', 'Connecteurs et permissions explicites.'], en: ['Local workflows with inspection of each step.', 'Inputs and outputs defined by tool contracts.', 'Connectors with explicit permissions.'] },
-    next: { fr: 'L’éditeur et les connecteurs restent à développer. Sur le web, un workflow ne pourra fonctionner que pendant que son onglet est ouvert ; les tâches en arrière-plan nécessiteront la version bureau.', en: 'The editor and connectors still need to be built. Web workflows will run only while their tab is open; background tasks will require the desktop version.' },
+    status: { fr: 'Première version', en: 'First release' },
+    description: { fr: 'Reliez des outils sur un canevas pour répéter une suite de traitements, avec un déroulement visible étape par étape. Vos fichiers restent sur votre appareil.', en: 'Connect tools on a canvas to repeat a sequence of steps, with visible step-by-step execution. Your files stay on your device.' },
+    features: { fr: ['Canevas nodal validé par les contrats des outils.', 'Exécution locale avec réessais, annulation et historique.', 'Bibliothèque, modèles, déclencheurs et nœud IA avec consentement.'], en: ['Node canvas validated by tool contracts.', 'Local execution with retries, cancellation and history.', 'Library, templates, triggers and an AI node with consent.'] },
+    next: { fr: 'Première version Rust/Dioxus. Sur le web, un workflow ne fonctionne que pendant que son onglet est ouvert. Le nœud IA nécessite un compte. Connexions OAuth aux services et distribution bureau restent à terminer.', en: 'First Rust/Dioxus version. On the web, a workflow runs only while its tab is open. The AI node requires an account. OAuth service connections and desktop distribution remain to be completed.' },
   },
   {
-    id: 'mind', name: appNames.mind, available: false,
+    id: 'mind', name: appNames.mind, available: true, launchUrl: `https://${domains.mind}`,
     title: { fr: 'Un assistant qui prépare un plan visible.', en: 'An assistant that prepares a visible plan.' },
-    status: { fr: 'En préparation', en: 'In preparation' },
-    description: { fr: 'Mind proposera des plans de traitement à partir de votre demande, puis utilisera les moteurs locaux après votre validation.', en: 'Mind will propose processing plans from your request and use local engines after your approval.' },
+    status: { fr: 'Première version', en: 'First release' },
+    description: { fr: 'Décrivez votre demande : Mind propose un plan de traitement avec les outils Kortex, puis l’exécute localement après votre validation.', en: 'Describe your request: Mind proposes a processing plan with Kortex tools, then runs it locally after your approval.' },
     features: { fr: ['Plan consultable avant toute exécution.', 'Consentement avant tout envoi de contenu à l’IA.', 'Crédits partagés et consommation visible.'], en: ['Reviewable plans before execution.', 'Consent before sending any content to AI.', 'Shared credits with visible usage.'] },
-    next: { fr: 'L’interface de conversation et l’orchestration restent à développer. La passerelle et les crédits ont uniquement été testés localement.', en: 'The conversation interface and orchestration still need to be built. The gateway and credits have only been tested locally.' },
+    next: { fr: 'Première version Rust/Dioxus. Un compte Kortex est nécessaire pour l’IA, avec des crédits limités. Synchronisation de l’historique et distribution bureau restent à terminer.', en: 'First Rust/Dioxus version. A Kortex account is required for AI, with limited credits. History sync and desktop distribution remain to be completed.' },
   },
   {
     id: 'hub', name: appNames.hub, available: true, launchUrl: `https://${domains.hub}`,

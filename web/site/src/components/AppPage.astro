@@ -15,10 +15,7 @@ const description = app?.description[lang] ?? (fr ? 'Découvrez les applications
     <section class="app-hero">
       <p class="k-muted">{app.name}</p><h1>{app.title[lang]}</h1>
       <span class="badge">{app.status[lang]}</span><p>{description}</p>
-      {'launchUrl' in app ? <a class="k-btn" href={`${app.launchUrl}${fr ? '/' : '/en/'}`}>{fr ? 'Ouvrir l’application' : 'Open app'}</a> : app.id === 'seek' ? <button class="k-btn" type="button" data-seek-open>{fr ? 'Ouvrir la recherche' : 'Open search'}</button>
-        : app.id === 'store' ? <a class="k-btn" href={fr ? '/telecharger' : '/en/download'}>{fr ? 'Voir les options de téléchargement' : 'View download options'}</a>
-        : app.id === 'hub' ? <a class="k-btn" href={fr ? '/compte' : '/en/account'}>{fr ? 'Voir la page Compte' : 'View the Account page'}</a>
-        : <a class="k-btn" href={fr ? '/outils' : '/en/tools'}>{fr ? 'Explorer les outils actuels' : 'Explore current tools'}</a>}
+      <a class="k-btn" href={`${app.launchUrl}${fr ? '/' : '/en/'}`}>{fr ? 'Ouvrir l’application' : 'Open app'}</a>
     </section>
     <section class="k-card k-stack"><h2>{app.available ? (fr ? 'Ce qui existe aujourd’hui' : 'What exists today') : (fr ? 'Fonctions prévues' : 'Planned features')}</h2>
       <ul>{app.features[lang].map(feature => <li>{feature}</li>)}</ul>
@@ -33,7 +30,7 @@ const description = app?.description[lang] ?? (fr ? 'Découvrez les applications
       <span class="badge">{item.status[lang]}</span><h2>{item.name}</h2><p>{item.title[lang]}</p><span class="k-muted">{fr ? 'Découvrir' : 'Explore'} →</span>
     </a>)}</div></div>
     <section class="app-related"><h2>{fr ? 'Un socle commun, des usages complémentaires' : 'A shared foundation for different needs'}</h2>
-      <p>{fr ? 'Les applications utiliseront les mêmes contrats et moteurs que les outils indépendants. Les traitements de fichiers restent locaux ; tout recours à l’IA nécessite votre consentement.' : 'Apps will use the same contracts and engines as standalone tools. File processing stays local; any use of AI requires your consent.'}</p>
+      <p>{fr ? 'Les applications utilisent les mêmes contrats et moteurs que les outils indépendants. Les traitements de fichiers restent locaux ; tout recours à l’IA nécessite votre consentement.' : 'Apps use the same contracts and engines as standalone tools. File processing stays local; any use of AI requires your consent.'}</p>
     </section>
   </>}
 </Base>
