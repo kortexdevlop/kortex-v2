@@ -1,0 +1,107 @@
+---
+import Base from '../layouts/Base.astro';
+import { apps, type AppInfo } from '../lib/apps';
+import { prefix, type Lang } from '../lib/data';
+const { lang, app } = Astro.props as { lang: Lang; app?: AppInfo };
+const fr = lang === 'fr';
+const home = fr ? '/applications' : '/en/apps';
+const description = app?.description[lang] ?? (fr ? 'Découvrez les applications Kortex, leurs fonctions disponibles et les prochaines étapes.' : 'Explore Kortex applications, available features and upcoming work.');
+// Bento rhythm for the index: wide / narrow, narrow / wide, then two halves.
+const spans = [4, 2, 2, 4, 3, 3];
+const initial = (name: string) => name.replace(/^Kortex\s+/i, '').charAt(0);
+---
+<Base lang={lang} title={app ? `${app.name} — Kortex` : (fr ? 'Applications — Kortex' : 'Apps — Kortex')}
+  description={description} noindex={!!app && !app.available}
+  alt={app ? {fr:`/${app.id}`,en:`/en/${app.id}`} : {fr:'/applications',en:'/en/apps'}}>
+  {app ? <>
+    <nav class="crumbs" aria-label={fr ? 'Fil d’Ariane' : 'Breadcrumb'}><a href={home}>{fr ? 'Applications' : 'Apps'}</a><span aria-hidden="true">/</span><span>{app.name}</span></nav>
+    <section class="app-detail">
+      <div class="app-intro">
+        <div class="app-id"><span class="app-mark" aria-hidden="true">{initial(app.name)}</span><span class="app-id-name">{app.name}</span><span class="badge" data-tone={app.available ? 'success' : undefined}>{app.status[lang]}</span></div>
+        <h1>{app.title[lang]}</h1>
+        <p class="lead">{description}</p>
+        <div class="app-cta">
+          <a class="k-btn" data-size="lg" href={`${app.launchUrl}${fr ? '/' : '/en/'}`}>{fr ? 'Ouvrir l’application' : 'Open app'}</a>
+        </div>
+      </div>
+      <div class="app-panel-card">
+        <h2>{app.available ? (fr ? 'Ce qui existe aujourd’hui' : 'What exists today') : (fr ? 'Fonctions prévues' : 'Planned features')}</h2>
+        <ul class="app-features">{app.features[lang].map(feature => <li>{feature}</li>)}</ul>
+        <div class="app-next">
+          <p class="app-next-title">{fr ? 'État et suite' : 'Status and next'}</p>
+          <p>{app.next[lang]}</p>
+        </div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="section-head"><h2>{fr ? 'Les autres applications' : 'Other apps'}</h2></div>
+      <div class="app-others">{apps.filter(other => other.id !== app.id).map(other => (
+        <a href={`${prefix(lang)}/${other.id}`}><span class="app-mark" aria-hidden="true">{initial(other.name)}</span><span><strong>{other.name}</strong><span class="k-muted">{other.title[lang]}</span></span></a>
+      ))}</div>
+    </section>
+  </> : <>
+    <header class="page-head">
+      <h1>{fr ? 'Les applications Kortex' : 'Kortex apps'}</h1>
+      <p class="lead">{description}</p>
+    </header>
+    <div class="apps-bento">{apps.map((item, i) => (
+      <a class="app-tile reveal" href={`${prefix(lang)}/${item.id}`} style={`--span:${spans[i] ?? 3}`} data-wide={(spans[i] ?? 3) >= 4 ? '' : undefined}>
+        <div class="app-tile-top"><span class="app-mark" aria-hidden="true">{initial(item.name)}</span><span class="badge" data-tone={item.available ? 'success' : undefined}>{item.status[lang]}</span></div>
+        <h2>{item.name}</h2>
+        <p class="app-tile-title">{item.title[lang]}</p>
+        <ul class="app-tile-features">{item.features[lang].map((f) => <li>{f}</li>)}</ul>
+        <span class="more">{fr ? 'Découvrir' : 'Explore'}</span>
+      </a>
+    ))}</div>
+    <section class="section app-foundation">
+      <h2>{fr ? 'Un socle commun, des usages complémentaires' : 'A shared foundation for different needs'}</h2>
+      <p>{fr ? 'Les applications utilisent les mêmes contrats et moteurs que les outils indépendants. Les traitements de fichiers restent locaux ; tout recours à l’IA nécessite votre consentement.' : 'Apps use the same contracts and engines as standalone tools. File processing stays local; any use of AI requires your consent.'}</p>
+    </section>
+  </>}
+</Base>
+<style>
+  .app-mark { display: inline-grid; place-items: center; flex-shrink: 0; width: 44px; height: 44px; border-radius: var(--k-radius-field); background: var(--k-ink); color: var(--k-ink-text);
+    font-family: var(--k-type-display); font-weight: var(--k-type-weight-strong); font-size: var(--k-type-scale-1); }
+  /* Index: a bento of apps, wide tiles reveal their feature list. */
+  .apps-bento { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--k-space-4); }
+  .app-tile { grid-column: span var(--span); display: grid; align-content: start; gap: var(--k-space-2); min-height: 260px; padding: var(--k-space-6); border: 1px solid var(--k-border); border-radius: var(--k-radius-card);
+    background: var(--k-surface); color: inherit; text-decoration: none; transition: border-color var(--k-motion-base) var(--k-motion-ease), box-shadow var(--k-motion-slow) var(--k-motion-out); }
+  .app-tile:hover { border-color: var(--k-border-strong); box-shadow: var(--k-shadow-2); }
+  .app-tile-top { display: flex; align-items: center; justify-content: space-between; gap: var(--k-space-3); margin-bottom: var(--k-space-4); }
+  .app-tile h2 { margin: 0; font-size: var(--k-type-scale-2); }
+  .app-tile-title { margin: 0; color: var(--k-text-2); font-size: var(--k-type-scale-1); line-height: 1.4; max-width: 34ch; }
+  .app-tile-features { display: none; list-style: none; margin: var(--k-space-4) 0 0; padding: var(--k-space-4) 0 0; border-top: 1px solid var(--k-border); gap: var(--k-space-2); font-size: var(--k-type-scale-sm); color: var(--k-text-2); }
+  .app-tile[data-wide] .app-tile-features { display: grid; }
+  .app-tile-features li { display: flex; gap: var(--k-space-2); }
+  .app-tile-features li::before { content: ""; flex-shrink: 0; width: 5px; height: 9px; margin: 4px 4px 0 2px; border-right: 1.5px solid var(--k-success); border-bottom: 1.5px solid var(--k-success); transform: rotate(45deg); }
+  .app-tile .more { margin-top: auto; padding-top: var(--k-space-4); align-self: end; }
+  .app-foundation { max-width: 64ch; }
+  .app-foundation h2 { font-size: var(--k-type-scale-2); margin: 0 0 var(--k-space-3); }
+  .app-foundation p { margin: 0; color: var(--k-text-2); line-height: 1.7; }
+  @media (max-width: 899px) { .apps-bento { grid-template-columns: repeat(2, minmax(0, 1fr)); } .app-tile { grid-column: span 1; } .app-tile[data-wide] { grid-column: span 2; } }
+  @media (max-width: 599px) { .apps-bento { grid-template-columns: 1fr; } .app-tile, .app-tile[data-wide] { grid-column: auto; min-height: 0; padding: var(--k-space-5); } }
+
+  /* Detail: the pitch on the left, what exists today on the right. */
+  .app-detail { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: var(--k-space-7); align-items: start; padding-top: var(--k-space-5); }
+  .app-intro { display: grid; justify-items: start; gap: var(--k-space-4); padding-top: var(--k-space-3); }
+  .app-id { display: flex; align-items: center; gap: var(--k-space-3); }
+  .app-id-name { font-weight: var(--k-type-weight-strong); font-size: var(--k-type-scale-1); }
+  .app-intro h1 { margin: var(--k-space-2) 0 0; font-size: clamp(2.25rem, 4.6vw, var(--k-type-scale-5)); }
+  .app-cta { margin-top: var(--k-space-3); }
+  .app-panel-card { display: grid; gap: var(--k-space-4); padding: var(--k-space-6); border: 1px solid var(--k-border); border-radius: var(--k-radius-panel); background: var(--k-surface); }
+  .app-panel-card h2 { margin: 0; font-size: var(--k-type-scale-1); }
+  .app-features { list-style: none; margin: 0; padding: 0; display: grid; }
+  .app-features li { display: flex; gap: var(--k-space-3); padding: var(--k-space-3) 0; line-height: 1.55; }
+  .app-features li + li { border-top: 1px solid var(--k-border); }
+  .app-features li::before { content: ""; flex-shrink: 0; width: 6px; height: 11px; margin: 4px 6px 0 4px; border-right: 2px solid var(--k-success); border-bottom: 2px solid var(--k-success); transform: rotate(45deg); }
+  .app-next { padding: var(--k-space-4); border-radius: var(--k-radius-field); background: var(--k-surface-2); }
+  .app-next-title { margin: 0 0 var(--k-space-1); font-weight: var(--k-type-weight-strong); font-size: var(--k-type-scale-sm); }
+  .app-next p:last-child { margin: 0; color: var(--k-text-2); font-size: var(--k-type-scale-sm); line-height: 1.6; }
+  .app-others { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: var(--k-space-3); }
+  .app-others a { display: flex; align-items: center; gap: var(--k-space-4); min-height: 76px; padding: var(--k-space-3) var(--k-space-4); border: 1px solid var(--k-border); border-radius: var(--k-radius-card); background: var(--k-surface); color: inherit; text-decoration: none;
+    transition: border-color var(--k-motion-base) var(--k-motion-ease); }
+  .app-others a:hover { border-color: var(--k-border-strong); }
+  .app-others a > span:last-child { display: grid; gap: 2px; min-width: 0; }
+  .app-others .k-muted { font-size: var(--k-type-scale-sm); }
+  @media (max-width: 899px) { .app-detail { grid-template-columns: 1fr; gap: var(--k-space-6); } }
+</style>

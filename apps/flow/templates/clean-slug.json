@@ -1,0 +1,59 @@
+{
+ "id": "clean-slug",
+ "name": {
+  "fr": "Nettoyer un texte et créer un lien",
+  "en": "Clean a text and make a slug"
+ },
+ "description": {
+  "fr": "Retire les espaces en trop puis transforme le texte en adresse propre (slug).",
+  "en": "Removes extra spaces then turns the text into a clean URL slug."
+ },
+ "needs": [],
+ "samples": {
+  "fr": "  Mon   Super Article : l’été 2026 !  ",
+  "en": "  My   Great Article: summer 2026 !  "
+ },
+ "workflow": {
+  "version": 1,
+  "name": "",
+  "nodes": [
+   {
+    "id": "n1",
+    "kind": "text",
+    "value": "{sample}"
+   },
+   {
+    "id": "n2",
+    "kind": "tool",
+    "tool": "text.cleaner"
+   },
+   {
+    "id": "n3",
+    "kind": "tool",
+    "tool": "text.slug-generator"
+   }
+  ],
+  "edges": [
+   {
+    "from": {
+     "node": "n1",
+     "port": "text"
+    },
+    "to": {
+     "node": "n2",
+     "port": "text"
+    }
+   },
+   {
+    "from": {
+     "node": "n2",
+     "port": "text"
+    },
+    "to": {
+     "node": "n3",
+     "port": "text"
+    }
+   }
+  ]
+ }
+}

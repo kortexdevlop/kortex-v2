@@ -1,0 +1,17 @@
+{
+  "date": "2026-10-20",
+  "lot": 34,
+  "release_runs": ["39419966634", "39423627386"],
+  "commit": "86f6d4f3fb6f05d7ea1786e756f2f37e7c59f2b4",
+  "artifacts_verified": "38 tools and 6 apps (scripts/verify-web-artifacts.mjs)",
+  "publication": "scripts/publish.mjs --static-only (API unchanged)",
+  "site_version": "2bd1f88a-38e9-4b2e-9730-42ba470f27a2",
+  "tool_opening_ms": {
+    "before_production": { "desktop": 1430, "mobile_4g_simulated": 3206 },
+    "after_production_click_after_1_5s": { "desktop": 601, "mobile_4g_simulated": 1476 },
+    "after_production_click_after_8s": { "desktop": 407, "mobile_4g_simulated": 255 }
+  },
+  "headers": "hashed assets on kortex.site/_astro and run.kortex.site/:tool/assets served with Cache-Control: public, max-age=31536000, immutable",
+  "mobile_checks": "6 production apps at 375 px light/dark: no overflow, no target under 44 px except one inline text link in Mind; Stage + 3 tools at 375 px light/dark; site visual audit 168 views 0 blocking defect",
+  "not_checked": ["real iOS Safari / Android devices", "Firefox", "desktop webview"]
+}

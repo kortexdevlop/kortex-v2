@@ -1,0 +1,92 @@
+{
+  "published": "2026-10-18",
+  "method": "scripts/publish.mjs (local rescue path), user-authorized",
+  "release_run": "39156702154",
+  "source_commit": "75e82b782c62f1002aacb1c7af31ce3b28847a89",
+  "verified_artifact": "38 tools and 6 apps via scripts/verify-web-artifacts.mjs",
+  "inventory": {
+    "site": {
+      "host": "kortex.site",
+      "assets": 334,
+      "bytes": 9316983
+    },
+    "run": {
+      "host": "run.kortex.site",
+      "assets": 440,
+      "bytes": 165454596
+    },
+    "desk": {
+      "host": "workspace.kortex.site",
+      "assets": 22,
+      "bytes": 14363718
+    },
+    "flow": {
+      "host": "flow.kortex.site",
+      "assets": 6,
+      "bytes": 2848933
+    },
+    "hub": {
+      "host": "dashboard.kortex.site",
+      "assets": 18,
+      "bytes": 11202132
+    },
+    "mind": {
+      "host": "agent.kortex.site",
+      "assets": 120,
+      "bytes": 10668332
+    },
+    "seek": {
+      "host": "search.kortex.site",
+      "assets": 12,
+      "bytes": 6762654
+    },
+    "store": {
+      "host": "store.kortex.site",
+      "assets": 10,
+      "bytes": 5180585
+    }
+  },
+  "versions_now": {
+    "kortex-api": "81d085b6-64aa-45f3-845d-142ebbdc22e4",
+    "kortex-run": "18574925-0521-425b-89c2-1cb22f735a31",
+    "kortex-desk": "68af131d-0d71-4670-8317-af38af951811",
+    "kortex-flow": "ea1bbc17-889a-48dc-bd80-6d57e30a924c",
+    "kortex-hub": "8f1c1b7f-4a73-4dfe-9397-3bed30ac3ec8",
+    "kortex-mind": "ac0ee11e-83cf-4b03-ac45-c552ab13b9a2",
+    "kortex-seek": "355a56cf-2bc0-4e5e-b25c-84a83faa4827",
+    "kortex-store": "04441397-25ee-4d5a-a1da-8d8fd3d41fba",
+    "kortex-site": "ecb78739-8d29-4dd4-bdb5-236c09819815"
+  },
+  "previous_versions_for_rollback": {
+    "kortex-api": "88ec229c-48a6-44a9-b9a7-5ba60f96af81",
+    "kortex-run": "b930b1b1-51c2-4727-8536-1e5499a39e9f",
+    "kortex-desk": "bf40f204-c8e6-4f17-9ef0-ecb07da0e0ce",
+    "kortex-flow": null,
+    "kortex-hub": "4003679e-e813-4704-b1cc-a9aeb585804f",
+    "kortex-mind": null,
+    "kortex-seek": null,
+    "kortex-store": "9365e6f5-7274-4952-aaa5-f50b60e7a999",
+    "kortex-site": "7206b12d-5e7c-442a-9f02-d8cef6e09132"
+  },
+  "checks": {
+    "hosts_200": [
+      "kortex.site",
+      "workspace",
+      "dashboard",
+      "store",
+      "agent",
+      "search",
+      "flow"
+    ],
+    "api_health": true,
+    "ai_chat_without_session": 401,
+    "credits_without_session": 401,
+    "mind_engine_in_same_origin_worker_under_production_csp": "text.cleaner returned 'hello from production'",
+    "fonts": "Inter Variable loaded"
+  },
+  "not_done": [
+    "conversation with Gemma on production (needs an account; the agent does not create production accounts)",
+    "desktop distribution stays closed"
+  ],
+  "rollback": "wrangler rollback <previous version id> --name <worker> after inspecting the target version"
+}

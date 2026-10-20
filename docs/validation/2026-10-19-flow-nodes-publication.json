@@ -1,0 +1,20 @@
+{
+  "date": "2026-10-19",
+  "release_run": "39242109559",
+  "commit": "ed9b945a19602e55891187e95a7283ce1994258d",
+  "versions": {
+    "kortex-run": "9cb05b83-9c19-41f2-97f9-0a59e4041d69",
+    "kortex-desk": "c0fdeca9-4f25-4685-a524-4c8ea056a678",
+    "kortex-flow": "ae112639-9f1a-4b39-aad6-3d24a05b315b",
+    "kortex-hub": "cd1028ba-882d-465a-99fd-0dd5044d522d",
+    "kortex-mind": "ec58e653-3b63-4666-9b8a-fc36080668ff",
+    "kortex-seek": "974732d1-41f1-4bf3-828c-56609913a03e",
+    "kortex-store": "4a081694-b186-4867-87c7-4cb55b5f47e3",
+    "kortex-site": "879d8b71-94ac-4a58-8cc3-3d9523a28d6d"
+  },
+  "previous_versions_file": "2026-10-19-flow-canvas-publication.json",
+  "checks": [
+    "6 app hosts 200",
+    "live browser run on flow.kortex.site: file node abc.txt -> secure.hash-calculator returns the reference SHA-256, no page error"
+  ]
+}

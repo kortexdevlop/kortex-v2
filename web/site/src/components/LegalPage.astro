@@ -6,8 +6,14 @@ const { page, lang } = Astro.props as { page: LegalPage; lang: Lang };
 const path = (l: Lang) => (l === 'fr' ? `/${page.slug.fr}` : `/en/${page.slug.en}`);
 ---
 <Base title={`${page.title[lang]} — Kortex`} description={page.title[lang]} lang={lang} alt={{ fr: path('fr'), en: path('en') }} noindex={page.draft}>
-  <article class="prose">
+  <article class="prose legal">
     <h1>{page.title[lang]}</h1>
     {page.body[lang].map((line) => line.startsWith('## ') ? <h2>{line.slice(3)}</h2> : <p>{line}</p>)}
   </article>
 </Base>
+<style>
+  .legal { margin: 0 auto; padding-top: var(--k-space-6); }
+  .legal h1 { font-size: clamp(2rem, 4vw, var(--k-type-scale-4)); margin: 0 0 var(--k-space-6); }
+  .legal h2 { font-size: var(--k-type-scale-1); padding-top: var(--k-space-5); border-top: 1px solid var(--k-border); }
+  .legal p { color: var(--k-text-2); }
+</style>

@@ -192,7 +192,7 @@ fn generate(c: &ToolContract, raw_path: &str) -> Result<String, String> {
     // Dynamic entry points: ValueMap <-> typed structs, and `run_map` (calls `engine::run`).
     let _ = writeln!(
         out,
-        "impl Inputs {{\n    /// # Errors\n    /// `missing_input` / `invalid_param`.\n    pub fn from_map(m: &::kortex::runtime::ValueMap) -> ::core::result::Result<Self, ::kortex::runtime::ToolError> {{\n        ::core::result::Result::Ok(Self {{"
+        "impl Inputs {{\n    /// # Errors\n    /// `missing_input` / `invalid_param`.\n    pub fn from_map(m: &::kortex::runtime::ValueMap) -> ::core::result::Result<Self, ::kortex::runtime::ToolError> {{\n        let inputs = Self {{"
     );
     for i in &c.inputs {
         let t = rust_type(&i.ty);
@@ -210,7 +210,34 @@ fn generate(c: &ToolContract, raw_path: &str) -> Result<String, String> {
             );
         }
     }
-    let _ = writeln!(out, "        }})\n    }}\n}}");
+    let _ = writeln!(out, "        }};");
+    for i in &c.inputs {
+        let pattern = match &i.ty {
+            PortType::File(m) | PortType::Files(m) => m,
+            _ => continue,
+        };
+        let multiple = matches!(i.ty, PortType::Files(_));
+        let check = |var: &str| format!("::kortex::io::check_file({var}, {pattern:?})?;");
+        let body = match (multiple, i.required) {
+            (false, true) => check(&format!("&inputs.{}", i.id)),
+            (false, false) => format!(
+                "if let ::core::option::Option::Some(f) = &inputs.{} {{ {} }}",
+                i.id,
+                check("f")
+            ),
+            (true, true) => format!("for f in &inputs.{} {{ {} }}", i.id, check("f")),
+            (true, false) => format!(
+                "if let ::core::option::Option::Some(v) = &inputs.{} {{ for f in v {{ {} }} }}",
+                i.id,
+                check("f")
+            ),
+        };
+        let _ = writeln!(out, "        {body}");
+    }
+    let _ = writeln!(
+        out,
+        "        ::core::result::Result::Ok(inputs)\n    }}\n}}"
+    );
     let _ = writeln!(
         out,
         "impl Params {{\n    /// Missing keys keep their contract defaults.\n    ///\n    /// # Errors\n    /// `invalid_param` on a wrongly typed value.\n    pub fn from_map(m: &::kortex::runtime::ValueMap) -> ::core::result::Result<Self, ::kortex::runtime::ToolError> {{\n        #[allow(unused_mut)]\n        let mut s = Self::default();"

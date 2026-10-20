@@ -1,0 +1,70 @@
+schema = 1
+[tool]
+id = "code.markdown-table"
+version = "1.0.2"
+universe = "code"
+status = "beta"
+ui = "auto"
+platforms = ["web", "desktop"]
+offline = true
+ai = false
+viral_priority = 1
+[tool.name]
+fr = "Générateur de tableau Markdown"
+en = "Markdown Table Generator"
+[tool.tagline]
+fr = "Transformez des lignes délimitées en tableau Markdown."
+en = "Turn delimited lines into a Markdown table."
+[tool.slug]
+fr = "generateur-tableau-markdown"
+en = "markdown-table-generator"
+[search]
+keywords.fr = ["générateur de tableau markdown", "generateur tableau markdown"]
+keywords.en = ["markdown table generator", "markdown table generator"]
+intents.fr = ["Transformez des lignes délimitées en tableau Markdown."]
+intents.en = ["Turn delimited lines into a Markdown table."]
+related = []
+[limits]
+timeout_s = 10
+
+[[inputs]]
+id = "text"
+type = "text"
+required = true
+max_len = 100000
+multiline = true
+label = { fr = "Texte", en = "Text" }
+
+[[params]]
+id = "delimiter"
+type = "enum"
+default = "tab"
+level = "simple"
+label = { fr = "Séparateur", en = "Delimiter" }
+options = ["tab", "semicolon", "comma"]
+
+[[params]]
+id = "header"
+type = "bool"
+default = true
+level = "medium"
+label = { fr = "Première ligne comme en-tête", en = "First row is the header" }
+
+[[params]]
+id = "alignment"
+type = "enum"
+default = "left"
+level = "medium"
+label = { fr = "Alignement", en = "Alignment" }
+options = ["left", "center", "right"]
+
+[[outputs]]
+id = "text"
+type = "text"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "write"
+sensitive = false
+privacy = "local"

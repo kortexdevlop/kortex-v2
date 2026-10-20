@@ -1,4 +1,6 @@
 # 0006 — Passerelle IA dans le Worker `api`, crédits en pourcentage
+> Mise à jour 2026-10-18 : le modèle est désormais Gemma 4 (ADR 0023) ; les seaux, budgets et règles de confidentialité ci-dessous restent valables. Les prix par modèle et l'exemple Llama sont historiques.
+
 **Statut** : accepté (2026-10-15)
 **Contexte** : Workers AI gratuit = 10 000 neurons/jour pour TOUT le compte (reset 00:00 UTC), erreur au-delà (pas de dépassement possible sans plan payant). L'utilisateur veut des crédits affichés en %, calculés d'après les neurons réellement consommés, avec une limite « généreuse mais pas trop ».
 **Décision** :

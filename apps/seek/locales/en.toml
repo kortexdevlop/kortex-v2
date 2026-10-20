@@ -1,0 +1,10 @@
+[ui]
+title = "Kortex Seek"
+subtitle = "Describe what you want to do: Seek finds the right tool, and your request never leaves your device."
+label = "What do you want to do?"
+placeholder = "E.g. convert a PNG image to JPG"
+try = "Try:"
+results = "result(s)"
+open = "Open"
+empty = "No tool matches. Try other words, for example the format or the tool name."
+not_installed = "This tool is not installed on this computer. Install it from Kortex Store or open it on kortex.site."

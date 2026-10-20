@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-19",
+  "release_run": "39309965233",
+  "commit": "9ca66898e5e81085bc1b6d69fc53d03e678b30d1",
+  "versions": {
+    "kortex-api": "de78f4d9-11c7-4e90-809e-605121eac9dd",
+    "kortex-run": "02fa81a7-b0fa-47a7-9adf-437d83e95d12",
+    "kortex-desk": "dec19c5e-0b6c-4b07-ae0c-8b7741f51410",
+    "kortex-flow": "ad4b29c9-07cb-4d65-bfec-075271b38793",
+    "kortex-hub": "bd3d199f-6990-4c7d-afef-165859defec2",
+    "kortex-mind": "591f5ca7-5e3a-4305-9758-03c27a55985a",
+    "kortex-seek": "b77baf45-eb51-496c-8ff3-ca0830727f46",
+    "kortex-store": "ee545644-724d-4504-ad5f-ffaa246d01a8",
+    "kortex-site": "1ee7c097-c917-4ce5-af9f-fae96ea073c6"
+  },
+  "previous_versions_file": "2026-10-19-flow-http-connectors-publication.json",
+  "previous_api": "f2ed7d29-4c18-4435-b7c2-5fcd4da1bb95",
+  "checks": [
+    "api health ok; chat without session 401",
+    "flow.kortex.site: Agent node in the palette, AI panel shows the signed-out state, task selectable, no page error"
+  ],
+  "not_verified": [
+    "a real AI call from production (needs an account created by the user)"
+  ]
+}

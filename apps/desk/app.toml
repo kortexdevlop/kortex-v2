@@ -1,0 +1,25 @@
+schema = 1
+[app]
+id = "apps.desk"
+version = "0.2.2"
+universe = "apps"
+status = "beta"
+ui = "custom"
+platforms = ["web", "desktop"]
+offline = false
+ai = false
+[app.name]
+fr = "Kortex Desk"
+en = "Kortex Desk"
+[app.tagline]
+fr = "Votre espace de travail, vos outils."
+en = "Your workspace, your tools."
+[app.slug]
+fr = "desk"
+en = "desk"
+[permissions]
+network = true
+filesystem = "none"
+clipboard = "none"
+sensitive = false
+privacy = "local"

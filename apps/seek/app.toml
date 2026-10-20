@@ -1,0 +1,28 @@
+schema = 1
+
+[app]
+id = "apps.seek"
+version = "0.1.2"
+universe = "apps"
+status = "beta"
+ui = "custom"
+platforms = ["web", "desktop"]
+offline = false
+ai = false
+
+[app.name]
+fr = "Kortex Seek"
+en = "Kortex Seek"
+[app.tagline]
+fr = "Décrivez votre besoin, Seek trouve l’outil."
+en = "Describe what you need, Seek finds the tool."
+[app.slug]
+fr = "seek"
+en = "seek"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "none"
+sensitive = false
+privacy = "local"

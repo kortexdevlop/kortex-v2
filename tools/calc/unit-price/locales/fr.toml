@@ -1,0 +1,14 @@
+[ui]
+title = "Comparateur de prix au kilo"
+[errors]
+empty_input = "Saisissez un texte."
+invalid_param = "Valeur invalide."
+missing_input = "Ajoutez le contenu à traiter."
+cancelled = "Annulé."
+division_by_zero = "Ce calcul exige une base non nulle."
+invalid_color = "Couleur invalide : vérifiez le format et les composantes."
+empty_slug = "Le texte ne contient aucun caractère utilisable pour ce slug."
+[outputs]
+unit_a = "Prix A par kg / L"
+unit_b = "Prix B par kg / L"
+difference = "Écart A − B par kg / L"

@@ -1,0 +1,21 @@
+//! Kortex Flow: workflow engine (pure) and shared Dioxus UI.
+pub mod ai;
+pub mod builder;
+pub mod canvas;
+pub mod catalogue;
+pub mod connectors;
+pub mod engine;
+pub mod headless;
+pub mod history;
+pub mod inspector;
+pub mod library;
+pub mod libui;
+pub mod runner;
+pub mod scheduler;
+pub mod secrets;
+pub mod subflow;
+pub mod sync;
+pub mod sync_net;
+pub mod templates;
+pub mod triggers;
+pub mod ui;

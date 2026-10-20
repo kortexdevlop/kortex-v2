@@ -1,0 +1,12 @@
+[ui]
+title = "Number Base Converter"
+[errors]
+empty_input = "Enter some text."
+invalid_param = "Invalid value."
+missing_input = "Add the content to process."
+cancelled = "Cancelled."
+division_by_zero = "This calculation requires a nonzero base."
+invalid_color = "Invalid color: check the format and component ranges."
+empty_slug = "The text contains no usable characters for this slug."
+[outputs]
+text = "Converted integer"

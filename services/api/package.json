@@ -5,13 +5,16 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "test": "node --test --experimental-sqlite tests/*.test.ts",
-    "dev": "wrangler dev --local --port 8787",
+    "dev": "wrangler dev --port 8787",
     "migrate:local": "wrangler d1 migrations apply kortex-accounts --local"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260101.0",
+    "@types/node": "^24.0.0",
     "typescript": "^5.6.0",
-    "wrangler": "^4.151.0",
-    "@types/node": "^24.0.0"
+    "wrangler": "^4.151.0"
+  },
+  "dependencies": {
+    "@simplewebauthn/server": "14.0.3"
   }
 }

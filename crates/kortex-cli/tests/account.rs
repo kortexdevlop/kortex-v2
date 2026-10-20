@@ -146,6 +146,9 @@ fn fx(name: &str, api: &str) -> Fx {
     };
     let index = serde_json::to_vec_pretty(&Index {
         schema: 1,
+        channel: "stable".into(),
+        sequence: 0,
+        source_commit: None,
         generated: "x".into(),
         cli: None,
         tools: BTreeMap::from([(ID.into(), tool)]),
@@ -154,7 +157,10 @@ fn fx(name: &str, api: &str) -> Fx {
     std::fs::write(dir.join("rel/index.json"), &index).expect("index");
     std::fs::write(dir.join("rel/index.json.sig"), sign_bytes(&SEED, &index)).expect("sig");
     let env = PkgEnv {
-        home: Home::at(dir.join("home/.kortex"), dir.join("home")),
+        channel: "stable".into(),
+        home: Home::at(dir.join("home/.kortex"), dir.join("home")).with_secret_store(
+            std::sync::Arc::new(kortex_platform::secrets::MemorySecretStore::default()),
+        ),
         index_src: dir.join("rel/index.json").to_string_lossy().into_owned(),
         public_key: public_key_b64(&SEED),
         target: Some(TARGET.to_owned()),
@@ -257,23 +263,21 @@ fn login_sends_a_derived_key_never_the_password_and_stores_a_private_token() {
         (body["kdf"].as_u64(), body["name"].as_str()),
         (Some(1), Some("Test Mac"))
     );
-    let c = f.env.home.load_credentials().expect("credentials");
+    let c = f
+        .env
+        .home
+        .load_credentials()
+        .expect("store")
+        .expect("credentials");
     assert_eq!(
         (c.token.as_str(), c.device_id.as_str(), c.email.as_str()),
         ("kdt_secret_token", "dev-1", "a@example.com")
     );
-    #[cfg(unix)]
-    {
-        use std::os::unix::fs::PermissionsExt;
-        assert_eq!(
-            std::fs::metadata(f.env.home.credentials_path())
-                .expect("meta")
-                .permissions()
-                .mode()
-                & 0o777,
-            0o600
-        );
-    }
+    assert!(
+        !f.env.home.credentials_path().exists(),
+        "no plaintext credential file"
+    );
+
     assert!(
         !out.contains("kdt_secret_token"),
         "the token is never printed"
@@ -293,7 +297,7 @@ fn login_failure_stores_nothing_and_says_why() {
     };
     let err = run(&f, &mut io, &["login"]).expect_err("refused");
     assert!(err.contains("incorrect"), "{err}");
-    assert!(f.env.home.load_credentials().is_none());
+    assert!(f.env.home.load_credentials().expect("store").is_none());
     let mut none = Script::default();
     assert!(
         run(&f, &mut none, &["login"])
@@ -323,7 +327,7 @@ fn whoami_and_logout_use_the_bearer_token_and_clear_local_state() {
             .expect("logout")
             .contains("révoqué")
     );
-    assert!(f.env.home.load_credentials().is_none());
+    assert!(f.env.home.load_credentials().expect("store").is_none());
     let reqs = log.lock().expect("log").clone();
     assert!(reqs.iter().any(|r| r.method == "GET"
         && r.path == "/v1/me"
@@ -429,17 +433,22 @@ fn the_confirmation_can_be_disabled_in_the_account() {
 }
 
 #[test]
-fn fails_closed_when_the_account_server_is_unreachable_but_works_without_an_account() {
+fn fails_closed_when_the_account_server_is_unreachable_and_refuses_anonymous_installation() {
     let (api, _log) = mock_api(api_ok());
     let f = fx("closed", &api);
     login(&f);
     // The stored token is pinned to the API that issued it: point it at a dead address.
-    let mut c = f.env.home.load_credentials().expect("credentials");
+    let mut c = f
+        .env
+        .home
+        .load_credentials()
+        .expect("store")
+        .expect("credentials");
     c.api = "http://127.0.0.1:9".to_owned();
     f.env.home.save_credentials(&c).expect("save");
     let err = run(&f, &mut Script::default(), &["install", ID]).expect_err("closed");
     assert!(
-        err.contains("impossible de vérifier ton compte") && err.contains("kortex logout"),
+        err.contains("impossible de vérifier ton compte") && err.contains("kortex login"),
         "{err}"
     );
     assert!(
@@ -451,7 +460,7 @@ fn fails_closed_when_the_account_server_is_unreachable_but_works_without_an_acco
             .is_empty(),
         "nothing installed while the account cannot be verified"
     );
-    // `kortex logout` works offline and then anonymous installs work again.
+    // Offline logout is allowed; it cannot bypass the installation account requirement.
     assert!(
         run(&f, &mut Script::default(), &["logout"])
             .expect("logout")
@@ -459,8 +468,16 @@ fn fails_closed_when_the_account_server_is_unreachable_but_works_without_an_acco
     );
     assert!(
         run(&f, &mut Script::default(), &["install", ID])
-            .expect("anonymous install")
-            .contains("installé")
+            .expect_err("anonymous install refused")
+            .contains("compte requis")
+    );
+    assert!(
+        f.env
+            .home
+            .load_registry()
+            .expect("registry")
+            .tools
+            .is_empty()
     );
 }
 
@@ -489,4 +506,50 @@ fn an_unreachable_account_does_not_fail_an_update_or_removal() {
     };
     assert!(out.contains("supprimé"));
     let _ = &f.dir;
+}
+
+#[derive(Debug)]
+struct RefuseProtectedWrite;
+impl kortex_platform::secrets::SecretStore for RefuseProtectedWrite {
+    fn read(
+        &self,
+        _: &str,
+        _: &str,
+    ) -> Result<Option<Vec<u8>>, kortex_platform::secrets::SecretError> {
+        Ok(None)
+    }
+    fn write(
+        &self,
+        _: &str,
+        _: &str,
+        _: &[u8],
+    ) -> Result<(), kortex_platform::secrets::SecretError> {
+        Err(kortex_platform::secrets::SecretError::LockedOrDenied)
+    }
+    fn delete(&self, _: &str, _: &str) -> Result<(), kortex_platform::secrets::SecretError> {
+        Ok(())
+    }
+}
+#[test]
+fn failed_protected_persistence_revokes_the_new_device_and_never_claims_login() {
+    let (api, log) = mock_api(api_ok());
+    let mut f = fx("store-failed", &api);
+    f.env.home = f
+        .env
+        .home
+        .clone()
+        .with_secret_store(std::sync::Arc::new(RefuseProtectedWrite));
+    let mut io = Script {
+        emails: vec!["a@example.com".into()],
+        passwords: vec!["correct horse battery".into()],
+        ..Script::default()
+    };
+    let error =
+        run(&f, &mut io, &["login", "--name", "Test Mac"]).expect_err("protected write failed");
+    assert!(error.contains("trousseau"));
+    assert!(!error.contains("kdt_secret_token"));
+    assert!(!f.env.home.credentials_path().exists());
+    assert!(log.lock().expect("log").iter().any(|r| r.method == "DELETE"
+        && r.path == "/v1/devices/self"
+        && r.auth.as_deref() == Some("Bearer kdt_secret_token")));
 }

@@ -7,9 +7,10 @@
     "dev": "node scripts/sync.mjs && astro dev",
     "build": "node scripts/sync.mjs && astro build",
     "preview": "astro preview",
-    "test": "node --test tests/seek.test.mjs"
+    "test": "node --test tests/site-search.test.mjs tests/admin-view.test.mjs"
   },
   "dependencies": {
+    "@simplewebauthn/browser": "14.0.0",
     "astro": "7.4.0"
   }
 }

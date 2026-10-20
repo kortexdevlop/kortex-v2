@@ -1,0 +1,15 @@
+[package]
+name = "kortex-storage-probe"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[workspace]
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+kortex-platform = { path = "../../../../crates/kortex-platform" }
+wasm-bindgen = "0.2.129"
+wasm-bindgen-futures = "0.4"

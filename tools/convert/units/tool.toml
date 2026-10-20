@@ -1,0 +1,67 @@
+schema = 1
+[tool]
+id = "convert.units"
+version = "1.0.2"
+universe = "convert"
+status = "beta"
+ui = "auto"
+platforms = ["web", "desktop"]
+offline = true
+ai = false
+viral_priority = 1
+[tool.name]
+fr = "Convertisseur d’unités"
+en = "Unit Converter"
+[tool.tagline]
+fr = "Longueur, masse, durée, volume, surface, température et octets."
+en = "Length, mass, duration, volume, area, temperature and bytes."
+[tool.slug]
+fr = "convertisseur-unites"
+en = "unit-converter"
+[search]
+keywords.fr = ["convertisseur d’unités", "convertisseur unites"]
+keywords.en = ["unit converter", "unit converter"]
+intents.fr = ["Longueur, masse, durée, volume, surface, température et octets."]
+intents.en = ["Length, mass, duration, volume, area, temperature and bytes."]
+related = []
+[limits]
+timeout_s = 10
+
+[[params]]
+id = "value"
+type = "number"
+default = 1
+level = "simple"
+label = { fr = "Valeur", en = "Value" }
+range = [-1000000000000000.0, 1000000000000000.0]
+
+[[params]]
+id = "from_unit"
+type = "enum"
+default = "m"
+level = "simple"
+label = { fr = "Unité source", en = "Source unit" }
+options = ["mm", "cm", "m", "km", "in", "ft", "yd", "mi", "mg", "g", "kg", "t", "oz", "lb", "ms", "s", "min", "h", "day", "ml", "l", "us_gal", "m2", "km2", "ft2", "ha", "c", "f", "k", "b", "kb", "mb", "gb", "kib", "mib", "gib"]
+
+[[params]]
+id = "to_unit"
+type = "enum"
+default = "km"
+level = "simple"
+label = { fr = "Unité cible", en = "Target unit" }
+options = ["mm", "cm", "m", "km", "in", "ft", "yd", "mi", "mg", "g", "kg", "t", "oz", "lb", "ms", "s", "min", "h", "day", "ml", "l", "us_gal", "m2", "km2", "ft2", "ha", "c", "f", "k", "b", "kb", "mb", "gb", "kib", "mib", "gib"]
+
+[[outputs]]
+id = "result"
+type = "number"
+
+[[outputs]]
+id = "exact"
+type = "text"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "write"
+sensitive = false
+privacy = "local"

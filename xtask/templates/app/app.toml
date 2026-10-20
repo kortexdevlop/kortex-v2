@@ -1,0 +1,28 @@
+schema = 1
+
+[app]
+id = "apps.{{name}}"
+version = "0.1.0"
+universe = "apps"
+status = "draft"
+ui = "custom"
+platforms = ["web", "desktop"]
+offline = false
+ai = false
+
+[app.name]
+fr = "Kortex {{Name}}"
+en = "Kortex {{Name}}"
+[app.tagline]
+fr = "À compléter."
+en = "To be completed."
+[app.slug]
+fr = "{{name}}"
+en = "{{name}}"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "none"
+sensitive = false
+privacy = "local"

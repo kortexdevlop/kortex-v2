@@ -1,0 +1,10 @@
+[ui]
+title = "Kortex Seek"
+subtitle = "Décrivez ce que vous voulez faire : Seek trouve le bon outil, sans envoyer votre demande nulle part."
+label = "Que voulez-vous faire ?"
+placeholder = "Ex. : convertir une image PNG en JPG"
+try = "Essayez :"
+results = "résultat(s)"
+open = "Ouvrir"
+empty = "Aucun outil ne correspond. Essayez d’autres mots, par exemple le format ou le nom de l’outil."
+not_installed = "Cet outil n’est pas installé sur cet ordinateur. Installez-le depuis Kortex Store ou ouvrez-le sur kortex.site."

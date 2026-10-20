@@ -1,0 +1,63 @@
+schema = 1
+[tool]
+id = "convert.timestamp"
+version = "1.0.2"
+universe = "convert"
+status = "beta"
+ui = "auto"
+platforms = ["web", "desktop"]
+offline = true
+ai = false
+viral_priority = 1
+[tool.name]
+fr = "Timestamp Unix et date UTC"
+en = "Unix Timestamp and UTC Date"
+[tool.tagline]
+fr = "Convertissez un entier Unix en date UTC, ou une date UTC en timestamp."
+en = "Convert an integer Unix timestamp to UTC or a UTC date to a timestamp."
+[tool.slug]
+fr = "timestamp-date-utc"
+en = "unix-timestamp-utc"
+[search]
+keywords.fr = ["timestamp unix et date utc", "timestamp date utc"]
+keywords.en = ["unix timestamp and utc date", "unix timestamp utc"]
+intents.fr = ["Convertissez un entier Unix en date UTC, ou une date UTC en timestamp."]
+intents.en = ["Convert an integer Unix timestamp to UTC or a UTC date to a timestamp."]
+related = []
+[limits]
+timeout_s = 10
+
+[[inputs]]
+id = "text"
+type = "text"
+required = true
+max_len = 100000
+multiline = true
+label = { fr = "Texte", en = "Text" }
+
+[[params]]
+id = "direction"
+type = "enum"
+default = "to_date"
+level = "simple"
+label = { fr = "Conversion", en = "Conversion" }
+options = ["to_date", "to_timestamp"]
+
+[[params]]
+id = "unit"
+type = "enum"
+default = "seconds"
+level = "simple"
+label = { fr = "Unité du timestamp", en = "Timestamp unit" }
+options = ["seconds", "milliseconds"]
+
+[[outputs]]
+id = "text"
+type = "text"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "write"
+sensitive = false
+privacy = "local"

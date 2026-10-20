@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
-import { tools, toolPath, variantPath } from '../lib/data';
+import { tools, universes, universePath, toolPath, variantPath } from '../lib/data';
+import { apps } from '../lib/apps';
 import { legalPages } from '../lib/legal';
 
 // Draft pages (noindex) are not listed.
@@ -10,7 +11,10 @@ export const GET: APIRoute = ({ site }) => {
   const pairs: [string, string][] = [
     ['/', '/en'],
     ['/outils', '/en/tools'],
+    ['/applications', '/en/apps'],
+    ...apps.filter(app => app.available).map((app): [string,string] => [`/${app.id}`, `/en/${app.id}`]),
     ['/telecharger', '/en/download'],
+    ...universes.filter(u => tools.some(t => t.tool.universe === u.id && t.tool.status !== 'draft')).map((u): [string,string] => [universePath(u,'fr'),universePath(u,'en')]),
     ...legal.map((p): [string, string] => [`/${p.slug.fr}`, `/en/${p.slug.en}`]),
     ...tools.flatMap((t): [string, string][] => [
       [toolPath(t, 'fr'), toolPath(t, 'en')],

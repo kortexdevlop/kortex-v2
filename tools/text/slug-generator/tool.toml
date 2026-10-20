@@ -1,0 +1,70 @@
+schema = 1
+[tool]
+id = "text.slug-generator"
+version = "1.0.2"
+universe = "text"
+status = "beta"
+ui = "auto"
+platforms = ["web", "desktop"]
+offline = true
+ai = false
+viral_priority = 1
+[tool.name]
+fr = "Générateur de slug"
+en = "Slug Generator"
+[tool.tagline]
+fr = "Transformez un titre en slug lisible, avec accents translittérés et séparateur au choix."
+en = "Turn a title into a readable URL slug with transliteration and a choice of separator."
+[tool.slug]
+fr = "generateur-slug"
+en = "slug-generator"
+[search]
+keywords.fr = ["générateur de slug", "generateur slug"]
+keywords.en = ["slug generator", "slug generator"]
+intents.fr = ["Transformez un titre en slug lisible, avec accents translittérés et séparateur au choix."]
+intents.en = ["Turn a title into a readable URL slug with transliteration and a choice of separator."]
+related = []
+[limits]
+timeout_s = 10
+
+[[inputs]]
+id = "text"
+type = "text"
+required = true
+max_len = 100000
+multiline = true
+label = { fr = "Texte", en = "Text" }
+
+[[params]]
+id = "separator"
+type = "enum"
+default = "dash"
+level = "simple"
+label = { fr = "Séparateur", en = "Separator" }
+options = ["dash", "underscore"]
+
+[[params]]
+id = "ascii_only"
+type = "bool"
+default = true
+level = "medium"
+label = { fr = "Translittérer en ASCII", en = "Transliterate to ASCII" }
+
+[[params]]
+id = "max_length"
+type = "integer"
+default = 80
+level = "pro"
+label = { fr = "Longueur maximale (caractères)", en = "Maximum length (characters)" }
+range = [1, 200]
+
+[[outputs]]
+id = "text"
+type = "text"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "write"
+sensitive = false
+privacy = "local"

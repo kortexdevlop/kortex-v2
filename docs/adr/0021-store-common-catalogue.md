@@ -1,0 +1,7 @@
+# 0021 — Shared Rust Store catalogue and verified CI package inventory
+
+The previous Store entry point forced the desktop renderer and could not deliver its declared web target. Store 0.2 uses the shared Dioxus shell and the same application component on web and desktop. Its catalogue is generated from the frozen 38 tool contracts, with local search, universe filters, detailed listings and explicit web launch links. Native installed state is read from the actual local registry and checked binary paths; browser state never pretends to detect installed software.
+
+`store.kortex.site` is added to the central domain configuration. Public installation remains closed while system keychains, install confirmation and end-to-end distribution are incomplete. The old Store actions are removed from its live entry point rather than allowing unconfirmed installs. CLI/package internals remain under plan 8.5/10.4, not certified by this delivery.
+
+The manually dispatched desktop workflow builds all selected tools and every released app discovered from app contracts, on Linux, Windows and macOS ARM + Intel. A package inventory verifier checks manifest identity/version/target, binary hashes and exact counts, then writes proof files tied to the workflow commit. The signing job checks the configured public key via the existing release-index implementation. CI artifacts remain private until public distribution is separately ready; no source enters the public release repository.

@@ -1,0 +1,5968 @@
+{
+  "schema": 1,
+  "tools": [
+    {
+      "inputs": [],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 10
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "years",
+          "type": "integer"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "days",
+          "type": "integer"
+        }
+      ],
+      "params": [
+        {
+          "default": "2000-01-01",
+          "id": "birth",
+          "label": {
+            "en": "Birth date (YYYY-MM-DD)",
+            "fr": "Date de naissance (AAAA-MM-JJ)"
+          },
+          "level": "simple",
+          "options": null,
+          "range": null,
+          "type": "text"
+        },
+        {
+          "default": "2024-01-01",
+          "id": "at",
+          "label": {
+            "en": "Reference date (YYYY-MM-DD)",
+            "fr": "Date de référence (AAAA-MM-JJ)"
+          },
+          "level": "simple",
+          "options": null,
+          "range": null,
+          "type": "text"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "Calculate completed years and days lived on a date you choose."
+          ],
+          "fr": [
+            "Calculez un âge révolu et le nombre de jours vécus à une date choisie."
+          ]
+        },
+        "keywords": {
+          "en": [
+            "age calculator",
+            "age calculator"
+          ],
+          "fr": [
+            "calculateur d’âge",
+            "calculateur age"
+          ]
+        },
+        "related": []
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "calc.age",
+        "name": {
+          "en": "Age Calculator",
+          "fr": "Calculateur d’âge"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "age-calculator",
+          "fr": "calculateur-age"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Calculate completed years and days lived on a date you choose.",
+          "fr": "Calculez un âge révolu et le nombre de jours vécus à une date choisie."
+        },
+        "ui": "auto",
+        "universe": "calc",
+        "version": "1.0.2",
+        "viral_priority": 1,
+        "web_worker": false
+      },
+      "variants": []
+    },
+    {
+      "inputs": [
+        {
+          "id": "text",
+          "label": {
+            "en": "Text",
+            "fr": "Texte"
+          },
+          "max_len": 100000,
+          "multiline": true,
+          "required": true,
+          "type": "text"
+        }
+      ],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 10
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "count",
+          "type": "integer"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "mean",
+          "type": "number"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "median",
+          "type": "number"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "sum",
+          "type": "number"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "min",
+          "type": "number"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "max",
+          "type": "number"
+        }
+      ],
+      "params": [],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "Get the mean, median, sum, minimum and maximum of a series."
+          ],
+          "fr": [
+            "Obtenez moyenne, médiane, somme, minimum et maximum d’une série."
+          ]
+        },
+        "keywords": {
+          "en": [
+            "mean and statistics",
+            "mean statistics"
+          ],
+          "fr": [
+            "moyenne et statistiques",
+            "moyenne statistiques"
+          ]
+        },
+        "related": []
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "calc.average",
+        "name": {
+          "en": "Mean and Statistics",
+          "fr": "Moyenne et statistiques"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "mean-statistics",
+          "fr": "moyenne-statistiques"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Get the mean, median, sum, minimum and maximum of a series.",
+          "fr": "Obtenez moyenne, médiane, somme, minimum et maximum d’une série."
+        },
+        "ui": "auto",
+        "universe": "calc",
+        "version": "1.0.2",
+        "viral_priority": 1,
+        "web_worker": false
+      },
+      "variants": []
+    },
+    {
+      "inputs": [],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 10
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "final_value",
+          "type": "number"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "contributed",
+          "type": "number"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "interest",
+          "type": "number"
+        }
+      ],
+      "params": [
+        {
+          "default": 1000,
+          "id": "principal",
+          "label": {
+            "en": "Initial principal",
+            "fr": "Capital initial"
+          },
+          "level": "simple",
+          "options": null,
+          "range": [
+            0.0,
+            1000000000000.0
+          ],
+          "type": "number"
+        },
+        {
+          "default": 0,
+          "id": "monthly",
+          "label": {
+            "en": "Monthly contribution",
+            "fr": "Versement mensuel"
+          },
+          "level": "simple",
+          "options": null,
+          "range": [
+            0.0,
+            1000000000.0
+          ],
+          "type": "number"
+        },
+        {
+          "default": 5,
+          "id": "annual_rate",
+          "label": {
+            "en": "Nominal annual rate (%)",
+            "fr": "Taux annuel nominal (%)"
+          },
+          "level": "simple",
+          "options": null,
+          "range": [
+            -99.0,
+            100.0
+          ],
+          "type": "number"
+        },
+        {
+          "default": 10,
+          "id": "years",
+          "label": {
+            "en": "Term (years)",
+            "fr": "Durée (années)"
+          },
+          "level": "simple",
+          "options": null,
+          "range": [
+            1.0,
+            100.0
+          ],
+          "type": "integer"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "Project savings with monthly contributions and a constant rate."
+          ],
+          "fr": [
+            "Projetez un capital avec versements mensuels et taux constant."
+          ]
+        },
+        "keywords": {
+          "en": [
+            "compound interest calculator",
+            "compound interest calculator"
+          ],
+          "fr": [
+            "intérêts composés",
+            "interets composes"
+          ]
+        },
+        "related": []
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "calc.compound-interest",
+        "name": {
+          "en": "Compound Interest Calculator",
+          "fr": "Intérêts composés"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "compound-interest-calculator",
+          "fr": "interets-composes"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Project savings with monthly contributions and a constant rate.",
+          "fr": "Projetez un capital avec versements mensuels et taux constant."
+        },
+        "ui": "auto",
+        "universe": "calc",
+        "version": "1.0.2",
+        "viral_priority": 1,
+        "web_worker": false
+      },
+      "variants": []
+    },
+    {
+      "inputs": [],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 10
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "date",
+          "type": "text"
+        }
+      ],
+      "params": [
+        {
+          "default": "2024-02-28",
+          "id": "date",
+          "label": {
+            "en": "Date (YYYY-MM-DD)",
+            "fr": "Date (AAAA-MM-JJ)"
+          },
+          "level": "simple",
+          "options": null,
+          "range": null,
+          "type": "text"
+        },
+        {
+          "default": 1,
+          "id": "days",
+          "label": {
+            "en": "Days to add (negative to subtract)",
+            "fr": "Jours à ajouter (négatif pour retirer)"
+          },
+          "level": "simple",
+          "options": null,
+          "range": [
+            -36500.0,
+            36500.0
+          ],
+          "type": "integer"
+        },
+        {
+          "default": false,
+          "id": "weekdays_only",
+          "label": {
+            "en": "Count Monday to Friday only",
+            "fr": "Compter du lundi au vendredi uniquement"
+          },
+          "level": "medium",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "Shift a date by calendar days or Monday-to-Friday days."
+          ],
+          "fr": [
+            "Décalez une date en jours calendaires ou du lundi au vendredi."
+          ]
+        },
+        "keywords": {
+          "en": [
+            "add or subtract days",
+            "add subtract days"
+          ],
+          "fr": [
+            "ajouter ou retirer des jours",
+            "ajouter retirer jours"
+          ]
+        },
+        "related": []
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "calc.date-add",
+        "name": {
+          "en": "Add or Subtract Days",
+          "fr": "Ajouter ou retirer des jours"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "add-subtract-days",
+          "fr": "ajouter-retirer-jours"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Shift a date by calendar days or Monday-to-Friday days.",
+          "fr": "Décalez une date en jours calendaires ou du lundi au vendredi."
+        },
+        "ui": "auto",
+        "universe": "calc",
+        "version": "1.0.2",
+        "viral_priority": 1,
+        "web_worker": false
+      },
+      "variants": []
+    },
+    {
+      "inputs": [],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 10
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "days",
+          "type": "integer"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "weeks",
+          "type": "number"
+        }
+      ],
+      "params": [
+        {
+          "default": "2024-01-01",
+          "id": "start",
+          "label": {
+            "en": "Start date (YYYY-MM-DD)",
+            "fr": "Date de départ (AAAA-MM-JJ)"
+          },
+          "level": "simple",
+          "options": null,
+          "range": null,
+          "type": "text"
+        },
+        {
+          "default": "2024-02-01",
+          "id": "end",
+          "label": {
+            "en": "End date (YYYY-MM-DD)",
+            "fr": "Date de fin (AAAA-MM-JJ)"
+          },
+          "level": "simple",
+          "options": null,
+          "range": null,
+          "type": "text"
+        },
+        {
+          "default": false,
+          "id": "inclusive",
+          "label": {
+            "en": "Include both dates",
+            "fr": "Inclure les deux dates"
+          },
+          "level": "medium",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "Calculate calendar days between two dates."
+          ],
+          "fr": [
+            "Calculez le nombre de jours entre deux dates du calendrier."
+          ]
+        },
+        "keywords": {
+          "en": [
+            "date difference",
+            "date difference"
+          ],
+          "fr": [
+            "écart entre deux dates",
+            "ecart entre dates"
+          ]
+        },
+        "related": []
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "calc.date-difference",
+        "name": {
+          "en": "Date Difference",
+          "fr": "Écart entre deux dates"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "date-difference",
+          "fr": "ecart-entre-dates"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Calculate calendar days between two dates.",
+          "fr": "Calculez le nombre de jours entre deux dates du calendrier."
+        },
+        "ui": "auto",
+        "universe": "calc",
+        "version": "1.0.2",
+        "viral_priority": 1,
+        "web_worker": false
+      },
+      "variants": []
+    },
+    {
+      "inputs": [],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 10
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "litres",
+          "type": "number"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "total",
+          "type": "number"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "per_person",
+          "type": "number"
+        }
+      ],
+      "params": [
+        {
+          "default": 100,
+          "id": "distance",
+          "label": {
+            "en": "Total distance (km)",
+            "fr": "Distance totale (km)"
+          },
+          "level": "simple",
+          "options": null,
+          "range": [
+            0.0,
+            10000000.0
+          ],
+          "type": "number"
+        },
+        {
+          "default": 6,
+          "id": "consumption",
+          "label": {
+            "en": "Consumption (L/100 km)",
+            "fr": "Consommation (L/100 km)"
+          },
+          "level": "simple",
+          "options": null,
+          "range": [
+            0.0,
+            1000.0
+          ],
+          "type": "number"
+        },
+        {
+          "default": 1.8,
+          "id": "price",
+          "label": {
+            "en": "Price per litre",
+            "fr": "Prix par litre"
+          },
+          "level": "simple",
+          "options": null,
+          "range": [
+            0.0,
+            1000000.0
+          ],
+          "type": "number"
+        },
+        {
+          "default": 0,
+          "id": "extra",
+          "label": {
+            "en": "Other costs (tolls, parking)",
+            "fr": "Autres frais (péages, parking)"
+          },
+          "level": "medium",
+          "options": null,
+          "range": [
+            0.0,
+            1000000000.0
+          ],
+          "type": "number"
+        },
+        {
+          "default": 1,
+          "id": "people",
+          "label": {
+            "en": "Travellers",
+            "fr": "Voyageurs"
+          },
+          "level": "medium",
+          "options": null,
+          "range": [
+            1.0,
+            1000.0
+          ],
+          "type": "integer"
+        },
+        {
+          "default": false,
+          "id": "return_trip",
+          "label": {
+            "en": "Double distance for a return trip",
+            "fr": "Doubler la distance pour l’aller-retour"
+          },
+          "level": "medium",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "Estimate fuel use, total cost and cost per traveller."
+          ],
+          "fr": [
+            "Estimez carburant, coût total et part par voyageur."
+          ]
+        },
+        "keywords": {
+          "en": [
+            "fuel cost calculator",
+            "fuel cost calculator"
+          ],
+          "fr": [
+            "coût d’un trajet",
+            "cout trajet carburant"
+          ]
+        },
+        "related": []
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "calc.fuel-cost",
+        "name": {
+          "en": "Fuel Cost Calculator",
+          "fr": "Coût d’un trajet"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "fuel-cost-calculator",
+          "fr": "cout-trajet-carburant"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Estimate fuel use, total cost and cost per traveller.",
+          "fr": "Estimez carburant, coût total et part par voyageur."
+        },
+        "ui": "auto",
+        "universe": "calc",
+        "version": "1.0.2",
+        "viral_priority": 1,
+        "web_worker": false
+      },
+      "variants": []
+    },
+    {
+      "inputs": [],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 5
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "gross",
+          "type": "number"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "social_contributions",
+          "type": "number"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "csg_crds",
+          "type": "number"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "net_taxable",
+          "type": "number"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "net_before_tax",
+          "type": "number"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "income_tax",
+          "type": "number"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "net_after_tax",
+          "type": "number"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "charges_rate",
+          "type": "number"
+        }
+      ],
+      "params": [
+        {
+          "default": 3000,
+          "id": "amount",
+          "label": {
+            "en": "Amount (€)",
+            "fr": "Montant (€)"
+          },
+          "level": "simple",
+          "options": null,
+          "range": [
+            0.0,
+            10000000.0
+          ],
+          "type": "number"
+        },
+        {
+          "default": "gross_to_net",
+          "id": "mode",
+          "label": {
+            "en": "Direction",
+            "fr": "Sens du calcul"
+          },
+          "level": "simple",
+          "options": [
+            "gross_to_net",
+            "net_to_gross"
+          ],
+          "range": null,
+          "type": "enum"
+        },
+        {
+          "default": "monthly",
+          "id": "period",
+          "label": {
+            "en": "Period",
+            "fr": "Période"
+          },
+          "level": "simple",
+          "options": [
+            "monthly",
+            "annual"
+          ],
+          "range": null,
+          "type": "enum"
+        },
+        {
+          "default": false,
+          "id": "cadre",
+          "label": {
+            "en": "Executive status (APEC contribution)",
+            "fr": "Statut cadre (cotisation APEC)"
+          },
+          "level": "medium",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        },
+        {
+          "default": 0,
+          "id": "tax_rate",
+          "label": {
+            "en": "Withholding tax rate (%)",
+            "fr": "Taux de prélèvement à la source (%)"
+          },
+          "level": "medium",
+          "options": null,
+          "range": [
+            0.0,
+            45.0
+          ],
+          "type": "number"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "calculate my net salary in france",
+            "convert gross salary to net france"
+          ],
+          "fr": [
+            "calculer mon salaire net",
+            "convertir un salaire brut en net"
+          ]
+        },
+        "keywords": {
+          "en": [
+            "gross to net",
+            "salary france",
+            "net salary",
+            "payslip",
+            "social contributions"
+          ],
+          "fr": [
+            "salaire brut net",
+            "brut en net",
+            "net en brut",
+            "calcul salaire",
+            "fiche de paie",
+            "cotisations"
+          ]
+        },
+        "related": []
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "calc.gross-net-salary",
+        "name": {
+          "en": "Gross to Net Salary (France)",
+          "fr": "Salaire brut en net"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "gross-net-salary-france",
+          "fr": "salaire-brut-net"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Estimate your net salary from gross (or the reverse), 2026 French private-sector rates.",
+          "fr": "Estimez votre salaire net à partir du brut (ou l'inverse), barème 2026, secteur privé."
+        },
+        "ui": "auto",
+        "universe": "calc",
+        "version": "1.0.2",
+        "viral_priority": 1,
+        "web_worker": false
+      },
+      "variants": [
+        {
+          "id": "gross-to-net",
+          "name": {
+            "en": "Gross to Net",
+            "fr": "Brut en net"
+          },
+          "preset": {
+            "mode": "gross_to_net"
+          },
+          "slug": {
+            "en": "gross-to-net-salary",
+            "fr": "brut-en-net"
+          }
+        },
+        {
+          "id": "net-to-gross",
+          "name": {
+            "en": "Net to Gross",
+            "fr": "Net en brut"
+          },
+          "preset": {
+            "mode": "net_to_gross"
+          },
+          "slug": {
+            "en": "net-to-gross-salary",
+            "fr": "net-en-brut"
+          }
+        },
+        {
+          "id": "cadre",
+          "name": {
+            "en": "Executive Gross to Net",
+            "fr": "Salaire brut net cadre"
+          },
+          "preset": {
+            "cadre": true
+          },
+          "slug": {
+            "en": "executive-gross-net-salary",
+            "fr": "salaire-brut-net-cadre"
+          }
+        },
+        {
+          "id": "annual",
+          "name": {
+            "en": "Annual Gross to Net",
+            "fr": "Salaire brut net annuel"
+          },
+          "preset": {
+            "period": "annual"
+          },
+          "slug": {
+            "en": "annual-gross-net-salary",
+            "fr": "salaire-brut-net-annuel"
+          }
+        }
+      ]
+    },
+    {
+      "inputs": [],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 10
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "monthly",
+          "type": "number"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "interest",
+          "type": "number"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "insurance",
+          "type": "number"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "total",
+          "type": "number"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "schedule",
+          "type": "table"
+        }
+      ],
+      "params": [
+        {
+          "default": 100000,
+          "id": "principal",
+          "label": {
+            "en": "Loan principal",
+            "fr": "Capital emprunté"
+          },
+          "level": "simple",
+          "options": null,
+          "range": [
+            1.0,
+            1000000000.0
+          ],
+          "type": "number"
+        },
+        {
+          "default": 3,
+          "id": "annual_rate",
+          "label": {
+            "en": "Nominal annual rate (%)",
+            "fr": "Taux annuel nominal (%)"
+          },
+          "level": "simple",
+          "options": null,
+          "range": [
+            0.0,
+            100.0
+          ],
+          "type": "number"
+        },
+        {
+          "default": 20,
+          "id": "years",
+          "label": {
+            "en": "Term (years)",
+            "fr": "Durée (années)"
+          },
+          "level": "simple",
+          "options": null,
+          "range": [
+            1.0,
+            50.0
+          ],
+          "type": "integer"
+        },
+        {
+          "default": 0,
+          "id": "insurance_rate",
+          "label": {
+            "en": "Annual insurance on initial principal (%)",
+            "fr": "Assurance annuelle sur capital initial (%)"
+          },
+          "level": "pro",
+          "options": null,
+          "range": [
+            0.0,
+            20.0
+          ],
+          "type": "number"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "Estimate fixed-rate loan payments and view an amortization schedule."
+          ],
+          "fr": [
+            "Estimez une mensualité à taux fixe et consultez le tableau d’amortissement."
+          ]
+        },
+        "keywords": {
+          "en": [
+            "loan calculator",
+            "loan calculator"
+          ],
+          "fr": [
+            "simulateur de prêt",
+            "simulateur pret"
+          ]
+        },
+        "related": []
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "calc.loan",
+        "name": {
+          "en": "Loan Calculator",
+          "fr": "Simulateur de prêt"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "loan-calculator",
+          "fr": "simulateur-pret"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Estimate fixed-rate loan payments and view an amortization schedule.",
+          "fr": "Estimez une mensualité à taux fixe et consultez le tableau d’amortissement."
+        },
+        "ui": "auto",
+        "universe": "calc",
+        "version": "1.0.2",
+        "viral_priority": 1,
+        "web_worker": false
+      },
+      "variants": []
+    },
+    {
+      "inputs": [],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 10
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "result",
+          "type": "number"
+        }
+      ],
+      "params": [
+        {
+          "default": 100,
+          "id": "a",
+          "label": {
+            "en": "Value A / initial value",
+            "fr": "Valeur A / valeur initiale"
+          },
+          "level": "simple",
+          "options": null,
+          "range": [
+            -1000000000000000.0,
+            1000000000000000.0
+          ],
+          "type": "number"
+        },
+        {
+          "default": 20,
+          "id": "b",
+          "label": {
+            "en": "Value B / percentage",
+            "fr": "Valeur B / pourcentage"
+          },
+          "level": "simple",
+          "options": null,
+          "range": [
+            -1000000000000000.0,
+            1000000000000000.0
+          ],
+          "type": "number"
+        },
+        {
+          "default": "part",
+          "id": "operation",
+          "label": {
+            "en": "Calculation",
+            "fr": "Calcul"
+          },
+          "level": "simple",
+          "options": [
+            "part",
+            "share",
+            "change",
+            "increase",
+            "decrease"
+          ],
+          "range": null,
+          "type": "enum"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "Calculate percentages, shares, changes and discounts locally."
+          ],
+          "fr": [
+            "Part, proportion, évolution et réduction : calculez vos pourcentages localement."
+          ]
+        },
+        "keywords": {
+          "en": [
+            "percentage calculator",
+            "percentage calculator"
+          ],
+          "fr": [
+            "calculateur de pourcentages",
+            "calcul pourcentage"
+          ]
+        },
+        "related": []
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "calc.percentage",
+        "name": {
+          "en": "Percentage Calculator",
+          "fr": "Calculateur de pourcentages"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "percentage-calculator",
+          "fr": "calcul-pourcentage"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Calculate percentages, shares, changes and discounts locally.",
+          "fr": "Part, proportion, évolution et réduction : calculez vos pourcentages localement."
+        },
+        "ui": "auto",
+        "universe": "calc",
+        "version": "1.0.2",
+        "viral_priority": 1,
+        "web_worker": false
+      },
+      "variants": [
+        {
+          "id": "discount",
+          "name": {
+            "en": "Calculate a Discount",
+            "fr": "Calculer une réduction"
+          },
+          "preset": {
+            "operation": "decrease"
+          },
+          "slug": {
+            "en": "discount",
+            "fr": "discount"
+          }
+        }
+      ]
+    },
+    {
+      "inputs": [],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 10
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "result",
+          "type": "number"
+        }
+      ],
+      "params": [
+        {
+          "default": 2,
+          "id": "a",
+          "label": {
+            "en": "Value A",
+            "fr": "Valeur A"
+          },
+          "level": "simple",
+          "options": null,
+          "range": [
+            -1000000000000000.0,
+            1000000000000000.0
+          ],
+          "type": "number"
+        },
+        {
+          "default": 10,
+          "id": "b",
+          "label": {
+            "en": "Corresponding value B",
+            "fr": "Valeur B associée"
+          },
+          "level": "simple",
+          "options": null,
+          "range": [
+            -1000000000000000.0,
+            1000000000000000.0
+          ],
+          "type": "number"
+        },
+        {
+          "default": 5,
+          "id": "c",
+          "label": {
+            "en": "New value C",
+            "fr": "Nouvelle valeur C"
+          },
+          "level": "simple",
+          "options": null,
+          "range": [
+            -1000000000000000.0,
+            1000000000000000.0
+          ],
+          "type": "number"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "Find a fourth value using direct proportion."
+          ],
+          "fr": [
+            "Retrouvez une quatrième valeur par proportionnalité."
+          ]
+        },
+        "keywords": {
+          "en": [
+            "rule of three",
+            "rule of three"
+          ],
+          "fr": [
+            "règle de trois",
+            "regle de trois"
+          ]
+        },
+        "related": []
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "calc.rule-of-three",
+        "name": {
+          "en": "Rule of Three",
+          "fr": "Règle de trois"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "rule-of-three",
+          "fr": "regle-de-trois"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Find a fourth value using direct proportion.",
+          "fr": "Retrouvez une quatrième valeur par proportionnalité."
+        },
+        "ui": "auto",
+        "universe": "calc",
+        "version": "1.0.2",
+        "viral_priority": 1,
+        "web_worker": false
+      },
+      "variants": []
+    },
+    {
+      "inputs": [],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 10
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "tip",
+          "type": "number"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "total",
+          "type": "number"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "per_person",
+          "type": "number"
+        }
+      ],
+      "params": [
+        {
+          "default": 100,
+          "id": "amount",
+          "label": {
+            "en": "Bill",
+            "fr": "Addition"
+          },
+          "level": "simple",
+          "options": null,
+          "range": [
+            0.0,
+            1000000000000.0
+          ],
+          "type": "number"
+        },
+        {
+          "default": 15,
+          "id": "percent",
+          "label": {
+            "en": "Tip (%)",
+            "fr": "Pourboire (%)"
+          },
+          "level": "simple",
+          "options": null,
+          "range": [
+            0.0,
+            1000.0
+          ],
+          "type": "number"
+        },
+        {
+          "default": 2,
+          "id": "people",
+          "label": {
+            "en": "People",
+            "fr": "Personnes"
+          },
+          "level": "simple",
+          "options": null,
+          "range": [
+            1.0,
+            10000.0
+          ],
+          "type": "integer"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "Calculate a tip and split the total equally."
+          ],
+          "fr": [
+            "Calculez un pourboire et répartissez le total à parts égales."
+          ]
+        },
+        "keywords": {
+          "en": [
+            "tip and bill splitter",
+            "tip bill splitter"
+          ],
+          "fr": [
+            "pourboire et partage d’addition",
+            "pourboire partage addition"
+          ]
+        },
+        "related": []
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "calc.tip",
+        "name": {
+          "en": "Tip and Bill Splitter",
+          "fr": "Pourboire et partage d’addition"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "tip-bill-splitter",
+          "fr": "pourboire-partage-addition"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Calculate a tip and split the total equally.",
+          "fr": "Calculez un pourboire et répartissez le total à parts égales."
+        },
+        "ui": "auto",
+        "universe": "calc",
+        "version": "1.0.2",
+        "viral_priority": 1,
+        "web_worker": false
+      },
+      "variants": []
+    },
+    {
+      "inputs": [],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 10
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "unit_a",
+          "type": "number"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "unit_b",
+          "type": "number"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "difference",
+          "type": "number"
+        }
+      ],
+      "params": [
+        {
+          "default": 3,
+          "id": "price_a",
+          "label": {
+            "en": "Price A",
+            "fr": "Prix A"
+          },
+          "level": "simple",
+          "options": null,
+          "range": [
+            0.0,
+            1000000000000.0
+          ],
+          "type": "number"
+        },
+        {
+          "default": 500,
+          "id": "quantity_a",
+          "label": {
+            "en": "Quantity A (g or ml)",
+            "fr": "Quantité A (g ou ml)"
+          },
+          "level": "simple",
+          "options": null,
+          "range": [
+            1e-6,
+            1000000000000.0
+          ],
+          "type": "number"
+        },
+        {
+          "default": 5,
+          "id": "price_b",
+          "label": {
+            "en": "Price B",
+            "fr": "Prix B"
+          },
+          "level": "simple",
+          "options": null,
+          "range": [
+            0.0,
+            1000000000000.0
+          ],
+          "type": "number"
+        },
+        {
+          "default": 1000,
+          "id": "quantity_b",
+          "label": {
+            "en": "Quantity B (g or ml)",
+            "fr": "Quantité B (g ou ml)"
+          },
+          "level": "simple",
+          "options": null,
+          "range": [
+            1e-6,
+            1000000000000.0
+          ],
+          "type": "number"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "Compare two products per kilogram or litre."
+          ],
+          "fr": [
+            "Comparez deux produits au kilogramme ou au litre."
+          ]
+        },
+        "keywords": {
+          "en": [
+            "unit price calculator",
+            "unit price calculator"
+          ],
+          "fr": [
+            "comparateur de prix au kilo",
+            "comparateur prix kilo"
+          ]
+        },
+        "related": []
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "calc.unit-price",
+        "name": {
+          "en": "Unit Price Calculator",
+          "fr": "Comparateur de prix au kilo"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "unit-price-calculator",
+          "fr": "comparateur-prix-kilo"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Compare two products per kilogram or litre.",
+          "fr": "Comparez deux produits au kilogramme ou au litre."
+        },
+        "ui": "auto",
+        "universe": "calc",
+        "version": "1.0.2",
+        "viral_priority": 1,
+        "web_worker": false
+      },
+      "variants": []
+    },
+    {
+      "inputs": [],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 10
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "net",
+          "type": "number"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "tax",
+          "type": "number"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "gross",
+          "type": "number"
+        }
+      ],
+      "params": [
+        {
+          "default": 100,
+          "id": "amount",
+          "label": {
+            "en": "Amount",
+            "fr": "Montant"
+          },
+          "level": "simple",
+          "options": null,
+          "range": [
+            0.0,
+            1000000000000.0
+          ],
+          "type": "number"
+        },
+        {
+          "default": 20,
+          "id": "rate",
+          "label": {
+            "en": "Rate (%)",
+            "fr": "Taux (%)"
+          },
+          "level": "simple",
+          "options": null,
+          "range": [
+            0.0,
+            1000.0
+          ],
+          "type": "number"
+        },
+        {
+          "default": "net",
+          "id": "direction",
+          "label": {
+            "en": "Input amount",
+            "fr": "Montant saisi"
+          },
+          "level": "simple",
+          "options": [
+            "net",
+            "gross"
+          ],
+          "range": null,
+          "type": "enum"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "Convert between net and gross prices with a tax rate you choose."
+          ],
+          "fr": [
+            "Passez du HT au TTC et retrouvez le montant de taxe avec le taux de votre choix."
+          ]
+        },
+        "keywords": {
+          "en": [
+            "vat calculator",
+            "vat calculator"
+          ],
+          "fr": [
+            "calculateur de tva",
+            "calcul tva"
+          ]
+        },
+        "related": []
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "calc.vat",
+        "name": {
+          "en": "VAT Calculator",
+          "fr": "Calculateur de TVA"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "vat-calculator",
+          "fr": "calcul-tva"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Convert between net and gross prices with a tax rate you choose.",
+          "fr": "Passez du HT au TTC et retrouvez le montant de taxe avec le taux de votre choix."
+        },
+        "ui": "auto",
+        "universe": "calc",
+        "version": "1.0.2",
+        "viral_priority": 1,
+        "web_worker": false
+      },
+      "variants": [
+        {
+          "id": "excluding-tax",
+          "name": {
+            "en": "Gross to Net",
+            "fr": "TTC en HT"
+          },
+          "preset": {
+            "direction": "gross"
+          },
+          "slug": {
+            "en": "excluding-tax",
+            "fr": "excluding-tax"
+          }
+        }
+      ]
+    },
+    {
+      "inputs": [
+        {
+          "id": "text",
+          "label": {
+            "en": "Text or Base64",
+            "fr": "Texte ou Base64"
+          },
+          "max_len": 5000000,
+          "multiline": true,
+          "required": true,
+          "type": "text"
+        }
+      ],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 10
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "text",
+          "type": "text"
+        }
+      ],
+      "params": [
+        {
+          "default": "encode",
+          "id": "direction",
+          "label": {
+            "en": "Direction",
+            "fr": "Sens"
+          },
+          "level": "simple",
+          "options": [
+            "encode",
+            "decode"
+          ],
+          "range": null,
+          "type": "enum"
+        },
+        {
+          "default": false,
+          "id": "url_safe",
+          "label": {
+            "en": "URL-safe variant (- and _ instead of + and /)",
+            "fr": "Variante URL-safe (- et _ au lieu de + et /)"
+          },
+          "level": "medium",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        },
+        {
+          "default": true,
+          "id": "padding",
+          "label": {
+            "en": "Add “=” padding",
+            "fr": "Ajouter le remplissage « = »"
+          },
+          "level": "pro",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "decode a base64 string",
+            "encode text to base64"
+          ],
+          "fr": [
+            "décoder une chaîne base64",
+            "encoder du texte en base64"
+          ]
+        },
+        "keywords": {
+          "en": [
+            "base64",
+            "encode base64",
+            "decode base64",
+            "url safe"
+          ],
+          "fr": [
+            "base64",
+            "encoder base64",
+            "décoder base64",
+            "url safe"
+          ]
+        },
+        "related": []
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "code.base64",
+        "name": {
+          "en": "Base64 Encoder and Decoder",
+          "fr": "Encodeur et décodeur Base64"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "base64-encoder-decoder",
+          "fr": "base64"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Encode text to Base64 or decode it, in standard or URL-safe variant.",
+          "fr": "Encodez du texte en Base64 ou décodez-le, en variante standard ou URL-safe."
+        },
+        "ui": "auto",
+        "universe": "code",
+        "version": "1.0.2",
+        "viral_priority": 2,
+        "web_worker": false
+      },
+      "variants": [
+        {
+          "id": "encode",
+          "name": {
+            "en": "Base64 Encoder",
+            "fr": "Encoder en Base64"
+          },
+          "preset": {
+            "direction": "encode"
+          },
+          "slug": {
+            "en": "base64-encoder",
+            "fr": "encoder-base64"
+          }
+        },
+        {
+          "id": "decode",
+          "name": {
+            "en": "Base64 Decoder",
+            "fr": "Décoder du Base64"
+          },
+          "preset": {
+            "direction": "decode"
+          },
+          "slug": {
+            "en": "base64-decoder",
+            "fr": "decoder-base64"
+          }
+        }
+      ]
+    },
+    {
+      "inputs": [
+        {
+          "id": "text",
+          "label": {
+            "en": "Text",
+            "fr": "Texte"
+          },
+          "max_len": 100000,
+          "multiline": true,
+          "required": true,
+          "type": "text"
+        }
+      ],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 10
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "text",
+          "type": "text"
+        }
+      ],
+      "params": [
+        {
+          "default": "to_symbolic",
+          "id": "direction",
+          "label": {
+            "en": "Conversion",
+            "fr": "Conversion"
+          },
+          "level": "simple",
+          "options": [
+            "to_symbolic",
+            "to_octal"
+          ],
+          "range": null,
+          "type": "enum"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "Convert Unix permissions between octal and symbolic notation."
+          ],
+          "fr": [
+            "Convertissez des permissions Unix entre notation octale et symbolique."
+          ]
+        },
+        "keywords": {
+          "en": [
+            "chmod calculator",
+            "chmod calculator"
+          ],
+          "fr": [
+            "calculateur chmod",
+            "calculateur chmod"
+          ]
+        },
+        "related": []
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "code.chmod",
+        "name": {
+          "en": "chmod Calculator",
+          "fr": "Calculateur chmod"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "chmod-calculator",
+          "fr": "calculateur-chmod"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Convert Unix permissions between octal and symbolic notation.",
+          "fr": "Convertissez des permissions Unix entre notation octale et symbolique."
+        },
+        "ui": "auto",
+        "universe": "code",
+        "version": "1.0.2",
+        "viral_priority": 1,
+        "web_worker": false
+      },
+      "variants": []
+    },
+    {
+      "inputs": [
+        {
+          "id": "text",
+          "label": {
+            "en": "Text",
+            "fr": "Texte"
+          },
+          "max_len": 100000,
+          "multiline": true,
+          "required": true,
+          "type": "text"
+        }
+      ],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 10
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "text",
+          "type": "text"
+        }
+      ],
+      "params": [
+        {
+          "default": "encode",
+          "id": "direction",
+          "label": {
+            "en": "Conversion",
+            "fr": "Conversion"
+          },
+          "level": "simple",
+          "options": [
+            "encode",
+            "decode"
+          ],
+          "range": null,
+          "type": "enum"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "Escape text for HTML or decode common character references."
+          ],
+          "fr": [
+            "Échappez le texte pour HTML ou décodez les références de caractères courantes."
+          ]
+        },
+        "keywords": {
+          "en": [
+            "html entities",
+            "html entities"
+          ],
+          "fr": [
+            "entités html",
+            "entites html"
+          ]
+        },
+        "related": []
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "code.html-entities",
+        "name": {
+          "en": "HTML Entities",
+          "fr": "Entités HTML"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "html-entities",
+          "fr": "entites-html"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Escape text for HTML or decode common character references.",
+          "fr": "Échappez le texte pour HTML ou décodez les références de caractères courantes."
+        },
+        "ui": "auto",
+        "universe": "code",
+        "version": "1.0.2",
+        "viral_priority": 1,
+        "web_worker": false
+      },
+      "variants": []
+    },
+    {
+      "inputs": [
+        {
+          "id": "text",
+          "label": {
+            "en": "JSON",
+            "fr": "JSON"
+          },
+          "max_len": 5000000,
+          "multiline": true,
+          "required": true,
+          "type": "text"
+        }
+      ],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 10
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "result",
+          "type": "text"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "status",
+          "type": "text"
+        }
+      ],
+      "params": [
+        {
+          "default": "format",
+          "id": "action",
+          "label": {
+            "en": "Action",
+            "fr": "Action"
+          },
+          "level": "simple",
+          "options": [
+            "format",
+            "minify",
+            "validate"
+          ],
+          "range": null,
+          "type": "enum"
+        },
+        {
+          "default": 2,
+          "id": "indent",
+          "label": {
+            "en": "Indent (spaces)",
+            "fr": "Indentation (espaces)"
+          },
+          "level": "medium",
+          "options": null,
+          "range": [
+            1.0,
+            8.0
+          ],
+          "type": "integer"
+        },
+        {
+          "default": false,
+          "id": "sort_keys",
+          "label": {
+            "en": "Sort keys alphabetically",
+            "fr": "Trier les clés par ordre alphabétique"
+          },
+          "level": "pro",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "pretty print some json",
+            "check if my json is valid"
+          ],
+          "fr": [
+            "mettre en forme du json",
+            "vérifier si mon json est valide"
+          ]
+        },
+        "keywords": {
+          "en": [
+            "json",
+            "format json",
+            "validate json",
+            "minify json",
+            "pretty print",
+            "beautify"
+          ],
+          "fr": [
+            "json",
+            "formater json",
+            "valider json",
+            "minifier json",
+            "embellir json",
+            "indenter"
+          ]
+        },
+        "related": []
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "code.json-formatter",
+        "name": {
+          "en": "JSON Formatter and Validator",
+          "fr": "Formateur et validateur JSON"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "json-formatter",
+          "fr": "formateur-json"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Pretty-print, minify and validate JSON, with the line and column of the error.",
+          "fr": "Embellissez, minifiez et validez du JSON, avec la ligne et la colonne de l'erreur."
+        },
+        "ui": "auto",
+        "universe": "code",
+        "version": "1.0.2",
+        "viral_priority": 1,
+        "web_worker": false
+      },
+      "variants": [
+        {
+          "id": "minify",
+          "name": {
+            "en": "JSON Minifier",
+            "fr": "Minifier du JSON"
+          },
+          "preset": {
+            "action": "minify"
+          },
+          "slug": {
+            "en": "json-minifier",
+            "fr": "minifier-json"
+          }
+        },
+        {
+          "id": "validate",
+          "name": {
+            "en": "JSON Validator",
+            "fr": "Valider du JSON"
+          },
+          "preset": {
+            "action": "validate"
+          },
+          "slug": {
+            "en": "json-validator",
+            "fr": "valider-json"
+          }
+        }
+      ]
+    },
+    {
+      "inputs": [
+        {
+          "id": "text",
+          "label": {
+            "en": "Text",
+            "fr": "Texte"
+          },
+          "max_len": 100000,
+          "multiline": true,
+          "required": true,
+          "type": "text"
+        }
+      ],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 10
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "text",
+          "type": "text"
+        }
+      ],
+      "params": [
+        {
+          "default": "tab",
+          "id": "delimiter",
+          "label": {
+            "en": "Delimiter",
+            "fr": "Séparateur"
+          },
+          "level": "simple",
+          "options": [
+            "tab",
+            "semicolon",
+            "comma"
+          ],
+          "range": null,
+          "type": "enum"
+        },
+        {
+          "default": true,
+          "id": "header",
+          "label": {
+            "en": "First row is the header",
+            "fr": "Première ligne comme en-tête"
+          },
+          "level": "medium",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        },
+        {
+          "default": "left",
+          "id": "alignment",
+          "label": {
+            "en": "Alignment",
+            "fr": "Alignement"
+          },
+          "level": "medium",
+          "options": [
+            "left",
+            "center",
+            "right"
+          ],
+          "range": null,
+          "type": "enum"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "Turn delimited lines into a Markdown table."
+          ],
+          "fr": [
+            "Transformez des lignes délimitées en tableau Markdown."
+          ]
+        },
+        "keywords": {
+          "en": [
+            "markdown table generator",
+            "markdown table generator"
+          ],
+          "fr": [
+            "générateur de tableau markdown",
+            "generateur tableau markdown"
+          ]
+        },
+        "related": []
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "code.markdown-table",
+        "name": {
+          "en": "Markdown Table Generator",
+          "fr": "Générateur de tableau Markdown"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "markdown-table-generator",
+          "fr": "generateur-tableau-markdown"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Turn delimited lines into a Markdown table.",
+          "fr": "Transformez des lignes délimitées en tableau Markdown."
+        },
+        "ui": "auto",
+        "universe": "code",
+        "version": "1.0.2",
+        "viral_priority": 1,
+        "web_worker": false
+      },
+      "variants": []
+    },
+    {
+      "inputs": [
+        {
+          "id": "text",
+          "label": {
+            "en": "Text",
+            "fr": "Texte"
+          },
+          "max_len": 100000,
+          "multiline": true,
+          "required": true,
+          "type": "text"
+        }
+      ],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 10
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "text",
+          "type": "text"
+        }
+      ],
+      "params": [
+        {
+          "default": 10,
+          "id": "from_base",
+          "label": {
+            "en": "Source base",
+            "fr": "Base source"
+          },
+          "level": "simple",
+          "options": null,
+          "range": [
+            2.0,
+            36.0
+          ],
+          "type": "integer"
+        },
+        {
+          "default": 16,
+          "id": "to_base",
+          "label": {
+            "en": "Target base",
+            "fr": "Base cible"
+          },
+          "level": "simple",
+          "options": null,
+          "range": [
+            2.0,
+            36.0
+          ],
+          "type": "integer"
+        },
+        {
+          "default": false,
+          "id": "uppercase",
+          "label": {
+            "en": "Uppercase letters",
+            "fr": "Lettres majuscules"
+          },
+          "level": "medium",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "Convert signed integers between bases 2 and 36."
+          ],
+          "fr": [
+            "Convertissez un entier signé entre les bases 2 et 36."
+          ]
+        },
+        "keywords": {
+          "en": [
+            "number base converter",
+            "number base converter"
+          ],
+          "fr": [
+            "convertisseur de bases numériques",
+            "convertisseur bases numeriques"
+          ]
+        },
+        "related": []
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "code.number-base",
+        "name": {
+          "en": "Number Base Converter",
+          "fr": "Convertisseur de bases numériques"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "number-base-converter",
+          "fr": "convertisseur-bases-numeriques"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Convert signed integers between bases 2 and 36.",
+          "fr": "Convertissez un entier signé entre les bases 2 et 36."
+        },
+        "ui": "auto",
+        "universe": "code",
+        "version": "1.0.2",
+        "viral_priority": 1,
+        "web_worker": false
+      },
+      "variants": []
+    },
+    {
+      "inputs": [
+        {
+          "id": "text",
+          "label": {
+            "en": "Text or URL",
+            "fr": "Texte ou URL"
+          },
+          "max_len": 2000000,
+          "multiline": true,
+          "required": true,
+          "type": "text"
+        }
+      ],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 10
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "text",
+          "type": "text"
+        }
+      ],
+      "params": [
+        {
+          "default": "encode",
+          "id": "direction",
+          "label": {
+            "en": "Direction",
+            "fr": "Sens"
+          },
+          "level": "simple",
+          "options": [
+            "encode",
+            "decode"
+          ],
+          "range": null,
+          "type": "enum"
+        },
+        {
+          "default": "component",
+          "id": "scope",
+          "label": {
+            "en": "Encoding scope",
+            "fr": "Portée de l'encodage"
+          },
+          "level": "medium",
+          "options": [
+            "component",
+            "uri"
+          ],
+          "range": null,
+          "type": "enum"
+        },
+        {
+          "default": false,
+          "id": "plus_as_space",
+          "label": {
+            "en": "Read “+” as a space (form data)",
+            "fr": "Lire « + » comme une espace (formulaires)"
+          },
+          "level": "pro",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "decode a url with %20",
+            "encode a url parameter"
+          ],
+          "fr": [
+            "décoder une url avec des %20",
+            "encoder un paramètre d'url"
+          ]
+        },
+        "keywords": {
+          "en": [
+            "url encode",
+            "url decode",
+            "percent encoding",
+            "encodeuricomponent",
+            "%20"
+          ],
+          "fr": [
+            "encoder url",
+            "décoder url",
+            "percent encoding",
+            "encodeuricomponent",
+            "%20"
+          ]
+        },
+        "related": []
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "code.url-encoder",
+        "name": {
+          "en": "URL Encoder and Decoder",
+          "fr": "Encodeur et décodeur d'URL"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "url-encoder-decoder",
+          "fr": "encodeur-url"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Encode or decode URLs and parameters (percent-encoding), like encodeURIComponent.",
+          "fr": "Encodez ou décodez des URL et des paramètres (pourcentage), comme encodeURIComponent."
+        },
+        "ui": "auto",
+        "universe": "code",
+        "version": "1.0.2",
+        "viral_priority": 2,
+        "web_worker": false
+      },
+      "variants": [
+        {
+          "id": "encode",
+          "name": {
+            "en": "URL Encoder",
+            "fr": "Encoder une URL"
+          },
+          "preset": {
+            "direction": "encode"
+          },
+          "slug": {
+            "en": "url-encoder",
+            "fr": "encoder-url"
+          }
+        },
+        {
+          "id": "decode",
+          "name": {
+            "en": "URL Decoder",
+            "fr": "Décoder une URL"
+          },
+          "preset": {
+            "direction": "decode"
+          },
+          "slug": {
+            "en": "url-decoder",
+            "fr": "decoder-url"
+          }
+        }
+      ]
+    },
+    {
+      "inputs": [],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 10
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "uuids",
+          "type": "text"
+        }
+      ],
+      "params": [
+        {
+          "default": "v4",
+          "id": "version",
+          "label": {
+            "en": "Version",
+            "fr": "Version"
+          },
+          "level": "simple",
+          "options": [
+            "v4",
+            "v7"
+          ],
+          "range": null,
+          "type": "enum"
+        },
+        {
+          "default": 1,
+          "id": "count",
+          "label": {
+            "en": "Count",
+            "fr": "Quantité"
+          },
+          "level": "simple",
+          "options": null,
+          "range": [
+            1.0,
+            500.0
+          ],
+          "type": "integer"
+        },
+        {
+          "default": false,
+          "id": "uppercase",
+          "label": {
+            "en": "UPPERCASE",
+            "fr": "MAJUSCULES"
+          },
+          "level": "medium",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        },
+        {
+          "default": true,
+          "id": "hyphens",
+          "label": {
+            "en": "With hyphens",
+            "fr": "Avec tirets"
+          },
+          "level": "medium",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "generate a uuid",
+            "create 100 unique identifiers"
+          ],
+          "fr": [
+            "générer un uuid",
+            "créer 100 identifiants uniques"
+          ]
+        },
+        "keywords": {
+          "en": [
+            "uuid",
+            "guid",
+            "unique identifier",
+            "uuid v4",
+            "uuid v7",
+            "uuid generator"
+          ],
+          "fr": [
+            "uuid",
+            "guid",
+            "identifiant unique",
+            "uuid v4",
+            "uuid v7",
+            "générateur uuid"
+          ]
+        },
+        "related": []
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "code.uuid-generator",
+        "name": {
+          "en": "UUID Generator",
+          "fr": "Générateur d'UUID"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "uuid-generator",
+          "fr": "generateur-uuid"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Generate UUID v4 (random) or v7 (time-sortable), in bulk.",
+          "fr": "Générez des UUID v4 (aléatoires) ou v7 (triables par date), en lot."
+        },
+        "ui": "auto",
+        "universe": "code",
+        "version": "1.0.2",
+        "viral_priority": 2,
+        "web_worker": false
+      },
+      "variants": [
+        {
+          "id": "v4",
+          "name": {
+            "en": "UUID v4 Generator",
+            "fr": "Générateur d'UUID v4"
+          },
+          "preset": {
+            "version": "v4"
+          },
+          "slug": {
+            "en": "uuid-v4-generator",
+            "fr": "generateur-uuid-v4"
+          }
+        },
+        {
+          "id": "v7",
+          "name": {
+            "en": "UUID v7 Generator",
+            "fr": "Générateur d'UUID v7"
+          },
+          "preset": {
+            "version": "v7"
+          },
+          "slug": {
+            "en": "uuid-v7-generator",
+            "fr": "generateur-uuid-v7"
+          }
+        },
+        {
+          "id": "bulk",
+          "name": {
+            "en": "Bulk UUID Generator",
+            "fr": "Générer plusieurs UUID"
+          },
+          "preset": {
+            "count": 50
+          },
+          "slug": {
+            "en": "bulk-uuid-generator",
+            "fr": "generer-plusieurs-uuid"
+          }
+        }
+      ]
+    },
+    {
+      "inputs": [],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 10
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "ratio",
+          "type": "text"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "aa_normal",
+          "type": "text"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "aa_large",
+          "type": "text"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "aaa_normal",
+          "type": "text"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "aaa_large",
+          "type": "text"
+        }
+      ],
+      "params": [
+        {
+          "default": "#000000",
+          "id": "foreground",
+          "label": {
+            "en": "Text color (HEX)",
+            "fr": "Couleur du texte (HEX)"
+          },
+          "level": "simple",
+          "options": null,
+          "range": null,
+          "type": "color"
+        },
+        {
+          "default": "#FFFFFF",
+          "id": "background",
+          "label": {
+            "en": "Background color (HEX)",
+            "fr": "Couleur de fond (HEX)"
+          },
+          "level": "simple",
+          "options": null,
+          "range": null,
+          "type": "color"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "Check contrast ratios and WCAG AA and AAA thresholds for opaque text."
+          ],
+          "fr": [
+            "Vérifiez le rapport de contraste et les seuils WCAG AA et AAA pour du texte opaque."
+          ]
+        },
+        "keywords": {
+          "en": [
+            "wcag contrast checker",
+            "color contrast checker"
+          ],
+          "fr": [
+            "vérificateur de contraste wcag",
+            "contraste couleurs"
+          ]
+        },
+        "related": []
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "color.contrast-checker",
+        "name": {
+          "en": "WCAG Contrast Checker",
+          "fr": "Vérificateur de contraste WCAG"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "color-contrast-checker",
+          "fr": "contraste-couleurs"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Check contrast ratios and WCAG AA and AAA thresholds for opaque text.",
+          "fr": "Vérifiez le rapport de contraste et les seuils WCAG AA et AAA pour du texte opaque."
+        },
+        "ui": "auto",
+        "universe": "color",
+        "version": "1.0.2",
+        "viral_priority": 1,
+        "web_worker": false
+      },
+      "variants": []
+    },
+    {
+      "inputs": [
+        {
+          "id": "text",
+          "label": {
+            "en": "Text",
+            "fr": "Texte"
+          },
+          "max_len": 100000,
+          "multiline": true,
+          "required": true,
+          "type": "text"
+        }
+      ],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 10
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "hex",
+          "type": "text"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "rgb",
+          "type": "text"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "hsl",
+          "type": "text"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "oklch",
+          "type": "text"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "gamut",
+          "type": "text"
+        }
+      ],
+      "params": [
+        {
+          "default": "hex",
+          "id": "format",
+          "label": {
+            "en": "Input format",
+            "fr": "Format saisi"
+          },
+          "level": "simple",
+          "options": [
+            "hex",
+            "rgb",
+            "hsl",
+            "oklch"
+          ],
+          "range": null,
+          "type": "enum"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "Convert HEX, RGB, HSL and OKLCH with sRGB gamut detection."
+          ],
+          "fr": [
+            "Convertissez HEX, RGB, HSL et OKLCH, avec détection des couleurs hors sRGB."
+          ]
+        },
+        "keywords": {
+          "en": [
+            "color converter",
+            "color converter"
+          ],
+          "fr": [
+            "convertisseur de couleurs",
+            "convertisseur couleurs"
+          ]
+        },
+        "related": []
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "color.converter",
+        "name": {
+          "en": "Color Converter",
+          "fr": "Convertisseur de couleurs"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "color-converter",
+          "fr": "convertisseur-couleurs"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Convert HEX, RGB, HSL and OKLCH with sRGB gamut detection.",
+          "fr": "Convertissez HEX, RGB, HSL et OKLCH, avec détection des couleurs hors sRGB."
+        },
+        "ui": "auto",
+        "universe": "color",
+        "version": "1.0.2",
+        "viral_priority": 1,
+        "web_worker": false
+      },
+      "variants": []
+    },
+    {
+      "inputs": [
+        {
+          "id": "text",
+          "label": {
+            "en": "Text",
+            "fr": "Texte"
+          },
+          "max_len": 100000,
+          "multiline": true,
+          "required": true,
+          "type": "text"
+        }
+      ],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 10
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "text",
+          "type": "text"
+        }
+      ],
+      "params": [
+        {
+          "default": "to_date",
+          "id": "direction",
+          "label": {
+            "en": "Conversion",
+            "fr": "Conversion"
+          },
+          "level": "simple",
+          "options": [
+            "to_date",
+            "to_timestamp"
+          ],
+          "range": null,
+          "type": "enum"
+        },
+        {
+          "default": "seconds",
+          "id": "unit",
+          "label": {
+            "en": "Timestamp unit",
+            "fr": "Unité du timestamp"
+          },
+          "level": "simple",
+          "options": [
+            "seconds",
+            "milliseconds"
+          ],
+          "range": null,
+          "type": "enum"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "Convert an integer Unix timestamp to UTC or a UTC date to a timestamp."
+          ],
+          "fr": [
+            "Convertissez un entier Unix en date UTC, ou une date UTC en timestamp."
+          ]
+        },
+        "keywords": {
+          "en": [
+            "unix timestamp and utc date",
+            "unix timestamp utc"
+          ],
+          "fr": [
+            "timestamp unix et date utc",
+            "timestamp date utc"
+          ]
+        },
+        "related": []
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "convert.timestamp",
+        "name": {
+          "en": "Unix Timestamp and UTC Date",
+          "fr": "Timestamp Unix et date UTC"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "unix-timestamp-utc",
+          "fr": "timestamp-date-utc"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Convert an integer Unix timestamp to UTC or a UTC date to a timestamp.",
+          "fr": "Convertissez un entier Unix en date UTC, ou une date UTC en timestamp."
+        },
+        "ui": "auto",
+        "universe": "convert",
+        "version": "1.0.2",
+        "viral_priority": 1,
+        "web_worker": false
+      },
+      "variants": []
+    },
+    {
+      "inputs": [],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 10
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "result",
+          "type": "number"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "exact",
+          "type": "text"
+        }
+      ],
+      "params": [
+        {
+          "default": 1,
+          "id": "value",
+          "label": {
+            "en": "Value",
+            "fr": "Valeur"
+          },
+          "level": "simple",
+          "options": null,
+          "range": [
+            -1000000000000000.0,
+            1000000000000000.0
+          ],
+          "type": "number"
+        },
+        {
+          "default": "m",
+          "id": "from_unit",
+          "label": {
+            "en": "Source unit",
+            "fr": "Unité source"
+          },
+          "level": "simple",
+          "options": [
+            "mm",
+            "cm",
+            "m",
+            "km",
+            "in",
+            "ft",
+            "yd",
+            "mi",
+            "mg",
+            "g",
+            "kg",
+            "t",
+            "oz",
+            "lb",
+            "ms",
+            "s",
+            "min",
+            "h",
+            "day",
+            "ml",
+            "l",
+            "us_gal",
+            "m2",
+            "km2",
+            "ft2",
+            "ha",
+            "c",
+            "f",
+            "k",
+            "b",
+            "kb",
+            "mb",
+            "gb",
+            "kib",
+            "mib",
+            "gib"
+          ],
+          "range": null,
+          "type": "enum"
+        },
+        {
+          "default": "km",
+          "id": "to_unit",
+          "label": {
+            "en": "Target unit",
+            "fr": "Unité cible"
+          },
+          "level": "simple",
+          "options": [
+            "mm",
+            "cm",
+            "m",
+            "km",
+            "in",
+            "ft",
+            "yd",
+            "mi",
+            "mg",
+            "g",
+            "kg",
+            "t",
+            "oz",
+            "lb",
+            "ms",
+            "s",
+            "min",
+            "h",
+            "day",
+            "ml",
+            "l",
+            "us_gal",
+            "m2",
+            "km2",
+            "ft2",
+            "ha",
+            "c",
+            "f",
+            "k",
+            "b",
+            "kb",
+            "mb",
+            "gb",
+            "kib",
+            "mib",
+            "gib"
+          ],
+          "range": null,
+          "type": "enum"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "Length, mass, duration, volume, area, temperature and bytes."
+          ],
+          "fr": [
+            "Longueur, masse, durée, volume, surface, température et octets."
+          ]
+        },
+        "keywords": {
+          "en": [
+            "unit converter",
+            "unit converter"
+          ],
+          "fr": [
+            "convertisseur d’unités",
+            "convertisseur unites"
+          ]
+        },
+        "related": []
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "convert.units",
+        "name": {
+          "en": "Unit Converter",
+          "fr": "Convertisseur d’unités"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "unit-converter",
+          "fr": "convertisseur-unites"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Length, mass, duration, volume, area, temperature and bytes.",
+          "fr": "Longueur, masse, durée, volume, surface, température et octets."
+        },
+        "ui": "auto",
+        "universe": "convert",
+        "version": "1.0.2",
+        "viral_priority": 1,
+        "web_worker": false
+      },
+      "variants": []
+    },
+    {
+      "inputs": [
+        {
+          "id": "images",
+          "label": {
+            "en": "Images",
+            "fr": "Images"
+          },
+          "max_len": null,
+          "multiline": false,
+          "required": true,
+          "type": "files<image/*>"
+        }
+      ],
+      "limits": {
+        "max_batch": 100,
+        "max_input_bytes": "100MB",
+        "timeout_s": 180
+      },
+      "outputs": [
+        {
+          "default_format": "image/jpeg",
+          "formats": [
+            "image/jpeg",
+            "image/png",
+            "image/webp"
+          ],
+          "id": "compressed",
+          "type": "files<image/*>"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "original_bytes",
+          "type": "integer"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "compressed_bytes",
+          "type": "integer"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "saved_percent",
+          "type": "integer"
+        }
+      ],
+      "params": [
+        {
+          "default": 75,
+          "id": "quality",
+          "label": {
+            "en": "JPG quality (1-100)",
+            "fr": "Qualité JPG (1-100)"
+          },
+          "level": "simple",
+          "options": null,
+          "range": [
+            1.0,
+            100.0
+          ],
+          "type": "integer"
+        },
+        {
+          "default": "keep",
+          "id": "format",
+          "label": {
+            "en": "Output format",
+            "fr": "Format de sortie"
+          },
+          "level": "medium",
+          "options": [
+            "keep",
+            "jpg",
+            "png",
+            "webp"
+          ],
+          "range": null,
+          "type": "enum"
+        },
+        {
+          "default": 0,
+          "id": "max_side",
+          "label": {
+            "en": "Maximum side in px (0 = unchanged)",
+            "fr": "Taille maximale en px (0 = inchangée)"
+          },
+          "level": "medium",
+          "options": null,
+          "range": [
+            0.0,
+            20000.0
+          ],
+          "type": "integer"
+        },
+        {
+          "default": "256",
+          "id": "png_colors",
+          "label": {
+            "en": "PNG colors",
+            "fr": "Couleurs PNG"
+          },
+          "level": "pro",
+          "options": [
+            "256",
+            "full"
+          ],
+          "range": null,
+          "type": "enum"
+        }
+      ],
+      "permissions": {
+        "clipboard": "none",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "reduce a photo's file size to send it by email",
+            "compress png images for my website"
+          ],
+          "fr": [
+            "réduire le poids d'une photo pour l'envoyer par mail",
+            "compresser des images png pour mon site"
+          ]
+        },
+        "keywords": {
+          "en": [
+            "compress image",
+            "reduce photo size",
+            "shrink image",
+            "optimize image",
+            "jpg",
+            "png",
+            "webp"
+          ],
+          "fr": [
+            "compresser image",
+            "réduire le poids d'une photo",
+            "alléger image",
+            "optimiser image",
+            "jpg",
+            "png",
+            "webp"
+          ]
+        },
+        "related": [
+          "image.convert",
+          "pdf.merge"
+        ]
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "image.compress",
+        "name": {
+          "en": "Image Compressor",
+          "fr": "Compresseur d'images"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "image-compressor",
+          "fr": "compresseur-images"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Shrink your photos without uploading them anywhere.",
+          "fr": "Réduisez le poids de vos photos sans les envoyer nulle part."
+        },
+        "ui": "auto",
+        "universe": "image",
+        "version": "1.0.0",
+        "viral_priority": 1,
+        "web_worker": true
+      },
+      "variants": [
+        {
+          "id": "compress-jpg",
+          "name": {
+            "en": "Compress a JPG image",
+            "fr": "Compresser une image JPG"
+          },
+          "preset": {
+            "format": "jpg"
+          },
+          "slug": {
+            "en": "compress-jpg",
+            "fr": "compresser-jpg"
+          }
+        },
+        {
+          "id": "compress-png",
+          "name": {
+            "en": "Compress a PNG image",
+            "fr": "Compresser une image PNG"
+          },
+          "preset": {
+            "format": "png"
+          },
+          "slug": {
+            "en": "compress-png",
+            "fr": "compresser-png"
+          }
+        },
+        {
+          "id": "compress-photo-for-email",
+          "name": {
+            "en": "Reduce a photo for email",
+            "fr": "Réduire une photo pour un e-mail"
+          },
+          "preset": {
+            "format": "jpg",
+            "max_side": "1600",
+            "quality": "70"
+          },
+          "slug": {
+            "en": "reduce-photo-for-email",
+            "fr": "reduire-photo-pour-mail"
+          }
+        }
+      ]
+    },
+    {
+      "inputs": [
+        {
+          "id": "images",
+          "label": {
+            "en": "Images",
+            "fr": "Images"
+          },
+          "max_len": null,
+          "multiline": false,
+          "required": true,
+          "type": "files<image/*>"
+        }
+      ],
+      "limits": {
+        "max_batch": 100,
+        "max_input_bytes": "100MB",
+        "timeout_s": 120
+      },
+      "outputs": [
+        {
+          "default_format": "image/png",
+          "formats": [
+            "image/png",
+            "image/jpeg",
+            "image/webp",
+            "image/bmp",
+            "image/gif"
+          ],
+          "id": "converted",
+          "type": "files<image/*>"
+        }
+      ],
+      "params": [
+        {
+          "default": "png",
+          "id": "format",
+          "label": {
+            "en": "Output format",
+            "fr": "Format de sortie"
+          },
+          "level": "simple",
+          "options": [
+            "png",
+            "jpg",
+            "webp",
+            "bmp",
+            "gif"
+          ],
+          "range": null,
+          "type": "enum"
+        },
+        {
+          "default": 90,
+          "id": "quality",
+          "label": {
+            "en": "JPG quality (1-100)",
+            "fr": "Qualité JPG (1-100)"
+          },
+          "level": "medium",
+          "options": null,
+          "range": [
+            1.0,
+            100.0
+          ],
+          "type": "integer"
+        },
+        {
+          "default": "#FFFFFF",
+          "id": "background",
+          "label": {
+            "en": "Background for transparency (JPG, BMP)",
+            "fr": "Fond pour la transparence (JPG, BMP)"
+          },
+          "level": "pro",
+          "options": null,
+          "range": null,
+          "type": "color"
+        }
+      ],
+      "permissions": {
+        "clipboard": "none",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "convert a png image to jpg",
+            "turn webp images into png"
+          ],
+          "fr": [
+            "convertir une image png en jpg",
+            "transformer des images webp en png"
+          ]
+        },
+        "keywords": {
+          "en": [
+            "convert image",
+            "png to jpg",
+            "jpg to png",
+            "webp",
+            "converter",
+            "image"
+          ],
+          "fr": [
+            "convertir image",
+            "png en jpg",
+            "jpg en png",
+            "webp",
+            "convertisseur",
+            "image"
+          ]
+        },
+        "related": [
+          "pdf.merge"
+        ]
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "image.convert",
+        "name": {
+          "en": "Image Converter",
+          "fr": "Convertisseur d'images"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "image-converter",
+          "fr": "convertisseur-images"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "PNG, JPG, WebP, BMP, GIF: convert your images without uploading them.",
+          "fr": "PNG, JPG, WebP, BMP, GIF : convertissez vos images sans les envoyer."
+        },
+        "ui": "auto",
+        "universe": "image",
+        "version": "1.0.2",
+        "viral_priority": 1,
+        "web_worker": true
+      },
+      "variants": [
+        {
+          "id": "png-to-jpg",
+          "name": {
+            "en": "PNG to JPG Converter",
+            "fr": "Convertir PNG en JPG"
+          },
+          "preset": {
+            "format": "jpg"
+          },
+          "slug": {
+            "en": "png-to-jpg-converter",
+            "fr": "convertir-png-en-jpg"
+          }
+        },
+        {
+          "id": "jpg-to-png",
+          "name": {
+            "en": "JPG to PNG Converter",
+            "fr": "Convertir JPG en PNG"
+          },
+          "preset": {
+            "format": "png"
+          },
+          "slug": {
+            "en": "jpg-to-png-converter",
+            "fr": "convertir-jpg-en-png"
+          }
+        },
+        {
+          "id": "webp-to-png",
+          "name": {
+            "en": "WebP to PNG Converter",
+            "fr": "Convertir WebP en PNG"
+          },
+          "preset": {
+            "format": "png"
+          },
+          "slug": {
+            "en": "webp-to-png-converter",
+            "fr": "convertir-webp-en-png"
+          }
+        },
+        {
+          "id": "png-to-webp",
+          "name": {
+            "en": "PNG to WebP Converter",
+            "fr": "Convertir PNG en WebP"
+          },
+          "preset": {
+            "format": "webp"
+          },
+          "slug": {
+            "en": "png-to-webp-converter",
+            "fr": "convertir-png-en-webp"
+          }
+        },
+        {
+          "id": "jpg-to-webp",
+          "name": {
+            "en": "JPG to WebP Converter",
+            "fr": "Convertir JPG en WebP"
+          },
+          "preset": {
+            "format": "webp"
+          },
+          "slug": {
+            "en": "jpg-to-webp-converter",
+            "fr": "convertir-jpg-en-webp"
+          }
+        },
+        {
+          "id": "webp-to-jpg",
+          "name": {
+            "en": "WebP to JPG Converter",
+            "fr": "Convertir WebP en JPG"
+          },
+          "preset": {
+            "format": "jpg"
+          },
+          "slug": {
+            "en": "webp-to-jpg-converter",
+            "fr": "convertir-webp-en-jpg"
+          }
+        }
+      ]
+    },
+    {
+      "inputs": [
+        {
+          "id": "files",
+          "label": {
+            "en": "PDF files",
+            "fr": "Fichiers PDF"
+          },
+          "max_len": null,
+          "multiline": false,
+          "required": true,
+          "type": "files<application/pdf>"
+        }
+      ],
+      "limits": {
+        "max_batch": 50,
+        "max_input_bytes": "500MB",
+        "timeout_s": 120
+      },
+      "outputs": [
+        {
+          "default_format": "application/pdf",
+          "formats": [
+            "application/pdf"
+          ],
+          "id": "merged",
+          "type": "file<application/pdf>"
+        }
+      ],
+      "params": [
+        {
+          "default": false,
+          "id": "compress",
+          "label": {
+            "en": "Compress the result",
+            "fr": "Compresser le résultat"
+          },
+          "level": "pro",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        }
+      ],
+      "permissions": {
+        "clipboard": "none",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "merge several pdfs into one",
+            "combine pdf documents"
+          ],
+          "fr": [
+            "fusionner plusieurs pdf en un seul",
+            "assembler des documents pdf"
+          ]
+        },
+        "keywords": {
+          "en": [
+            "merge pdf",
+            "combine pdf",
+            "join pdf",
+            "pdf"
+          ],
+          "fr": [
+            "fusionner pdf",
+            "assembler pdf",
+            "joindre pdf",
+            "combiner pdf",
+            "pdf"
+          ]
+        },
+        "related": [
+          "secure.hash-calculator"
+        ]
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "pdf.merge",
+        "name": {
+          "en": "Merge PDF",
+          "fr": "Fusionner des PDF"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "merge-pdf",
+          "fr": "fusionner-pdf"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Combine several PDFs into one, without uploading them.",
+          "fr": "Assemblez plusieurs PDF en un seul, sans les envoyer nulle part."
+        },
+        "ui": "auto",
+        "universe": "pdf",
+        "version": "1.0.2",
+        "viral_priority": 1,
+        "web_worker": true
+      },
+      "variants": []
+    },
+    {
+      "inputs": [
+        {
+          "id": "content",
+          "label": {
+            "en": "Content (link, text…)",
+            "fr": "Contenu (lien, texte…)"
+          },
+          "max_len": 2048,
+          "multiline": false,
+          "required": true,
+          "type": "text"
+        }
+      ],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 10
+      },
+      "outputs": [
+        {
+          "default_format": "image/png",
+          "formats": [
+            "image/png",
+            "image/svg+xml"
+          ],
+          "id": "image",
+          "type": "file<image/*>"
+        }
+      ],
+      "params": [
+        {
+          "default": "png",
+          "id": "format",
+          "label": {
+            "en": "Format",
+            "fr": "Format"
+          },
+          "level": "simple",
+          "options": [
+            "png",
+            "svg"
+          ],
+          "range": null,
+          "type": "enum"
+        },
+        {
+          "default": 1024,
+          "id": "size",
+          "label": {
+            "en": "Size (px)",
+            "fr": "Taille (px)"
+          },
+          "level": "medium",
+          "options": null,
+          "range": [
+            64.0,
+            4096.0
+          ],
+          "type": "integer"
+        },
+        {
+          "default": "#0B0F19",
+          "id": "foreground",
+          "label": {
+            "en": "Module color",
+            "fr": "Couleur des modules"
+          },
+          "level": "medium",
+          "options": null,
+          "range": null,
+          "type": "color"
+        },
+        {
+          "default": "#FFFFFF",
+          "id": "background",
+          "label": {
+            "en": "Background color",
+            "fr": "Couleur de fond"
+          },
+          "level": "medium",
+          "options": null,
+          "range": null,
+          "type": "color"
+        },
+        {
+          "default": "M",
+          "id": "error_correction",
+          "label": {
+            "en": "Error correction",
+            "fr": "Correction d'erreur"
+          },
+          "level": "pro",
+          "options": [
+            "L",
+            "M",
+            "Q",
+            "H"
+          ],
+          "range": null,
+          "type": "enum"
+        },
+        {
+          "default": 4,
+          "id": "margin",
+          "label": {
+            "en": "Margin (modules)",
+            "fr": "Marge (modules)"
+          },
+          "level": "pro",
+          "options": null,
+          "range": [
+            0.0,
+            16.0
+          ],
+          "type": "integer"
+        }
+      ],
+      "permissions": {
+        "clipboard": "none",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "put a link in a qr code",
+            "make a qr code for my website"
+          ],
+          "fr": [
+            "mettre un lien dans un qr code",
+            "créer un qr code pour mon site"
+          ]
+        },
+        "keywords": {
+          "en": [
+            "qr code",
+            "qr generator",
+            "qrcode",
+            "link"
+          ],
+          "fr": [
+            "qr code",
+            "qrcode",
+            "code qr",
+            "générateur",
+            "lien",
+            "wifi"
+          ]
+        },
+        "related": [
+          "secure.password-generator"
+        ]
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "qr.generator",
+        "name": {
+          "en": "QR Code Generator",
+          "fr": "Générateur de QR code"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "qr-code-generator",
+          "fr": "generateur-qr-code"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Crisp, customizable QR codes, created on your device.",
+          "fr": "Des QR codes nets, personnalisables, créés sur votre appareil."
+        },
+        "ui": "auto",
+        "universe": "qr",
+        "version": "1.0.2",
+        "viral_priority": 1,
+        "web_worker": false
+      },
+      "variants": [
+        {
+          "id": "png",
+          "name": {
+            "en": "QR Code PNG Generator",
+            "fr": "Générateur de QR code PNG"
+          },
+          "preset": {
+            "format": "png"
+          },
+          "slug": {
+            "en": "qr-code-png-generator",
+            "fr": "qr-code-png"
+          }
+        },
+        {
+          "id": "svg",
+          "name": {
+            "en": "QR Code SVG Generator",
+            "fr": "Générateur de QR code SVG"
+          },
+          "preset": {
+            "format": "svg"
+          },
+          "slug": {
+            "en": "qr-code-svg-generator",
+            "fr": "qr-code-svg"
+          }
+        }
+      ]
+    },
+    {
+      "inputs": [
+        {
+          "id": "file",
+          "label": {
+            "en": "File",
+            "fr": "Fichier"
+          },
+          "max_len": null,
+          "multiline": false,
+          "required": false,
+          "type": "file<*/*>"
+        },
+        {
+          "id": "text",
+          "label": {
+            "en": "Text (if no file)",
+            "fr": "Texte (si aucun fichier)"
+          },
+          "max_len": 1000000,
+          "multiline": false,
+          "required": false,
+          "type": "text"
+        }
+      ],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": "2GB",
+        "timeout_s": 120
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "hash",
+          "type": "text"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "verdict",
+          "type": "text"
+        }
+      ],
+      "params": [
+        {
+          "default": "sha256",
+          "id": "algorithm",
+          "label": {
+            "en": "Algorithm",
+            "fr": "Algorithme"
+          },
+          "level": "simple",
+          "options": [
+            "sha256",
+            "sha1",
+            "md5",
+            "sha512"
+          ],
+          "range": null,
+          "type": "enum"
+        },
+        {
+          "default": false,
+          "id": "uppercase",
+          "label": {
+            "en": "Uppercase",
+            "fr": "Majuscules"
+          },
+          "level": "medium",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        },
+        {
+          "default": "",
+          "id": "compare_with",
+          "label": {
+            "en": "Compare with (expected hash)",
+            "fr": "Comparer avec (hash attendu)"
+          },
+          "level": "pro",
+          "options": null,
+          "range": null,
+          "type": "text"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "compute the sha256 of a file",
+            "verify a download's integrity"
+          ],
+          "fr": [
+            "calculer le sha256 d'un fichier",
+            "vérifier l'intégrité d'un téléchargement"
+          ]
+        },
+        "keywords": {
+          "en": [
+            "hash",
+            "sha256",
+            "md5",
+            "sha1",
+            "checksum",
+            "digest"
+          ],
+          "fr": [
+            "hash",
+            "sha256",
+            "md5",
+            "sha1",
+            "checksum",
+            "somme de contrôle",
+            "empreinte"
+          ]
+        },
+        "related": [
+          "secure.password-generator"
+        ]
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "secure.hash-calculator",
+        "name": {
+          "en": "Hash Calculator",
+          "fr": "Calculateur de hash"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "hash-calculator",
+          "fr": "calculateur-hash"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "MD5, SHA-1, SHA-256, SHA-512 of a text or a file, without uploading it.",
+          "fr": "MD5, SHA-1, SHA-256, SHA-512 d'un texte ou d'un fichier, sans l'envoyer."
+        },
+        "ui": "auto",
+        "universe": "secure",
+        "version": "1.0.2",
+        "viral_priority": 1,
+        "web_worker": true
+      },
+      "variants": [
+        {
+          "id": "sha256",
+          "name": {
+            "en": "SHA-256 Calculator",
+            "fr": "Calculateur SHA-256"
+          },
+          "preset": {
+            "algorithm": "sha256"
+          },
+          "slug": {
+            "en": "sha256-calculator",
+            "fr": "calculateur-sha256"
+          }
+        },
+        {
+          "id": "md5",
+          "name": {
+            "en": "MD5 Calculator",
+            "fr": "Calculateur MD5"
+          },
+          "preset": {
+            "algorithm": "md5"
+          },
+          "slug": {
+            "en": "md5-calculator",
+            "fr": "calculateur-md5"
+          }
+        }
+      ]
+    },
+    {
+      "inputs": [],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 5
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "password",
+          "type": "text"
+        }
+      ],
+      "params": [
+        {
+          "default": 16,
+          "id": "length",
+          "label": {
+            "en": "Length",
+            "fr": "Longueur"
+          },
+          "level": "simple",
+          "options": null,
+          "range": [
+            8.0,
+            128.0
+          ],
+          "type": "integer"
+        },
+        {
+          "default": true,
+          "id": "lowercase",
+          "label": {
+            "en": "Lowercase (a-z)",
+            "fr": "Minuscules (a-z)"
+          },
+          "level": "medium",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        },
+        {
+          "default": true,
+          "id": "uppercase",
+          "label": {
+            "en": "Uppercase (A-Z)",
+            "fr": "Majuscules (A-Z)"
+          },
+          "level": "medium",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        },
+        {
+          "default": true,
+          "id": "digits",
+          "label": {
+            "en": "Digits (0-9)",
+            "fr": "Chiffres (0-9)"
+          },
+          "level": "medium",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        },
+        {
+          "default": true,
+          "id": "symbols",
+          "label": {
+            "en": "Symbols (!@#…)",
+            "fr": "Symboles (!@#…)"
+          },
+          "level": "medium",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        },
+        {
+          "default": false,
+          "id": "exclude_ambiguous",
+          "label": {
+            "en": "Exclude ambiguous characters (0 O l 1 I)",
+            "fr": "Exclure les caractères ambigus (0 O l 1 I)"
+          },
+          "level": "pro",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "create a strong password",
+            "generate a random password"
+          ],
+          "fr": [
+            "créer un mot de passe sécurisé",
+            "générer un mot de passe aléatoire"
+          ]
+        },
+        "keywords": {
+          "en": [
+            "password",
+            "generator",
+            "random",
+            "secure",
+            "strong"
+          ],
+          "fr": [
+            "mot de passe",
+            "générateur",
+            "password",
+            "sécurisé",
+            "aléatoire"
+          ]
+        },
+        "related": []
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "secure.password-generator",
+        "name": {
+          "en": "Password Generator",
+          "fr": "Générateur de mots de passe"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "password-generator",
+          "fr": "generateur-mot-de-passe"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Strong passwords, generated on your device.",
+          "fr": "Des mots de passe solides, créés sur votre appareil."
+        },
+        "ui": "auto",
+        "universe": "secure",
+        "version": "1.0.2",
+        "viral_priority": 1,
+        "web_worker": false
+      },
+      "variants": [
+        {
+          "id": "16",
+          "name": {
+            "en": "16-character password",
+            "fr": "Mot de passe de 16 caractères"
+          },
+          "preset": {
+            "length": 16
+          },
+          "slug": {
+            "en": "16-character-password",
+            "fr": "mot-de-passe-16-caracteres"
+          }
+        },
+        {
+          "id": "pin",
+          "name": {
+            "en": "Random PIN",
+            "fr": "Code PIN aléatoire"
+          },
+          "preset": {
+            "length": 8,
+            "lowercase": false,
+            "symbols": false,
+            "uppercase": false
+          },
+          "slug": {
+            "en": "random-pin",
+            "fr": "code-pin-aleatoire"
+          }
+        }
+      ]
+    },
+    {
+      "inputs": [
+        {
+          "id": "text",
+          "label": {
+            "en": "Text to convert",
+            "fr": "Texte à convertir"
+          },
+          "max_len": 1000000,
+          "multiline": true,
+          "required": true,
+          "type": "text"
+        }
+      ],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 10
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "text",
+          "type": "text"
+        }
+      ],
+      "params": [
+        {
+          "default": "upper",
+          "id": "case",
+          "label": {
+            "en": "Case",
+            "fr": "Casse"
+          },
+          "level": "simple",
+          "options": [
+            "upper",
+            "lower",
+            "title",
+            "sentence",
+            "camel",
+            "pascal",
+            "snake",
+            "kebab",
+            "constant"
+          ],
+          "range": null,
+          "type": "enum"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "make a text uppercase",
+            "convert to snake_case"
+          ],
+          "fr": [
+            "mettre un texte en majuscules",
+            "transformer en snake_case"
+          ]
+        },
+        "keywords": {
+          "en": [
+            "uppercase",
+            "lowercase",
+            "case converter",
+            "camelcase",
+            "snake case",
+            "title case"
+          ],
+          "fr": [
+            "majuscules",
+            "minuscules",
+            "casse",
+            "camelcase",
+            "snake case",
+            "titre"
+          ]
+        },
+        "related": []
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "text.case-converter",
+        "name": {
+          "en": "Case Converter",
+          "fr": "Convertisseur de casse"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "case-converter",
+          "fr": "convertisseur-de-casse"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "UPPERCASE, lowercase, Title Case, camelCase, snake_case, kebab-case and more.",
+          "fr": "MAJUSCULES, minuscules, Titre, camelCase, snake_case, kebab-case et plus."
+        },
+        "ui": "auto",
+        "universe": "text",
+        "version": "1.0.2",
+        "viral_priority": 1,
+        "web_worker": false
+      },
+      "variants": [
+        {
+          "id": "uppercase",
+          "name": {
+            "en": "Uppercase Converter",
+            "fr": "Texte en majuscules"
+          },
+          "preset": {
+            "case": "upper"
+          },
+          "slug": {
+            "en": "uppercase-converter",
+            "fr": "texte-en-majuscules"
+          }
+        },
+        {
+          "id": "snake",
+          "name": {
+            "en": "snake_case Converter",
+            "fr": "Convertisseur snake_case"
+          },
+          "preset": {
+            "case": "snake"
+          },
+          "slug": {
+            "en": "snake-case-converter",
+            "fr": "convertisseur-snake-case"
+          }
+        },
+        {
+          "id": "camel",
+          "name": {
+            "en": "camelCase Converter",
+            "fr": "Convertisseur camelCase"
+          },
+          "preset": {
+            "case": "camel"
+          },
+          "slug": {
+            "en": "camel-case-converter",
+            "fr": "convertisseur-camel-case"
+          }
+        }
+      ]
+    },
+    {
+      "inputs": [
+        {
+          "id": "text",
+          "label": {
+            "en": "Text",
+            "fr": "Texte"
+          },
+          "max_len": 100000,
+          "multiline": true,
+          "required": true,
+          "type": "text"
+        }
+      ],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 10
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "text",
+          "type": "text"
+        }
+      ],
+      "params": [
+        {
+          "default": true,
+          "id": "collapse_spaces",
+          "label": {
+            "en": "Collapse repeated spaces",
+            "fr": "Réduire les espaces multiples"
+          },
+          "level": "medium",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        },
+        {
+          "default": false,
+          "id": "remove_empty",
+          "label": {
+            "en": "Remove blank lines",
+            "fr": "Supprimer les lignes vides"
+          },
+          "level": "medium",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        },
+        {
+          "default": true,
+          "id": "remove_invisible",
+          "label": {
+            "en": "Remove common invisible characters",
+            "fr": "Retirer les caractères invisibles courants"
+          },
+          "level": "pro",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "Clean whitespace, tabs and common invisible characters."
+          ],
+          "fr": [
+            "Nettoyez les espaces, tabulations et caractères invisibles courants."
+          ]
+        },
+        "keywords": {
+          "en": [
+            "text cleaner",
+            "text cleaner"
+          ],
+          "fr": [
+            "nettoyeur de texte",
+            "nettoyer texte"
+          ]
+        },
+        "related": []
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "text.cleaner",
+        "name": {
+          "en": "Text Cleaner",
+          "fr": "Nettoyeur de texte"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "text-cleaner",
+          "fr": "nettoyer-texte"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Clean whitespace, tabs and common invisible characters.",
+          "fr": "Nettoyez les espaces, tabulations et caractères invisibles courants."
+        },
+        "ui": "auto",
+        "universe": "text",
+        "version": "1.0.2",
+        "viral_priority": 1,
+        "web_worker": false
+      },
+      "variants": []
+    },
+    {
+      "inputs": [
+        {
+          "id": "text",
+          "label": {
+            "en": "Text",
+            "fr": "Texte"
+          },
+          "max_len": 100000,
+          "multiline": true,
+          "required": true,
+          "type": "text"
+        }
+      ],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 10
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "text",
+          "type": "text"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "removed",
+          "type": "integer"
+        }
+      ],
+      "params": [
+        {
+          "default": true,
+          "id": "case_sensitive",
+          "label": {
+            "en": "Case sensitive",
+            "fr": "Respecter la casse"
+          },
+          "level": "medium",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        },
+        {
+          "default": false,
+          "id": "trim",
+          "label": {
+            "en": "Ignore surrounding whitespace",
+            "fr": "Ignorer les espaces aux extrémités"
+          },
+          "level": "medium",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        },
+        {
+          "default": false,
+          "id": "remove_empty",
+          "label": {
+            "en": "Remove empty lines",
+            "fr": "Supprimer les lignes vides"
+          },
+          "level": "medium",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "Keep the first occurrence of each line in its original order."
+          ],
+          "fr": [
+            "Gardez la première occurrence de chaque ligne, dans son ordre initial."
+          ]
+        },
+        "keywords": {
+          "en": [
+            "remove duplicate lines",
+            "remove duplicate lines"
+          ],
+          "fr": [
+            "supprimer les lignes en double",
+            "supprimer doublons lignes"
+          ]
+        },
+        "related": []
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "text.deduplicate",
+        "name": {
+          "en": "Remove Duplicate Lines",
+          "fr": "Supprimer les lignes en double"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "remove-duplicate-lines",
+          "fr": "supprimer-doublons-lignes"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Keep the first occurrence of each line in its original order.",
+          "fr": "Gardez la première occurrence de chaque ligne, dans son ordre initial."
+        },
+        "ui": "auto",
+        "universe": "text",
+        "version": "1.0.2",
+        "viral_priority": 1,
+        "web_worker": false
+      },
+      "variants": []
+    },
+    {
+      "inputs": [
+        {
+          "id": "text",
+          "label": {
+            "en": "Text",
+            "fr": "Texte"
+          },
+          "max_len": 100000,
+          "multiline": true,
+          "required": true,
+          "type": "text"
+        }
+      ],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 10
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "text",
+          "type": "text"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "count",
+          "type": "integer"
+        }
+      ],
+      "params": [
+        {
+          "default": "",
+          "id": "search",
+          "label": {
+            "en": "Find",
+            "fr": "Texte à chercher"
+          },
+          "level": "simple",
+          "options": null,
+          "range": null,
+          "type": "text"
+        },
+        {
+          "default": "",
+          "id": "replacement",
+          "label": {
+            "en": "Replace with",
+            "fr": "Remplacer par"
+          },
+          "level": "simple",
+          "options": null,
+          "range": null,
+          "type": "text"
+        },
+        {
+          "default": false,
+          "id": "first_only",
+          "label": {
+            "en": "First occurrence only",
+            "fr": "Première occurrence uniquement"
+          },
+          "level": "medium",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "Replace exact text and count matching occurrences."
+          ],
+          "fr": [
+            "Remplacez un texte exact, avec comptage des occurrences."
+          ]
+        },
+        "keywords": {
+          "en": [
+            "find and replace",
+            "find and replace"
+          ],
+          "fr": [
+            "rechercher et remplacer",
+            "rechercher remplacer"
+          ]
+        },
+        "related": []
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "text.find-replace",
+        "name": {
+          "en": "Find and Replace",
+          "fr": "Rechercher et remplacer"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "find-and-replace",
+          "fr": "rechercher-remplacer"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Replace exact text and count matching occurrences.",
+          "fr": "Remplacez un texte exact, avec comptage des occurrences."
+        },
+        "ui": "auto",
+        "universe": "text",
+        "version": "1.0.2",
+        "viral_priority": 1,
+        "web_worker": false
+      },
+      "variants": []
+    },
+    {
+      "inputs": [],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 10
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "text",
+          "type": "text"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "words",
+          "type": "integer"
+        }
+      ],
+      "params": [
+        {
+          "default": "paragraphs",
+          "id": "unit",
+          "label": {
+            "en": "Unit",
+            "fr": "Unité"
+          },
+          "level": "simple",
+          "options": [
+            "paragraphs",
+            "words"
+          ],
+          "range": null,
+          "type": "enum"
+        },
+        {
+          "default": 3,
+          "id": "count",
+          "label": {
+            "en": "Count (max. 100 paragraphs or 1,000 words)",
+            "fr": "Quantité (100 paragraphes ou 1 000 mots max.)"
+          },
+          "level": "simple",
+          "options": null,
+          "range": [
+            1.0,
+            1000.0
+          ],
+          "type": "integer"
+        },
+        {
+          "default": 60,
+          "id": "words_per_paragraph",
+          "label": {
+            "en": "Words per paragraph",
+            "fr": "Mots par paragraphe"
+          },
+          "level": "medium",
+          "options": null,
+          "range": [
+            10.0,
+            200.0
+          ],
+          "type": "integer"
+        },
+        {
+          "default": true,
+          "id": "classic_start",
+          "label": {
+            "en": "Start with Lorem ipsum",
+            "fr": "Commencer par Lorem ipsum"
+          },
+          "level": "medium",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "Generate placeholder words or paragraphs without a connection."
+          ],
+          "fr": [
+            "Créez du texte de remplissage par mots ou paragraphes, sans connexion."
+          ]
+        },
+        "keywords": {
+          "en": [
+            "lorem ipsum generator",
+            "lorem ipsum generator"
+          ],
+          "fr": [
+            "générateur lorem ipsum",
+            "generateur lorem ipsum"
+          ]
+        },
+        "related": []
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "text.lorem-ipsum",
+        "name": {
+          "en": "Lorem Ipsum Generator",
+          "fr": "Générateur Lorem ipsum"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "lorem-ipsum-generator",
+          "fr": "generateur-lorem-ipsum"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Generate placeholder words or paragraphs without a connection.",
+          "fr": "Créez du texte de remplissage par mots ou paragraphes, sans connexion."
+        },
+        "ui": "auto",
+        "universe": "text",
+        "version": "1.0.2",
+        "viral_priority": 1,
+        "web_worker": false
+      },
+      "variants": []
+    },
+    {
+      "inputs": [
+        {
+          "id": "text",
+          "label": {
+            "en": "Text",
+            "fr": "Texte"
+          },
+          "max_len": 100000,
+          "multiline": true,
+          "required": true,
+          "type": "text"
+        }
+      ],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 10
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "text",
+          "type": "text"
+        }
+      ],
+      "params": [
+        {
+          "default": "dash",
+          "id": "separator",
+          "label": {
+            "en": "Separator",
+            "fr": "Séparateur"
+          },
+          "level": "simple",
+          "options": [
+            "dash",
+            "underscore"
+          ],
+          "range": null,
+          "type": "enum"
+        },
+        {
+          "default": true,
+          "id": "ascii_only",
+          "label": {
+            "en": "Transliterate to ASCII",
+            "fr": "Translittérer en ASCII"
+          },
+          "level": "medium",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        },
+        {
+          "default": 80,
+          "id": "max_length",
+          "label": {
+            "en": "Maximum length (characters)",
+            "fr": "Longueur maximale (caractères)"
+          },
+          "level": "pro",
+          "options": null,
+          "range": [
+            1.0,
+            200.0
+          ],
+          "type": "integer"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "Turn a title into a readable URL slug with transliteration and a choice of separator."
+          ],
+          "fr": [
+            "Transformez un titre en slug lisible, avec accents translittérés et séparateur au choix."
+          ]
+        },
+        "keywords": {
+          "en": [
+            "slug generator",
+            "slug generator"
+          ],
+          "fr": [
+            "générateur de slug",
+            "generateur slug"
+          ]
+        },
+        "related": []
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "text.slug-generator",
+        "name": {
+          "en": "Slug Generator",
+          "fr": "Générateur de slug"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "slug-generator",
+          "fr": "generateur-slug"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Turn a title into a readable URL slug with transliteration and a choice of separator.",
+          "fr": "Transformez un titre en slug lisible, avec accents translittérés et séparateur au choix."
+        },
+        "ui": "auto",
+        "universe": "text",
+        "version": "1.0.2",
+        "viral_priority": 1,
+        "web_worker": false
+      },
+      "variants": []
+    },
+    {
+      "inputs": [
+        {
+          "id": "text",
+          "label": {
+            "en": "One entry per line",
+            "fr": "Une entrée par ligne"
+          },
+          "max_len": 5000000,
+          "multiline": true,
+          "required": true,
+          "type": "text"
+        }
+      ],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 10
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "text",
+          "type": "text"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "lines",
+          "type": "integer"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "removed",
+          "type": "integer"
+        }
+      ],
+      "params": [
+        {
+          "default": "asc",
+          "id": "sort",
+          "label": {
+            "en": "Sort",
+            "fr": "Tri"
+          },
+          "level": "simple",
+          "options": [
+            "none",
+            "asc",
+            "desc",
+            "length",
+            "reverse"
+          ],
+          "range": null,
+          "type": "enum"
+        },
+        {
+          "default": true,
+          "id": "dedupe",
+          "label": {
+            "en": "Remove duplicates",
+            "fr": "Supprimer les doublons"
+          },
+          "level": "simple",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        },
+        {
+          "default": false,
+          "id": "ignore_case",
+          "label": {
+            "en": "Ignore case",
+            "fr": "Ignorer la casse"
+          },
+          "level": "medium",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        },
+        {
+          "default": true,
+          "id": "trim",
+          "label": {
+            "en": "Trim spaces around lines",
+            "fr": "Retirer les espaces autour des lignes"
+          },
+          "level": "medium",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        },
+        {
+          "default": true,
+          "id": "remove_empty",
+          "label": {
+            "en": "Remove empty lines",
+            "fr": "Supprimer les lignes vides"
+          },
+          "level": "medium",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "remove duplicates from a list",
+            "sort a list alphabetically"
+          ],
+          "fr": [
+            "supprimer les doublons d'une liste",
+            "trier une liste par ordre alphabétique"
+          ]
+        },
+        "keywords": {
+          "en": [
+            "sort lines",
+            "remove duplicates",
+            "alphabetical order",
+            "list",
+            "deduplicate"
+          ],
+          "fr": [
+            "trier des lignes",
+            "supprimer les doublons",
+            "ordre alphabétique",
+            "liste",
+            "dédoublonner"
+          ]
+        },
+        "related": []
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "text.sort-lines",
+        "name": {
+          "en": "Sort and Deduplicate Lines",
+          "fr": "Trier et dédupliquer des lignes"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "sort-lines",
+          "fr": "trier-lignes"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Sort, reverse and remove duplicates from a list, line by line.",
+          "fr": "Triez, inversez et supprimez les doublons d'une liste, ligne par ligne."
+        },
+        "ui": "auto",
+        "universe": "text",
+        "version": "1.0.2",
+        "viral_priority": 2,
+        "web_worker": false
+      },
+      "variants": [
+        {
+          "id": "dedupe",
+          "name": {
+            "en": "Remove Duplicate Lines",
+            "fr": "Supprimer les doublons d'une liste"
+          },
+          "preset": {
+            "dedupe": true,
+            "sort": "none"
+          },
+          "slug": {
+            "en": "remove-duplicate-lines",
+            "fr": "supprimer-doublons-liste"
+          }
+        },
+        {
+          "id": "alphabetical",
+          "name": {
+            "en": "Alphabetical Sorter",
+            "fr": "Trier par ordre alphabétique"
+          },
+          "preset": {
+            "dedupe": false,
+            "sort": "asc"
+          },
+          "slug": {
+            "en": "alphabetical-sorter",
+            "fr": "trier-par-ordre-alphabetique"
+          }
+        }
+      ]
+    },
+    {
+      "inputs": [
+        {
+          "id": "text",
+          "label": {
+            "en": "Your text",
+            "fr": "Votre texte"
+          },
+          "max_len": 2000000,
+          "multiline": true,
+          "required": true,
+          "type": "text"
+        }
+      ],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 10
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "words",
+          "type": "integer"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "characters",
+          "type": "integer"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "characters_no_spaces",
+          "type": "integer"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "sentences",
+          "type": "integer"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "paragraphs",
+          "type": "integer"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "lines",
+          "type": "integer"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "reading_minutes",
+          "type": "number"
+        }
+      ],
+      "params": [
+        {
+          "default": 230,
+          "id": "wpm",
+          "label": {
+            "en": "Reading speed (words per minute)",
+            "fr": "Vitesse de lecture (mots par minute)"
+          },
+          "level": "medium",
+          "options": null,
+          "range": [
+            50.0,
+            1000.0
+          ],
+          "type": "integer"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "count the words in a text",
+            "how many characters in my text"
+          ],
+          "fr": [
+            "compter les mots d'un texte",
+            "savoir combien de caractères dans mon texte"
+          ]
+        },
+        "keywords": {
+          "en": [
+            "word counter",
+            "character count",
+            "count words",
+            "reading time",
+            "text"
+          ],
+          "fr": [
+            "compteur de mots",
+            "nombre de caractères",
+            "compter les mots",
+            "temps de lecture",
+            "texte"
+          ]
+        },
+        "related": []
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "text.word-counter",
+        "name": {
+          "en": "Word and Character Counter",
+          "fr": "Compteur de mots et de caractères"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "word-counter",
+          "fr": "compteur-de-mots"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Words, characters, sentences, paragraphs and reading time, right on your device.",
+          "fr": "Mots, caractères, phrases, paragraphes et temps de lecture, en direct sur votre appareil."
+        },
+        "ui": "auto",
+        "universe": "text",
+        "version": "1.0.2",
+        "viral_priority": 1,
+        "web_worker": false
+      },
+      "variants": [
+        {
+          "id": "characters",
+          "name": {
+            "en": "Character Counter",
+            "fr": "Compteur de caractères"
+          },
+          "preset": {
+            "wpm": 230
+          },
+          "slug": {
+            "en": "character-counter",
+            "fr": "compteur-de-caracteres"
+          }
+        }
+      ]
+    }
+  ]
+}

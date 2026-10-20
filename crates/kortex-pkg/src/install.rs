@@ -1,6 +1,5 @@
 use std::io::Read;
 use std::path::{Path, PathBuf};
-use std::time::{SystemTime, UNIX_EPOCH};
 
 use flate2::read::GzDecoder;
 
@@ -18,9 +17,7 @@ const MAX_FILE: u64 = 800 * 1024 * 1024;
 const MAX_MANIFEST: u64 = 64 * 1024;
 
 fn now() -> u64 {
-    SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .map_or(0, |d| d.as_secs())
+    kortex_platform::now_ms() / 1000
 }
 
 fn display_name(r: &ToolRelease, id: &str) -> String {
@@ -154,25 +151,29 @@ pub fn install(
     progress("install");
     let dir = home.tools_dir().join(id);
     let final_dir = dir.join(&release.version);
-    let stage = dir.join(format!(".stage-{}-{}", std::process::id(), now()));
-    std::fs::create_dir_all(&stage)?;
+    let stage = dir.join(format!(
+        ".stage-{}-{}",
+        kortex_platform::native::process_id(),
+        now()
+    ));
+    kortex_platform::native::fs::create_dir_all(&stage)?;
     let written = (|| -> Result<()> {
         let bin_path = stage.join(&expected);
-        std::fs::write(&bin_path, &binary)?;
+        kortex_platform::native::fs::write(&bin_path, &binary)?;
         shortcuts::set_exec(&bin_path)?;
-        std::fs::write(
+        kortex_platform::native::fs::write(
             stage.join("manifest.json"),
             serde_json::to_vec_pretty(&manifest)
                 .map_err(|e| PkgError::new(Kind::Parse, e.to_string()))?,
         )?;
-        if final_dir.exists() {
-            std::fs::remove_dir_all(&final_dir)?;
+        if kortex_platform::native::fs::exists(&final_dir) {
+            kortex_platform::native::fs::remove_dir_all(&final_dir)?;
         }
-        std::fs::rename(&stage, &final_dir)?;
+        kortex_platform::native::fs::rename(&stage, &final_dir)?;
         Ok(())
     })();
     if let Err(e) = written {
-        let _ = std::fs::remove_dir_all(&stage);
+        let _ = kortex_platform::native::fs::remove_dir_all(&stage);
         return Err(e);
     }
     let rel = PathBuf::from("tools")
@@ -188,10 +189,10 @@ pub fn install(
     reg.tools.insert(id.to_owned(), entry.clone());
     home.save_registry(&reg)?;
     // Old versions are removed only once the new one is registered.
-    if let Ok(rd) = std::fs::read_dir(&dir) {
+    if let Ok(rd) = kortex_platform::native::fs::read_dir(&dir) {
         for e in rd.filter_map(std::result::Result::ok) {
             if e.file_name().to_string_lossy() != release.version.as_str() {
-                let _ = std::fs::remove_dir_all(e.path());
+                let _ = kortex_platform::native::fs::remove_dir_all(e.path());
             }
         }
     }
@@ -241,8 +242,8 @@ pub fn remove(home: &Home, id: &str, display: &str) -> Result<()> {
     }
     home.save_registry(&reg)?;
     let dir = home.tools_dir().join(id);
-    if dir.exists() {
-        std::fs::remove_dir_all(&dir)?;
+    if kortex_platform::native::fs::exists(&dir) {
+        kortex_platform::native::fs::remove_dir_all(&dir)?;
     }
     shortcuts::remove(home, id, display);
     Ok(())
@@ -311,10 +312,10 @@ fn check(name: &str, ok: bool, detail: impl Into<String>) -> Check {
 pub fn doctor(home: &Home) -> Vec<Check> {
     let mut out = Vec::new();
     out.push(
-        match std::fs::create_dir_all(home.root()).and_then(|()| {
+        match kortex_platform::native::fs::create_dir_all(home.root()).and_then(|()| {
             let probe = home.root().join(".write-test");
-            std::fs::write(&probe, b"x")?;
-            std::fs::remove_file(probe)
+            kortex_platform::native::fs::write(&probe, b"x")?;
+            kortex_platform::native::fs::remove_file(probe)
         }) {
             Ok(()) => check("dossier", true, home.root().display().to_string()),
             Err(e) => check("dossier", false, format!("{} : {e}", home.root().display())),
@@ -350,9 +351,9 @@ pub fn doctor(home: &Home) -> Vec<Check> {
         let path = home.binary_path(t);
         let manifest: Option<Manifest> = path
             .parent()
-            .and_then(|d| std::fs::read(d.join("manifest.json")).ok())
+            .and_then(|d| kortex_platform::native::fs::read(d.join("manifest.json")).ok())
             .and_then(|b| serde_json::from_slice(&b).ok());
-        out.push(match (std::fs::read(&path), manifest) {
+        out.push(match (kortex_platform::native::fs::read(&path), manifest) {
             (Ok(bytes), Some(m)) if sha256_hex(&bytes).eq_ignore_ascii_case(&m.sha256_binary) => {
                 check(id, true, format!("v{} intact", t.version))
             }
@@ -408,15 +409,15 @@ pub fn self_update(
     }
     let new = exe.with_extension("new");
     let old = exe.with_extension("old");
-    std::fs::write(&new, &binary)?;
+    kortex_platform::native::fs::write(&new, &binary)?;
     shortcuts::set_exec(&new)?;
-    let _ = std::fs::remove_file(&old);
-    std::fs::rename(exe, &old)?;
-    if let Err(e) = std::fs::rename(&new, exe) {
-        let _ = std::fs::rename(&old, exe); // roll back: never leave the user without a CLI
+    let _ = kortex_platform::native::fs::remove_file(&old);
+    kortex_platform::native::fs::rename(exe, &old)?;
+    if let Err(e) = kortex_platform::native::fs::rename(&new, exe) {
+        let _ = kortex_platform::native::fs::rename(&old, exe); // roll back: never leave the user without a CLI
         return Err(e.into());
     }
-    let _ = std::fs::remove_file(&old);
+    let _ = kortex_platform::native::fs::remove_file(&old);
     Ok(Some(cli.version.clone()))
 }
 

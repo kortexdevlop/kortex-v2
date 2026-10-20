@@ -1,0 +1,157 @@
+name: deploy
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/deploy.yml'
+      - '.github/web-build.json'
+      - 'scripts/verify-web-*'
+      - 'scripts/prepare-publish.mjs'
+      - 'scripts/publish.mjs'
+  workflow_dispatch:
+    inputs:
+      source_run:
+        description: 'Completed release run containing verified web bundles'
+        required: true
+        type: string
+      publish:
+        description: 'Publish prepared static assets using Cloudflare secrets'
+        type: boolean
+        default: false
+concurrency:
+  group: static-production
+  cancel-in-progress: false
+permissions:
+  contents: read
+  actions: read
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SOURCE_RUN: ${{ inputs.source_run }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check build provenance
+        run: |
+          set -euo pipefail
+          if [ -z "$SOURCE_RUN" ]; then SOURCE_RUN=$(node -p 'JSON.parse(require("fs").readFileSync(".github/web-build.json","utf8")).source_run'); fi
+          [[ "$SOURCE_RUN" =~ ^[0-9]+$ ]] || exit 1
+          echo "SOURCE_RUN=$SOURCE_RUN" >> "$GITHUB_ENV"
+          mkdir -p .kortex/publication
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$SOURCE_RUN" > .kortex/publication/run.json
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$SOURCE_RUN/jobs?per_page=100" > .kortex/publication/jobs.json
+          node --input-type=module <<'JS'
+          import {readFileSync,appendFileSync} from 'node:fs';
+          const run=JSON.parse(readFileSync('.kortex/publication/run.json'));
+          const jobs=JSON.parse(readFileSync('.kortex/publication/jobs.json')).jobs;
+          if(run.repository.full_name!==process.env.GITHUB_REPOSITORY||run.path!=='.github/workflows/release.yml'||run.status!=='completed'||!/^([a-f0-9]{40})$/.test(run.head_sha)||!jobs.some(job=>job.name==='web'&&job.conclusion==='success'))throw Error('Unverified release source');
+          if(process.env.GITHUB_EVENT_NAME==='pull_request'){const selected=JSON.parse(readFileSync('.github/web-build.json'));if(String(run.id)!==selected.source_run||run.head_sha!==selected.source_commit)throw Error('Published build reference mismatch');}
+          appendFileSync(process.env.GITHUB_ENV,`SOURCE_COMMIT=${run.head_sha}\n`);
+          JS
+      - name: Download selected web artifact
+        run: |
+          set -euo pipefail
+          git cat-file -e "$SOURCE_COMMIT" || git fetch origin "$SOURCE_COMMIT"
+          gh run download "$SOURCE_RUN" --repo "$GITHUB_REPOSITORY" --name web-bundles-and-receipts --dir .kortex/publication/input
+      - run: rustup show
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Verify inventory, compiled sources and output receipts
+        run: node scripts/verify-web-artifacts.mjs .kortex/publication/input "$SOURCE_COMMIT"
+      - uses: Swatinem/rust-cache@v2
+      - name: Build site and prepare static delivery
+        run: |
+          set -euo pipefail
+          cargo xtask tokens
+          cargo xtask registry
+          cargo xtask icons
+          pnpm site:build
+          node scripts/prepare-publish.mjs
+          node --input-type=module <<'JS'
+          import {readFileSync,writeFileSync,cpSync,mkdirSync} from 'node:fs';
+          const inventory=JSON.parse(readFileSync('dist/publish/inventory.json'));
+          mkdirSync('dist/publish/.publication/configs',{recursive:true});
+          for(const name of Object.keys(inventory)){
+            if(!/^[a-z]+$/.test(name))throw Error('Invalid deployment target');
+            cpSync(`services/${name}/wrangler.jsonc`,`dist/publish/.publication/configs/${name}.jsonc`);
+          }
+          cpSync('.kortex/verification/web-artifacts.json','dist/publish/.publication/web-artifacts.json');
+          writeFileSync('dist/publish/.publication/provenance.json',JSON.stringify({source_run:process.env.SOURCE_RUN,source_commit:process.env.SOURCE_COMMIT,publication_commit:process.env.GITHUB_SHA,published:false},null,2));
+          JS
+      - uses: actions/upload-artifact@v4
+        with:
+          name: prepared-static-publication
+          path: dist/publish/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 7
+  publish:
+    if: github.event_name == 'workflow_dispatch' && inputs.publish
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      WRANGLER_SEND_METRICS: 'false'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Require scoped deployment credentials
+        run: |
+          test -n "$CLOUDFLARE_API_TOKEN" || { echo '::error::CLOUDFLARE_API_TOKEN is missing'; exit 1; }
+          test -n "$CLOUDFLARE_ACCOUNT_ID" || { echo '::error::CLOUDFLARE_ACCOUNT_ID is missing'; exit 1; }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - uses: actions/download-artifact@v4
+        with:
+          name: prepared-static-publication
+          path: dist/publish
+      - name: Restore prepared static configurations
+        run: |
+          node --input-type=module <<'JS'
+          import {readFileSync,cpSync,mkdirSync} from 'node:fs';
+          const inventory=JSON.parse(readFileSync('dist/publish/inventory.json'));
+          for(const name of Object.keys(inventory)){
+            if(!/^[a-z]+$/.test(name))throw Error('Invalid deployment target');
+            mkdirSync(`services/${name}`,{recursive:true});
+            cpSync(`dist/publish/.publication/configs/${name}.jsonc`,`services/${name}/wrangler.jsonc`);
+          }
+          JS
+      - name: Publish static targets with API health gate
+        run: |
+          set -euo pipefail
+          mkdir -p .kortex/publication
+          npm exec --yes --package=wrangler@4.151.0 -- node scripts/publish.mjs --static-only | tee .kortex/publication/deploy.log
+      - name: Verify public entries and record versions
+        run: |
+          node --input-type=module <<'JS'
+          import {readFileSync,writeFileSync} from 'node:fs';
+          import {createHash} from 'node:crypto';
+          const proof=JSON.parse(readFileSync('dist/publish/.publication/web-artifacts.json'));
+          const inventory=JSON.parse(readFileSync('dist/publish/inventory.json'));
+          const entries=[...Object.entries(proof.tools).map(([id,item])=>({url:`https://${inventory.run.host}/${id}/`,hash:item.files['index.html']})),...Object.entries(proof.apps).map(([id,item])=>({url:`https://${inventory[id.replace(/^apps\./,'')].host}/`,hash:item.files['index.html']}))];
+          for(let i=0;i<entries.length;i+=4)await Promise.all(entries.slice(i,i+4).map(async({url,hash})=>{
+            const response=await fetch(url,{cache:'no-store',redirect:'error',signal:AbortSignal.timeout(30000)});
+            if(!response.ok||createHash('sha256').update(Buffer.from(await response.arrayBuffer())).digest('hex')!==hash)throw Error(`Published entry mismatch: ${url}`);
+          }));
+          const log=readFileSync('.kortex/publication/deploy.log','utf8');
+          const versions=Object.fromEntries([...log.matchAll(/Uploaded kortex-(\w+)[\s\S]*?Current Version ID: ([a-f0-9-]+)/g)].map(match=>[match[1],match[2]]));
+          if(Object.keys(versions).length!==Object.keys(inventory).length)throw Error('Missing deployed version receipt');
+          const provenance=JSON.parse(readFileSync('dist/publish/.publication/provenance.json'));
+          writeFileSync('.kortex/publication/deployed.json',JSON.stringify({...provenance,published:true,versions,verified_entries:entries.length},null,2));
+          JS
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: static-publication-result
+          path: .kortex/publication/
+          if-no-files-found: warn
+          retention-days: 7

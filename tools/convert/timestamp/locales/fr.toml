@@ -1,0 +1,17 @@
+[ui]
+title = "Timestamp Unix et date UTC"
+[errors]
+empty_input = "Saisissez un texte."
+invalid_param = "Valeur invalide."
+missing_input = "Ajoutez le contenu à traiter."
+cancelled = "Annulé."
+division_by_zero = "Ce calcul exige une base non nulle."
+invalid_color = "Couleur invalide : vérifiez le format et les composantes."
+empty_slug = "Le texte ne contient aucun caractère utilisable pour ce slug."
+[outputs]
+text = "Résultat"
+[options]
+direction_to_date = "Timestamp → date UTC"
+direction_to_timestamp = "Date UTC → timestamp"
+unit_seconds = "Secondes"
+unit_milliseconds = "Millisecondes"

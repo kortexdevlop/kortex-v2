@@ -2,10 +2,11 @@ schema = 1
 
 [tool]
 id = "pdf.merge"
-version = "1.0.0"
+version = "1.0.2"
 universe = "pdf"
 status = "beta"
 ui = "auto"
+web_worker = true
 platforms = ["web", "desktop"]
 offline = true
 ai = false

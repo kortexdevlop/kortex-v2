@@ -1,0 +1,94 @@
+schema = 1
+[tool]
+id = "calc.fuel-cost"
+version = "1.0.2"
+universe = "calc"
+status = "beta"
+ui = "auto"
+platforms = ["web", "desktop"]
+offline = true
+ai = false
+viral_priority = 1
+[tool.name]
+fr = "Coût d’un trajet"
+en = "Fuel Cost Calculator"
+[tool.tagline]
+fr = "Estimez carburant, coût total et part par voyageur."
+en = "Estimate fuel use, total cost and cost per traveller."
+[tool.slug]
+fr = "cout-trajet-carburant"
+en = "fuel-cost-calculator"
+[search]
+keywords.fr = ["coût d’un trajet", "cout trajet carburant"]
+keywords.en = ["fuel cost calculator", "fuel cost calculator"]
+intents.fr = ["Estimez carburant, coût total et part par voyageur."]
+intents.en = ["Estimate fuel use, total cost and cost per traveller."]
+related = []
+[limits]
+timeout_s = 10
+
+[[params]]
+id = "distance"
+type = "number"
+default = 100
+level = "simple"
+label = { fr = "Distance totale (km)", en = "Total distance (km)" }
+range = [0, 10000000.0]
+
+[[params]]
+id = "consumption"
+type = "number"
+default = 6
+level = "simple"
+label = { fr = "Consommation (L/100 km)", en = "Consumption (L/100 km)" }
+range = [0, 1000]
+
+[[params]]
+id = "price"
+type = "number"
+default = 1.8
+level = "simple"
+label = { fr = "Prix par litre", en = "Price per litre" }
+range = [0, 1000000.0]
+
+[[params]]
+id = "extra"
+type = "number"
+default = 0
+level = "medium"
+label = { fr = "Autres frais (péages, parking)", en = "Other costs (tolls, parking)" }
+range = [0, 1000000000.0]
+
+[[params]]
+id = "people"
+type = "integer"
+default = 1
+level = "medium"
+label = { fr = "Voyageurs", en = "Travellers" }
+range = [1, 1000]
+
+[[params]]
+id = "return_trip"
+type = "bool"
+default = false
+level = "medium"
+label = { fr = "Doubler la distance pour l’aller-retour", en = "Double distance for a return trip" }
+
+[[outputs]]
+id = "litres"
+type = "number"
+
+[[outputs]]
+id = "total"
+type = "number"
+
+[[outputs]]
+id = "per_person"
+type = "number"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "write"
+sensitive = false
+privacy = "local"

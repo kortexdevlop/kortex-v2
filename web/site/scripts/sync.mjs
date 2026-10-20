@@ -1,5 +1,6 @@
 // Copies generated design CSS and builds the site data from registry + tool content.
-import { cpSync, mkdirSync, readFileSync, readdirSync, existsSync, writeFileSync } from 'node:fs';
+import { cpSync, mkdirSync, readFileSync, readdirSync, existsSync, writeFileSync, rmSync } from 'node:fs';
+import { publicFeatures } from '../../../scripts/public-features.mjs';
 import { join, resolve } from 'node:path';
 
 const root = resolve(import.meta.dirname, '../../..');
@@ -15,17 +16,30 @@ for (const dir of ['icons', 'og']) {
 
 // Installers (served as kortex.site/install.sh and /install.ps1) and, when a release was built, the
 // signed index with the CLI pointer file used by the installers.
-for (const f of ['install.sh', 'install.ps1']) {
-  const src = join(root, 'installers', f);
-  if (existsSync(src)) cpSync(src, join(out, 'public', f));
-}
-const rel = join(root, 'dist/release');
-if (existsSync(join(rel, 'index.json'))) {
+const features = publicFeatures(root);
+const desktopReleases = features.desktop;
+// Never expose local release-test indexes or installation commands in a public build.
+for (const f of ['install.sh', 'install.ps1', 'registry']) rmSync(join(out, 'public', f), { recursive: true, force: true });
+if (desktopReleases) {
+  const rel = process.env.KORTEX_RELEASE_DIR;
+  if (!rel) throw new Error('KORTEX_RELEASE_DIR is required to publish desktop releases');
+  // A local release test (relative package names, one platform) must never reach the public registry:
+  // the installers need absolute https package URLs and every platform of the published release.
+  const published = JSON.parse(readFileSync(join(rel, 'index.json'), 'utf8'));
+  const targets = new Set(Object.keys(published.cli?.targets ?? {}));
+  const urls = [...Object.values(published.cli?.targets ?? {}), ...Object.values(published.tools ?? {}).flatMap((t) => Object.values(t.targets ?? {}))].map((t) => t.url);
+  const wanted = ['aarch64-apple-darwin', 'x86_64-apple-darwin', 'x86_64-pc-windows-msvc', 'x86_64-unknown-linux-gnu'];
+  if (urls.length === 0 || urls.some((u) => !/^https:\/\//.test(u)) || wanted.some((t) => !targets.has(t))) {
+    throw new Error(`${join(rel, 'index.json')} is not a published release index (needs absolute https URLs and ${wanted.join(', ')}); download the GitHub release files instead of using a local test build`);
+  }
+  for (const f of ['install.sh', 'install.ps1']) cpSync(join(root, 'installers', f), join(out, 'public', f));
   mkdirSync(join(out, 'public/registry'), { recursive: true });
-  for (const f of ['index.json', 'index.json.sig', 'cli-latest.txt']) if (existsSync(join(rel, f))) cpSync(join(rel, f), join(out, 'public/registry', f));
+  for (const f of ['index.json', 'index.json.sig', 'cli-latest.txt']) cpSync(join(rel, f), join(out, 'public/registry', f));
+  // Signed contract catalogue (ADR 0034): apps fetch it at runtime, so a new tool needs no app rebuild.
+  for (const f of ['catalog.json', 'catalog.json.sig']) if (existsSync(join(rel, f))) cpSync(join(rel, f), join(out, 'public/registry', f));
 }
 
-const registry = JSON.parse(readFileSync(join(root, 'registry/index.json'), 'utf8'));
+const registry = JSON.parse(readFileSync(join(root, 'registry/contracts.json'), 'utf8'));
 const read = (p) => (existsSync(p) ? readFileSync(p, 'utf8') : '');
 
 // "## Title" sections; "### Question" lines inside become FAQ entries (question + answer).
@@ -49,6 +63,9 @@ function parseContent(md) {
 
 const universes = [...read(join(root, 'brand/universes.toml')).matchAll(/id = "([^"]+)"\nname = "([^"]+)"\nhue = (\d+)/g)]
   .map((m) => ({ id: m[1], name: m[2], hue: Number(m[3]) }));
+
+const domains = Object.fromEntries([...read(join(root, 'brand/domains.toml')).matchAll(/^\s*(\w+)\s*=\s*"([^"]+)"/gm)].map(match => [match[1], match[2]]));
+const appNames = Object.fromEntries([...read(join(root, 'brand/names.toml')).split('[apps]')[1].matchAll(/^\s*([a-z]+)\s*=\s*"([^"]+)"/gm)].map(match => [match[1], match[2]]));
 
 const tools = registry.tools.map((t) => {
   const [u, n] = t.tool.id.split('.');
@@ -78,5 +95,5 @@ for (const t of tools) {
   }
 }
 writeFileSync(join(out, 'public/seek-index.json'), JSON.stringify(seek));
-writeFileSync(join(out, 'src/generated/site-data.json'), JSON.stringify({ universes, tools }, null, 1));
+writeFileSync(join(out, 'src/generated/site-data.json'), JSON.stringify({ universes, tools, appNames, domains, features }, null, 1));
 console.log(`site data: ${tools.length} tool(s), ${universes.length} universe(s)`);

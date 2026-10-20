@@ -1,0 +1,68 @@
+name: browsers
+
+# Flow's browser recipe on the three engines (Chromium, Firefox, WebKit/Safari). Playwright's
+# Firefox and WebKit do not run on every developer machine, so the proof of "it works outside
+# Chrome" lives here. Manual, and on changes to Flow or its recipe.
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'apps/flow/**'
+      - 'tests/e2e/flow.mjs'
+      - 'crates/kortex-workflow/**'
+      - 'crates/kortex-vault/**'
+      - '.github/workflows/browsers.yml'
+
+concurrency:
+  group: browsers-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  flow:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup show
+      - uses: Swatinem/rust-cache@v2
+      - name: Dioxus compiler (official pinned binary)
+        run: |
+          mkdir -p "$RUNNER_TEMP/dioxus"
+          gh release download v0.7.10 --repo DioxusLabs/dioxus --pattern 'dx-x86_64-unknown-linux-gnu.tar.gz' --pattern 'dx-x86_64-unknown-linux-gnu.sha256' --dir "$RUNNER_TEMP/dioxus"
+          cd "$RUNNER_TEMP/dioxus"
+          sha256sum --check --ignore-missing dx-x86_64-unknown-linux-gnu.sha256
+          tar -xzf dx-x86_64-unknown-linux-gnu.tar.gz
+          find "$RUNNER_TEMP/dioxus" -type f -name dx -exec chmod +x {} \;
+          find "$RUNNER_TEMP/dioxus" -type f -name dx -printf '%h\n' >> "$GITHUB_PATH"
+      - name: wasm-bindgen compiler (pinned to the worker contract)
+        run: |
+          mkdir -p "$RUNNER_TEMP/wasm-bindgen"
+          gh release download 0.2.129 --repo wasm-bindgen/wasm-bindgen --pattern 'wasm-bindgen-0.2.129-x86_64-unknown-linux-musl.tar.gz' --dir "$RUNNER_TEMP/wasm-bindgen"
+          cd "$RUNNER_TEMP/wasm-bindgen"
+          echo '82d12bb940e2d4e72e0d5605387fc1b8ca179044e012b620f0ce4e7440e8320e  wasm-bindgen-0.2.129-x86_64-unknown-linux-musl.tar.gz' | sha256sum --check
+          tar -xzf wasm-bindgen-0.2.129-x86_64-unknown-linux-musl.tar.gz
+          find "$RUNNER_TEMP/wasm-bindgen" -type f -name wasm-bindgen -printf '%h\n' >> "$GITHUB_PATH"
+      - name: Build Flow for the web
+        run: |
+          cargo xtask tokens
+          cargo xtask build-app apps.flow --web
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium firefox webkit
+      - name: Chromium
+        run: BROWSER=chromium node tests/e2e/flow.mjs
+      - name: Firefox
+        if: always()
+        run: BROWSER=firefox node tests/e2e/flow.mjs
+      - name: WebKit (Safari engine)
+        if: always()
+        run: BROWSER=webkit node tests/e2e/flow.mjs

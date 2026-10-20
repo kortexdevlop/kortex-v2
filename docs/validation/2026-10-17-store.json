@@ -1,0 +1,217 @@
+{
+  "schema": 1,
+  "steps": [
+    "10.3",
+    "11.2",
+    "10.1",
+    "10.7",
+    "17.4"
+  ],
+  "app": "apps.store",
+  "version": "0.2.0",
+  "catalogue_count": 38,
+  "receipts": {
+    "web": {
+      "files": {
+        "assets/kortex-store-dxh1b2df7808c5c3a87.js": "88888f64ce97b220bffd8cd9cdd8537cf5c84db2fd04d8e8d6c3f706d2be5537",
+        "assets/kortex-store-dxh79a82d8d2ad89b38.js": "4c8b3ff06d8b42a81bbbe5b5e89b790a11c939722efe52f802a1fbb187e58b90",
+        "assets/kortex-store_bg-dxh72b2b4a1c9823970.wasm": "4a8e76075a0545025cb4b5fc4ebd8362b60e575a8d23726081d6e48bafec5ac8",
+        "assets/kortex-store_bg-dxh81cd61bd92a6fc43.wasm": "171ef5ab4019ded5a01dd726e12b08e2420011802e3b8ac93f7ff34d6e8beede",
+        "en/index.html": "22628ec95d77fe3bea5fe2bc57b67c95dd1d6138488bb249bd442299a16eb39c",
+        "index.html": "22628ec95d77fe3bea5fe2bc57b67c95dd1d6138488bb249bd442299a16eb39c"
+      },
+      "output": "6bbe1869ab6741c6",
+      "path": "/Users/user/Desktop/Kortex-v2/dist/apps/apps.store",
+      "source": "a8690f261d4c77c8:4d40544b761f2413:a6c9ba2eefcb8112:650c11c672fda530",
+      "target": "web"
+    },
+    "x86_64-apple-darwin": {
+      "files": {
+        "kortex-apps-store": "5393a46fbd186caae1021bb2bbf57bd7ad1d8008c128b3f59799b94b5918959b"
+      },
+      "output": "16985a180342dcd4",
+      "path": "dist/desktop/x86_64-apple-darwin/apps.store",
+      "source": "a8690f261d4c77c8:4d40544b761f2413:a6c9ba2eefcb8112:650c11c672fda530",
+      "target": "x86_64-apple-darwin"
+    }
+  },
+  "recipe": {
+    "url": "https://store.kortex.site",
+    "checks": [
+      "38 real tools",
+      "search, detail and real web link",
+      "universe filter",
+      "unready installation closed",
+      "English and theme",
+      "mobile layout"
+    ],
+    "errors": []
+  },
+  "public_installation": false,
+  "github": {
+    "status": "All four release targets and web compiled; all 168 native release packages verified; later credential-store implementation is separate and pending acceptance",
+    "tools": 38,
+    "targets": [
+      "x86_64-unknown-linux-gnu",
+      "aarch64-apple-darwin",
+      "x86_64-apple-darwin",
+      "x86_64-pc-windows-msvc",
+      "wasm32-unknown-unknown"
+    ],
+    "run_id": 39031294481,
+    "run_url": "https://github.com/kortexdevlop/kortex-v2/actions/runs/39031294481",
+    "commit": "7ed41ae47a71056d980519537a7237044d00ec3a",
+    "pull_request": "https://github.com/kortexdevlop/kortex-v2/pull/1",
+    "expected_desktop_packages": 168,
+    "expected_web_bundles": 41,
+    "failures": {
+      "windows": "Path separator and checkout CRLF mismatches in structural gate",
+      "web": "Worker forced offline with missing byteorder-lite on fresh CI",
+      "quality": "PlatformError unused on Linux with document feature"
+    },
+    "verified_native_packages": 168,
+    "verified_native_targets": [
+      "x86_64-unknown-linux-gnu",
+      "aarch64-apple-darwin",
+      "x86_64-apple-darwin",
+      "x86_64-pc-windows-msvc"
+    ],
+    "web_verified": {
+      "run_id": 39032642157,
+      "commit": "26051d4bb72b79401a38cd014802cc7cec515957",
+      "tools": 38,
+      "apps": 3,
+      "proof": "2026-10-17-github-web.json"
+    },
+    "quality": {
+      "run_id": 39048924068,
+      "commit": "c95bf87b0f37e50c0526f13955d6f66d6266d861",
+      "conclusion": "success"
+    },
+    "windows_verified": {
+      "run_id": 39049702070,
+      "commit": "ca3d62342a6cbbacf493628ddfb0cdbfdb1e1ec1",
+      "packages": 42,
+      "signed_index_verified": true,
+      "public_release": false
+    }
+  },
+  "limits": [
+    "Native keychain and install confirmation remain open",
+    "No public desktop release",
+    "Compilation is distinct from OS installation acceptance"
+  ],
+  "public_recipe": {
+    "url": "https://store.kortex.site",
+    "checks": [
+      "38 real tools",
+      "search, detail and real web link",
+      "universe filter",
+      "unready installation closed",
+      "English and theme",
+      "mobile layout"
+    ],
+    "errors": []
+  },
+  "deployments": {
+    "store": "08da94f0-d2de-4b19-b59d-7b43c8323b3f",
+    "site": "193a7ee0-9ac9-444a-91e4-5ef8ef2690a0"
+  },
+  "public_integrity": {
+    "sha256_files_verified": 6,
+    "private_source_status": "404"
+  },
+  "gate": {
+    "status": "passed",
+    "rust_tests": 234,
+    "api_tests": 50,
+    "checks": [
+      "frozen lockfile",
+      "fmt",
+      "workspace clippy -D warnings",
+      "workspace tests",
+      "generated tokens and registry",
+      "contracts/platform check",
+      "site tests",
+      "shared tests",
+      "API typecheck and tests",
+      "release workflow YAML structure"
+    ]
+  },
+  "pipeline_fix": {
+    "gate": "passed",
+    "changes": [
+      "cfg-aware clipboard import",
+      "native Path comparisons",
+      "LF checkout with binary/fixture preservation",
+      "normal Cargo network policy for worker builds",
+      "pinned official wasm-bindgen CLI with SHA-256",
+      "shared native Cargo cache for CLI/apps/tools",
+      "blocking macOS signature verification",
+      "cache retained after build failure"
+    ],
+    "engines_modified": false,
+    "commit": "26051d4bb72b79401a38cd014802cc7cec515957",
+    "run_id": 39032642157,
+    "run_url": "https://github.com/kortexdevlop/kortex-v2/actions/runs/39032642157",
+    "targets": [
+      "x86_64-pc-windows-msvc",
+      "wasm32-unknown-unknown"
+    ],
+    "cancelled_pending_run": 39032570661
+  },
+  "native_verification": {
+    "macos": {
+      "source_commit": "7ed41ae47a71056d980519537a7237044d00ec3a",
+      "targets": {
+        "aarch64-apple-darwin": {
+          "packages": 42,
+          "tool_count": 38,
+          "proof_sha256": "f36688b0aa2cfafd308853cce75268d2671ebaee57a3c3c7881198d9b22378d2",
+          "run_id": "39031294481"
+        },
+        "x86_64-apple-darwin": {
+          "packages": 42,
+          "tool_count": 38,
+          "proof_sha256": "c464f40724375a473b607050a39191585f314fb28c52d5cfad1655d1aaa42cdd",
+          "run_id": "39031294481"
+        }
+      },
+      "packages_verified": 84,
+      "signatures_verified": 84
+    }
+  },
+  "ci_publication": {
+    "artifact_run": 39032642157,
+    "commit": "26051d4bb72b79401a38cd014802cc7cec515957",
+    "versions": {
+      "run": "b930b1b1-51c2-4727-8536-1e5499a39e9f",
+      "desk": "bf40f204-c8e6-4f17-9ef0-ecb07da0e0ce",
+      "hub": "4003679e-e813-4704-b1cc-a9aeb585804f",
+      "store": "9365e6f5-7274-4952-aaa5-f50b60e7a999",
+      "site": "7206b12d-5e7c-442a-9f02-d8cef6e09132"
+    },
+    "store_recipe": {
+      "url": "https://store.kortex.site",
+      "checks": [
+        "38 real tools",
+        "search, detail and real web link",
+        "universe filter",
+        "unready installation closed",
+        "English and theme",
+        "mobile layout"
+      ],
+      "errors": []
+    },
+    "hub_desk_recipe": {
+      "mode": "public HTTPS",
+      "date": "2026-10-17T16:27:42.643Z",
+      "results": [
+        "Hub: real catalogue, favourites and widget layout survive reload; search and launch work.",
+        "Desk: Rust hash, minimize/restore, arrangement/maximize, theme/language/mode, spaces retain iframe content; layout restores.",
+        "Blocked browser storage shows a clear warning; in-memory favourites remain usable."
+      ],
+      "errors": []
+    }
+  }
+}

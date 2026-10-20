@@ -1,0 +1,77 @@
+schema = 1
+[tool]
+id = "calc.vat"
+version = "1.0.2"
+universe = "calc"
+status = "beta"
+ui = "auto"
+platforms = ["web", "desktop"]
+offline = true
+ai = false
+viral_priority = 1
+[tool.name]
+fr = "Calculateur de TVA"
+en = "VAT Calculator"
+[tool.tagline]
+fr = "Passez du HT au TTC et retrouvez le montant de taxe avec le taux de votre choix."
+en = "Convert between net and gross prices with a tax rate you choose."
+[tool.slug]
+fr = "calcul-tva"
+en = "vat-calculator"
+[search]
+keywords.fr = ["calculateur de tva", "calcul tva"]
+keywords.en = ["vat calculator", "vat calculator"]
+intents.fr = ["Passez du HT au TTC et retrouvez le montant de taxe avec le taux de votre choix."]
+intents.en = ["Convert between net and gross prices with a tax rate you choose."]
+related = []
+[limits]
+timeout_s = 10
+
+[[params]]
+id = "amount"
+type = "number"
+default = 100
+level = "simple"
+label = { fr = "Montant", en = "Amount" }
+range = [0, 1000000000000.0]
+
+[[params]]
+id = "rate"
+type = "number"
+default = 20
+level = "simple"
+label = { fr = "Taux (%)", en = "Rate (%)" }
+range = [0, 1000]
+
+[[params]]
+id = "direction"
+type = "enum"
+default = "net"
+level = "simple"
+label = { fr = "Montant saisi", en = "Input amount" }
+options = ["net", "gross"]
+
+[[outputs]]
+id = "net"
+type = "number"
+
+[[outputs]]
+id = "tax"
+type = "number"
+
+[[outputs]]
+id = "gross"
+type = "number"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "write"
+sensitive = false
+privacy = "local"
+
+[[variants]]
+id = "excluding-tax"
+slug = { fr = "excluding-tax", en = "excluding-tax" }
+name = { fr = "TTC en HT", en = "Gross to Net" }
+preset = { direction = "gross" }

@@ -26,12 +26,18 @@ class Stmt {
 export function makeEnv(extra: Partial<Env> = {}): { env: Env; raw: DatabaseSync } {
   const raw = new DatabaseSync(':memory:');
   raw.exec('PRAGMA foreign_keys = ON');
-  for (const f of ['0001_init.sql', '0002_ai.sql', '0003_devices.sql']) raw.exec(readFileSync(join(import.meta.dirname, '../migrations', f), 'utf8'));
-  const DB = { prepare: (sql: string) => new Stmt(raw, sql) } as unknown as D1Database;
+  for (const f of ['0001_init.sql', '0002_ai.sql', '0003_devices.sql', '0004_retention_indexes.sql', '0005_account_security.sql', '0006_client_errors.sql', '0007_ai_usage.sql']) raw.exec(readFileSync(join(import.meta.dirname, '../migrations', f), 'utf8'));
+  const DB = { prepare: (sql: string) => new Stmt(raw, sql), batch: async (statements: Stmt[]) => {
+    raw.exec('BEGIN');
+    try { const results = []; for (const statement of statements) results.push(await statement.run()); raw.exec('COMMIT'); return results; }
+    catch (e) { raw.exec('ROLLBACK'); throw e; }
+  } } as unknown as D1Database;
   return {
     raw,
     env: {
       DB,
+      WEBAUTHN_RP_ID: 'kortex.site',
+      WEBAUTHN_ORIGIN: 'https://kortex.site',
       ALLOWED_ORIGINS: 'https://kortex.site,https://workspace.kortex.site',
       COOKIE_NAME: 'kortex_session',
       COOKIE_SECURE: 'true',
@@ -55,6 +61,15 @@ export async function call(env: Env, method: string, path: string, body?: unknow
   let data: any = null;
   try { data = text ? JSON.parse(text) : null; } catch { data = text; }
   return { status: res.status, data, headers: res.headers };
+}
+
+/** Same request, but the untouched `Response` (streaming bodies, cancellation). */
+export async function callRaw(env: Env, method: string, path: string, body: unknown, opts: CallOpts = {}): Promise<Response> {
+  const headers: Record<string, string> = { ...(opts.headers ?? {}), 'Content-Type': 'application/json' };
+  const origin = opts.origin === undefined ? 'https://kortex.site' : opts.origin;
+  if (origin) headers.Origin = origin;
+  if (opts.cookie) headers.Cookie = opts.cookie;
+  return handle(new Request(`https://api.kortex.site${path}`, { method, headers, body: JSON.stringify(body) }), env);
 }
 
 /** Client-side derivation with few iterations (tests only; real clients use 600 000). */

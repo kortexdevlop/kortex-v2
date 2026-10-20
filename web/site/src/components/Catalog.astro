@@ -1,18 +1,62 @@
 ---
 import Base from '../layouts/Base.astro';
 import ToolCard from './ToolCard.astro';
-import { tools, universes, ui, byPriority, type Lang } from '../lib/data';
+import { tools, universes, ui, byPriority, universePath, type Lang } from '../lib/data';
 const { lang } = Astro.props as { lang: Lang };
 const t = ui[lang];
+const fr = lang === 'fr';
 const groups = universes.map((u) => ({ u, items: tools.filter((x) => x.tool.universe === u.id).sort(byPriority) })).filter((g) => g.items.length);
+const total = groups.reduce((n, g) => n + g.items.length, 0);
 ---
 <Base title={`${t.all} — Kortex`} description={t.sub} lang={lang} alt={{ fr: '/outils', en: '/en/tools' }}>
-  <h1>{t.all}</h1>
+  <header class="page-head catalog-head">
+    <h1>{t.all}</h1>
+    <p class="lead">{t.sub}</p>
+  </header>
   {groups.length === 0 && <p class="k-muted">{t.empty}</p>}
-  {groups.map((g) => (
-    <section>
-      <h2>{g.u.name}</h2>
-      <div class="grid">{g.items.map((x) => <ToolCard t={x} lang={lang} />)}</div>
-    </section>
-  ))}
+  {groups.length > 0 && (
+    <div class="catalog">
+      <nav class="catalog-index" aria-label={fr ? 'Univers' : 'Universes'}>
+        <a href="#top" class="catalog-all"><span>{fr ? 'Tout' : 'All'}</span><span class="k-muted">{total}</span></a>
+        {groups.map((g) => (
+          <a href={`#${g.u.id}`} style={`--hue:${g.u.hue}`}><span class="catalog-dot" aria-hidden="true"></span><span>{g.u.name}</span><span class="k-muted">{g.items.length}</span></a>
+        ))}
+      </nav>
+      <div class="catalog-groups" id="top">
+        {groups.map((g) => (
+          <section class="catalog-group" id={g.u.id} aria-labelledby={`h-${g.u.id}`}>
+            <div class="section-head">
+              <h2 id={`h-${g.u.id}`}>{g.u.name}</h2>
+              <a class="more" href={universePath(g.u, lang)}>{fr ? 'Voir l’univers' : 'View universe'}</a>
+            </div>
+            <div class="grid">{g.items.map((x) => <ToolCard t={x} lang={lang} />)}</div>
+          </section>
+        ))}
+      </div>
+    </div>
+  )}
 </Base>
+<style is:global>
+  .catalog { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: var(--k-space-7); align-items: start; }
+  .catalog-index { position: sticky; top: calc(var(--site-bar) + var(--k-space-5)); display: grid; gap: 2px; }
+  .catalog-index a { --c: oklch(var(--k-hue-l) var(--k-hue-c) var(--hue, 250)); display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: var(--k-space-3); min-height: 44px; padding: 0 var(--k-space-3);
+    border-radius: var(--k-radius-field); color: var(--k-text-2); text-decoration: none; font-size: 0.9375rem; font-weight: var(--k-type-weight-medium);
+    transition: background-color var(--k-motion-base) var(--k-motion-ease), color var(--k-motion-base) var(--k-motion-ease); }
+  .catalog-index a:hover { background: var(--k-surface-2); color: var(--k-text); }
+  .catalog-index .k-muted { font-size: var(--k-type-scale-sm); font-variant-numeric: tabular-nums; }
+  .catalog-all { grid-template-columns: 1fr auto !important; color: var(--k-text) !important; }
+  .catalog-dot { width: 8px; height: 8px; border-radius: var(--k-radius-round); background: var(--c); }
+  .catalog-groups { display: grid; gap: var(--k-space-9); }
+  .catalog-group { scroll-margin-top: calc(var(--site-bar) + var(--k-space-5)); }
+  @media (min-width: 600px) { .catalog-group .grid { grid-template-columns: repeat(auto-fill, minmax(216px, 1fr)); } }
+  @media (max-width: 899px) {
+    .catalog { grid-template-columns: 1fr; gap: var(--k-space-5); }
+    .catalog-index { top: var(--site-bar); z-index: 5; display: flex; gap: var(--k-space-2); margin-inline: calc(-1 * var(--site-gutter)); padding: var(--k-space-2) var(--site-gutter); overflow-x: auto; scrollbar-width: none;
+      background: var(--k-glass); -webkit-backdrop-filter: blur(var(--k-glass-blur-lg)) saturate(var(--k-glass-saturate)); backdrop-filter: blur(var(--k-glass-blur-lg)) saturate(var(--k-glass-saturate)); border-bottom: 1px solid var(--k-border); }
+    .catalog-index a { flex-shrink: 0; grid-template-columns: auto auto auto; border: 1px solid var(--k-border); border-radius: var(--k-radius-pill); background: var(--k-surface); white-space: nowrap; }
+    .catalog-all { grid-template-columns: auto auto !important; }
+    .catalog-groups { gap: var(--k-space-8); }
+    .catalog-group { scroll-margin-top: calc(var(--site-bar) + 72px); }
+  }
+  @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) { .catalog-index { background: var(--k-surface); -webkit-backdrop-filter: none; backdrop-filter: none; } }
+</style>

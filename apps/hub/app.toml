@@ -1,0 +1,25 @@
+schema = 1
+[app]
+id = "apps.hub"
+version = "0.2.2"
+universe = "apps"
+status = "beta"
+ui = "custom"
+platforms = ["web", "desktop"]
+offline = false
+ai = false
+[app.name]
+fr = "Kortex Hub"
+en = "Kortex Hub"
+[app.tagline]
+fr = "Votre tableau de bord personnel."
+en = "Your personal dashboard."
+[app.slug]
+fr = "hub"
+en = "hub"
+[permissions]
+network = true
+filesystem = "none"
+clipboard = "none"
+sensitive = false
+privacy = "local"

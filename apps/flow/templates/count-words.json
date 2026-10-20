@@ -1,0 +1,44 @@
+{
+ "id": "count-words",
+ "name": {
+  "fr": "Compter les mots et le temps de lecture",
+  "en": "Count words and reading time"
+ },
+ "description": {
+  "fr": "Donne le nombre de mots, de phrases et le temps de lecture d’un texte.",
+  "en": "Gives the number of words, sentences and the reading time of a text."
+ },
+ "needs": [],
+ "samples": {
+  "fr": "Kortex regroupe des outils qui fonctionnent sur votre appareil. Rien ne quitte votre ordinateur.",
+  "en": "Kortex gathers tools that run on your device. Nothing leaves your computer."
+ },
+ "workflow": {
+  "version": 1,
+  "name": "",
+  "nodes": [
+   {
+    "id": "n1",
+    "kind": "text",
+    "value": "{sample}"
+   },
+   {
+    "id": "n2",
+    "kind": "tool",
+    "tool": "text.word-counter"
+   }
+  ],
+  "edges": [
+   {
+    "from": {
+     "node": "n1",
+     "port": "text"
+    },
+    "to": {
+     "node": "n2",
+     "port": "text"
+    }
+   }
+  ]
+ }
+}

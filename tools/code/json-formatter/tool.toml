@@ -2,7 +2,7 @@ schema = 1
 
 [tool]
 id = "code.json-formatter"
-version = "1.0.0"
+version = "1.0.2"
 universe = "code"
 status = "beta"
 ui = "auto"

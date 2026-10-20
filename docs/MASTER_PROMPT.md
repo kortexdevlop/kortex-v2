@@ -1,12 +1,8 @@
 # KORTEX — Prompt maître du projet
 
-> **Comment utiliser ce fichier**
-> 1. Place-le à la racine du futur dépôt sous `docs/MASTER_PROMPT.md`.
-> 2. Première session : « Lis `docs/MASTER_PROMPT.md` en entier, puis exécute la **Phase 0** ».
-> 3. Sessions suivantes : « Lis `CLAUDE.md` (ou `AGENTS.md`) et `docs/PROGRESS.md`, puis continue la phase en cours ».
-> Ce document fait autorité. En cas de conflit entre ce document et une habitude de l'agent, **ce document gagne**. Toute déviation doit être justifiée dans un ADR (`docs/adr/`).
+Le cahier des charges fonctionnel ci-dessous est appliqué avec [RULES.md](RULES.md), version consolidée des règles et des instructions utilisateur. Les consignes utilisateur les plus récentes priment ; les ADR et journaux ne peuvent pas y déroger.
 
----
+Périmètre actuel : **38 outils gelés, plus `image.compress` autorisé le 2026-10-20 (39)**, correction de l’existant, applications Rust/Dioxus dans `apps/`, publication des lots terminés après contrôles groupés. Les anciennes cibles de croissance et chiffres indicatifs ne déclenchent aucun ajout d’outil. `docs/PLAN.md` contient les étapes et leurs validations.
 
 ## 0. Ton rôle et ta façon de travailler
 
@@ -29,7 +25,7 @@ Tu es l'architecte principal et le développeur de **Kortex**. Tu travailles en 
 
 **Kortex** est un écosystème de logiciels **gratuits, modernes, multiplateformes et respectueux de la vie privée** :
 
-- **Des centaines d'outils** (convertisseurs, PDF, image, vidéo, audio, dev, calcul, sécurité, QR…) qui s'exécutent **100 % côté client** : *« vos fichiers ne quittent jamais votre appareil »* est l'argument central (marketing + architecture + coût serveur quasi nul).
+- **38 outils existants** (convertisseurs, PDF, image, vidéo, audio, dev, calcul, sécurité, QR…) qui s'exécutent **100 % côté client** : *« vos fichiers ne quittent jamais votre appareil »* est l'argument central (marketing + architecture + coût serveur quasi nul).
 - **Un seul code par outil** : moteur en **Rust**, interface en **Dioxus**, compilé à l'identique pour **WebAssembly (site)** et **application bureau** (Windows, macOS, Linux). Plus tard : mobile natif et **Kortex OS**.
 - **Des applications d'écosystème** construites exactement comme les outils (même structure, même contrat, installables) :
   - **Kortex Mind** — agent IA universel (`agent.kortex.site`)
@@ -61,8 +57,8 @@ Ces points corrigent ou précisent la demande initiale. Ils sont **décidés** s
    - OAuth avec **PKCE** quand le fournisseur le permet (pas de secret) ; sinon un tout petit Worker `oauth-broker` échange le code. **Les tokens sont stockés chez l'utilisateur** (chiffrés localement, sync chiffrée de bout en bout optionnelle), jamais en clair sur le serveur.
    - Les requêtes web depuis le navigateur sont bloquées par **CORS** pour beaucoup d'API → Worker `proxy` minimal, **réservé aux utilisateurs connectés**, rate-limité, liste blanche de domaines connecteurs + mode requête libre limité. Sur desktop : requêtes natives, pas de proxy.
 6. **Noms d'outils et SEO** : un nom de marque par outil (façon « iMovie ») tuerait le référencement (« convertir png en jpg » se cherche, pas « Pixora »). Décision (voir §3) : **marques fortes pour les apps et les univers**, **noms fonctionnels clairs pour les outils**, préfixés visuellement par l'univers.
-7. **Un outil = plusieurs pages SEO** : un même moteur (ex. convertisseur d'images) expose des **variantes** (png→jpg, jpg→png, webp→png, heic→jpg…) déclarées dans son contrat. Chaque variante = une page générée, préréglée, sans code supplémentaire. **Objectif : ≥ 150 outils distincts, et plusieurs centaines de pages.**
-8. **UI auto-générée** : pour aller vite et garantir la cohérence, l'interface d'un outil simple est **générée automatiquement depuis son contrat** (zone de dépôt, paramètres filtrés par mode Simple/Medium/Pro, bouton d'action, aperçu du résultat). L'outil ne code une UI Dioxus sur mesure que s'il en a besoin (éditeur vidéo, éditeur photo, QR stylé…). → Ajouter un outil simple = **contrat + moteur** (+ icône + textes).
+7. **Un outil = plusieurs pages SEO** : un même moteur (ex. convertisseur d'images) expose des **variantes** (png→jpg, jpg→png, webp→png, heic→jpg…) déclarées dans son contrat. Chaque variante = une page générée, préréglée, sans code supplémentaire. **Objectif actuel : terminer les 38 outils existants et leurs pages ; extension du catalogue suspendue.**
+8. **UI auto-générée** : pour aller vite et garantir la cohérence, l'interface d'un outil simple est **générée automatiquement depuis son contrat** (zone de dépôt, paramètres filtrés par mode Simple/Medium/Pro, bouton d'action, aperçu du résultat). L'outil ne code une UI Dioxus sur mesure que s'il en a besoin (éditeur vidéo, éditeur photo, QR stylé…). → Structure d’un outil simple = **contrat + moteur** (+ icône + textes).
 9. **Garde-fous à la compilation** : le contrat est lu par une **macro procédurale** ; si le moteur ne correspond pas au contrat, **ça ne compile pas**. `cargo xtask check` complète (structure, icône, textes, taille, dépendances). La CI bloque.
 10. **Mobile** : site responsive irréprochable + **PWA installable et utilisable hors ligne** (service worker qui met en cache les outils utilisés). Applications mobiles natives Dioxus : plus tard, l'architecture doit le permettre.
 11. **Budget zéro (décidé)** : aucun service payant, aucune signature de code payante, Cloudflare **plan gratuit uniquement**, IA limitée aux **~10 000 neurons/jour partagés par tous les utilisateurs**. Toute solution proposée doit rester gratuite ; si une fonctionnalité exige un service payant, elle est reportée et notée dans PROGRESS.md.
@@ -335,7 +331,7 @@ pub async fn run(input: Inputs, params: Params, cx: &mut Cx) -> Result<Outputs, 
 
 ## 7. Exécution, coopération entre outils et modes d'hébergement
 
-1. **Build par outil** : `engine.wasm` (headless, minimal) + `ui` web (wasm Dioxus) + binaire desktop (Dioxus desktop). Budgets de taille vérifiés (cible UI ≤ 400 Ko brotli hors codecs lourds chargés à la demande).
+1. **Build par outil** : `engine.wasm` (headless, minimal) + `ui` web (wasm Dioxus) + binaire desktop (Dioxus desktop). Tailles mesurées ; cible historique indicative, pas de blocage au-delà de 400 Ko depuis la consigne utilisateur, sauf taille inadmissible.
 2. **Isolation recommandée** (à confirmer par spike Phase 0) : les bundles d'outils sont servis depuis **`run.kortex.site`** et chargés dans des **iframes** par les hôtes (page outil, Desk, Flow, Mind). Communication via `kortex-bus` (postMessage typé). Avantages : un outil qui plante ne casse pas l'hôte, cache partagé entre tous les hôtes, aucune donnée de session accessible aux outils.
 3. **Headless** : Flow, Mind, la CLI et les lots utilisent `engine.wasm` dans un Web Worker (web) ou le binaire de l'outil en mode `--engine` (JSON-RPC sur stdio) sur desktop.
 4. **Desktop** : chaque outil installé = binaire autonome (mode Standalone) + son bundle UI web + manifeste dans `~/.kortex/tools/<id>/`. Desk/Flow desktop découvrent les **outils installés** via `~/.kortex/registry.json` : s'il n'y en a que 2, seuls ces 2 sont proposés. Sur desktop, accès système complet (créer/modifier des fichiers) **dans la limite des permissions du contrat**, avec sélection explicite des dossiers.
@@ -447,7 +443,7 @@ Toutes sont dans `apps/<nom>/` avec un `app.toml` (même format que `tool.toml`,
 - **Plan gratuit uniquement** : vérifier en Phase 0 que chaque service utilisé (Workers, Static Assets, D1, Durable Objects SQLite, Workers AI, Turnstile, Web Analytics) est disponible **sans abonnement ni moyen de paiement**. Sinon, alternative gratuite (ex. compteurs de crédits dans D1 au lieu des Durable Objects). Ne pas utiliser R2 s'il exige un moyen de paiement.
 - **Durable Objects** (si gratuits) : compteur de crédits IA par utilisateur (seau rechargé toutes les 3 h) + compteur du budget global journalier.
 - **AI gateway** : authentifie, vérifie/décompte les crédits, choisit le modèle selon la tâche (config centrale), streaming SSE, cache des réponses identiques, journalise l'agrégat (pas le contenu).
-- **Infrastructure as code** : tous les `wrangler.toml`/`wrangler.jsonc` versionnés, environnements `preview` et `production`, déploiement par GitHub Actions uniquement.
+- **Infrastructure as code** : tous les `wrangler.toml`/`wrangler.jsonc` versionnés, environnements `preview` et `production`. GitHub Actions est la voie nominale ; la publication locale reproductible est le secours autorisé. Publier les lots terminés selon RULES.md §8.
 
 ---
 
@@ -491,7 +487,7 @@ Hook pré-commit optionnel : `cargo xtask check --changed`.
 
 ---
 
-## 13. Recette : ajouter un outil (doit tenir en quelques minutes)
+## 13. Recette technique d’outil — ne pas exécuter pendant le gel du catalogue
 
 ```bash
 cargo xtask new-tool --universe pdf --name merge      # crée tout le squelette depuis tools/_template
@@ -510,7 +506,7 @@ Autres commandes xtask : `new-app`, `registry`, `tokens`, `icons`, `og-images`, 
 
 ---
 
-## 14. Catalogue cible (≥ 150 outils distincts)
+## 14. Réservoir historique de catalogue — extension suspendue
 
 Priorité au **potentiel viral** (⭐ = priorité haute). 🧠 = utilise l'IA (crédits). 🔧 = difficulté élevée. Les variantes SEO (paires de formats, etc.) ne comptent pas comme outils distincts.
 
@@ -548,7 +544,7 @@ Priorité au **potentiel viral** (⭐ = priorité haute). 🧠 = utilise l'IA (c
 
 **AI (8, 🧠)** — Résumer un texte · Traduire · Reformuler/corriger · Décrire une image (alt text) · Discuter avec un PDF · Extraire des données structurées · Renommer intelligemment des fichiers · Générateur d'images
 
-Total ≈ 200 candidats : en Phase 11, finalise la liste à 150+ selon faisabilité et potentiel de trafic (vérifie les volumes de recherche FR/EN si possible).
+Liste historique de candidats uniquement. La consigne actuelle interdit tout ajout : terminer et vérifier les 38 outils existants. Réactivation uniquement sur instruction explicite de l’utilisateur.
 
 **Outils pilotes (Phase 3)**, choisis pour couvrir toute la variété du contrat :
 1. Convertisseur d'images universel (fichier → fichier, lot, variantes SEO, Worker)
@@ -562,7 +558,7 @@ Total ≈ 200 candidats : en Phase 11, finalise la liste à 150+ selon faisabili
 
 ## 15. Feuille de route (une phase = une ou plusieurs sessions)
 
-Chaque phase se termine par : `docs/PROGRESS.md` à jour, CI verte, démo testable, liste de ce que je dois vérifier.
+Chaque phase se termine par : critères et preuves de PLAN.md satisfaits, PROGRESS.md à jour, contrôles requis réussis, démo testable et limites explicites. Une compilation isolée ne valide pas toute une phase.
 
 ### Phase 0 — Cadrage, spikes, nettoyage
 - Lire la doc à jour : Dioxus (dernière stable, web + desktop), Astro (dernière stable), Workers Static Assets, D1, Durable Objects, Workers AI (modèles, tarifs, quota gratuit), limites du plan gratuit.
@@ -594,7 +590,7 @@ Matrice de build, paquets, signatures, registre signé, CLI `kortex`, scripts d'
 ### Phase 10 — Kortex Hub (dashboard + widgets + compte)
 
 ### Phase 11 — Catalogue
-Lots de 10 à 15 outils, **par ordre de potentiel viral**, chaque lot : outils complets, check vert, déployés. Mettre à jour `xtask stats` dans PROGRESS.md.
+Catalogue gelé à 38 outils plus `image.compress` (2026-10-20) : terminer les fonctions/contrats existants, vérifier les cibles web et desktop, compiler les changements et leurs dépendants, publier les lots validés. Aucun nouvel outil. Mettre à jour les preuves du plan et PROGRESS.md.
 
 ### Phase 12 — Finition & lancement
 Audit perf (Lighthouse), audit accessibilité, audit sécurité (en-têtes, CSP, auth), relecture des textes FR/EN, test sur vrais appareils (iOS Safari, Android Chrome, Windows, macOS, Linux), mentions légales, monitoring d'erreurs léger (journal client agrégé, sans données personnelles).

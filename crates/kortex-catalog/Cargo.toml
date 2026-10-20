@@ -1,0 +1,13 @@
+[package]
+name = "kortex-catalog"
+version = "0.1.0"
+edition.workspace = true
+publish.workspace = true
+
+# Pure verification of signed Kortex documents (package index, contract catalogue).
+# No I/O: builds for the browser (wasm) and natively; hosts fetch and store through kortex-platform.
+[dependencies]
+ed25519-dalek = "3"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"

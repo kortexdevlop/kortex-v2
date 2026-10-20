@@ -79,10 +79,7 @@ fn unicode_and_escapes_survive() {
 fn errors_report_line_and_column() {
     let (code, detail) = go("{\n  \"a\": 1,\n  \"b\": }\n", |_| {}).expect_err("invalid");
     assert_eq!(code, "invalid_json");
-    assert!(
-        detail.as_deref().is_some_and(|d| d.starts_with("3:")),
-        "{detail:?}"
-    );
+    assert_eq!(detail.as_deref(), Some("3:8"));
     assert_eq!(go("   ", |_| {}).expect_err("empty").0, "empty_input");
     assert_eq!(
         go("{}", |p| p.indent = 99).expect_err("range").0,

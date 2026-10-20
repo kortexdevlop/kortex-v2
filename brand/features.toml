@@ -1,0 +1,3 @@
+# Public availability, separate from local development.
+account = true
+desktop_releases = true

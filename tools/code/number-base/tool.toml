@@ -1,0 +1,70 @@
+schema = 1
+[tool]
+id = "code.number-base"
+version = "1.0.2"
+universe = "code"
+status = "beta"
+ui = "auto"
+platforms = ["web", "desktop"]
+offline = true
+ai = false
+viral_priority = 1
+[tool.name]
+fr = "Convertisseur de bases numériques"
+en = "Number Base Converter"
+[tool.tagline]
+fr = "Convertissez un entier signé entre les bases 2 et 36."
+en = "Convert signed integers between bases 2 and 36."
+[tool.slug]
+fr = "convertisseur-bases-numeriques"
+en = "number-base-converter"
+[search]
+keywords.fr = ["convertisseur de bases numériques", "convertisseur bases numeriques"]
+keywords.en = ["number base converter", "number base converter"]
+intents.fr = ["Convertissez un entier signé entre les bases 2 et 36."]
+intents.en = ["Convert signed integers between bases 2 and 36."]
+related = []
+[limits]
+timeout_s = 10
+
+[[inputs]]
+id = "text"
+type = "text"
+required = true
+max_len = 100000
+multiline = true
+label = { fr = "Texte", en = "Text" }
+
+[[params]]
+id = "from_base"
+type = "integer"
+default = 10
+level = "simple"
+label = { fr = "Base source", en = "Source base" }
+range = [2, 36]
+
+[[params]]
+id = "to_base"
+type = "integer"
+default = 16
+level = "simple"
+label = { fr = "Base cible", en = "Target base" }
+range = [2, 36]
+
+[[params]]
+id = "uppercase"
+type = "bool"
+default = false
+level = "medium"
+label = { fr = "Lettres majuscules", en = "Uppercase letters" }
+
+[[outputs]]
+id = "text"
+type = "text"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "write"
+sensitive = false
+privacy = "local"

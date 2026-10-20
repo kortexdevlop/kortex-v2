@@ -1,5 +1,9 @@
 export interface Env {
   DB: D1Database;
+  WEBAUTHN_RP_ID?: string;
+  WEBAUTHN_ORIGIN?: string;
+  TURNSTILE_SECRET_KEY?: string;
+  TURNSTILE_REQUIRED?: string;
   ALLOWED_ORIGINS: string;
   COOKIE_NAME?: string;
   COOKIE_SECURE?: string;
@@ -9,6 +13,18 @@ export interface Env {
   AI_USER_CAP?: string;
   AI_USER_REFILL_3H?: string;
   AI_GLOBAL_DAILY?: string;
+  /** E-mails (comma-separated, a Worker secret) allowed to read the owner's dashboard. */
+  ADMIN_EMAILS?: string;
+  /** Workers version metadata binding: the live version of this Worker. */
+  CF_VERSION_METADATA?: { id: string; tag?: string; timestamp: string };
+  /** Neurons one account may spend per UTC day (default 2 500). */
+  AI_USER_DAILY?: string;
+  /** Comma-separated connector hosts the proxy may call with credentials (suffix match). */
+  PROXY_CONNECTORS?: string;
+  PROXY_FREE_PER_HOUR?: string;
+  PROXY_CONNECTOR_PER_HOUR?: string;
+  /** `OAUTH_<PROVIDER>_ID` / `OAUTH_<PROVIDER>_SECRET`: Worker secrets of the OAuth broker. */
+  [secret: `OAUTH_${string}`]: string | undefined;
 }
 
 export interface Ctx {

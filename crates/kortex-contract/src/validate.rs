@@ -78,6 +78,14 @@ fn is_slug(s: &str) -> bool {
 /// Validate a contract. `universes` is the list of ids from `brand/universes.toml`.
 #[must_use]
 pub fn validate(c: &ToolContract, universes: &[String]) -> Vec<Issue> {
+    validate_contract(c, universes, true)
+}
+
+pub(crate) fn validate_contract(
+    c: &ToolContract,
+    universes: &[String],
+    require_outputs: bool,
+) -> Vec<Issue> {
     let mut issues = Vec::new();
     let t = &c.tool;
     if c.schema != 1 {
@@ -161,7 +169,7 @@ pub fn validate(c: &ToolContract, universes: &[String]) -> Vec<Issue> {
             )));
         }
     }
-    if c.outputs.is_empty() {
+    if require_outputs && c.outputs.is_empty() {
         issues.push(Issue(
             "au moins une sortie `[[outputs]]` est requise".into(),
         ));
@@ -192,6 +200,11 @@ pub fn validate(c: &ToolContract, universes: &[String]) -> Vec<Issue> {
     if !["none", "read", "write"].contains(&perm.filesystem.as_str()) {
         issues.push(Issue(
             "permissions.filesystem doit valoir none|read|write".into(),
+        ));
+    }
+    if !["none", "read", "write"].contains(&perm.clipboard.as_str()) {
+        issues.push(Issue(
+            "permissions.clipboard doit valoir none|read|write".into(),
         ));
     }
     if !["local", "ai-consent"].contains(&perm.privacy.as_str()) {

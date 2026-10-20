@@ -1,0 +1,74 @@
+schema = 1
+[tool]
+id = "text.lorem-ipsum"
+version = "1.0.2"
+universe = "text"
+status = "beta"
+ui = "auto"
+platforms = ["web", "desktop"]
+offline = true
+ai = false
+viral_priority = 1
+[tool.name]
+fr = "Générateur Lorem ipsum"
+en = "Lorem Ipsum Generator"
+[tool.tagline]
+fr = "Créez du texte de remplissage par mots ou paragraphes, sans connexion."
+en = "Generate placeholder words or paragraphs without a connection."
+[tool.slug]
+fr = "generateur-lorem-ipsum"
+en = "lorem-ipsum-generator"
+[search]
+keywords.fr = ["générateur lorem ipsum", "generateur lorem ipsum"]
+keywords.en = ["lorem ipsum generator", "lorem ipsum generator"]
+intents.fr = ["Créez du texte de remplissage par mots ou paragraphes, sans connexion."]
+intents.en = ["Generate placeholder words or paragraphs without a connection."]
+related = []
+[limits]
+timeout_s = 10
+
+[[params]]
+id = "unit"
+type = "enum"
+default = "paragraphs"
+level = "simple"
+label = { fr = "Unité", en = "Unit" }
+options = ["paragraphs", "words"]
+
+[[params]]
+id = "count"
+type = "integer"
+default = 3
+level = "simple"
+label = { fr = "Quantité (100 paragraphes ou 1 000 mots max.)", en = "Count (max. 100 paragraphs or 1,000 words)" }
+range = [1, 1000]
+
+[[params]]
+id = "words_per_paragraph"
+type = "integer"
+default = 60
+level = "medium"
+label = { fr = "Mots par paragraphe", en = "Words per paragraph" }
+range = [10, 200]
+
+[[params]]
+id = "classic_start"
+type = "bool"
+default = true
+level = "medium"
+label = { fr = "Commencer par Lorem ipsum", en = "Start with Lorem ipsum" }
+
+[[outputs]]
+id = "text"
+type = "text"
+
+[[outputs]]
+id = "words"
+type = "integer"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "write"
+sensitive = false
+privacy = "local"

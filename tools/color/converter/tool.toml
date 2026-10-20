@@ -1,0 +1,71 @@
+schema = 1
+[tool]
+id = "color.converter"
+version = "1.0.2"
+universe = "color"
+status = "beta"
+ui = "auto"
+platforms = ["web", "desktop"]
+offline = true
+ai = false
+viral_priority = 1
+[tool.name]
+fr = "Convertisseur de couleurs"
+en = "Color Converter"
+[tool.tagline]
+fr = "Convertissez HEX, RGB, HSL et OKLCH, avec détection des couleurs hors sRGB."
+en = "Convert HEX, RGB, HSL and OKLCH with sRGB gamut detection."
+[tool.slug]
+fr = "convertisseur-couleurs"
+en = "color-converter"
+[search]
+keywords.fr = ["convertisseur de couleurs", "convertisseur couleurs"]
+keywords.en = ["color converter", "color converter"]
+intents.fr = ["Convertissez HEX, RGB, HSL et OKLCH, avec détection des couleurs hors sRGB."]
+intents.en = ["Convert HEX, RGB, HSL and OKLCH with sRGB gamut detection."]
+related = []
+[limits]
+timeout_s = 10
+
+[[inputs]]
+id = "text"
+type = "text"
+required = true
+max_len = 100000
+multiline = true
+label = { fr = "Texte", en = "Text" }
+
+[[params]]
+id = "format"
+type = "enum"
+default = "hex"
+level = "simple"
+label = { fr = "Format saisi", en = "Input format" }
+options = ["hex", "rgb", "hsl", "oklch"]
+
+[[outputs]]
+id = "hex"
+type = "text"
+
+[[outputs]]
+id = "rgb"
+type = "text"
+
+[[outputs]]
+id = "hsl"
+type = "text"
+
+[[outputs]]
+id = "oklch"
+type = "text"
+
+[[outputs]]
+id = "gamut"
+type = "text"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "write"
+sensitive = false
+privacy = "local"

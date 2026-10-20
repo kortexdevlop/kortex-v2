@@ -1,4 +1,5 @@
 import type { Ctx } from './env.ts';
+import { sha256Hex } from './crypto.ts';
 import { HttpError } from './http.ts';
 
 /** Fixed-window limiter backed by D1. `key` should already include the route and the client. */
@@ -12,7 +13,7 @@ export async function rateLimit(ctx: Ctx, key: string, limit: number, windowSeco
          window_start = ?2
        RETURNING count`,
     )
-    .bind(key, windowStart)
+    .bind(await sha256Hex(key), windowStart)
     .first<{ count: number }>();
   if ((row?.count ?? 1) > limit) throw new HttpError(429, 'rate_limited');
 }

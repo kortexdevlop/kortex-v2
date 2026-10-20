@@ -1,0 +1,47 @@
+{
+ "id": "merge-pdf",
+ "name": {
+  "fr": "Fusionner des PDF",
+  "en": "Merge PDFs"
+ },
+ "description": {
+  "fr": "Choisissez plusieurs PDF : Flow les assemble en un seul, sur votre appareil.",
+  "en": "Pick several PDFs: Flow merges them into one, on your device."
+ },
+ "needs": [
+  "files"
+ ],
+ "samples": {
+  "fr": "",
+  "en": ""
+ },
+ "workflow": {
+  "version": 1,
+  "name": "",
+  "nodes": [
+   {
+    "id": "n1",
+    "kind": "file",
+    "accept": "application/pdf",
+    "multiple": true
+   },
+   {
+    "id": "n2",
+    "kind": "tool",
+    "tool": "pdf.merge"
+   }
+  ],
+  "edges": [
+   {
+    "from": {
+     "node": "n1",
+     "port": "files"
+    },
+    "to": {
+     "node": "n2",
+     "port": "files"
+    }
+   }
+  ]
+ }
+}

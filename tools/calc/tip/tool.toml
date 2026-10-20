@@ -1,0 +1,71 @@
+schema = 1
+[tool]
+id = "calc.tip"
+version = "1.0.2"
+universe = "calc"
+status = "beta"
+ui = "auto"
+platforms = ["web", "desktop"]
+offline = true
+ai = false
+viral_priority = 1
+[tool.name]
+fr = "Pourboire et partage d’addition"
+en = "Tip and Bill Splitter"
+[tool.tagline]
+fr = "Calculez un pourboire et répartissez le total à parts égales."
+en = "Calculate a tip and split the total equally."
+[tool.slug]
+fr = "pourboire-partage-addition"
+en = "tip-bill-splitter"
+[search]
+keywords.fr = ["pourboire et partage d’addition", "pourboire partage addition"]
+keywords.en = ["tip and bill splitter", "tip bill splitter"]
+intents.fr = ["Calculez un pourboire et répartissez le total à parts égales."]
+intents.en = ["Calculate a tip and split the total equally."]
+related = []
+[limits]
+timeout_s = 10
+
+[[params]]
+id = "amount"
+type = "number"
+default = 100
+level = "simple"
+label = { fr = "Addition", en = "Bill" }
+range = [0, 1000000000000.0]
+
+[[params]]
+id = "percent"
+type = "number"
+default = 15
+level = "simple"
+label = { fr = "Pourboire (%)", en = "Tip (%)" }
+range = [0, 1000]
+
+[[params]]
+id = "people"
+type = "integer"
+default = 2
+level = "simple"
+label = { fr = "Personnes", en = "People" }
+range = [1, 10000]
+
+[[outputs]]
+id = "tip"
+type = "number"
+
+[[outputs]]
+id = "total"
+type = "number"
+
+[[outputs]]
+id = "per_person"
+type = "number"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "write"
+sensitive = false
+privacy = "local"

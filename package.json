@@ -4,6 +4,16 @@
   "packageManager": "pnpm@12.6.0",
   "scripts": {
     "site:dev": "pnpm --filter @kortex/site dev",
-    "site:build": "pnpm --filter @kortex/site build"
+    "site:build": "pnpm --filter @kortex/site build",
+    "deploy": "pnpm site:build && node scripts/prepare-publish.mjs && node scripts/publish.mjs",
+    "e2e": "node tests/e2e/smoke.mjs",
+    "e2e:engines": "node tests/e2e/engines.mjs",
+    "e2e:mind": "node tests/e2e/mind.mjs",
+    "e2e:pwa": "node tests/e2e/pwa.mjs",
+    "e2e:prefs": "node tests/e2e/prefs.mjs",
+    "e2e:admin": "node tests/e2e/admin.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.63.0"
   }
 }

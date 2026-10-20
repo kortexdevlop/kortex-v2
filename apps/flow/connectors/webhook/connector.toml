@@ -1,0 +1,48 @@
+schema = 1
+
+[connector]
+id = "webhook"
+[connector.name]
+fr = "Webhook"
+en = "Webhook"
+[connector.help]
+fr = "Appelle n’importe quelle adresse HTTPS publique : un service de notification, un déclencheur d’automatisation, une API."
+en = "Calls any public HTTPS address: a notification service, an automation trigger, an API."
+
+[[actions]]
+id = "post_json"
+method = "POST"
+url = "{url}"
+headers = ["content-type: application/json"]
+body = "{json}"
+[actions.name]
+fr = "Envoyer du JSON"
+en = "Send JSON"
+[[actions.params]]
+id = "url"
+required = true
+[actions.params.label]
+fr = "Adresse du webhook (HTTPS)"
+en = "Webhook address (HTTPS)"
+[[actions.params]]
+id = "json"
+required = true
+default = "{}"
+multiline = true
+[actions.params.label]
+fr = "Corps JSON"
+en = "JSON body"
+
+[[actions]]
+id = "get"
+method = "GET"
+url = "{url}"
+[actions.name]
+fr = "Lire une adresse"
+en = "Fetch an address"
+[[actions.params]]
+id = "url"
+required = true
+[actions.params.label]
+fr = "Adresse (HTTPS)"
+en = "Address (HTTPS)"

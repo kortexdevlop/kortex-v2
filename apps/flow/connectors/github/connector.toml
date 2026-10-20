@@ -1,0 +1,65 @@
+schema = 1
+
+[connector]
+id = "github"
+[connector.name]
+fr = "GitHub"
+en = "GitHub"
+[connector.help]
+fr = "Lit un dépôt ou crée un ticket. Enregistrez un jeton d’accès personnel comme secret GITHUB_TOKEN."
+en = "Reads a repository or opens an issue. Save a personal access token as the secret GITHUB_TOKEN."
+
+[[actions]]
+id = "get_repo"
+method = "GET"
+url = "https://api.github.com/repos/{owner|url}/{repo|url}"
+headers = ["accept: application/vnd.github+json", "authorization: Bearer {secret:GITHUB_TOKEN}"]
+[actions.name]
+fr = "Lire un dépôt"
+en = "Read a repository"
+[[actions.params]]
+id = "owner"
+required = true
+[actions.params.label]
+fr = "Propriétaire"
+en = "Owner"
+[[actions.params]]
+id = "repo"
+required = true
+[actions.params.label]
+fr = "Dépôt"
+en = "Repository"
+
+[[actions]]
+id = "create_issue"
+method = "POST"
+url = "https://api.github.com/repos/{owner|url}/{repo|url}/issues"
+headers = ["accept: application/vnd.github+json", "authorization: Bearer {secret:GITHUB_TOKEN}", "content-type: application/json"]
+body = '{"title": {title|json}, "body": {body|json}}'
+[actions.name]
+fr = "Créer un ticket"
+en = "Open an issue"
+[[actions.params]]
+id = "owner"
+required = true
+[actions.params.label]
+fr = "Propriétaire"
+en = "Owner"
+[[actions.params]]
+id = "repo"
+required = true
+[actions.params.label]
+fr = "Dépôt"
+en = "Repository"
+[[actions.params]]
+id = "title"
+required = true
+[actions.params.label]
+fr = "Titre"
+en = "Title"
+[[actions.params]]
+id = "body"
+multiline = true
+[actions.params.label]
+fr = "Description"
+en = "Description"

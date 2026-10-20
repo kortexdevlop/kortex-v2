@@ -6,6 +6,14 @@ import { MAX_BLOB_BYTES, checkBlob, checkKey, checkTool } from '../validate.ts';
 const MAX_KEYS = 200;
 const MAX_SETTINGS_BYTES = 16 * 1024;
 
+/** Bind each backup request to the account the client displayed, even across cookie rotation. */
+async function requireSyncUser(ctx: Ctx): Promise<string> {
+  const uid = await requireUser(ctx);
+  const expected = ctx.req.headers.get('x-kortex-user');
+  if (expected !== null && expected !== uid) throw new HttpError(409, 'session_changed');
+  return uid;
+}
+
 // ---- settings: one JSON blob per user --------------------------------------------------------
 export async function getSettings(ctx: Ctx): Promise<Response> {
   const uid = await requireUser(ctx);
@@ -29,13 +37,13 @@ export async function putSettings(ctx: Ctx): Promise<Response> {
 
 // ---- sync: small versioned blobs with optimistic concurrency ---------------------------------
 export async function listSync(ctx: Ctx): Promise<Response> {
-  const uid = await requireUser(ctx);
+  const uid = await requireSyncUser(ctx);
   const r = await ctx.env.DB.prepare('SELECT key, version, updated_at FROM sync_items WHERE user_id = ?1 ORDER BY key').bind(uid).all();
   return json({ items: r.results });
 }
 
 export async function getSync(ctx: Ctx, p: Record<string, string>): Promise<Response> {
-  const uid = await requireUser(ctx);
+  const uid = await requireSyncUser(ctx);
   const key = checkKey(p.key ?? '');
   const row = await ctx.env.DB.prepare('SELECT version, data, updated_at FROM sync_items WHERE user_id = ?1 AND key = ?2').bind(uid, key).first<{ version: number; data: string; updated_at: number }>();
   if (!row) return json(errorBody('not_found'), { status: 404 });
@@ -44,7 +52,7 @@ export async function getSync(ctx: Ctx, p: Record<string, string>): Promise<Resp
 
 /** Body `{ data, version }`: `version` is the version the client last saw (0 to create). */
 export async function putSync(ctx: Ctx, p: Record<string, string>): Promise<Response> {
-  const uid = await requireUser(ctx);
+  const uid = await requireSyncUser(ctx);
   const key = checkKey(p.key ?? '');
   const b = await readJson(ctx.req, MAX_BLOB_BYTES + 200);
   if (!isRecord(b) || !('data' in b) || !Number.isInteger(b.version) || (b.version as number) < 0) throw new HttpError(400, 'invalid_data');
@@ -74,7 +82,7 @@ export async function putSync(ctx: Ctx, p: Record<string, string>): Promise<Resp
 }
 
 export async function deleteSync(ctx: Ctx, p: Record<string, string>): Promise<Response> {
-  const uid = await requireUser(ctx);
+  const uid = await requireSyncUser(ctx);
   const key = checkKey(p.key ?? '');
   await ctx.env.DB.prepare('DELETE FROM sync_items WHERE user_id = ?1 AND key = ?2').bind(uid, key).run();
   return json({ ok: true });

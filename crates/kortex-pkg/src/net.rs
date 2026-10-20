@@ -3,9 +3,7 @@ use std::time::Duration;
 use crate::error::{Kind, PkgError, Result};
 
 pub(crate) fn is_local_host(url: &str) -> bool {
-    let rest = url.strip_prefix("http://").unwrap_or("");
-    let host = rest.split(['/', ':']).next().unwrap_or("");
-    host == "localhost" || host == "127.0.0.1" || host == "[::1]"
+    kortex_platform::native::is_local_http(url)
 }
 
 /// Absolute `url`, or `url` resolved against the directory of `base` (the index location).
@@ -26,24 +24,22 @@ pub fn resolve(base: &str, url: &str) -> String {
 /// Plain `http://` to any other host is refused, and every read is size-capped.
 pub fn fetch(src: &str, max_bytes: u64) -> Result<Vec<u8>> {
     if src.starts_with("https://") || (src.starts_with("http://") && is_local_host(src)) {
-        let agent: ureq::Agent = ureq::Agent::config_builder()
-            .timeout_global(Some(Duration::from_secs(300)))
-            .build()
-            .into();
-        let mut res = agent.get(src).call().map_err(|e| {
-            PkgError::new(
+        let response = kortex_platform::native::http(kortex_platform::native::HttpRequest {
+            method: "GET",
+            url: src,
+            headers: &[],
+            body: None,
+            timeout: Duration::from_secs(300),
+            max_bytes,
+        })
+        .map_err(|e| PkgError::new(Kind::Network, format!("téléchargement impossible : {e}")))?;
+        if !(200..300).contains(&response.status) {
+            return Err(PkgError::new(
                 Kind::Network,
-                format!("téléchargement impossible ({src}) : {e}"),
-            )
-        })?;
-        return res
-            .body_mut()
-            .with_config()
-            .limit(max_bytes)
-            .read_to_vec()
-            .map_err(|e| {
-                PkgError::new(Kind::Network, format!("lecture interrompue ({src}) : {e}"))
-            });
+                format!("HTTP {}", response.status),
+            ));
+        }
+        return Ok(response.body);
     }
     if src.starts_with("http://") {
         return Err(PkgError::new(
@@ -52,7 +48,7 @@ pub fn fetch(src: &str, max_bytes: u64) -> Result<Vec<u8>> {
         ));
     }
     let path = src.strip_prefix("file://").unwrap_or(src);
-    let meta = std::fs::metadata(path)
+    let meta = kortex_platform::native::fs::metadata(path)
         .map_err(|e| PkgError::new(Kind::NotFound, format!("{path} : {e}")))?;
     if meta.len() > max_bytes {
         return Err(PkgError::new(
@@ -60,7 +56,14 @@ pub fn fetch(src: &str, max_bytes: u64) -> Result<Vec<u8>> {
             format!("{path} dépasse la taille maximale autorisée"),
         ));
     }
-    Ok(std::fs::read(path)?)
+    kortex_platform::native::fs::read_limited(path, max_bytes).map_err(|e| {
+        let kind = if e.kind() == std::io::ErrorKind::FileTooLarge {
+            Kind::Unsafe
+        } else {
+            Kind::Io
+        };
+        PkgError::new(kind, e.to_string())
+    })
 }
 
 #[cfg(test)]

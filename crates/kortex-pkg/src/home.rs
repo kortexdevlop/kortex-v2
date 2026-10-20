@@ -1,5 +1,7 @@
+use kortex_platform::secrets::{NativeSecretStore, SecretStore};
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
 
 use serde::{Deserialize, Serialize};
 
@@ -10,6 +12,7 @@ use crate::version::Version;
 #[derive(Debug, Clone)]
 pub struct Home {
     root: PathBuf,
+    pub(crate) secrets: Arc<dyn SecretStore>,
     /// Where launchers (`.desktop`, `.app`, Start Menu entries) go; defaults to the user's home.
     user_home: PathBuf,
 }
@@ -61,13 +64,13 @@ pub(crate) fn check_version(v: &str) -> Result<()> {
 impl Home {
     /// `$KORTEX_HOME`, else `~/.kortex`.
     pub fn from_env() -> Result<Self> {
-        let user_home = std::env::var_os("HOME")
-            .or_else(|| std::env::var_os("USERPROFILE"))
+        let user_home = kortex_platform::native::env::var_os("HOME")
+            .or_else(|| kortex_platform::native::env::var_os("USERPROFILE"))
             .map(PathBuf::from)
             .ok_or_else(|| PkgError::new(Kind::Io, "dossier personnel introuvable (HOME)"))?;
-        let root = std::env::var_os("KORTEX_HOME")
+        let root = kortex_platform::native::env::var_os("KORTEX_HOME")
             .map_or_else(|| user_home.join(".kortex"), PathBuf::from);
-        Ok(Self { root, user_home })
+        Ok(Self::at(root, user_home))
     }
 
     /// Explicit locations (tests, portable installs).
@@ -75,8 +78,16 @@ impl Home {
     pub fn at(root: impl Into<PathBuf>, user_home: impl Into<PathBuf>) -> Self {
         Self {
             root: root.into(),
+            secrets: Arc::new(NativeSecretStore),
             user_home: user_home.into(),
         }
+    }
+
+    /// Explicit backend injection for isolated tests and controlled hosts.
+    #[must_use]
+    pub fn with_secret_store(mut self, secrets: Arc<dyn SecretStore>) -> Self {
+        self.secrets = secrets;
+        self
     }
 
     #[must_use]
@@ -106,7 +117,7 @@ impl Home {
     }
 
     pub fn load_registry(&self) -> Result<Registry> {
-        match std::fs::read(self.registry_path()) {
+        match kortex_platform::native::fs::read(self.registry_path()) {
             Ok(b) => serde_json::from_slice(&b)
                 .map_err(|e| PkgError::new(Kind::Parse, format!("registry.json illisible : {e}"))),
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(Registry {
@@ -118,12 +129,48 @@ impl Home {
     }
 
     /// Atomic write (temp file + rename): a crash never leaves a half-written registry.
+    fn floors_path(&self) -> PathBuf {
+        self.root.join("floors.json")
+    }
+
+    fn floors(&self) -> BTreeMap<String, kortex_catalog::Floor> {
+        kortex_platform::native::fs::read(self.floors_path())
+            .ok()
+            .and_then(|b| serde_json::from_slice(&b).ok())
+            .unwrap_or_default()
+    }
+
+    /// Last signed document of `key` (`index:stable`, `catalog:stable`…) accepted here.
+    #[must_use]
+    pub fn floor(&self, key: &str) -> Option<kortex_catalog::Floor> {
+        self.floors().remove(key)
+    }
+
+    /// Remembers an accepted document so older ones are refused afterwards (written atomically).
+    pub fn save_floor(&self, key: &str, floor: kortex_catalog::Floor) -> Result<()> {
+        let mut all = self.floors();
+        all.insert(key.to_owned(), floor);
+        kortex_platform::native::fs::create_dir_all(&self.root)?;
+        let tmp = self.root.join(format!(
+            ".floors.{}.tmp",
+            kortex_platform::native::process_id()
+        ));
+        kortex_platform::native::fs::write(
+            &tmp,
+            serde_json::to_vec_pretty(&all)
+                .map_err(|e| PkgError::new(Kind::Parse, e.to_string()))?,
+        )?;
+        kortex_platform::native::fs::rename(&tmp, self.floors_path())?;
+        Ok(())
+    }
+
     pub fn save_registry(&self, r: &Registry) -> Result<()> {
-        std::fs::create_dir_all(&self.root)?;
-        let tmp = self
-            .root
-            .join(format!(".registry.{}.tmp", std::process::id()));
-        std::fs::write(
+        kortex_platform::native::fs::create_dir_all(&self.root)?;
+        let tmp = self.root.join(format!(
+            ".registry.{}.tmp",
+            kortex_platform::native::process_id()
+        ));
+        kortex_platform::native::fs::write(
             &tmp,
             serde_json::to_vec_pretty(&Registry {
                 schema: 1,
@@ -131,7 +178,7 @@ impl Home {
             })
             .map_err(|e| PkgError::new(Kind::Parse, e.to_string()))?,
         )?;
-        std::fs::rename(&tmp, self.registry_path())?;
+        kortex_platform::native::fs::rename(&tmp, self.registry_path())?;
         Ok(())
     }
 }

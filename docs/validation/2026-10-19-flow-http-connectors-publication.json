@@ -1,0 +1,21 @@
+{
+  "date": "2026-10-19",
+  "release_run": "39289961730",
+  "commit": "ee45c4287c31d4d92c6c980ad99ba36c45be0f10",
+  "versions": {
+    "kortex-run": "ead04e1f-a3f7-499d-8376-94cb9a7f3b5c",
+    "kortex-desk": "58d812bb-8686-49b6-bd0b-3575b9e2f7c2",
+    "kortex-flow": "41ba7b73-6385-4824-ac9f-df168f4fc38a",
+    "kortex-hub": "c7b454fc-e6ee-4a4b-9f1d-0bcfc3a32fda",
+    "kortex-mind": "a6395e18-3a7b-44d9-b278-7fbcb9d927b2",
+    "kortex-seek": "69de437f-b1a0-4d7e-a4f5-2d07174c7313",
+    "kortex-store": "2e7efced-72ba-42e1-94e5-d9259c8bf809",
+    "kortex-site": "886f3ce2-7cc1-4ae5-b63f-2dceb286c024"
+  },
+  "previous_versions_file": "2026-10-19-api-proxy-turnstile-publication.json",
+  "checks": [
+    "flow.kortex.site palette offers HTTP, template, loop and the 4 connector actions",
+    "live run: text -> template node returns 'Hello ADA!' with no page error"
+  ],
+  "api": "unchanged since the previous publication"
+}

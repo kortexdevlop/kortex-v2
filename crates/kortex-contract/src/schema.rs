@@ -31,12 +31,20 @@ pub enum ParamLevel {
 }
 
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
 pub struct ToolMeta {
     pub id: String,
     pub version: String,
     pub universe: String,
     pub status: Status,
     pub ui: UiKind,
+    /// Run the web engine in an isolated Worker; desktop keeps its native runner.
+    #[serde(default)]
+    pub web_worker: bool,
+    /// Web builds of this application ship the headless engine of every tool under `engines/`
+    /// (Mind and Flow run tools in Web Workers of their own origin).
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub bundles_engines: bool,
     pub platforms: Vec<String>,
     #[serde(default)]
     pub offline: bool,
@@ -50,6 +58,11 @@ pub struct ToolMeta {
     /// Former slugs per language, kept as redirects.
     #[serde(default)]
     pub aliases: BTreeMap<String, Vec<String>>,
+}
+
+#[allow(clippy::trivially_copy_pass_by_ref)]
+const fn is_false(value: &bool) -> bool {
+    !*value
 }
 
 const fn default_priority() -> u8 {
@@ -143,4 +156,43 @@ pub struct ToolContract {
     pub permissions: Permissions,
     #[serde(default)]
     pub variants: Vec<Variant>,
+}
+
+/// Installable applications use the same metadata, ports and permission types as tools.
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct AppContract {
+    pub schema: u32,
+    pub app: ToolMeta,
+    #[serde(default)]
+    pub search: Search,
+    #[serde(default)]
+    pub limits: Limits,
+    #[serde(default)]
+    pub inputs: Vec<Input>,
+    #[serde(default)]
+    pub params: Vec<Param>,
+    #[serde(default)]
+    pub outputs: Vec<Output>,
+    pub permissions: Permissions,
+    #[serde(default)]
+    pub variants: Vec<Variant>,
+}
+
+impl AppContract {
+    /// A common validation view; no second implementation of port/permission rules.
+    #[must_use]
+    pub fn as_tool_contract(&self) -> ToolContract {
+        ToolContract {
+            schema: self.schema,
+            tool: self.app.clone(),
+            search: self.search.clone(),
+            limits: self.limits.clone(),
+            inputs: self.inputs.clone(),
+            params: self.params.clone(),
+            outputs: self.outputs.clone(),
+            permissions: self.permissions.clone(),
+            variants: self.variants.clone(),
+        }
+    }
 }

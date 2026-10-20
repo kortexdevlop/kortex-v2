@@ -1,0 +1,44 @@
+---
+import Base from '../layouts/Base.astro';
+import ToolCard from './ToolCard.astro';
+import { tools, universes, byPriority, universePath, type Lang, type Universe } from '../lib/data';
+const { lang, universe } = Astro.props as { lang: Lang; universe: Universe };
+const items = tools.filter(t => t.tool.universe === universe.id && t.tool.status !== 'draft').sort(byPriority);
+const fr = lang === 'fr';
+const description = fr
+  ? `${universe.name} : ${items.length} outils gratuits à utiliser sur votre appareil, en français et sans envoyer vos fichiers.`
+  : `${universe.name}: ${items.length} free tools running on your device without uploading your files.`;
+const active = universes.filter(u => tools.some(t => t.tool.universe === u.id && t.tool.status !== 'draft'));
+---
+<Base title={`${universe.name} — Kortex`} description={description} lang={lang}
+  alt={{ fr: universePath(universe, 'fr'), en: universePath(universe, 'en') }} noindex={!items.length}>
+  <nav class="crumbs" aria-label={fr ? 'Fil d’Ariane' : 'Breadcrumb'}><a href={fr ? '/outils' : '/en/tools'}>{fr ? 'Tous les outils' : 'All tools'}</a><span aria-hidden="true">/</span><span>{universe.name}</span></nav>
+  <header class="universe-head" style={`--hue:${universe.hue}`}>
+    <span class="universe-mark" aria-hidden="true"></span>
+    <div>
+      <h1>{universe.name}</h1>
+      <p class="lead">{description}</p>
+    </div>
+  </header>
+  {items.length ? <div class="grid">{items.map(t => <ToolCard t={t} lang={lang} />)}</div>
+    : <div class="universe-empty"><p>{fr ? 'Les outils de cet univers sont en préparation. Découvrez les univers déjà disponibles.' : 'Tools for this universe are being prepared. Explore the available universes.'}</p></div>}
+  <section class="section">
+    <div class="section-head"><h2>{fr ? 'Explorer les autres univers' : 'Explore other universes'}</h2></div>
+    <div class="universe-links">{active.filter(u => u.id !== universe.id).map(u => <a href={universePath(u,lang)} style={`--hue:${u.hue}`}><span class="catalog-dot" aria-hidden="true"></span>{u.name}</a>)}</div>
+    <p class="k-muted universe-note">{fr ? 'Un calcul ou une conversion s’exécute localement. Les outils IA demandent un consentement avant tout envoi.' : 'Calculations and conversions run locally. AI tools ask for consent before sending content.'}</p>
+  </section>
+</Base>
+<style>
+  .universe-head { --c: oklch(var(--k-hue-l) var(--k-hue-c) var(--hue)); display: flex; align-items: flex-start; gap: var(--k-space-5); padding: var(--k-space-5) 0 var(--k-space-7); }
+  .universe-head h1 { margin: 0 0 var(--k-space-3); font-size: clamp(2.25rem, 4.6vw, var(--k-type-scale-5)); }
+  .universe-mark { flex-shrink: 0; width: 64px; height: 64px; margin-top: var(--k-space-1); border-radius: var(--k-radius-sheet);
+    background: radial-gradient(70% 70% at 50% 100%, color-mix(in oklab, var(--c) 55%, transparent), transparent 75%), color-mix(in oklab, var(--c) 14%, var(--k-surface)); border: 1px solid var(--k-border); }
+  .universe-empty { padding: var(--k-space-7); border: 1.5px dashed var(--k-border-strong); border-radius: var(--k-radius-card); text-align: center; color: var(--k-text-2); }
+  .universe-links { display: flex; flex-wrap: wrap; gap: var(--k-space-2); }
+  .universe-links a { --c: oklch(var(--k-hue-l) var(--k-hue-c) var(--hue)); display: inline-flex; align-items: center; gap: var(--k-space-2); min-height: 44px; padding: 0 var(--k-space-4); border: 1px solid var(--k-border); border-radius: var(--k-radius-pill);
+    background: var(--k-surface); color: var(--k-text); text-decoration: none; font-weight: var(--k-type-weight-medium); transition: border-color var(--k-motion-base) var(--k-motion-ease); }
+  .universe-links a:hover { border-color: var(--k-border-strong); }
+  .catalog-dot { width: 8px; height: 8px; border-radius: var(--k-radius-round); background: var(--c); }
+  .universe-note { margin-top: var(--k-space-5); font-size: var(--k-type-scale-sm); }
+  @media (max-width: 599px) { .universe-head { flex-direction: column; gap: var(--k-space-4); } .universe-mark { width: 52px; height: 52px; } }
+</style>

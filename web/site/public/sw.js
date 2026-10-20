@@ -1,17 +1,30 @@
-// Minimal offline cache: pages and tool bundles already visited keep working offline.
-const CACHE = 'kortex-v1';
-self.addEventListener('install', (e) => { e.waitUntil(caches.open(CACHE).then((c) => c.addAll(['/', '/kortex.css'])).then(() => self.skipWaiting())); });
-self.addEventListener('activate', (e) => { e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim())); });
-self.addEventListener('fetch', (e) => {
-  const req = e.request;
-  if (req.method !== 'GET' || !req.url.startsWith('http')) return;
-  e.respondWith(
-    fetch(req).then((res) => {
-      if (res.ok && (res.type === 'basic' || new URL(req.url).hostname.startsWith('run.'))) {
-        const copy = res.clone();
-        caches.open(CACHE).then((c) => c.put(req, copy));
+// Cache public site assets only. API failures must never become cached HTML successes.
+const CACHE = 'kortex-site-v4';
+self.addEventListener('install', event => {
+  event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(['/', '/kortex.css'])).then(() => self.skipWaiting()));
+});
+self.addEventListener('activate', event => {
+  event.waitUntil(caches.keys().then(keys => Promise.all(
+    keys.filter(key => key.startsWith('kortex-') && key !== CACHE).map(key => caches.delete(key))
+  )).then(() => self.clients.claim()));
+});
+self.addEventListener('fetch', event => {
+  const request = event.request;
+  // The API is never intercepted; tools have their own cache on their isolated origin.
+  if (request.method !== 'GET' || new URL(request.url).origin !== self.location.origin) return;
+  event.respondWith((async () => {
+    const cache = await caches.open(CACHE);
+    try {
+      const response = await fetch(request);
+      if (response.ok && !/(?:no-store|private)/i.test(response.headers.get('Cache-Control') || '')) {
+        event.waitUntil(cache.put(request, response.clone()));
       }
-      return res;
-    }).catch(() => caches.match(req).then((hit) => hit || caches.match('/'))),
-  );
+      return response;
+    } catch {
+      const cached = await cache.match(request);
+      if (cached) return cached;
+      if (request.mode === 'navigate') return await cache.match('/') || Response.error();
+      return Response.error();
+    }
+  })());
 });

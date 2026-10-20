@@ -1,0 +1,47 @@
+{
+ "id": "hash-file",
+ "name": {
+  "fr": "Calculer l’empreinte d’un fichier",
+  "en": "Compute a file checksum"
+ },
+ "description": {
+  "fr": "Choisissez un fichier : Flow calcule son empreinte SHA-256, sans l’envoyer nulle part.",
+  "en": "Pick a file: Flow computes its SHA-256 checksum without sending it anywhere."
+ },
+ "needs": [
+  "files"
+ ],
+ "samples": {
+  "fr": "",
+  "en": ""
+ },
+ "workflow": {
+  "version": 1,
+  "name": "",
+  "nodes": [
+   {
+    "id": "n1",
+    "kind": "file",
+    "accept": "*/*",
+    "multiple": false
+   },
+   {
+    "id": "n2",
+    "kind": "tool",
+    "tool": "secure.hash-calculator"
+   }
+  ],
+  "edges": [
+   {
+    "from": {
+     "node": "n1",
+     "port": "file"
+    },
+    "to": {
+     "node": "n2",
+     "port": "file"
+    }
+   }
+  ]
+ }
+}

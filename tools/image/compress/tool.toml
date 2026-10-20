@@ -1,0 +1,116 @@
+schema = 1
+
+[tool]
+id = "image.compress"
+version = "1.0.0"
+universe = "image"
+status = "beta"
+ui = "auto"
+web_worker = true
+platforms = ["web", "desktop"]
+offline = true
+ai = false
+viral_priority = 1
+
+[tool.name]
+fr = "Compresseur d'images"
+en = "Image Compressor"
+[tool.tagline]
+fr = "Réduisez le poids de vos photos sans les envoyer nulle part."
+en = "Shrink your photos without uploading them anywhere."
+[tool.slug]
+fr = "compresseur-images"
+en = "image-compressor"
+
+[search]
+keywords.fr = ["compresser image", "réduire le poids d'une photo", "alléger image", "optimiser image", "jpg", "png", "webp"]
+keywords.en = ["compress image", "reduce photo size", "shrink image", "optimize image", "jpg", "png", "webp"]
+intents.fr = ["réduire le poids d'une photo pour l'envoyer par mail", "compresser des images png pour mon site"]
+intents.en = ["reduce a photo's file size to send it by email", "compress png images for my website"]
+related = ["image.convert", "pdf.merge"]
+
+[limits]
+max_input_bytes = "100MB"
+max_batch = 100
+timeout_s = 180
+
+[[inputs]]
+id = "images"
+type = "files<image/*>"
+required = true
+label = { fr = "Images", en = "Images" }
+
+[[params]]
+id = "quality"
+type = "integer"
+range = [1, 100]
+default = 75
+level = "simple"
+label = { fr = "Qualité JPG (1-100)", en = "JPG quality (1-100)" }
+
+[[params]]
+id = "format"
+type = "enum"
+options = ["keep", "jpg", "png", "webp"]
+default = "keep"
+level = "medium"
+label = { fr = "Format de sortie", en = "Output format" }
+
+[[params]]
+id = "max_side"
+type = "integer"
+range = [0, 20000]
+default = 0
+level = "medium"
+label = { fr = "Taille maximale en px (0 = inchangée)", en = "Maximum side in px (0 = unchanged)" }
+
+[[params]]
+id = "png_colors"
+type = "enum"
+options = ["256", "full"]
+default = "256"
+level = "pro"
+label = { fr = "Couleurs PNG", en = "PNG colors" }
+
+[[outputs]]
+id = "compressed"
+type = "files<image/*>"
+formats = ["image/jpeg", "image/png", "image/webp"]
+default_format = "image/jpeg"
+
+[[outputs]]
+id = "original_bytes"
+type = "integer"
+
+[[outputs]]
+id = "compressed_bytes"
+type = "integer"
+
+[[outputs]]
+id = "saved_percent"
+type = "integer"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "none"
+sensitive = false
+privacy = "local"
+
+[[variants]]
+id = "compress-jpg"
+slug = { fr = "compresser-jpg", en = "compress-jpg" }
+name = { fr = "Compresser une image JPG", en = "Compress a JPG image" }
+preset = { format = "jpg" }
+
+[[variants]]
+id = "compress-png"
+slug = { fr = "compresser-png", en = "compress-png" }
+name = { fr = "Compresser une image PNG", en = "Compress a PNG image" }
+preset = { format = "png" }
+
+[[variants]]
+id = "compress-photo-for-email"
+slug = { fr = "reduire-photo-pour-mail", en = "reduce-photo-for-email" }
+name = { fr = "Réduire une photo pour un e-mail", en = "Reduce a photo for email" }
+preset = { format = "jpg", quality = "70", max_side = "1600" }

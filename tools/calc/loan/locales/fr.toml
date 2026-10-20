@@ -1,0 +1,21 @@
+[ui]
+title = "Simulateur de prêt"
+[errors]
+empty_input = "Saisissez un texte."
+invalid_param = "Valeur invalide."
+missing_input = "Ajoutez le contenu à traiter."
+cancelled = "Annulé."
+division_by_zero = "Ce calcul exige une base non nulle."
+invalid_color = "Couleur invalide : vérifiez le format et les composantes."
+empty_slug = "Le texte ne contient aucun caractère utilisable pour ce slug."
+[outputs]
+monthly = "Mensualité avec assurance"
+interest = "Intérêts totaux"
+insurance = "Assurance totale"
+total = "Montant total remboursé"
+schedule = "Amortissement hors assurance"
+[columns]
+month = "Mois"
+principal = "Capital remboursé"
+interest = "Intérêts"
+balance = "Capital restant"

@@ -1,0 +1,69 @@
+{
+ "id": "summarize-telegram",
+ "name": {
+  "fr": "Résumer puis envoyer sur Telegram",
+  "en": "Summarize then send to Telegram"
+ },
+ "description": {
+  "fr": "Résumé par l’IA envoyé par un robot Telegram. Demande le secret TELEGRAM_TOKEN et l’identifiant de la conversation.",
+  "en": "AI summary sent by a Telegram bot. Needs the secret TELEGRAM_TOKEN and the chat id."
+ },
+ "needs": [
+  "ai",
+  "secret:TELEGRAM_TOKEN"
+ ],
+ "samples": {
+  "fr": "Compte rendu de la réunion : le lancement est confirmé pour lundi, l’équipe prépare la communication et un point est prévu jeudi.",
+  "en": "Meeting notes: the launch is confirmed for Monday, the team is preparing the announcement and a check-in is planned for Thursday."
+ },
+ "workflow": {
+  "version": 1,
+  "name": "",
+  "nodes": [
+   {
+    "id": "n1",
+    "kind": "text",
+    "value": "{sample}"
+   },
+   {
+    "id": "n2",
+    "kind": "logic",
+    "op": "ai",
+    "params": {
+     "task": "summarize",
+     "prompt": "En une phrase."
+    }
+   },
+   {
+    "id": "n3",
+    "kind": "tool",
+    "tool": "connector.telegram.send_message",
+    "params": {
+     "chat_id": "123456789"
+    }
+   }
+  ],
+  "edges": [
+   {
+    "from": {
+     "node": "n1",
+     "port": "text"
+    },
+    "to": {
+     "node": "n2",
+     "port": "source"
+    }
+   },
+   {
+    "from": {
+     "node": "n2",
+     "port": "text"
+    },
+    "to": {
+     "node": "n3",
+     "port": "text"
+    }
+   }
+  ]
+ }
+}

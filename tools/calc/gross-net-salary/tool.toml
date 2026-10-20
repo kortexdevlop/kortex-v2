@@ -2,7 +2,7 @@ schema = 1
 
 [tool]
 id = "calc.gross-net-salary"
-version = "1.0.0"
+version = "1.0.2"
 universe = "calc"
 status = "beta"
 ui = "auto"

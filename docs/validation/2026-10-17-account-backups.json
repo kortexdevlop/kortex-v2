@@ -1,0 +1,654 @@
+{
+  "finalToolSmoke": {
+    "mode": "public HTTPS",
+    "date": "2026-10-17T11:37:32.868Z",
+    "results": [
+      "Hub: real catalogue, favourites and widget layout survive reload; search and launch work.",
+      "Desk: Rust hash, minimize/restore, arrangement/maximize, theme/language/mode, spaces retain iframe content; layout restores.",
+      "Blocked browser storage shows a clear warning; in-memory favourites remain usable."
+    ],
+    "errors": []
+  },
+  "cacheEquivalence": {
+    "date": "2026-10-17T11:32:56.787Z",
+    "reason": "Only Hub/Desk account consent translations changed; tool compiler input lists do not reference either locale file.",
+    "ignoredFiles": [
+      "crates/kortex-shell/locales/fr.toml",
+      "crates/kortex-shell/locales/en.toml"
+    ],
+    "reused": [],
+    "current": [
+      "calc.age",
+      "calc.average",
+      "calc.compound-interest",
+      "calc.date-add",
+      "calc.date-difference",
+      "calc.fuel-cost",
+      "calc.gross-net-salary",
+      "calc.loan",
+      "calc.percentage",
+      "calc.rule-of-three",
+      "calc.tip",
+      "calc.unit-price",
+      "calc.vat",
+      "code.base64",
+      "code.chmod",
+      "code.html-entities",
+      "code.json-formatter",
+      "code.markdown-table",
+      "code.number-base",
+      "code.url-encoder",
+      "code.uuid-generator",
+      "color.contrast-checker",
+      "color.converter",
+      "convert.timestamp",
+      "convert.units",
+      "image.convert",
+      "pdf.merge",
+      "qr.generator",
+      "secure.hash-calculator",
+      "secure.password-generator",
+      "text.case-converter",
+      "text.cleaner",
+      "text.deduplicate",
+      "text.find-replace",
+      "text.lorem-ipsum",
+      "text.slug-generator",
+      "text.sort-lines",
+      "text.word-counter"
+    ],
+    "rebuild": [],
+    "history": [
+      {
+        "date": "2026-10-17T11:25:23.156Z",
+        "reused": [
+          {
+            "id": "calc.age",
+            "oldSource": "5cd970a50584514b",
+            "newSource": "d6a9895be71d87b4",
+            "output": "4598c7b8f2d04de6",
+            "compilerInputsSha256": "aa2192b7087c2b27f7fca08076cd35b0f75e4ff96fa0ee59d63a97cd081173fe",
+            "compilerInputs": "/Users/user/Desktop/Kortex-v2/./.kortex/target/wasm32-unknown-unknown/wasm-release/run-calc-age.wasm: /Users/user/Desktop/Kortex-v2/.kortex/build/calc.age/src/main.rs /Users/user/Desktop/Kortex-v2/crates/kortex/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/port.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/schema.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/validate.rs /Users/user/Desktop/Kortex-v2/crates/kortex-date/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-i18n/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-macros/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/account-fetch.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/app-host.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/clipboard.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/document.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/download.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/host-bus.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/offline.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/storage.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/worker.rs /Users/user/Desktop/Kortex-v2/crates/kortex-runtime/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/auto.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/components.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/mode.rs /Users/user/Desktop/Kortex-v2/tools/calc/age/locales/en.toml /Users/user/Desktop/Kortex-v2/tools/calc/age/locales/fr.toml /Users/user/Desktop/Kortex-v2/tools/calc/age/src/engine.rs /Users/user/Desktop/Kortex-v2/tools/calc/age/src/lib.rs /Users/user/Desktop/Kortex-v2/tools/calc/age/tool.toml\n"
+          },
+          {
+            "id": "calc.average",
+            "oldSource": "07273cb2a0edab6b",
+            "newSource": "5f31a0ef13716f18",
+            "output": "2264754042a9f720",
+            "compilerInputsSha256": "2c06b87514aca58c97def2ca091f0fcbb95b49589b26cd29d22846b18403f651",
+            "compilerInputs": "/Users/user/Desktop/Kortex-v2/./.kortex/target/wasm32-unknown-unknown/wasm-release/run-calc-average.wasm: /Users/user/Desktop/Kortex-v2/.kortex/build/calc.average/src/main.rs /Users/user/Desktop/Kortex-v2/crates/kortex/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/port.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/schema.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/validate.rs /Users/user/Desktop/Kortex-v2/crates/kortex-i18n/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-macros/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/account-fetch.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/app-host.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/clipboard.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/document.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/download.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/host-bus.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/offline.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/storage.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/worker.rs /Users/user/Desktop/Kortex-v2/crates/kortex-runtime/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/auto.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/components.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/mode.rs /Users/user/Desktop/Kortex-v2/tools/calc/average/locales/en.toml /Users/user/Desktop/Kortex-v2/tools/calc/average/locales/fr.toml /Users/user/Desktop/Kortex-v2/tools/calc/average/src/engine.rs /Users/user/Desktop/Kortex-v2/tools/calc/average/src/lib.rs /Users/user/Desktop/Kortex-v2/tools/calc/average/tool.toml\n"
+          },
+          {
+            "id": "calc.compound-interest",
+            "oldSource": "a8fb3f4a44bd218a",
+            "newSource": "013b67aa749900b9",
+            "output": "9b71723ea355c28a",
+            "compilerInputsSha256": "b5ec9650644a7281bb6f0c23048c603cb7846e88062a782b475aa7e651e1c59d",
+            "compilerInputs": "/Users/user/Desktop/Kortex-v2/./.kortex/target/wasm32-unknown-unknown/wasm-release/run-calc-compound-interest.wasm: /Users/user/Desktop/Kortex-v2/.kortex/build/calc.compound-interest/src/main.rs /Users/user/Desktop/Kortex-v2/crates/kortex/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/port.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/schema.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/validate.rs /Users/user/Desktop/Kortex-v2/crates/kortex-i18n/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-macros/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/account-fetch.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/app-host.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/clipboard.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/document.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/download.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/host-bus.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/offline.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/storage.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/worker.rs /Users/user/Desktop/Kortex-v2/crates/kortex-runtime/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/auto.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/components.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/mode.rs /Users/user/Desktop/Kortex-v2/tools/calc/compound-interest/locales/en.toml /Users/user/Desktop/Kortex-v2/tools/calc/compound-interest/locales/fr.toml /Users/user/Desktop/Kortex-v2/tools/calc/compound-interest/src/engine.rs /Users/user/Desktop/Kortex-v2/tools/calc/compound-interest/src/lib.rs /Users/user/Desktop/Kortex-v2/tools/calc/compound-interest/tool.toml\n"
+          },
+          {
+            "id": "calc.date-add",
+            "oldSource": "a5e902b8d4e2faab",
+            "newSource": "3285aa90db2ffbb0",
+            "output": "1456435ca45cee07",
+            "compilerInputsSha256": "13ee56b5060252ac62f97b1bfd78879fabb7673477df8d0cea99d44dfe16e473",
+            "compilerInputs": "/Users/user/Desktop/Kortex-v2/./.kortex/target/wasm32-unknown-unknown/wasm-release/run-calc-date-add.wasm: /Users/user/Desktop/Kortex-v2/.kortex/build/calc.date-add/src/main.rs /Users/user/Desktop/Kortex-v2/crates/kortex/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/port.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/schema.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/validate.rs /Users/user/Desktop/Kortex-v2/crates/kortex-date/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-i18n/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-macros/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/account-fetch.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/app-host.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/clipboard.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/document.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/download.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/host-bus.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/offline.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/storage.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/worker.rs /Users/user/Desktop/Kortex-v2/crates/kortex-runtime/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/auto.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/components.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/mode.rs /Users/user/Desktop/Kortex-v2/tools/calc/date-add/locales/en.toml /Users/user/Desktop/Kortex-v2/tools/calc/date-add/locales/fr.toml /Users/user/Desktop/Kortex-v2/tools/calc/date-add/src/engine.rs /Users/user/Desktop/Kortex-v2/tools/calc/date-add/src/lib.rs /Users/user/Desktop/Kortex-v2/tools/calc/date-add/tool.toml\n"
+          },
+          {
+            "id": "calc.date-difference",
+            "oldSource": "716a5c0a9828d17d",
+            "newSource": "ce264ad09ee5ac62",
+            "output": "804f9c6baaa53204",
+            "compilerInputsSha256": "f3d388311b95f7bca76efa7582c4f419d83afba919b062f3906c94b08bc18ef3",
+            "compilerInputs": "/Users/user/Desktop/Kortex-v2/./.kortex/target/wasm32-unknown-unknown/wasm-release/run-calc-date-difference.wasm: /Users/user/Desktop/Kortex-v2/.kortex/build/calc.date-difference/src/main.rs /Users/user/Desktop/Kortex-v2/crates/kortex/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/port.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/schema.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/validate.rs /Users/user/Desktop/Kortex-v2/crates/kortex-date/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-i18n/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-macros/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/account-fetch.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/app-host.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/clipboard.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/document.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/download.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/host-bus.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/offline.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/storage.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/worker.rs /Users/user/Desktop/Kortex-v2/crates/kortex-runtime/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/auto.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/components.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/mode.rs /Users/user/Desktop/Kortex-v2/tools/calc/date-difference/locales/en.toml /Users/user/Desktop/Kortex-v2/tools/calc/date-difference/locales/fr.toml /Users/user/Desktop/Kortex-v2/tools/calc/date-difference/src/engine.rs /Users/user/Desktop/Kortex-v2/tools/calc/date-difference/src/lib.rs /Users/user/Desktop/Kortex-v2/tools/calc/date-difference/tool.toml\n"
+          },
+          {
+            "id": "calc.fuel-cost",
+            "oldSource": "f7e26434fba6f73c",
+            "newSource": "372917794557f274",
+            "output": "e862c74a1ad29349",
+            "compilerInputsSha256": "71aa7b0e795b6d36f3fd79bf62f74f72235c5ba01fea81003acb4207ad8b628d",
+            "compilerInputs": "/Users/user/Desktop/Kortex-v2/./.kortex/target/wasm32-unknown-unknown/wasm-release/run-calc-fuel-cost.wasm: /Users/user/Desktop/Kortex-v2/.kortex/build/calc.fuel-cost/src/main.rs /Users/user/Desktop/Kortex-v2/crates/kortex/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/port.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/schema.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/validate.rs /Users/user/Desktop/Kortex-v2/crates/kortex-i18n/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-macros/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/account-fetch.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/app-host.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/clipboard.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/document.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/download.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/host-bus.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/offline.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/storage.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/worker.rs /Users/user/Desktop/Kortex-v2/crates/kortex-runtime/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/auto.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/components.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/mode.rs /Users/user/Desktop/Kortex-v2/tools/calc/fuel-cost/locales/en.toml /Users/user/Desktop/Kortex-v2/tools/calc/fuel-cost/locales/fr.toml /Users/user/Desktop/Kortex-v2/tools/calc/fuel-cost/src/engine.rs /Users/user/Desktop/Kortex-v2/tools/calc/fuel-cost/src/lib.rs /Users/user/Desktop/Kortex-v2/tools/calc/fuel-cost/tool.toml\n"
+          },
+          {
+            "id": "calc.gross-net-salary",
+            "oldSource": "18594ab704788d23",
+            "newSource": "27a988f9530e52fe",
+            "output": "36c8d9331b5f1ec5",
+            "compilerInputsSha256": "7c8ff6d47179e9f93f9576fe7d5d06e5c771e9b9c1b24e6f18f61df9e054591c",
+            "compilerInputs": "/Users/user/Desktop/Kortex-v2/./.kortex/target/wasm32-unknown-unknown/wasm-release/run-calc-gross-net-salary.wasm: /Users/user/Desktop/Kortex-v2/.kortex/build/calc.gross-net-salary/src/main.rs /Users/user/Desktop/Kortex-v2/crates/kortex/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/port.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/schema.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/validate.rs /Users/user/Desktop/Kortex-v2/crates/kortex-i18n/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-macros/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/account-fetch.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/app-host.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/clipboard.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/document.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/download.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/host-bus.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/offline.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/storage.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/worker.rs /Users/user/Desktop/Kortex-v2/crates/kortex-runtime/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/auto.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/components.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/mode.rs /Users/user/Desktop/Kortex-v2/tools/calc/gross-net-salary/locales/en.toml /Users/user/Desktop/Kortex-v2/tools/calc/gross-net-salary/locales/fr.toml /Users/user/Desktop/Kortex-v2/tools/calc/gross-net-salary/src/engine.rs /Users/user/Desktop/Kortex-v2/tools/calc/gross-net-salary/src/lib.rs /Users/user/Desktop/Kortex-v2/tools/calc/gross-net-salary/tool.toml\n"
+          },
+          {
+            "id": "calc.loan",
+            "oldSource": "ff287ae5cfc69de9",
+            "newSource": "f2bcc6b6d9252ce2",
+            "output": "f4db2c5ca7a1d7d1",
+            "compilerInputsSha256": "121c3fc63d022b152dbe4f71e0c39db39202f77f52e1892f5ebac09e4ad28cb5",
+            "compilerInputs": "/Users/user/Desktop/Kortex-v2/./.kortex/target/wasm32-unknown-unknown/wasm-release/run-calc-loan.wasm: /Users/user/Desktop/Kortex-v2/.kortex/build/calc.loan/src/main.rs /Users/user/Desktop/Kortex-v2/crates/kortex/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/port.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/schema.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/validate.rs /Users/user/Desktop/Kortex-v2/crates/kortex-i18n/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-macros/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/account-fetch.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/app-host.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/clipboard.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/document.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/download.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/host-bus.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/offline.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/storage.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/worker.rs /Users/user/Desktop/Kortex-v2/crates/kortex-runtime/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/auto.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/components.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/mode.rs /Users/user/Desktop/Kortex-v2/tools/calc/loan/locales/en.toml /Users/user/Desktop/Kortex-v2/tools/calc/loan/locales/fr.toml /Users/user/Desktop/Kortex-v2/tools/calc/loan/src/engine.rs /Users/user/Desktop/Kortex-v2/tools/calc/loan/src/lib.rs /Users/user/Desktop/Kortex-v2/tools/calc/loan/tool.toml\n"
+          },
+          {
+            "id": "calc.tip",
+            "oldSource": "25db5868381f7d3d",
+            "newSource": "210f1193dbd9cc92",
+            "output": "e3b23dd0230c20e3",
+            "compilerInputsSha256": "00567a4dab985914bb8292bc6baf3c91b8ec75f72044f488c7f2e96010f81c7d",
+            "compilerInputs": "/Users/user/Desktop/Kortex-v2/./.kortex/target/wasm32-unknown-unknown/wasm-release/run-calc-tip.wasm: /Users/user/Desktop/Kortex-v2/.kortex/build/calc.tip/src/main.rs /Users/user/Desktop/Kortex-v2/crates/kortex/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/port.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/schema.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/validate.rs /Users/user/Desktop/Kortex-v2/crates/kortex-i18n/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-macros/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/account-fetch.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/app-host.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/clipboard.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/document.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/download.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/host-bus.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/offline.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/storage.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/worker.rs /Users/user/Desktop/Kortex-v2/crates/kortex-runtime/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/auto.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/components.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/mode.rs /Users/user/Desktop/Kortex-v2/tools/calc/tip/locales/en.toml /Users/user/Desktop/Kortex-v2/tools/calc/tip/locales/fr.toml /Users/user/Desktop/Kortex-v2/tools/calc/tip/src/engine.rs /Users/user/Desktop/Kortex-v2/tools/calc/tip/src/lib.rs /Users/user/Desktop/Kortex-v2/tools/calc/tip/tool.toml\n"
+          },
+          {
+            "id": "calc.unit-price",
+            "oldSource": "05f4d2c3ca38eabd",
+            "newSource": "2d1fa84fb63438e9",
+            "output": "556f0044f8004d8b",
+            "compilerInputsSha256": "6bd23d16ca52cec3eae3c62b4d414a21446eafc6b80b3e1374c0c403622496fa",
+            "compilerInputs": "/Users/user/Desktop/Kortex-v2/./.kortex/target/wasm32-unknown-unknown/wasm-release/run-calc-unit-price.wasm: /Users/user/Desktop/Kortex-v2/.kortex/build/calc.unit-price/src/main.rs /Users/user/Desktop/Kortex-v2/crates/kortex/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/port.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/schema.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/validate.rs /Users/user/Desktop/Kortex-v2/crates/kortex-i18n/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-macros/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/account-fetch.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/app-host.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/clipboard.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/document.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/download.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/host-bus.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/offline.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/storage.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/worker.rs /Users/user/Desktop/Kortex-v2/crates/kortex-runtime/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/auto.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/components.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/mode.rs /Users/user/Desktop/Kortex-v2/tools/calc/unit-price/locales/en.toml /Users/user/Desktop/Kortex-v2/tools/calc/unit-price/locales/fr.toml /Users/user/Desktop/Kortex-v2/tools/calc/unit-price/src/engine.rs /Users/user/Desktop/Kortex-v2/tools/calc/unit-price/src/lib.rs /Users/user/Desktop/Kortex-v2/tools/calc/unit-price/tool.toml\n"
+          },
+          {
+            "id": "calc.vat",
+            "oldSource": "b03e8803a09896ae",
+            "newSource": "ba413f28779e6609",
+            "output": "a06c5df2610a24c7",
+            "compilerInputsSha256": "f26e5e1439aa24e5577c23ef17b404d5e8926fd425046a867290ec8551d327c2",
+            "compilerInputs": "/Users/user/Desktop/Kortex-v2/./.kortex/target/wasm32-unknown-unknown/wasm-release/run-calc-vat.wasm: /Users/user/Desktop/Kortex-v2/.kortex/build/calc.vat/src/main.rs /Users/user/Desktop/Kortex-v2/crates/kortex/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/port.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/schema.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/validate.rs /Users/user/Desktop/Kortex-v2/crates/kortex-i18n/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-macros/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/account-fetch.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/app-host.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/clipboard.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/document.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/download.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/host-bus.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/offline.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/storage.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/worker.rs /Users/user/Desktop/Kortex-v2/crates/kortex-runtime/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/auto.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/components.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/mode.rs /Users/user/Desktop/Kortex-v2/tools/calc/vat/locales/en.toml /Users/user/Desktop/Kortex-v2/tools/calc/vat/locales/fr.toml /Users/user/Desktop/Kortex-v2/tools/calc/vat/src/engine.rs /Users/user/Desktop/Kortex-v2/tools/calc/vat/src/lib.rs /Users/user/Desktop/Kortex-v2/tools/calc/vat/tool.toml\n"
+          },
+          {
+            "id": "code.base64",
+            "oldSource": "0ff1c5fdd0e50b2d",
+            "newSource": "f75ef2fde06249c8",
+            "output": "d983dc371c5cde84",
+            "compilerInputsSha256": "7ea7cbd395f1db82d7648f99809dac1dc87fe5f3cec3a84c03fad7f1164739a7",
+            "compilerInputs": "/Users/user/Desktop/Kortex-v2/./.kortex/target/wasm32-unknown-unknown/wasm-release/run-code-base64.wasm: /Users/user/Desktop/Kortex-v2/.kortex/build/code.base64/src/main.rs /Users/user/Desktop/Kortex-v2/crates/kortex/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/port.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/schema.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/validate.rs /Users/user/Desktop/Kortex-v2/crates/kortex-i18n/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-macros/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/account-fetch.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/app-host.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/clipboard.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/document.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/download.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/host-bus.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/offline.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/storage.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/worker.rs /Users/user/Desktop/Kortex-v2/crates/kortex-runtime/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/auto.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/components.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/mode.rs /Users/user/Desktop/Kortex-v2/tools/code/base64/locales/en.toml /Users/user/Desktop/Kortex-v2/tools/code/base64/locales/fr.toml /Users/user/Desktop/Kortex-v2/tools/code/base64/src/engine.rs /Users/user/Desktop/Kortex-v2/tools/code/base64/src/lib.rs /Users/user/Desktop/Kortex-v2/tools/code/base64/tool.toml\n"
+          },
+          {
+            "id": "code.chmod",
+            "oldSource": "d5f2faa9316b8389",
+            "newSource": "041ae9b145dad647",
+            "output": "a0f490cd673cb224",
+            "compilerInputsSha256": "6baf4b40872959feb0030044e50eb0cc57782913301e59ce75a6cf7d9e410d2d",
+            "compilerInputs": "/Users/user/Desktop/Kortex-v2/./.kortex/target/wasm32-unknown-unknown/wasm-release/run-code-chmod.wasm: /Users/user/Desktop/Kortex-v2/.kortex/build/code.chmod/src/main.rs /Users/user/Desktop/Kortex-v2/crates/kortex/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/port.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/schema.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/validate.rs /Users/user/Desktop/Kortex-v2/crates/kortex-i18n/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-macros/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/account-fetch.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/app-host.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/clipboard.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/document.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/download.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/host-bus.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/offline.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/storage.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/worker.rs /Users/user/Desktop/Kortex-v2/crates/kortex-runtime/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/auto.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/components.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/mode.rs /Users/user/Desktop/Kortex-v2/tools/code/chmod/locales/en.toml /Users/user/Desktop/Kortex-v2/tools/code/chmod/locales/fr.toml /Users/user/Desktop/Kortex-v2/tools/code/chmod/src/engine.rs /Users/user/Desktop/Kortex-v2/tools/code/chmod/src/lib.rs /Users/user/Desktop/Kortex-v2/tools/code/chmod/tool.toml\n"
+          },
+          {
+            "id": "code.html-entities",
+            "oldSource": "983d39c0e7573829",
+            "newSource": "8b0671bf50d9e1ec",
+            "output": "862495bf5cbc210b",
+            "compilerInputsSha256": "7194053abc5f9f7467f816dc22bd40d4a492c90445a890effcb952515e001d29",
+            "compilerInputs": "/Users/user/Desktop/Kortex-v2/./.kortex/target/wasm32-unknown-unknown/wasm-release/run-code-html-entities.wasm: /Users/user/Desktop/Kortex-v2/.kortex/build/code.html-entities/src/main.rs /Users/user/Desktop/Kortex-v2/crates/kortex/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/port.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/schema.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/validate.rs /Users/user/Desktop/Kortex-v2/crates/kortex-i18n/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-macros/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/account-fetch.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/app-host.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/clipboard.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/document.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/download.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/host-bus.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/offline.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/storage.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/worker.rs /Users/user/Desktop/Kortex-v2/crates/kortex-runtime/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/auto.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/components.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/mode.rs /Users/user/Desktop/Kortex-v2/tools/code/html-entities/locales/en.toml /Users/user/Desktop/Kortex-v2/tools/code/html-entities/locales/fr.toml /Users/user/Desktop/Kortex-v2/tools/code/html-entities/src/engine.rs /Users/user/Desktop/Kortex-v2/tools/code/html-entities/src/lib.rs /Users/user/Desktop/Kortex-v2/tools/code/html-entities/tool.toml\n"
+          },
+          {
+            "id": "code.json-formatter",
+            "oldSource": "fd9803446a2e1b0f",
+            "newSource": "60861ce372c78048",
+            "output": "ca6404dc8b17cea3",
+            "compilerInputsSha256": "9dfa356cfe1429518aecef3331ec77c963c9bf269e18fa9968eb821318c8e2cf",
+            "compilerInputs": "/Users/user/Desktop/Kortex-v2/./.kortex/target/wasm32-unknown-unknown/wasm-release/run-code-json-formatter.wasm: /Users/user/Desktop/Kortex-v2/.kortex/build/code.json-formatter/src/main.rs /Users/user/Desktop/Kortex-v2/crates/kortex/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/port.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/schema.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/validate.rs /Users/user/Desktop/Kortex-v2/crates/kortex-i18n/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-macros/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/account-fetch.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/app-host.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/clipboard.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/document.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/download.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/host-bus.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/offline.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/storage.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/worker.rs /Users/user/Desktop/Kortex-v2/crates/kortex-runtime/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/auto.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/components.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/mode.rs /Users/user/Desktop/Kortex-v2/tools/code/json-formatter/locales/en.toml /Users/user/Desktop/Kortex-v2/tools/code/json-formatter/locales/fr.toml /Users/user/Desktop/Kortex-v2/tools/code/json-formatter/src/engine.rs /Users/user/Desktop/Kortex-v2/tools/code/json-formatter/src/lib.rs /Users/user/Desktop/Kortex-v2/tools/code/json-formatter/tool.toml\n"
+          },
+          {
+            "id": "code.markdown-table",
+            "oldSource": "288f0975f27d5612",
+            "newSource": "b7de59a3f6f7aacc",
+            "output": "59f70958f7a72e6d",
+            "compilerInputsSha256": "0529a501c874e51c9144d4c26819c14623a4e8e282565f6b9010743bb365c80b",
+            "compilerInputs": "/Users/user/Desktop/Kortex-v2/./.kortex/target/wasm32-unknown-unknown/wasm-release/run-code-markdown-table.wasm: /Users/user/Desktop/Kortex-v2/.kortex/build/code.markdown-table/src/main.rs /Users/user/Desktop/Kortex-v2/crates/kortex/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/port.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/schema.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/validate.rs /Users/user/Desktop/Kortex-v2/crates/kortex-i18n/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-macros/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/account-fetch.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/app-host.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/clipboard.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/document.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/download.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/host-bus.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/offline.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/storage.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/worker.rs /Users/user/Desktop/Kortex-v2/crates/kortex-runtime/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/auto.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/components.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/mode.rs /Users/user/Desktop/Kortex-v2/tools/code/markdown-table/locales/en.toml /Users/user/Desktop/Kortex-v2/tools/code/markdown-table/locales/fr.toml /Users/user/Desktop/Kortex-v2/tools/code/markdown-table/src/engine.rs /Users/user/Desktop/Kortex-v2/tools/code/markdown-table/src/lib.rs /Users/user/Desktop/Kortex-v2/tools/code/markdown-table/tool.toml\n"
+          },
+          {
+            "id": "code.number-base",
+            "oldSource": "ebd3bb40b801a2f8",
+            "newSource": "94fd471c8f811c4c",
+            "output": "88b968a606fa6329",
+            "compilerInputsSha256": "9d065478024373b16eba88c17d795410435ad16492b1ce95ce30fa33116ad1ba",
+            "compilerInputs": "/Users/user/Desktop/Kortex-v2/./.kortex/target/wasm32-unknown-unknown/wasm-release/run-code-number-base.wasm: /Users/user/Desktop/Kortex-v2/.kortex/build/code.number-base/src/main.rs /Users/user/Desktop/Kortex-v2/crates/kortex/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/port.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/schema.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/validate.rs /Users/user/Desktop/Kortex-v2/crates/kortex-i18n/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-macros/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/account-fetch.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/app-host.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/clipboard.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/document.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/download.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/host-bus.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/offline.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/storage.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/worker.rs /Users/user/Desktop/Kortex-v2/crates/kortex-runtime/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/auto.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/components.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/mode.rs /Users/user/Desktop/Kortex-v2/tools/code/number-base/locales/en.toml /Users/user/Desktop/Kortex-v2/tools/code/number-base/locales/fr.toml /Users/user/Desktop/Kortex-v2/tools/code/number-base/src/engine.rs /Users/user/Desktop/Kortex-v2/tools/code/number-base/src/lib.rs /Users/user/Desktop/Kortex-v2/tools/code/number-base/tool.toml\n"
+          },
+          {
+            "id": "code.url-encoder",
+            "oldSource": "04541d0164631e5d",
+            "newSource": "0da3f4b3c3477ac5",
+            "output": "09711c4dadc03bc0",
+            "compilerInputsSha256": "52afbb42655db5c41ac1f05248b7acdd7f009dd4b8315463c715bc76c45099d5",
+            "compilerInputs": "/Users/user/Desktop/Kortex-v2/./.kortex/target/wasm32-unknown-unknown/wasm-release/run-code-url-encoder.wasm: /Users/user/Desktop/Kortex-v2/.kortex/build/code.url-encoder/src/main.rs /Users/user/Desktop/Kortex-v2/crates/kortex/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/port.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/schema.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/validate.rs /Users/user/Desktop/Kortex-v2/crates/kortex-i18n/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-macros/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/account-fetch.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/app-host.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/clipboard.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/document.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/download.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/host-bus.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/offline.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/storage.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/worker.rs /Users/user/Desktop/Kortex-v2/crates/kortex-runtime/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/auto.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/components.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/mode.rs /Users/user/Desktop/Kortex-v2/tools/code/url-encoder/locales/en.toml /Users/user/Desktop/Kortex-v2/tools/code/url-encoder/locales/fr.toml /Users/user/Desktop/Kortex-v2/tools/code/url-encoder/src/engine.rs /Users/user/Desktop/Kortex-v2/tools/code/url-encoder/src/lib.rs /Users/user/Desktop/Kortex-v2/tools/code/url-encoder/tool.toml\n"
+          },
+          {
+            "id": "code.uuid-generator",
+            "oldSource": "460fde2a122be8e1",
+            "newSource": "93b1c329410ded91",
+            "output": "05d97d0c5d9ea4a9",
+            "compilerInputsSha256": "5952cb37604a62bc0ce54a727e0d13b0305d2cb81a710e32fd3cb9849e702803",
+            "compilerInputs": "/Users/user/Desktop/Kortex-v2/./.kortex/target/wasm32-unknown-unknown/wasm-release/run-code-uuid-generator.wasm: /Users/user/Desktop/Kortex-v2/.kortex/build/code.uuid-generator/src/main.rs /Users/user/Desktop/Kortex-v2/crates/kortex/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/port.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/schema.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/validate.rs /Users/user/Desktop/Kortex-v2/crates/kortex-i18n/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-macros/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/account-fetch.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/app-host.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/clipboard.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/document.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/download.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/host-bus.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/offline.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/storage.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/worker.rs /Users/user/Desktop/Kortex-v2/crates/kortex-runtime/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/auto.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/components.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/mode.rs /Users/user/Desktop/Kortex-v2/tools/code/uuid-generator/locales/en.toml /Users/user/Desktop/Kortex-v2/tools/code/uuid-generator/locales/fr.toml /Users/user/Desktop/Kortex-v2/tools/code/uuid-generator/src/engine.rs /Users/user/Desktop/Kortex-v2/tools/code/uuid-generator/src/lib.rs /Users/user/Desktop/Kortex-v2/tools/code/uuid-generator/tool.toml\n"
+          },
+          {
+            "id": "color.contrast-checker",
+            "oldSource": "0937ea2185cc7600",
+            "newSource": "dbaae0807d655012",
+            "output": "876cac67c33284d2",
+            "compilerInputsSha256": "7e945f3019d34d9a6fe921f58f6f48105e81418481416c78d1c907d09e0a12bb",
+            "compilerInputs": "/Users/user/Desktop/Kortex-v2/./.kortex/target/wasm32-unknown-unknown/wasm-release/run-color-contrast-checker.wasm: /Users/user/Desktop/Kortex-v2/.kortex/build/color.contrast-checker/src/main.rs /Users/user/Desktop/Kortex-v2/crates/kortex/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-color/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/port.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/schema.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/validate.rs /Users/user/Desktop/Kortex-v2/crates/kortex-i18n/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-macros/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/account-fetch.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/app-host.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/clipboard.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/document.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/download.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/host-bus.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/offline.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/storage.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/worker.rs /Users/user/Desktop/Kortex-v2/crates/kortex-runtime/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/auto.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/components.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/mode.rs /Users/user/Desktop/Kortex-v2/tools/color/contrast-checker/locales/en.toml /Users/user/Desktop/Kortex-v2/tools/color/contrast-checker/locales/fr.toml /Users/user/Desktop/Kortex-v2/tools/color/contrast-checker/src/engine.rs /Users/user/Desktop/Kortex-v2/tools/color/contrast-checker/src/lib.rs /Users/user/Desktop/Kortex-v2/tools/color/contrast-checker/tool.toml\n"
+          },
+          {
+            "id": "color.converter",
+            "oldSource": "262376f82fc8a1b9",
+            "newSource": "1116ae2a4997cd0f",
+            "output": "ce4075a1d5b11e16",
+            "compilerInputsSha256": "09b2d38bc818ff34ad88ec6ddec0c569adcbdc3788b9fc26c92cc9f0cc8a0eff",
+            "compilerInputs": "/Users/user/Desktop/Kortex-v2/./.kortex/target/wasm32-unknown-unknown/wasm-release/run-color-converter.wasm: /Users/user/Desktop/Kortex-v2/.kortex/build/color.converter/src/main.rs /Users/user/Desktop/Kortex-v2/crates/kortex/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-color/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/port.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/schema.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/validate.rs /Users/user/Desktop/Kortex-v2/crates/kortex-i18n/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-macros/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/account-fetch.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/app-host.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/clipboard.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/document.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/download.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/host-bus.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/offline.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/storage.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/worker.rs /Users/user/Desktop/Kortex-v2/crates/kortex-runtime/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/auto.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/components.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/mode.rs /Users/user/Desktop/Kortex-v2/tools/color/converter/locales/en.toml /Users/user/Desktop/Kortex-v2/tools/color/converter/locales/fr.toml /Users/user/Desktop/Kortex-v2/tools/color/converter/src/engine.rs /Users/user/Desktop/Kortex-v2/tools/color/converter/src/lib.rs /Users/user/Desktop/Kortex-v2/tools/color/converter/tool.toml\n"
+          },
+          {
+            "id": "convert.timestamp",
+            "oldSource": "adb1bbacfa1bab95",
+            "newSource": "2c27f467d3ad9de7",
+            "output": "054ab46c4116544d",
+            "compilerInputsSha256": "e4ad4942797c6d9d82dddc7c3bf1b79b05acb7ca1e2e25196b3656fd1ce37a6c",
+            "compilerInputs": "/Users/user/Desktop/Kortex-v2/./.kortex/target/wasm32-unknown-unknown/wasm-release/run-convert-timestamp.wasm: /Users/user/Desktop/Kortex-v2/.kortex/build/convert.timestamp/src/main.rs /Users/user/Desktop/Kortex-v2/crates/kortex/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/port.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/schema.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/validate.rs /Users/user/Desktop/Kortex-v2/crates/kortex-date/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-i18n/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-macros/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/account-fetch.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/app-host.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/clipboard.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/document.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/download.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/host-bus.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/offline.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/storage.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/worker.rs /Users/user/Desktop/Kortex-v2/crates/kortex-runtime/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/auto.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/components.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/mode.rs /Users/user/Desktop/Kortex-v2/tools/convert/timestamp/locales/en.toml /Users/user/Desktop/Kortex-v2/tools/convert/timestamp/locales/fr.toml /Users/user/Desktop/Kortex-v2/tools/convert/timestamp/src/engine.rs /Users/user/Desktop/Kortex-v2/tools/convert/timestamp/src/lib.rs /Users/user/Desktop/Kortex-v2/tools/convert/timestamp/tool.toml\n"
+          },
+          {
+            "id": "convert.units",
+            "oldSource": "ff7dedf046f69c68",
+            "newSource": "ae26c6103554dda2",
+            "output": "9ed6dca580a30316",
+            "compilerInputsSha256": "dacc8a82cf4bbd5abf5c1ce870518b757c7238a1302334adfe5e1b44f6fc3567",
+            "compilerInputs": "/Users/user/Desktop/Kortex-v2/./.kortex/target/wasm32-unknown-unknown/wasm-release/run-convert-units.wasm: /Users/user/Desktop/Kortex-v2/.kortex/build/convert.units/src/main.rs /Users/user/Desktop/Kortex-v2/crates/kortex/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/port.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/schema.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/validate.rs /Users/user/Desktop/Kortex-v2/crates/kortex-i18n/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-macros/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/account-fetch.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/app-host.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/clipboard.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/document.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/download.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/host-bus.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/offline.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/storage.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/worker.rs /Users/user/Desktop/Kortex-v2/crates/kortex-runtime/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/auto.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/components.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/mode.rs /Users/user/Desktop/Kortex-v2/tools/convert/units/locales/en.toml /Users/user/Desktop/Kortex-v2/tools/convert/units/locales/fr.toml /Users/user/Desktop/Kortex-v2/tools/convert/units/src/engine.rs /Users/user/Desktop/Kortex-v2/tools/convert/units/src/lib.rs /Users/user/Desktop/Kortex-v2/tools/convert/units/tool.toml\n"
+          },
+          {
+            "id": "image.convert",
+            "oldSource": "c828ecb16fd0430e",
+            "newSource": "a33cfebb5ab6f35b",
+            "output": "f6a9a964107ac255",
+            "compilerInputsSha256": "926c81860a98e3027a11cf466ba1af2509435b51e754e2cfd1bed36a026b5d12",
+            "compilerInputs": "/Users/user/Desktop/Kortex-v2/./.kortex/target/wasm32-unknown-unknown/wasm-release/run-image-convert.wasm: /Users/user/Desktop/Kortex-v2/.kortex/build/image.convert/src/main.rs /Users/user/Desktop/Kortex-v2/crates/kortex/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/port.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/schema.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/validate.rs /Users/user/Desktop/Kortex-v2/crates/kortex-i18n/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-macros/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/account-fetch.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/app-host.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/clipboard.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/document.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/download.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/host-bus.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/offline.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/storage.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/worker.rs /Users/user/Desktop/Kortex-v2/crates/kortex-runtime/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/auto.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/components.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/mode.rs /Users/user/Desktop/Kortex-v2/tools/image/convert/locales/en.toml /Users/user/Desktop/Kortex-v2/tools/image/convert/locales/fr.toml /Users/user/Desktop/Kortex-v2/tools/image/convert/src/engine.rs /Users/user/Desktop/Kortex-v2/tools/image/convert/src/lib.rs /Users/user/Desktop/Kortex-v2/tools/image/convert/tool.toml\n"
+          },
+          {
+            "id": "qr.generator",
+            "oldSource": "3622bffc77acaff1",
+            "newSource": "cffea74ef4f00b01",
+            "output": "693efa7c164f0238",
+            "compilerInputsSha256": "2f2515253750a8589c64893ca5afd526f5d536a91dfa60c5e26400f3d9c7ed39",
+            "compilerInputs": "/Users/user/Desktop/Kortex-v2/./.kortex/target/wasm32-unknown-unknown/wasm-release/run-qr-generator.wasm: /Users/user/Desktop/Kortex-v2/.kortex/build/qr.generator/src/main.rs /Users/user/Desktop/Kortex-v2/crates/kortex/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/port.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/schema.rs /Users/user/Desktop/Kortex-v2/crates/kortex-contract/src/validate.rs /Users/user/Desktop/Kortex-v2/crates/kortex-i18n/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-macros/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/account-fetch.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/app-host.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/clipboard.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/document.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/download.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/host-bus.js /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/offline.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/storage.rs /Users/user/Desktop/Kortex-v2/crates/kortex-platform/src/worker.rs /Users/user/Desktop/Kortex-v2/crates/kortex-runtime/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/auto.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/components.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/lib.rs /Users/user/Desktop/Kortex-v2/crates/kortex-ui/src/mode.rs /Users/user/Desktop/Kortex-v2/tools/qr/generator/locales/en.toml /Users/user/Desktop/Kortex-v2/tools/qr/generator/locales/fr.toml /Users/user/Desktop/Kortex-v2/tools/qr/generator/src/engine.rs /Users/user/Desktop/Kortex-v2/tools/qr/generator/src/lib.rs /Users/user/Desktop/Kortex-v2/tools/qr/generator/tool.toml\n"
+          }
+        ],
+        "ignoredFiles": [
+          "crates/kortex-shell/locales/fr.toml",
+          "crates/kortex-shell/locales/en.toml"
+        ]
+      }
+    ]
+  },
+  "date": "2026-10-17T11:38:44.397Z",
+  "scope": "Explicit browser account session and metadata backups; not automatic Sync or native authentication",
+  "sources": {
+    "apps/hub/CHANGELOG.md": "281936e66e3a158892bf77178ac8669ea6116fcac71e9b627eb0543dbd548f9a",
+    "apps/hub/Cargo.toml": "befe08acda5ec2b06b6994ce174afb391837821d69e8a5c6964ed739c0f819ef",
+    "apps/hub/Dioxus.toml": "943f50f0f751be0e1264a92f8e8aedfc770163b28e41796cec11d74a20814a61",
+    "apps/hub/app.toml": "55c3acab97dd1636a362247509b07ac0e7f3458992eefefc77f303e86e92672d",
+    "apps/hub/content/en.md": "e62aa56060df9567322e486bdb630f9c34866a5202e16f44dbfe07d89a3ebc43",
+    "apps/hub/content/fr.md": "800f7c2ec9e8a44dad22844a40c7cca2228d153eae74c56e50e99882eb98d455",
+    "apps/hub/glyph.svg": "5bf0b229380d982451ac2444bb36b568baef37d696941f6a29643cbcf16e1986",
+    "apps/hub/locales/en.toml": "c965720adcb90d3a425759c44cb210e06f55ea1dfd6f497936a57b43ad814b19",
+    "apps/hub/locales/fr.toml": "5a949016c21b9511e10da50548b880a6a7eb78d4c4cc2bef70dd617088f989d5",
+    "apps/hub/src/engine.rs": "89e77eff752fee6929ac16dd5bde32bb4683ef01eb9b3f61906386caded3ab72",
+    "apps/hub/src/hub.css": "ff9a3bc6d18ed8f8997130cd153bbe3a0d4ba2074415c1383a0424bec67af285",
+    "apps/hub/src/lib.rs": "7295fb593b1936175531d0a6c8d5962e694309f306288a5f0a7a7726b87033c7",
+    "apps/hub/src/main.rs": "f482496f415fd5e0d9d40f1921d9315a42f6b351ed19fe0326024aaa94db5716",
+    "apps/hub/src/ui.rs": "c356423bf9c138a178d771561507766623f456062d393564e5833165fd39d155",
+    "apps/hub/tests/engine.rs": "3427fbaf36eff1946708419f312e518eefb8498d0d6927d479fa002db0c454c4",
+    "apps/hub/widgets/activity/widget.toml": "6cd17ac80751795c6d632d3d92621ea3432f184e3c1687dac0addf943d1ba21b",
+    "apps/hub/widgets/catalogue/widget.toml": "83014cc4b0a999999fb32276f65dd29351d8b0a34554f8a88017dfc6fb5b5d79",
+    "apps/hub/widgets/favorites/widget.toml": "0481549d98a98a17dea5ae64b902b3999f905cdb1d00436500cf8f76d60e1a2a",
+    "apps/hub/widgets/recent/widget.toml": "1e22318e540c407f8045a1eb91f7a9d87851b89f76614064c83d23463f27f273",
+    "apps/desk/CHANGELOG.md": "281936e66e3a158892bf77178ac8669ea6116fcac71e9b627eb0543dbd548f9a",
+    "apps/desk/Cargo.toml": "e7dee3c3c5c3818e412a8b5d847fd6802df4364d120ac6e0c953aaeb9a55bbac",
+    "apps/desk/Dioxus.toml": "60b24538a3cdce59ed58ce019d5dd9adfaa4fe5cf5e4e7eb07fc627ee616af57",
+    "apps/desk/app.toml": "d455a74ec400e282a50082f2c09ec92ecd98e8ab120c190e9dceeacdf762baf1",
+    "apps/desk/content/en.md": "409f086736fd28abfa9ac174d64adbb3da96ede9140e7773aff1c19c75ab3c17",
+    "apps/desk/content/fr.md": "aca1554de8208e3505dda3497720aea11c50b2deb737f533d3422450a1da3f42",
+    "apps/desk/glyph.svg": "5bf0b229380d982451ac2444bb36b568baef37d696941f6a29643cbcf16e1986",
+    "apps/desk/locales/en.toml": "560aeffdcd19bba72853f6cefcd0e7005ca3698f6e087a8f2b77afb66895dd93",
+    "apps/desk/locales/fr.toml": "8433059afb5ae74e245b058b52e0200780d4ba995e77aeb7c8a933daac5ce4bb",
+    "apps/desk/src/desk.css": "4fcc7888d46b80cb3fadef78441f556e8a2c1812852f0cbc95aea3d9d1b254de",
+    "apps/desk/src/engine.rs": "0258f56a5396ae0006991be9866a2d5a0bf91793fd75ffd5c0288f7a21e5da97",
+    "apps/desk/src/lib.rs": "7295fb593b1936175531d0a6c8d5962e694309f306288a5f0a7a7726b87033c7",
+    "apps/desk/src/main.rs": "1b7737b04e75cce869bfd257c783dac088e618c15b52b5e4ddc29b6caab1a408",
+    "apps/desk/src/ui.rs": "62f439a1cbe7965450e9972aa380a112255d70825f1bf32425ba17a4b754d19c",
+    "apps/desk/tests/engine.rs": "35b0b504fe317723c40b46c8f3e4e89a41feb2ad5cbf38baf40c7b2fa02be9a3",
+    "crates/kortex-auth/Cargo.toml": "855528f252fd3997ca0d2465c944a5c644405eb70cd5cda81748562abb4d794b",
+    "crates/kortex-auth/src/lib.rs": "0ff52a95d438f5888024d09c19acc627fdb1b6ee0d0fc5afc9e5705430b53d44",
+    "crates/kortex-sync/Cargo.toml": "5ec5c39e6de4664cb38d6414d0d23e5d0cf893d1a4e2ebfccd820e6c1ee4b424",
+    "crates/kortex-sync/src/lib.rs": "10060e3dda3e129d0eb298b353d1c8a1f36d1ea3810da3cea1b9cb996a07f1f8",
+    "crates/kortex-shell/Cargo.toml": "6fb93466414da71115a159e9fce7819c8aced7112c6d2c7f331be8fcfb3c93f3",
+    "crates/kortex-shell/locales/en.toml": "9d1c622c0587569ef69871c8c1cd1246f0946ca33b068fb4b9b6db73a351e947",
+    "crates/kortex-shell/locales/fr.toml": "101e4080b4b1296d84e19607eaf09c09e75ad7811d6643b9d3133901d6bdd75b",
+    "crates/kortex-shell/src/account.rs": "e2d71a060647eed67b131b8130cdf6aa1de21a819e2a7fc86354e6fa5125ae30",
+    "crates/kortex-shell/src/lib.rs": "9dc9f7658291afe20fa718e6486cee3e2597727b97fe57bf8a7c3343e7cf2097",
+    "crates/kortex-shell/src/shell.css": "a66d345dae862620cd798a189c70eabd2d555e3d19d8e9b7415965be66b2dca5",
+    "crates/kortex-platform/Cargo.toml": "f97a905d9d85a8ae6869b9ae2b4e12731083228ae5ef93da6fad904444b2b605",
+    "crates/kortex-platform/src/account-fetch.js": "3a76544bdcc96bf629f17bfe48eb32ebb6ce1f4f0b9d9c9855ba4ca06ad9f686",
+    "crates/kortex-platform/src/app-host.js": "717761bbeca36d96b8fa48cbcbe9ec668b197f9aaa5ee4d0cc6179ebeb2441dd",
+    "crates/kortex-platform/src/clipboard.rs": "72eee83ebcbd10e9f484bafe5849a136a2f0182f42c97bcfab14989a0daccba2",
+    "crates/kortex-platform/src/document.rs": "1930748cfa836c80fbd8f3971d1fa8eb4c1a5b1eb88f37206a7088de0d3cc737",
+    "crates/kortex-platform/src/download.js": "cc2f206c3e9400f5dc9eb71eb64a9200ac255412ee5624bca3973feb6a5a92d8",
+    "crates/kortex-platform/src/host-bus.js": "ab07ac70b6397650d9899eab3165e40d5fd718eac9ee7ce161afef4cf2577a6d",
+    "crates/kortex-platform/src/lib.rs": "c7f9e6eeabe2b6244ba77e412694f8e338a2f654d13b6045f114628836254765",
+    "crates/kortex-platform/src/native.rs": "6e8439e17eb1419feb51ec85ee4fd15767662930c257d9c5ce2aa3ba29ffd1f6",
+    "crates/kortex-platform/src/offline-worker.js": "56bbaab3616276f9042cfa4aec848b8d77f98c4670ae7260329480b72cf33ee1",
+    "crates/kortex-platform/src/offline.rs": "184c8aa10d0ba60b6af1374e248a5a4bc89d78054abc0f6e34a6df5c4848cd63",
+    "crates/kortex-platform/src/storage.rs": "8150f3d044ba00f0191ab9cb0d9ad337ce7f583476c25f7bae0bb958f3e63512",
+    "crates/kortex-platform/src/worker.rs": "e45167184051d106bad432d8b0c03d8f09ea09acee6a223fc4fa68dd2bdc1197",
+    "crates/kortex-platform/tests/native.rs": "cbd18e5cc4f95bfc30c7e391ff7e2011e63e12f57cbcfad80f08dd1d24c2bfc1",
+    "crates/kortex-platform/tests/storage.rs": "9fcc14b2367c34d7ee5b223e40938350c549155c3771028d518b03358ed42796",
+    "xtask/src/apps.rs": "f31b02b676fd7c80c0f72353ea3c3fa86eae09d1719e7ff538dbd72826e30d19",
+    "xtask/src/build.rs": "92ee9ebe77bc356baaecbfafaf25677971b06766549e40e315be772d6ccf925f",
+    "xtask/src/check.rs": "1eb9510b5a4ef053f4b212ada3d25ee41e5cad19f6e5b6337ea80b8ec73c9171",
+    "xtask/src/cli_gen.rs": "37bb0f0e98f3e1389d3229f34fce0522fc11248cdc1901efc350c75b7f49b041",
+    "xtask/src/icons.rs": "c85f01523ac922aebd448ba44e4c288c1d15b0bfa3a8f06637043bd81f847974",
+    "xtask/src/main.rs": "eefcaec329bb6dca1eaa3c555053973b057e39695e0ff7756bc2db7e19c31c47",
+    "xtask/src/new_tool.rs": "e43890a2b35271bcc729ed9c45ea2b0df3c3f237cfddb45c94bc1760836f6bae",
+    "xtask/src/platform_check.rs": "9cee6d63207430a9c406f6f9c349850e38be2e54ec693b0b895c639d7540f066",
+    "xtask/src/registry.rs": "621bef9b97af0f6d8e11462a5ca09e4378da6d8325a141a6538aa77f3f132a86",
+    "xtask/src/release.rs": "7422260c6158ac11b983c67e01b15dce7664b6f84f27509320def5171c700f3c",
+    "xtask/src/stats.rs": "ee459a7e66700001c810b77b6dd1d6fbaf6cb074905819f9d2afab892f49f848",
+    "xtask/src/tokens.rs": "ae79bd3642c1d32f644e40213efbf5d13b3c5af9e0e17714dcb8c731a170e332",
+    "xtask/src/tools.rs": "c8152b2248f7a6e4d5fe6791b0c4260495bfdeb333d5695c1357a02ff0d8c615",
+    "xtask/src/worker.rs": "17d1f28b642361f1a1612141a19292dd8bdc748b3368e18e73b99b7a9c70f8c5",
+    "Cargo.toml": "078347aa44151f952f6ec348f9753d41c45bb8ae6fae919cd16821d5a3d05bc9",
+    "Cargo.lock": "797c3138878c59ea512322b5f73c1f6d1e3004cf9177e6348723cba068b9dcd9",
+    "registry/apps.json": "63b52e9dd3171661514cece96f070220e4ce967acb7e7195183ef7be63c2c04d",
+    "registry/index.json": "0f916a68521da493c6c83d34b515a82b76f8eba2fdb247b45255c165bd2e4d76",
+    "brand/domains.toml": "4ff5e146cc7eaaab16dbf9c6b180c7cf9a5e945ca9c0b932beb99f6ed887de4c",
+    "services/api/src/routes/data.ts": "ffcdabf0467ac7dd5af21a5d9a8978989531b037ea9da1aeb94f63f8922f4bd7",
+    "services/api/src/index.ts": "17d311bd962fbcca75cdfda5b13e21870e8fb06df51de661ed193e9f307da0f6",
+    "services/api/tests/data.test.ts": "11f4c59c6ba0b599027e2286418f2fff149d0555fef40c35985737aa83dcd251",
+    "scripts/tests/account-sync.mjs": "c5ee390503088246751eca8a6d74fbd014c97e380be2301a5a961ea186a293d2",
+    "scripts/tests/account-fetch.test.mjs": "cb7f0236418ab7f0443399f179272e7d2a651d7bfe078d5e6431ee56016fe397",
+    "scripts/prepare-publish.mjs": "acd0c5563ebeceb5101c233d03b5035dcf37bf8adb5dfbaf78c29e877241e83f",
+    "web/site/src/lib/apps.ts": "226626dba5abf0b1ed574bfde558d162b3c636890d016c06ec1dd1f673b77686"
+  },
+  "appBuilds": {
+    "apps.hub-web": {
+      "files": {
+        "assets/kortex-hub-dxh3097ae8736d08b.js": "23d909b142f407c5c18094e0354af99b36ba26b74cfc852407614a26bcefd51b",
+        "assets/kortex-hub-dxh635f6ac67b59d2f.js": "a26f7ea246258ab34de985b73f5dde7a129f60059e1b3c7e2306bf2c1bc39d46",
+        "assets/kortex-hub-dxh987af814c2dc2fcf.js": "c723958c774b38a1e3945df71df9c0db005ae806d00dedf6b2d134938c60915f",
+        "assets/kortex-hub-dxhac6f4cc52fd40e7.js": "41192621efa38681ef7e720f30df0d26a6374d356bac2bf2c2dce11fb6017833",
+        "assets/kortex-hub-dxhb9555cbf1a402e6.js": "16ccbac42eb25570917746237f43690773138026659a9b2a2f615b48fe6635f2",
+        "assets/kortex-hub-dxhf7eb37d2b4c7cce7.js": "bceb523589b594200170bba1029d90679c192b28e84f80fa6e1edad94647bca9",
+        "assets/kortex-hub_bg-dxh33f1e1f9cb4a4540.wasm": "6dd5fcbc629141744b1410c804502d0b26d83ca7e5737d59e8ca2ae3948d93a8",
+        "assets/kortex-hub_bg-dxh999a50668eeb10b5.wasm": "0882e13ced17a43caafca0b32289ade3bd1576438738b7b77d039b3c5b782f44",
+        "assets/kortex-hub_bg-dxha5ec1f5070ef76bd.wasm": "b370e6886aabd4b15514e13d65928b96c223675f2f9ae9bf4e74a7c9f7d44def",
+        "assets/kortex-hub_bg-dxha986b82d26d4c5c7.wasm": "399d7888973ed96ecb0c874e4f95662c9fd6d7b1fe98bb3c7c5bacd6bd801d99",
+        "assets/kortex-hub_bg-dxhc65da36ed2a47d1.wasm": "3f99d6bfb68387fc382f8a2814e00bf825de361120f368978afd978098b7dfd2",
+        "assets/kortex-hub_bg-dxheed225dc84d5fbcf.wasm": "27f4d8564856a8502a88864b2071e7cd612f3cc01016282f46773ab8bac834a6",
+        "en/index.html": "1cbf658a3a9401e6b5c52add1a729a58c502081d8736f4f6bf76d0455bdc3188",
+        "index.html": "1cbf658a3a9401e6b5c52add1a729a58c502081d8736f4f6bf76d0455bdc3188"
+      },
+      "output": "2f01cef063ebdc55",
+      "path": "/Users/user/Desktop/Kortex-v2/dist/apps/apps.hub",
+      "source": "68606fd224bb549a:2f24ec3a89311646:a6c9ba2eefcb8112:650c11c672fda530",
+      "target": "web"
+    },
+    "apps.hub-x86_64-apple-darwin": {
+      "files": {
+        "kortex-apps-hub": "4500def83209aa5f4edec0d2dad6fd03c44dd643265708878664eed69ffc7ed7"
+      },
+      "output": "52c7af934c439412",
+      "path": "dist/desktop/x86_64-apple-darwin/apps.hub",
+      "source": "8d1ca54e715c43c1:2f24ec3a89311646:a6c9ba2eefcb8112:650c11c672fda530",
+      "target": "x86_64-apple-darwin"
+    },
+    "apps.desk-web": {
+      "files": {
+        "assets/kortex-desk-dxh5ebff24a24a47d86.js": "81215eeb57987b121567062a397005903518a4cd96c4642a01adea0064984d27",
+        "assets/kortex-desk-dxh61831f9b1caf5d2.js": "398ecf60fe3c7317b06ee6fd57a048071419c5ddc138d7ed9c2320a6eabc4c52",
+        "assets/kortex-desk-dxh74195ad47147c89.js": "3ec92fa57582bae54f6da7b82fad398e51b679faab1fa560f9c7a21b8cd67e0f",
+        "assets/kortex-desk-dxh84a47176147117c9.js": "f0bee8de2e8448a45c2599b2e237ac005f386e16647adb54ff20c15b46bbbbe9",
+        "assets/kortex-desk-dxh8fe5abe41d6672f.js": "23038b3694afaedbb18ace5d6d408ececc8cb248b5945068bf27487d7e6fd58e",
+        "assets/kortex-desk-dxh97198dd4d8fc215e.js": "f3e65bc4c05634d9f7bc97d2a2eb356f6656ecfb642777a713f19ac12941c584",
+        "assets/kortex-desk-dxhc874e35de5932543.js": "11b91211b82e5e684a78f3c2a982fc00b602679e7fa4f33bd57ec16fd78f1345",
+        "assets/kortex-desk-dxhd4891f35944968b.js": "fb512793a482e603cee23fab706bf61d0417a0ca4e156f47209da3ecad214adc",
+        "assets/kortex-desk_bg-dxh2be963ee3d231cbf.wasm": "a0c7a8674264306685e43b1c0e77458efa85adbacc4799c8d0d54e8bb832533d",
+        "assets/kortex-desk_bg-dxh4bdbec9d7c731bb.wasm": "dc12c0eecc1e1cb4dbf70647718460f86470710bf45514a84486084a48411f37",
+        "assets/kortex-desk_bg-dxh4d7c31a4e1c4038.wasm": "dfe46bc8b7784e4162aa117fcf7fdb6d85776e2d63ace0af089a0f4049a76029",
+        "assets/kortex-desk_bg-dxh64595c5a8fe53b97.wasm": "b75589e5589c669f9bd5ccdbb8e37eb39886c3ee8006e3396a1e6896e64d31a6",
+        "assets/kortex-desk_bg-dxh74d7319f8a2465a5.wasm": "d8093dd8b023af980eb431eda1419420da928741b983f0fe9d67b4e2cbe65b48",
+        "assets/kortex-desk_bg-dxhba7ab0c3f8cff16.wasm": "226bc2191f9e64be95119655eb5324eba0edf28334fed1f20f3604be45479213",
+        "assets/kortex-desk_bg-dxhc15e759f3b62aa9.wasm": "fb059da294f2eecccfd85eb5b9e39461c33842916fc16eede4322b66dd528a15",
+        "assets/kortex-desk_bg-dxhd5fdf1e990d6fee7.wasm": "fa5e94ed0e6d8cbb651f27f51082117d96876ca798a7f1db1ca3ff961f9c4d31",
+        "en/index.html": "154efcdae9ce6cf14d8d3bc5d50237ba5004d5153ba74ce86b10e84347e0d8d4",
+        "index.html": "154efcdae9ce6cf14d8d3bc5d50237ba5004d5153ba74ce86b10e84347e0d8d4"
+      },
+      "output": "4bb0038412d57f42",
+      "path": "/Users/user/Desktop/Kortex-v2/dist/apps/apps.desk",
+      "source": "bfc0ad9aae429242:2f24ec3a89311646:a6c9ba2eefcb8112:650c11c672fda530",
+      "target": "web"
+    },
+    "apps.desk-x86_64-apple-darwin": {
+      "files": {
+        "kortex-apps-desk": "95b2e271c0afeb36c6802db95b89811b992ec5d51e32e99cc6b34baa8248eba6"
+      },
+      "output": "6817c5b2219a28f9",
+      "path": "dist/desktop/x86_64-apple-darwin/apps.desk",
+      "source": "ee85a4489a842176:2f24ec3a89311646:a6c9ba2eefcb8112:650c11c672fda530",
+      "target": "x86_64-apple-darwin"
+    }
+  },
+  "toolBuilds": {
+    "calc.age": {
+      "output": "4598c7b8f2d04de6",
+      "source": "d6a9895be71d87b4"
+    },
+    "calc.average": {
+      "output": "2264754042a9f720",
+      "source": "5f31a0ef13716f18"
+    },
+    "calc.compound-interest": {
+      "output": "9b71723ea355c28a",
+      "source": "013b67aa749900b9"
+    },
+    "calc.date-add": {
+      "output": "1456435ca45cee07",
+      "source": "3285aa90db2ffbb0"
+    },
+    "calc.date-difference": {
+      "output": "804f9c6baaa53204",
+      "source": "ce264ad09ee5ac62"
+    },
+    "calc.fuel-cost": {
+      "output": "e862c74a1ad29349",
+      "source": "372917794557f274"
+    },
+    "calc.gross-net-salary": {
+      "output": "36c8d9331b5f1ec5",
+      "source": "27a988f9530e52fe"
+    },
+    "calc.loan": {
+      "output": "f4db2c5ca7a1d7d1",
+      "source": "f2bcc6b6d9252ce2"
+    },
+    "calc.percentage": {
+      "output": "c4e9444deb0be097",
+      "source": "7aa92d89eefbd0b6"
+    },
+    "calc.rule-of-three": {
+      "output": "582828f257ae1a31",
+      "source": "ec38013f62d38e18"
+    },
+    "calc.tip": {
+      "output": "e3b23dd0230c20e3",
+      "source": "210f1193dbd9cc92"
+    },
+    "calc.unit-price": {
+      "output": "556f0044f8004d8b",
+      "source": "2d1fa84fb63438e9"
+    },
+    "calc.vat": {
+      "output": "a06c5df2610a24c7",
+      "source": "ba413f28779e6609"
+    },
+    "code.base64": {
+      "output": "d983dc371c5cde84",
+      "source": "f75ef2fde06249c8"
+    },
+    "code.chmod": {
+      "output": "a0f490cd673cb224",
+      "source": "041ae9b145dad647"
+    },
+    "code.html-entities": {
+      "output": "862495bf5cbc210b",
+      "source": "8b0671bf50d9e1ec"
+    },
+    "code.json-formatter": {
+      "output": "ca6404dc8b17cea3",
+      "source": "60861ce372c78048"
+    },
+    "code.markdown-table": {
+      "output": "59f70958f7a72e6d",
+      "source": "b7de59a3f6f7aacc"
+    },
+    "code.number-base": {
+      "output": "88b968a606fa6329",
+      "source": "94fd471c8f811c4c"
+    },
+    "code.url-encoder": {
+      "output": "09711c4dadc03bc0",
+      "source": "0da3f4b3c3477ac5"
+    },
+    "code.uuid-generator": {
+      "output": "05d97d0c5d9ea4a9",
+      "source": "93b1c329410ded91"
+    },
+    "color.contrast-checker": {
+      "output": "876cac67c33284d2",
+      "source": "dbaae0807d655012"
+    },
+    "color.converter": {
+      "output": "ce4075a1d5b11e16",
+      "source": "1116ae2a4997cd0f"
+    },
+    "convert.timestamp": {
+      "output": "054ab46c4116544d",
+      "source": "2c27f467d3ad9de7"
+    },
+    "convert.units": {
+      "output": "9ed6dca580a30316",
+      "source": "ae26c6103554dda2"
+    },
+    "image.convert": {
+      "output": "f6a9a964107ac255",
+      "source": "a33cfebb5ab6f35b"
+    },
+    "pdf.merge": {
+      "output": "93bd67df905eee91",
+      "source": "d463c81b3a47c2c8"
+    },
+    "qr.generator": {
+      "output": "693efa7c164f0238",
+      "source": "cffea74ef4f00b01"
+    },
+    "secure.hash-calculator": {
+      "output": "954749925541156b",
+      "source": "33418c4e9c24aa83"
+    },
+    "secure.password-generator": {
+      "output": "6b71febfede07ffe",
+      "source": "e13a4e788ede892a"
+    },
+    "text.case-converter": {
+      "output": "0d6dcf98f3fea851",
+      "source": "92940ebdf06c58fb"
+    },
+    "text.cleaner": {
+      "output": "a3f0fcae0422090f",
+      "source": "14689d54d38984c6"
+    },
+    "text.deduplicate": {
+      "output": "bce6ab9d2ac8ca40",
+      "source": "5d1a4ac67e813126"
+    },
+    "text.find-replace": {
+      "output": "0ab78cb28ec7d946",
+      "source": "821495f0f76acb8d"
+    },
+    "text.lorem-ipsum": {
+      "output": "e904e5ba89563924",
+      "source": "0ce57113d5c47146"
+    },
+    "text.slug-generator": {
+      "output": "919c9fcdffcbff1c",
+      "source": "997d622446cd8ecd"
+    },
+    "text.sort-lines": {
+      "output": "c57c8e9c5e2c85db",
+      "source": "eb7524ace3845928"
+    },
+    "text.word-counter": {
+      "output": "19876de4877cb54b",
+      "source": "06b2c241edf459cd"
+    }
+  },
+  "checks": {
+    "structure": "38 tools, 3 apps; app version 0.2.0",
+    "rust": "10 targeted tests passed; final snapshot protocol regressions passed",
+    "api": "50 tests and strict typecheck passed",
+    "transport": "2 bounded cookie-delivery tests passed",
+    "clippy": "targeted packages all-targets -D warnings passed",
+    "fmt": "passed",
+    "native": "both macOS x86_64 release binaries compiled; interactive native acceptance not claimed",
+    "toolReceiptVerification": {
+      "current": 38,
+      "rebuildNeeded": 0
+    },
+    "local": {
+      "date": "2026-10-17T11:29:19.255Z",
+      "mode": "compiled apps with isolated local API fixture",
+      "results": [
+        "Shared Rust cookie session, explicit metadata save and preview/restore across two browser contexts; preferences restored.",
+        "Version conflict and account switch reject writes without replacing the newer backup.",
+        "Desk saves only layout metadata, restores an empty tool in a second context, and refuses restoration while a window is open."
+      ],
+      "errors": [],
+      "fixtureAccounts": 2
+    },
+    "public": {
+      "date": "2026-10-17T11:33:29.090Z",
+      "mode": "public HTTPS",
+      "results": [
+        "Shared Rust cookie session and explicit metadata backup/restore across two contexts; preferences restored, local usage counters excluded from upload and preserved on restore.",
+        "Version conflict and account switch reject writes without replacing the newer backup.",
+        "Desk saves only layout metadata, restores an empty tool in a second context, and refuses restoration while a window is open."
+      ],
+      "errors": [],
+      "fixtureAccounts": 2
+    },
+    "publicHttp": {
+      "dashboard.kortex.site": {
+        "status": 200,
+        "csp": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://api.kortex.site; frame-src https://run.kortex.site; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'",
+        "sourceProbe": 404,
+        "verifiedArtifacts": 12
+      },
+      "workspace.kortex.site": {
+        "status": 200,
+        "csp": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://api.kortex.site; frame-src https://run.kortex.site; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'",
+        "sourceProbe": 404,
+        "verifiedArtifacts": 16
+      }
+    }
+  },
+  "deployment": {
+    "api": "88ec229c-48a6-44a9-b9a7-5ba60f96af81",
+    "desk": "cc6aa74a-0ddd-4f9a-a63e-66452f5540b7",
+    "hub": "0480ebdb-fb69-4411-9221-92b6c41c14af",
+    "site": "34e3f1a8-6fb8-4aec-95ea-317ea67e3009",
+    "run": "4fa43c62-f5a0-4d9c-b6e9-00a64932d597",
+    "migrationsApplied": 0,
+    "existingAccountsModified": false,
+    "fixtureAccountsCreatedAndCleaned": {
+      "finalRecipe": 2,
+      "earlierRecipe": 2,
+      "totalPublicThisSession": 4
+    },
+    "publicDesktopDownloads": false
+  },
+  "limitations": [
+    "Browser sign-in stays on the existing website; only typed session/profile recognition is integrated",
+    "No native sign-in or keychain yet; no plaintext credential fallback",
+    "Manual snapshots only; no automatic sync, field-level merge or end-to-end encryption; local lifetime usage counters are not sent",
+    "Full account/security UI, tool transfers and desktop distribution remain pending"
+  ]
+}

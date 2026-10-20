@@ -22,14 +22,74 @@ fn fx(name: &str) -> Fx {
     let dir = std::env::temp_dir().join(format!("kortex-cli-pkg-{}-{name}", std::process::id()));
     let _ = std::fs::remove_dir_all(&dir);
     std::fs::create_dir_all(dir.join("rel")).expect("dirs");
+    let api = installation_account();
     let env = PkgEnv {
-        home: Home::at(dir.join("home/.kortex"), dir.join("home")),
+        channel: "stable".into(),
+        home: Home::at(dir.join("home/.kortex"), dir.join("home")).with_secret_store(
+            std::sync::Arc::new(kortex_platform::secrets::MemorySecretStore::default()),
+        ),
         index_src: dir.join("rel/index.json").to_string_lossy().into_owned(),
         public_key: public_key_b64(&SEED),
         target: Some(TARGET.to_owned()),
-        api: "http://127.0.0.1:9".to_owned(), // nothing listens here: these tests never use the account
+        api: api.clone(),
     };
+    env.home
+        .save_credentials(&kortex_pkg::Credentials {
+            api,
+            email: "fixture@example.test".into(),
+            device_id: "fixture-device".into(),
+            token: "fixture-token".into(),
+        })
+        .expect("isolated account fixture");
     Fx { dir, env }
+}
+
+// Real local account verification with a public fixture; never accesses the OS keychain.
+fn installation_account() -> String {
+    use std::io::{BufRead, Read, Write};
+    let listener = std::net::TcpListener::bind("127.0.0.1:0").expect("bind");
+    let url = format!("http://{}", listener.local_addr().expect("address"));
+    std::thread::spawn(move || {
+        for connection in listener.incoming() {
+            let Ok(mut stream) = connection else { break };
+            let mut reader = std::io::BufReader::new(&mut stream);
+            let mut headers = String::new();
+            loop {
+                let mut line = String::new();
+                if reader.read_line(&mut line).unwrap_or(0) == 0 || line == "\r\n" {
+                    break;
+                }
+                headers.push_str(&line);
+            }
+            let length = headers
+                .lines()
+                .find_map(|line| {
+                    line.to_ascii_lowercase()
+                        .strip_prefix("content-length:")
+                        .and_then(|v| v.trim().parse::<usize>().ok())
+                })
+                .unwrap_or(0);
+            let mut body = vec![0; length];
+            let _ = reader.read_exact(&mut body);
+            let allowed = headers
+                .to_ascii_lowercase()
+                .contains("authorization: bearer fixture-token");
+            let (status, reply) = if allowed {
+                (
+                    200,
+                    r#"{"ok":true,"email":"fixture@example.test","data":{"confirm_install":false}}"#,
+                )
+            } else {
+                (401, r#"{"error":"unauthenticated"}"#)
+            };
+            let _ = write!(
+                stream,
+                "HTTP/1.1 {status} OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{reply}",
+                reply.len()
+            );
+        }
+    });
+    url
 }
 
 fn package(id: &str, version: &str, bin: &[u8]) -> Vec<u8> {
@@ -54,6 +114,10 @@ fn package(id: &str, version: &str, bin: &[u8]) -> Vec<u8> {
 }
 
 fn publish(f: &Fx, version: &str, bin: &[u8]) {
+    publish_at(f, version, bin, 0);
+}
+
+fn publish_at(f: &Fx, version: &str, bin: &[u8], sequence: u64) {
     let bytes = package(ID, version, bin);
     let file = format!("p-{version}.tar.gz");
     std::fs::write(f.dir.join("rel").join(&file), &bytes).expect("pkg");
@@ -75,6 +139,9 @@ fn publish(f: &Fx, version: &str, bin: &[u8]) {
     };
     let index = Index {
         schema: 1,
+        channel: "stable".into(),
+        sequence,
+        source_commit: None,
         generated: "2026-10-16".into(),
         cli: None,
         tools: BTreeMap::from([(ID.into(), tool)]),
@@ -220,6 +287,87 @@ fn an_index_not_signed_by_our_key_is_refused_before_anything_is_downloaded() {
     assert!(env.home.load_registry().expect("registry").tools.is_empty());
 }
 
+/// A genuine but older signed index (a replayed release) is refused once a newer one was seen,
+/// and the newer one keeps working (ADR 0034, PLAN 10.2/19.7).
+#[test]
+fn a_replayed_older_index_is_refused_without_losing_the_newer_one() {
+    let f = fx("rollback");
+    publish_at(&f, "1.1.0", b"new", 5);
+    assert!(run(&f, &["available"]).expect("seq 5").contains("1.1.0"));
+    publish_at(&f, "1.0.0", b"old", 4);
+    let err = run(&f, &["available"]).expect_err("replayed index refused");
+    assert!(err.contains("retour en arrière"), "{err}");
+    publish_at(&f, "1.1.0", b"new", 5);
+    assert!(
+        run(&f, &["available"])
+            .expect("same index again")
+            .contains("1.1.0")
+    );
+    publish_at(&f, "1.2.0", b"newer", 6);
+    assert!(run(&f, &["available"]).expect("seq 6").contains("1.2.0"));
+}
+
+fn publish_catalog(f: &Fx, version: &str, sequence: u64, seed: &[u8; 32]) {
+    let text = serde_json::json!({
+        "schema": 1, "channel": "stable", "sequence": sequence, "generated": "2026-10-20",
+        "tools": [{"tool": {"id": ID, "version": version}, "search": {}}],
+    })
+    .to_string();
+    std::fs::write(f.dir.join("rel/catalog.json"), &text).expect("catalog");
+    std::fs::write(
+        f.dir.join("rel/catalog.json.sig"),
+        sign_bytes(seed, text.as_bytes()),
+    )
+    .expect("sig");
+}
+
+fn saved_contract(f: &Fx, version: &str) -> Option<serde_json::Value> {
+    let path = f
+        .env
+        .home
+        .tools_dir()
+        .join(ID)
+        .join(version)
+        .join("contract.json");
+    serde_json::from_slice(&std::fs::read(path).ok()?).ok()
+}
+
+/// The signed catalogue's contract is kept with the package, so apps built before a tool existed
+/// can still list it (ADR 0034, PLAN 19.6). A forged catalogue is ignored.
+#[test]
+fn installing_keeps_the_signed_contract_next_to_the_package() {
+    let f = fx("contract");
+    publish(&f, "1.0.0", b"x");
+    publish_catalog(&f, "1.0.0", 1, &SEED);
+    run(&f, &["install", ID]).expect("installed");
+    let contract = saved_contract(&f, "1.0.0").expect("contract.json");
+    assert_eq!(contract["tool"]["id"], ID);
+
+    let g = fx("contract-forged");
+    publish(&g, "1.0.0", b"x");
+    publish_catalog(&g, "1.0.0", 1, &[5; 32]);
+    run(&g, &["install", ID]).expect("installed without a contract");
+    assert!(saved_contract(&g, "1.0.0").is_none());
+}
+
+#[test]
+fn a_test_feed_is_refused_by_a_stable_client() {
+    let f = fx("channel");
+    publish_at(&f, "1.0.0", b"x", 1);
+    let p = f.dir.join("rel/index.json");
+    let text = std::fs::read_to_string(&p)
+        .expect("read")
+        .replace("\"channel\": \"stable\"", "\"channel\": \"test\"");
+    std::fs::write(&p, &text).expect("write");
+    std::fs::write(
+        f.dir.join("rel/index.json.sig"),
+        sign_bytes(&SEED, text.as_bytes()),
+    )
+    .expect("sig");
+    let err = run(&f, &["available"]).expect_err("test feed refused");
+    assert!(err.contains("canal"), "{err}");
+}
+
 #[test]
 fn a_modified_index_is_refused() {
     let f = fx("modified");
@@ -265,26 +413,23 @@ fn errors_are_clear_for_unknown_and_malicious_ids() {
 }
 
 #[test]
-fn engine_commands_still_work_without_any_package_environment() {
-    let mut out = Vec::new();
-    kortex_cli::execute_with(
+fn commands_without_a_package_environment_explain_what_is_missing() {
+    // The CLI links no tool: running one needs an installation (ADR 0034).
+    let err = kortex_cli::execute_with(
         &[
             "run".to_owned(),
             ID.to_owned(),
             "--input".to_owned(),
             "text=abc".to_owned(),
-            "--param".to_owned(),
-            "algorithm=md5".to_owned(),
         ],
-        &mut out,
+        &mut Vec::new(),
         None,
     )
-    .expect("run");
-    assert!(
-        String::from_utf8(out)
-            .expect("utf8")
-            .contains("900150983cd24fb0d6963f7d28e17f72")
-    );
+    .expect_err("not installed");
+    assert!(err.contains("kortex install"), "{err}");
+    let mut out = Vec::new();
+    kortex_cli::execute_with(&["version".to_owned()], &mut out, None).expect("version");
+    assert!(String::from_utf8(out).expect("utf8").starts_with("kortex "));
     assert!(
         kortex_cli::execute_with(
             &["install".to_owned(), ID.to_owned()],

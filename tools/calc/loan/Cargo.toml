@@ -1,0 +1,9 @@
+[package]
+name = "tool-calc-loan"
+version = "0.1.0"
+edition.workspace = true
+publish.workspace = true
+license.workspace = true
+
+[dependencies]
+kortex = { path = "../../../crates/kortex" }

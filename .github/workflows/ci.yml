@@ -8,10 +8,16 @@ concurrency:
   cancel-in-progress: true
 jobs:
   rust:
+    env:
+      CARGO_PROFILE_DEV_DEBUG: '0'
+      CARGO_PROFILE_TEST_DEBUG: '0'
+      CARGO_BUILD_JOBS: '2'
     runs-on: ubuntu-latest   # Linux only: cheapest minutes (private repo budget, see MASTER_PROMPT §11)
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # contract compatibility compares with the base branch
       - run: rustup show
       - name: Linux system libraries (desktop webview crates are part of the workspace)
         run: |
@@ -22,11 +28,17 @@ jobs:
         run: cargo xtask tokens
       - run: cargo fmt --all --check
       - run: cargo clippy --workspace --all-targets -- -D warnings
-      - run: cargo xtask check
+      - name: Contract structure and compatibility with the base branch
+        env:
+          KORTEX_BASELINE_REF: origin/${{ github.base_ref || 'main' }}
+        run: cargo xtask check
       - run: cargo test --workspace
+      - name: Runner disk budget
+        if: always()
+        run: df -h "$GITHUB_WORKSPACE"
   site:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -39,8 +51,16 @@ jobs:
       - run: cargo xtask tokens
       - run: cargo xtask registry
       - run: cargo xtask icons
+      - run: node --test scripts/tests/offline-routing.test.mjs scripts/tests/host-fallback.test.mjs
       - run: pnpm --filter @kortex/site test
+      # Downloads need the signed release index, provided only by a real publication.
       - run: pnpm site:build
+        env:
+          PUBLIC_DESKTOP_RELEASES_ENABLED: 'false'
+      - name: Chromium for the e2e smoke test (ephemeral runner)
+        run: pnpm exec playwright install --with-deps chromium
+      - name: E2E smoke on three key pages of the built site
+        run: pnpm e2e
   services:
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -55,3 +75,99 @@ jobs:
       - run: pnpm --filter @kortex/shared test
       - run: pnpm --filter @kortex/api typecheck
       - run: pnpm --filter @kortex/api test
+  # ADR 0034: a tool, app or CLI whose code (or a shared crate it uses) changed since the published
+  # release must carry a higher version, otherwise `kortex update` and the Store would never offer it.
+  versions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: rustup show
+      - uses: Swatinem/rust-cache@v2
+      - name: Changed ids have a new version
+        run: |
+          set -euo pipefail
+          mkdir -p .kortex/previous
+          curl -fsSL https://kortex.site/registry/index.json -o .kortex/previous/index.json
+          curl -fsSL https://kortex.site/registry/index.json.sig -o .kortex/previous/index.json.sig
+          cargo xtask feed-plan --previous-dir .kortex/previous
+  # Pull requests only: compile just the web bundles the change can affect (MASTER_PROMPT §11).
+  # Selection comes from `cargo xtask changed` (crate dependency closure; toolchain, lockfile,
+  # design tokens and bundle generators select everything). Linux only; releases stay on tags.
+  web-changed:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      DX_CLI_TELEMETRY: 'false'
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: rustup show
+      - uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+          cache-directories: |
+            .kortex/target
+            .kortex/target-worker
+            .kortex/target-apps
+            ~/.cache/dioxus
+      - name: Select affected bundles
+        id: changed
+        run: |
+          set -euo pipefail
+          cargo xtask changed --base "origin/${{ github.base_ref }}" | tee -a "$GITHUB_OUTPUT"
+      - name: Existing Dioxus compiler (official pinned binary)
+        if: steps.changed.outputs.tools != '' || steps.changed.outputs.apps != ''
+        run: |
+          mkdir -p "$RUNNER_TEMP/dioxus"
+          gh release download v0.7.10 --repo DioxusLabs/dioxus --pattern 'dx-x86_64-unknown-linux-gnu.tar.gz' --pattern 'dx-x86_64-unknown-linux-gnu.sha256' --dir "$RUNNER_TEMP/dioxus"
+          cd "$RUNNER_TEMP/dioxus"
+          sha256sum --check --ignore-missing dx-x86_64-unknown-linux-gnu.sha256
+          tar -xzf dx-x86_64-unknown-linux-gnu.tar.gz
+          find "$RUNNER_TEMP/dioxus" -type f -name dx -exec chmod +x {} \;
+          find "$RUNNER_TEMP/dioxus" -type f -name dx -printf '%h\n' >> "$GITHUB_PATH"
+      - name: Existing wasm-bindgen compiler (pinned to the worker contract)
+        if: steps.changed.outputs.tools != '' || contains(steps.changed.outputs.apps, 'apps.mind')
+        run: |
+          mkdir -p "$RUNNER_TEMP/wasm-bindgen"
+          gh release download 0.2.129 --repo wasm-bindgen/wasm-bindgen --pattern 'wasm-bindgen-0.2.129-x86_64-unknown-linux-musl.tar.gz' --dir "$RUNNER_TEMP/wasm-bindgen"
+          cd "$RUNNER_TEMP/wasm-bindgen"
+          echo '82d12bb940e2d4e72e0d5605387fc1b8ca179044e012b620f0ce4e7440e8320e  wasm-bindgen-0.2.129-x86_64-unknown-linux-musl.tar.gz' | sha256sum --check
+          tar -xzf wasm-bindgen-0.2.129-x86_64-unknown-linux-musl.tar.gz
+          find "$RUNNER_TEMP/wasm-bindgen" -type f -name wasm-bindgen -printf '%h\n' >> "$GITHUB_PATH"
+      - name: Compile affected web bundles
+        if: steps.changed.outputs.tools != '' || steps.changed.outputs.apps != ''
+        env:
+          TOOLS: ${{ steps.changed.outputs.tools }}
+          APPS: ${{ steps.changed.outputs.apps }}
+          ALL: ${{ steps.changed.outputs.all }}
+        run: |
+          set -euo pipefail
+          cargo xtask tokens
+          if [ "$ALL" = "true" ]; then cargo xtask build all; elif [ -n "$TOOLS" ]; then cargo xtask build $TOOLS; fi
+          for id in $APPS; do cargo xtask build-app "$id" --web; done
+      - uses: pnpm/action-setup@v4
+        if: contains(steps.changed.outputs.apps, 'apps.seek') || contains(steps.changed.outputs.apps, 'apps.flow')
+      - uses: actions/setup-node@v4
+        if: contains(steps.changed.outputs.apps, 'apps.seek') || contains(steps.changed.outputs.apps, 'apps.flow')
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Browser recipes of the rebuilt Seek and Flow apps
+        if: contains(steps.changed.outputs.apps, 'apps.seek') || contains(steps.changed.outputs.apps, 'apps.flow')
+        env:
+          APPS: ${{ steps.changed.outputs.apps }}
+        run: |
+          set -euo pipefail
+          pnpm install --frozen-lockfile
+          pnpm exec playwright install --with-deps chromium
+          case " $APPS " in *" apps.seek "*) node tests/e2e/seek.mjs ;; esac
+          case " $APPS " in *" apps.flow "*) node tests/e2e/flow.mjs ;; esac
+      - name: Nothing to compile
+        if: steps.changed.outputs.tools == '' && steps.changed.outputs.apps == ''
+        run: echo "No web bundle is affected by this change."

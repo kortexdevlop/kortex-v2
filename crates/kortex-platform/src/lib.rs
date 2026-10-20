@@ -2,6 +2,23 @@
 //! Implementations: `web`, `desktop` (added with kortex-ui), later `os`.
 use std::collections::BTreeMap;
 
+pub mod clipboard;
+pub mod public;
+pub mod storage;
+
+#[cfg(all(feature = "secret-store", not(target_arch = "wasm32")))]
+pub mod secrets;
+
+#[cfg(not(target_arch = "wasm32"))]
+pub mod native;
+#[cfg(not(target_arch = "wasm32"))]
+pub mod webhook;
+
+#[cfg(target_arch = "wasm32")]
+pub mod offline;
+#[cfg(target_arch = "wasm32")]
+pub mod worker;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PlatformError(pub String);
 
@@ -62,6 +79,41 @@ impl Clipboard for MemoryPlatform {
     fn read_text(&self) -> Result<String> {
         Ok(self.clip.clone())
     }
+}
+
+/// Owned transport error; independent of engine and UI types.
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct WorkerFailure {
+    pub code: String,
+    pub detail: Option<String>,
+}
+
+#[cfg(feature = "document")]
+pub mod document;
+
+/// Platform wall clock in UTC milliseconds. Deterministic engines inject a clock via Cx.
+#[must_use]
+pub fn now_ms() -> u64 {
+    #[cfg(target_arch = "wasm32")]
+    {
+        js_sys::Date::now() as u64
+    }
+    #[cfg(not(target_arch = "wasm32"))]
+    {
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map_or(0, |d| d.as_millis() as u64)
+    }
+}
+
+/// Fill bytes using the operating system/browser CSPRNG, never a fallback PRNG.
+pub fn fill_random(bytes: &mut [u8]) -> Result<()> {
+    getrandom::fill(bytes).map_err(|_| PlatformError("entropy_unavailable".into()))
+}
+
+/// Yield during the synchronous headless executor's polling loop.
+pub fn yield_now() {
+    std::thread::yield_now();
 }
 
 #[cfg(test)]

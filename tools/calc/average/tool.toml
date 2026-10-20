@@ -1,0 +1,67 @@
+schema = 1
+[tool]
+id = "calc.average"
+version = "1.0.2"
+universe = "calc"
+status = "beta"
+ui = "auto"
+platforms = ["web", "desktop"]
+offline = true
+ai = false
+viral_priority = 1
+[tool.name]
+fr = "Moyenne et statistiques"
+en = "Mean and Statistics"
+[tool.tagline]
+fr = "Obtenez moyenne, médiane, somme, minimum et maximum d’une série."
+en = "Get the mean, median, sum, minimum and maximum of a series."
+[tool.slug]
+fr = "moyenne-statistiques"
+en = "mean-statistics"
+[search]
+keywords.fr = ["moyenne et statistiques", "moyenne statistiques"]
+keywords.en = ["mean and statistics", "mean statistics"]
+intents.fr = ["Obtenez moyenne, médiane, somme, minimum et maximum d’une série."]
+intents.en = ["Get the mean, median, sum, minimum and maximum of a series."]
+related = []
+[limits]
+timeout_s = 10
+
+[[inputs]]
+id = "text"
+type = "text"
+required = true
+max_len = 100000
+multiline = true
+label = { fr = "Texte", en = "Text" }
+
+[[outputs]]
+id = "count"
+type = "integer"
+
+[[outputs]]
+id = "mean"
+type = "number"
+
+[[outputs]]
+id = "median"
+type = "number"
+
+[[outputs]]
+id = "sum"
+type = "number"
+
+[[outputs]]
+id = "min"
+type = "number"
+
+[[outputs]]
+id = "max"
+type = "number"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "write"
+sensitive = false
+privacy = "local"

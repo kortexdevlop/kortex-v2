@@ -7,3 +7,4 @@ publish.workspace = true
 [dependencies]
 kortex-macros = { path = "../kortex-macros" }
 kortex-runtime = { path = "../kortex-runtime" }
+kortex-io = { path = "../kortex-io" }

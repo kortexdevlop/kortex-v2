@@ -1,7 +1,7 @@
 use std::collections::BTreeMap;
 
 use dioxus::prelude::*;
-use kortex_pkg::ToolStatus;
+use kortex_store::engine::ToolStatus;
 use kortex_store::{Action, Catalogue, ToolRow, primary_action, universes, visible};
 
 /// `names` = (fr, en); `state` = (installed version, available version, update available, supported).
@@ -133,4 +133,41 @@ fn english_labels_and_empty_state() {
         rsx! { Catalogue { items: vec![], lang: "fr".to_owned(), busy: vec![], onaction: |_| {} } }
     }
     assert!(render(empty).contains("Aucun outil ne correspond."));
+}
+
+#[test]
+fn desktop_package_actions_follow_the_install_state() {
+    use kortex_store::market::PackageActions;
+    fn install() -> Element {
+        rsx! { PackageActions { status: sample().remove(0), lang: "fr".to_owned(), busy: false, onaction: |_| {} } }
+    }
+    let html = render(install);
+    assert!(
+        html.contains(">Installer<") && !html.contains("Supprimer"),
+        "{html}"
+    );
+    fn update() -> Element {
+        rsx! { PackageActions { status: sample().remove(2), lang: "en".to_owned(), busy: false, onaction: |_| {} } }
+    }
+    let html = render(update);
+    assert!(
+        html.contains(">Update<") && html.contains(">Remove<"),
+        "{html}"
+    );
+    fn unsupported() -> Element {
+        rsx! { PackageActions { status: sample().remove(3), lang: "fr".to_owned(), busy: false, onaction: |_| {} } }
+    }
+    let html = render(unsupported);
+    assert!(
+        html.contains("Indisponible sur cette plateforme") && !html.contains("<button"),
+        "{html}"
+    );
+    fn busy() -> Element {
+        rsx! { PackageActions { status: sample().remove(1), lang: "fr".to_owned(), busy: true, onaction: |_| {} } }
+    }
+    let html = render(busy);
+    assert!(
+        html.contains("En cours…") && html.contains("disabled"),
+        "{html}"
+    );
 }

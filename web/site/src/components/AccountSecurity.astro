@@ -1,0 +1,59 @@
+---
+const { lang } = Astro.props;
+const fr = lang === 'fr';
+const T = fr ? {
+ title:'Sécurité du compte',passkeys:'Vos passkeys',hint:'Une passkey permet de vous connecter avec le verrouillage de votre appareil ou une clé de sécurité. Kortex ne reçoit aucune donnée biométrique.',
+ proof:'Mot de passe actuel',proofHint:'Confirmez votre mot de passe pour modifier la sécurité de votre compte.',name:'Nom de la passkey',namePlaceholder:'Mon téléphone, ma clé…',add:'Ajouter une passkey',empty:'Vous n’avez pas encore de passkey.',remove:'Retirer',sessions:'Sessions ouvertes',current:'Cette session',others:'Fermer les autres sessions',password:'Changer de mot de passe',next:'Nouveau mot de passe',repeat:'Confirmer le nouveau mot de passe',change:'Enregistrer le nouveau mot de passe',rotation:'Vos autres sessions et appareils seront déconnectés. Vos passkeys seront conservées.',loading:'Chargement…',working:'Un instant…',saved:'Modification enregistrée.',mismatch:'Les deux mots de passe ne correspondent pas.',unsupported:'Les passkeys ne sont pas disponibles dans ce navigateur.',cancelled:'Opération annulée ou passkey indisponible.',loadError:'Impossible de charger les informations de sécurité. Rechargez la page.',created:'Ajoutée le',used:'Dernière utilisation',unknown:'Navigateur',
+ errors:{invalid_credentials:'Mot de passe actuel incorrect.',rate_limited:'Trop de tentatives. Réessayez dans quelques minutes.',invalid_challenge:'La demande a expiré. Recommencez.',invalid_passkey:'Passkey non validée. Recommencez.',passkey_limit:'Impossible d’ajouter cette passkey : limite de 10 ou passkey déjà enregistrée.',invalid_name:'Donnez un nom à votre passkey (80 caractères maximum).',password_unchanged:'Choisissez un mot de passe différent.',security_conflict:'Votre compte a changé entre-temps. Reconnectez-vous.',unauthenticated:'Votre session a expiré. Reconnectez-vous.',network:'Impossible de joindre le serveur.',other:'La modification a échoué.'}
+} : {
+ title:'Account security',passkeys:'Your passkeys',hint:'Sign in using your device lock or a security key. Kortex never receives biometric data.',
+ proof:'Current password',proofHint:'Confirm your password to change account security.',name:'Passkey name',namePlaceholder:'My phone, my key…',add:'Add a passkey',empty:'You have no passkey yet.',remove:'Remove',sessions:'Open sessions',current:'This session',others:'Sign out other sessions',password:'Change password',next:'New password',repeat:'Confirm new password',change:'Save new password',rotation:'Your other sessions and connected devices will be signed out. Your passkeys will be kept.',loading:'Loading…',working:'One moment…',saved:'Change saved.',mismatch:'The two passwords do not match.',unsupported:'Passkeys are unavailable in this browser.',cancelled:'Operation cancelled or passkey unavailable.',loadError:'Could not load security information. Reload the page.',created:'Added',used:'Last used',unknown:'Browser',
+ errors:{invalid_credentials:'Incorrect current password.',rate_limited:'Too many attempts. Try again in a few minutes.',invalid_challenge:'Request expired. Start again.',invalid_passkey:'Passkey verification failed. Start again.',passkey_limit:'Could not add this passkey: limit of 10 or already registered.',invalid_name:'Name your passkey (80 characters maximum).',password_unchanged:'Choose a different password.',security_conflict:'Your account changed in the meantime. Sign in again.',unauthenticated:'Your session expired. Sign in again.',network:'Could not reach the server.',other:'Could not save this change.'}
+};
+---
+<section class="acct-security" data-security data-t={JSON.stringify(T)}>
+ <div class="acct-sec-head">
+  <h2>{T.title}</h2>
+  <p class="k-muted acct-note">{T.proofHint}</p>
+ </div>
+ <article class="acct-card acct-proof">
+  <label class="k-field"><span>{T.proof}</span><input class="k-input" type="password" autocomplete="current-password" data-security-password /></label>
+  <p class="acct-note" role="status" aria-live="polite" data-security-status></p>
+ </article>
+ <article class="acct-card acct-passkeys">
+  <h3>{T.passkeys}</h3>
+  <p class="k-muted acct-note">{T.hint}</p>
+  <ul class="k-files" data-passkeys><li>{T.loading}</li></ul>
+  <form class="acct-inline" data-passkey-form>
+   <label class="k-field"><span>{T.name}</span><input class="k-input" name="name" placeholder={T.namePlaceholder} maxlength="80" required /></label>
+   <button class="k-btn" type="submit" data-add-passkey>{T.add}</button>
+  </form>
+ </article>
+ <article class="acct-card">
+  <h3>{T.sessions}</h3>
+  <ul class="k-files" data-sessions><li>{T.loading}</li></ul>
+  <button class="k-btn" data-variant="ghost" type="button" data-revoke-sessions>{T.others}</button>
+ </article>
+ <article class="acct-card acct-password">
+  <h3>{T.password}</h3>
+  <form class="acct-pw" data-password-form>
+   <label class="k-field"><span>{T.next}</span><input class="k-input" type="password" name="next" autocomplete="new-password" minlength="10" required /></label>
+   <label class="k-field"><span>{T.repeat}</span><input class="k-input" type="password" name="repeat" autocomplete="new-password" minlength="10" required /></label>
+   <p class="k-muted acct-note">{T.rotation}</p>
+   <button class="k-btn" type="submit">{T.change}</button>
+  </form>
+ </article>
+</section>
+<style>
+/* The security cards join the account grid directly. */
+.acct-security { display: contents; }
+.acct-sec-head { grid-column: 1 / -1; display: grid; gap: var(--k-space-1); margin-top: var(--k-space-6); }
+.acct-sec-head h2 { margin: 0; font-size: var(--k-type-scale-2); }
+.acct-passkeys, .acct-password { grid-column: span 2; }
+.acct-inline { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--k-space-3); align-items: end; }
+.acct-pw { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--k-space-3); align-items: end; }
+.acct-pw .acct-note, .acct-pw .k-btn { grid-column: 1 / -1; }
+.acct-pw .k-btn { justify-self: start; }
+@media (max-width: 959px) { .acct-passkeys, .acct-password { grid-column: 1 / -1; } }
+@media (max-width: 599px) { .acct-inline, .acct-pw { grid-template-columns: 1fr; } }
+</style>

@@ -1,0 +1,48 @@
+{
+ "id": "each-line-upper",
+ "name": {
+  "fr": "Mettre chaque ligne en majuscules",
+  "en": "Uppercase every line"
+ },
+ "description": {
+  "fr": "Applique un outil à chaque ligne d’une liste, ici la conversion en majuscules.",
+  "en": "Applies a tool to every line of a list, here uppercase conversion."
+ },
+ "needs": [],
+ "samples": {
+  "fr": "pommes\npoires\ncerises",
+  "en": "apples\npears\ncherries"
+ },
+ "workflow": {
+  "version": 1,
+  "name": "",
+  "nodes": [
+   {
+    "id": "n1",
+    "kind": "text",
+    "value": "{sample}"
+   },
+   {
+    "id": "n2",
+    "kind": "logic",
+    "op": "foreach",
+    "params": {
+     "tool": "text.case-converter",
+     "options": "case=upper"
+    }
+   }
+  ],
+  "edges": [
+   {
+    "from": {
+     "node": "n1",
+     "port": "text"
+    },
+    "to": {
+     "node": "n2",
+     "port": "text"
+    }
+   }
+  ]
+ }
+}

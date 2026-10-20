@@ -1,0 +1,358 @@
+{
+  "publicHttp": {
+    "dashboard.kortex.site": {
+      "status": 200,
+      "csp": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; frame-src https://run.kortex.site; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'",
+      "sourceProbe": 404,
+      "verifiedArtifacts": 4
+    },
+    "workspace.kortex.site": {
+      "status": 200,
+      "csp": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; frame-src https://run.kortex.site; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'",
+      "sourceProbe": 404,
+      "verifiedArtifacts": 6
+    }
+  },
+  "toolReceiptVerification": {
+    "current": 38,
+    "recompilationNeeded": 0
+  },
+  "date": "2026-10-17T10:47:26.629Z",
+  "scope": "First Rust/Dioxus Hub and Desk delivery; complete prompt scope remains open",
+  "sources": {
+    "apps/hub/CHANGELOG.md": "12d2d403a14207efa0eddb4e43f7a4c13fa6cc576870c7be65eb48dfa6697e1c",
+    "apps/hub/Cargo.toml": "4e366b760d102e4798793772fd7e99e34ba18a5875ac4e30ff05e1e0f0d4e1b7",
+    "apps/hub/Dioxus.toml": "943f50f0f751be0e1264a92f8e8aedfc770163b28e41796cec11d74a20814a61",
+    "apps/hub/app.toml": "2cedda044b1eb5733ac9394982bbd5b5d2cdc966c9a0601b014270136d526de2",
+    "apps/hub/content/en.md": "306b9a2bcede95563af105a80cde4eba9f5d78b0ae808fc01f287e207a0a9b68",
+    "apps/hub/content/fr.md": "1ac58fe3415c36bf27236d31204f5eb5b0621a4ee79bda82a771ce6e0e8e6570",
+    "apps/hub/glyph.svg": "5bf0b229380d982451ac2444bb36b568baef37d696941f6a29643cbcf16e1986",
+    "apps/hub/locales/en.toml": "da503b2700951a45e53787b57daec1e391e40a24b728ec1eb501c6d8c413b76d",
+    "apps/hub/locales/fr.toml": "05333ba1b2bd6821659309eba1c83e6e31f253ddd2943cb8c5a5e50074793982",
+    "apps/hub/src/engine.rs": "fc317d643012733b15662a554480a9f6a9889118a4f09261aa0519ad4a7588bf",
+    "apps/hub/src/hub.css": "ff9a3bc6d18ed8f8997130cd153bbe3a0d4ba2074415c1383a0424bec67af285",
+    "apps/hub/src/lib.rs": "7295fb593b1936175531d0a6c8d5962e694309f306288a5f0a7a7726b87033c7",
+    "apps/hub/src/main.rs": "f482496f415fd5e0d9d40f1921d9315a42f6b351ed19fe0326024aaa94db5716",
+    "apps/hub/src/ui.rs": "c186db2d84dba6e53823b98ff7f8c4dd1fcb0471166145e60c5fd29379d69a3a",
+    "apps/hub/tests/engine.rs": "3427fbaf36eff1946708419f312e518eefb8498d0d6927d479fa002db0c454c4",
+    "apps/hub/widgets/activity/widget.toml": "6cd17ac80751795c6d632d3d92621ea3432f184e3c1687dac0addf943d1ba21b",
+    "apps/hub/widgets/catalogue/widget.toml": "83014cc4b0a999999fb32276f65dd29351d8b0a34554f8a88017dfc6fb5b5d79",
+    "apps/hub/widgets/favorites/widget.toml": "0481549d98a98a17dea5ae64b902b3999f905cdb1d00436500cf8f76d60e1a2a",
+    "apps/hub/widgets/recent/widget.toml": "1e22318e540c407f8045a1eb91f7a9d87851b89f76614064c83d23463f27f273",
+    "apps/desk/CHANGELOG.md": "12d2d403a14207efa0eddb4e43f7a4c13fa6cc576870c7be65eb48dfa6697e1c",
+    "apps/desk/Cargo.toml": "d02ba3a40e6b641b008bd7b4ff88dc4eab5a9ee0aed37695b95dba79f5d2d12f",
+    "apps/desk/Dioxus.toml": "60b24538a3cdce59ed58ce019d5dd9adfaa4fe5cf5e4e7eb07fc627ee616af57",
+    "apps/desk/app.toml": "0c2696a031772697f3843e60317f7f6cf1efdf7029505263c1349e16220dc420",
+    "apps/desk/content/en.md": "ef2d16fc2e27dd1cd3547f08568f4eeee7c1fcfb00e2f99354ab198d2d297e02",
+    "apps/desk/content/fr.md": "078b834991a0b8332897462aacb0c73aa63139ca8d45928b676760bed627ffca",
+    "apps/desk/glyph.svg": "5bf0b229380d982451ac2444bb36b568baef37d696941f6a29643cbcf16e1986",
+    "apps/desk/locales/en.toml": "ae57fb713ec8e11ca803c8f6b38e03372c1137e7337100b1ec3dfa2c9433375d",
+    "apps/desk/locales/fr.toml": "16ce7a71c7eb9a560fcf97f99ba038b4ea1123ff03b916bf33e72fb67d58407a",
+    "apps/desk/src/desk.css": "4fcc7888d46b80cb3fadef78441f556e8a2c1812852f0cbc95aea3d9d1b254de",
+    "apps/desk/src/engine.rs": "3fffb891594cb7f6ec11dd1a2ec378a1d8356de4ececf429e246f76e288ca0d9",
+    "apps/desk/src/lib.rs": "7295fb593b1936175531d0a6c8d5962e694309f306288a5f0a7a7726b87033c7",
+    "apps/desk/src/main.rs": "1b7737b04e75cce869bfd257c783dac088e618c15b52b5e4ddc29b6caab1a408",
+    "apps/desk/src/ui.rs": "3a099107da97fdfba9ad85101df27504c9e3ae6c31e5b170b70f4803524291f5",
+    "apps/desk/tests/engine.rs": "35b0b504fe317723c40b46c8f3e4e89a41feb2ad5cbf38baf40c7b2fa02be9a3",
+    "crates/kortex-shell/Cargo.toml": "ac3502a18a3842ceb244ee959adb200a8bb092530a6ad58bb42b4155e4acf4e0",
+    "crates/kortex-shell/src/lib.rs": "ddb1b9b599e1b9545306ad120c03c9605dc68ed0f0875edc0a4a0f84b823f791",
+    "crates/kortex-shell/src/shell.css": "d1c14c6cd848eb98d24d97eaf8b167055af8577a87bafd6235a7b6b12e308a45",
+    "crates/kortex-bus/Cargo.toml": "c677956a8e55138921a791982a83dc067f1255ac38a83efcbf321eab844d4f44",
+    "crates/kortex-bus/src/lib.rs": "641dd6cc32e2a0d1398efb3426a77b0cb6093ac01fdd43787dcb6ff798634789",
+    "crates/kortex-platform/Cargo.toml": "f97a905d9d85a8ae6869b9ae2b4e12731083228ae5ef93da6fad904444b2b605",
+    "crates/kortex-platform/src/app-host.js": "717761bbeca36d96b8fa48cbcbe9ec668b197f9aaa5ee4d0cc6179ebeb2441dd",
+    "crates/kortex-platform/src/clipboard.rs": "72eee83ebcbd10e9f484bafe5849a136a2f0182f42c97bcfab14989a0daccba2",
+    "crates/kortex-platform/src/document.rs": "a7fc2c89ca7785e4feb53c12cefaa1387bbb10caca456f423ea8a3deb9c0bf83",
+    "crates/kortex-platform/src/download.js": "cc2f206c3e9400f5dc9eb71eb64a9200ac255412ee5624bca3973feb6a5a92d8",
+    "crates/kortex-platform/src/host-bus.js": "ab07ac70b6397650d9899eab3165e40d5fd718eac9ee7ce161afef4cf2577a6d",
+    "crates/kortex-platform/src/lib.rs": "c7f9e6eeabe2b6244ba77e412694f8e338a2f654d13b6045f114628836254765",
+    "crates/kortex-platform/src/native.rs": "6e8439e17eb1419feb51ec85ee4fd15767662930c257d9c5ce2aa3ba29ffd1f6",
+    "crates/kortex-platform/src/offline-worker.js": "56bbaab3616276f9042cfa4aec848b8d77f98c4670ae7260329480b72cf33ee1",
+    "crates/kortex-platform/src/offline.rs": "184c8aa10d0ba60b6af1374e248a5a4bc89d78054abc0f6e34a6df5c4848cd63",
+    "crates/kortex-platform/src/storage.rs": "8150f3d044ba00f0191ab9cb0d9ad337ce7f583476c25f7bae0bb958f3e63512",
+    "crates/kortex-platform/src/worker.rs": "e45167184051d106bad432d8b0c03d8f09ea09acee6a223fc4fa68dd2bdc1197",
+    "crates/kortex-platform/tests/native.rs": "cbd18e5cc4f95bfc30c7e391ff7e2011e63e12f57cbcfad80f08dd1d24c2bfc1",
+    "crates/kortex-platform/tests/storage.rs": "9fcc14b2367c34d7ee5b223e40938350c549155c3771028d518b03358ed42796",
+    "xtask/src/apps.rs": "f31b02b676fd7c80c0f72353ea3c3fa86eae09d1719e7ff538dbd72826e30d19",
+    "xtask/src/build.rs": "92ee9ebe77bc356baaecbfafaf25677971b06766549e40e315be772d6ccf925f",
+    "xtask/src/check.rs": "1eb9510b5a4ef053f4b212ada3d25ee41e5cad19f6e5b6337ea80b8ec73c9171",
+    "xtask/src/cli_gen.rs": "37bb0f0e98f3e1389d3229f34fce0522fc11248cdc1901efc350c75b7f49b041",
+    "xtask/src/icons.rs": "c85f01523ac922aebd448ba44e4c288c1d15b0bfa3a8f06637043bd81f847974",
+    "xtask/src/main.rs": "eefcaec329bb6dca1eaa3c555053973b057e39695e0ff7756bc2db7e19c31c47",
+    "xtask/src/new_tool.rs": "e43890a2b35271bcc729ed9c45ea2b0df3c3f237cfddb45c94bc1760836f6bae",
+    "xtask/src/platform_check.rs": "9cee6d63207430a9c406f6f9c349850e38be2e54ec693b0b895c639d7540f066",
+    "xtask/src/registry.rs": "621bef9b97af0f6d8e11462a5ca09e4378da6d8325a141a6538aa77f3f132a86",
+    "xtask/src/release.rs": "7422260c6158ac11b983c67e01b15dce7664b6f84f27509320def5171c700f3c",
+    "xtask/src/stats.rs": "ee459a7e66700001c810b77b6dd1d6fbaf6cb074905819f9d2afab892f49f848",
+    "xtask/src/tokens.rs": "ae79bd3642c1d32f644e40213efbf5d13b3c5af9e0e17714dcb8c731a170e332",
+    "xtask/src/tools.rs": "c8152b2248f7a6e4d5fe6791b0c4260495bfdeb333d5695c1357a02ff0d8c615",
+    "xtask/src/worker.rs": "17d1f28b642361f1a1612141a19292dd8bdc748b3368e18e73b99b7a9c70f8c5",
+    "Cargo.toml": "078347aa44151f952f6ec348f9753d41c45bb8ae6fae919cd16821d5a3d05bc9",
+    "Cargo.lock": "12ff64d96b4ef4fb64d83a2791e305d730b0faa0b763b022a182e89dd2e8e24c",
+    "brand/domains.toml": "4ff5e146cc7eaaab16dbf9c6b180c7cf9a5e945ca9c0b932beb99f6ed887de4c",
+    "registry/apps.json": "0a1934870acfa0cc6ab4aac9ddffb2a24ede5a43b9fa6342c3f2f08bfc838768",
+    "registry/index.json": "0f916a68521da493c6c83d34b515a82b76f8eba2fdb247b45255c165bd2e4d76",
+    "scripts/prepare-publish.mjs": "033645ce907b08bfbb36835a12a5d5c8cdee3f8dd2f260893f73686fd04f5ad9",
+    "scripts/publish.mjs": "4e0af637c6bf04d8ce5274c1f78b9d3dff8638c7e661da15b718844c5b0822a1",
+    "scripts/tests/hub-desk.mjs": "f71e77242d707df90c2602567df3c42c3aef81b26c36e9ab12e5740309ac75e0",
+    "scripts/tests/host-fallback.test.mjs": "9693c2ae1f23ca1dd66e549df0d8c693201de50b412df784263d097a46c417d1",
+    "web/site/src/lib/apps.ts": "0b0d32af6f57c952334955c28b9574939cc02accaa5fa1a23c29400fc56b8a8b",
+    "web/site/src/lib/data.ts": "551cd81b469ef770260e0445365bdcb0e7bb85c86129528472504ca5cc7f882e",
+    "web/site/src/components/AppPage.astro": "10db859d8eca980d32c115d2d36214bec1bb65f9e51c613fcc6a45cd744cc44e",
+    "web/site/scripts/sync.mjs": "3287741b24a564992a9fde6f81523c76e2e3bc011fe755a3d846c53559515f35"
+  },
+  "appBuilds": {
+    "apps.hub-web": {
+      "files": {
+        "assets/kortex-hub-dxh987af814c2dc2fcf.js": "c723958c774b38a1e3945df71df9c0db005ae806d00dedf6b2d134938c60915f",
+        "assets/kortex-hub-dxhb9555cbf1a402e6.js": "16ccbac42eb25570917746237f43690773138026659a9b2a2f615b48fe6635f2",
+        "assets/kortex-hub_bg-dxha5ec1f5070ef76bd.wasm": "b370e6886aabd4b15514e13d65928b96c223675f2f9ae9bf4e74a7c9f7d44def",
+        "assets/kortex-hub_bg-dxheed225dc84d5fbcf.wasm": "27f4d8564856a8502a88864b2071e7cd612f3cc01016282f46773ab8bac834a6",
+        "en/index.html": "d3705a3d4a4c5ecf9f44cc828cf0f1eb035750323f8c1e7d9c6e4da346746d4f",
+        "index.html": "d3705a3d4a4c5ecf9f44cc828cf0f1eb035750323f8c1e7d9c6e4da346746d4f"
+      },
+      "output": "fe1fd7f3fe66dba7",
+      "path": "/Users/user/Desktop/Kortex-v2/dist/apps/apps.hub",
+      "source": "306d814c092f2cee:2f24ec3a89311646:a6c9ba2eefcb8112:650c11c672fda530",
+      "target": "web"
+    },
+    "apps.hub-x86_64-apple-darwin": {
+      "files": {
+        "kortex-apps-hub": "fb5b67c156772d1952907572ddda797934bac44417e7b5e8b69245a8176ea899"
+      },
+      "output": "8e3a08eb5f94638f",
+      "path": "dist/desktop/x86_64-apple-darwin/apps.hub",
+      "source": "578bf59cfdaca813:2f24ec3a89311646:a6c9ba2eefcb8112:650c11c672fda530",
+      "target": "x86_64-apple-darwin"
+    },
+    "apps.desk-web": {
+      "files": {
+        "assets/kortex-desk-dxh61831f9b1caf5d2.js": "398ecf60fe3c7317b06ee6fd57a048071419c5ddc138d7ed9c2320a6eabc4c52",
+        "assets/kortex-desk-dxh84a47176147117c9.js": "f0bee8de2e8448a45c2599b2e237ac005f386e16647adb54ff20c15b46bbbbe9",
+        "assets/kortex-desk-dxhc874e35de5932543.js": "11b91211b82e5e684a78f3c2a982fc00b602679e7fa4f33bd57ec16fd78f1345",
+        "assets/kortex-desk_bg-dxh4bdbec9d7c731bb.wasm": "dc12c0eecc1e1cb4dbf70647718460f86470710bf45514a84486084a48411f37",
+        "assets/kortex-desk_bg-dxhba7ab0c3f8cff16.wasm": "226bc2191f9e64be95119655eb5324eba0edf28334fed1f20f3604be45479213",
+        "assets/kortex-desk_bg-dxhc15e759f3b62aa9.wasm": "fb059da294f2eecccfd85eb5b9e39461c33842916fc16eede4322b66dd528a15",
+        "en/index.html": "c433e06519f6e3d0d056ddcfa185b5a72d429bc94ae2fccca94dbf8d5375895e",
+        "index.html": "c433e06519f6e3d0d056ddcfa185b5a72d429bc94ae2fccca94dbf8d5375895e"
+      },
+      "output": "642e6e3a7f5fe313",
+      "path": "/Users/user/Desktop/Kortex-v2/dist/apps/apps.desk",
+      "source": "cb6a05149abe927c:2f24ec3a89311646:a6c9ba2eefcb8112:650c11c672fda530",
+      "target": "web"
+    },
+    "apps.desk-x86_64-apple-darwin": {
+      "files": {
+        "kortex-apps-desk": "006dc13a57c20c654e7583f41919679427aab952c9bfd6f94a878664dd938b89"
+      },
+      "output": "87c339e2dbb41664",
+      "path": "dist/desktop/x86_64-apple-darwin/apps.desk",
+      "source": "7ab81e448cbde165:2f24ec3a89311646:a6c9ba2eefcb8112:650c11c672fda530",
+      "target": "x86_64-apple-darwin"
+    }
+  },
+  "toolBuilds": {
+    "calc.age": {
+      "output": "383cd6222e2fd43d",
+      "source": "854ecdfb073d6d0d"
+    },
+    "calc.average": {
+      "output": "ef9a4b402f857eff",
+      "source": "27f1e38a483f7138"
+    },
+    "calc.compound-interest": {
+      "output": "a552c4f5ffd4a4b2",
+      "source": "a3b0ebb52ea873f4"
+    },
+    "calc.date-add": {
+      "output": "6dbc4a87e9f8a210",
+      "source": "b0bb58c0fb2e62a0"
+    },
+    "calc.date-difference": {
+      "output": "7af281108569d35e",
+      "source": "39a3945b5d4270c3"
+    },
+    "calc.fuel-cost": {
+      "output": "2580ed91de74c53f",
+      "source": "018f1a5921a6f656"
+    },
+    "calc.gross-net-salary": {
+      "output": "8e75e53d0e42bf0b",
+      "source": "ba2fe8b263a06ba5"
+    },
+    "calc.loan": {
+      "output": "3c53cd002122ab99",
+      "source": "ad0a777019c6d788"
+    },
+    "calc.percentage": {
+      "output": "1e62112b6e4c4d0b",
+      "source": "95a098c3257f21fe"
+    },
+    "calc.rule-of-three": {
+      "output": "4f3f278348fac9ce",
+      "source": "13ab4fc45d91c308"
+    },
+    "calc.tip": {
+      "output": "c11fb097d929ac0d",
+      "source": "9058ee7ff4a76717"
+    },
+    "calc.unit-price": {
+      "output": "4d032d59d529290d",
+      "source": "3880b88bfc67494d"
+    },
+    "calc.vat": {
+      "output": "b48b579c2952d3ef",
+      "source": "5f80106fb42234c0"
+    },
+    "code.base64": {
+      "output": "90558cb65ab4c519",
+      "source": "86e4e9f54d345e0f"
+    },
+    "code.chmod": {
+      "output": "a48b877e2b7576ad",
+      "source": "ebda24b9f2275aa3"
+    },
+    "code.html-entities": {
+      "output": "8b2f3490f127921e",
+      "source": "bded0fcab8c51029"
+    },
+    "code.json-formatter": {
+      "output": "6bdcb23f8bc63042",
+      "source": "d61a97545268043d"
+    },
+    "code.markdown-table": {
+      "output": "3ac95b5f232a354b",
+      "source": "315cdc5d8347a3d1"
+    },
+    "code.number-base": {
+      "output": "447f72b3b04d59dc",
+      "source": "aa374d9bee651a14"
+    },
+    "code.url-encoder": {
+      "output": "3f00dfa2d99b44d7",
+      "source": "d3568b47eaea0f10"
+    },
+    "code.uuid-generator": {
+      "output": "0b0a2d90fb75e402",
+      "source": "1ea92ea390eabf52"
+    },
+    "color.contrast-checker": {
+      "output": "75f7dbd76b21051c",
+      "source": "22f5c2a9f95feb77"
+    },
+    "color.converter": {
+      "output": "66427489ce6ffb45",
+      "source": "f22187d714fe42de"
+    },
+    "convert.timestamp": {
+      "output": "070ca4bc62eb8c19",
+      "source": "84d9026baac7a1a6"
+    },
+    "convert.units": {
+      "output": "7676d5762db7c810",
+      "source": "2398735da0a320a6"
+    },
+    "image.convert": {
+      "output": "5524fbaab8e05953",
+      "source": "ce1c8ac2873842c5"
+    },
+    "pdf.merge": {
+      "output": "60642d1a6abb54bc",
+      "source": "146d21893270e087"
+    },
+    "qr.generator": {
+      "output": "977ac40f1d80263f",
+      "source": "5770cc6db2eff90b"
+    },
+    "secure.hash-calculator": {
+      "output": "71842fd75a5b5b88",
+      "source": "1a17c85a91b504a3"
+    },
+    "secure.password-generator": {
+      "output": "c68c92f7693e9036",
+      "source": "199efbb4126df14a"
+    },
+    "text.case-converter": {
+      "output": "062e11657ea5f507",
+      "source": "958e8a18898ec61f"
+    },
+    "text.cleaner": {
+      "output": "2d21e9c4d570cb2a",
+      "source": "d6ed10306bec127d"
+    },
+    "text.deduplicate": {
+      "output": "3f68a42157d60755",
+      "source": "bc17efead6eed9a2"
+    },
+    "text.find-replace": {
+      "output": "b56c0acd59f41594",
+      "source": "8789860bc7149b36"
+    },
+    "text.lorem-ipsum": {
+      "output": "07c73751f2e5cf6e",
+      "source": "a5900d2a7866322e"
+    },
+    "text.slug-generator": {
+      "output": "661b408bec39c7e0",
+      "source": "d2a977e8fb578a78"
+    },
+    "text.sort-lines": {
+      "output": "8b31df139d275653",
+      "source": "df4f4c3c232e6124"
+    },
+    "text.word-counter": {
+      "output": "502b516f967a1db9",
+      "source": "937601fc18b1edf9"
+    }
+  },
+  "checks": {
+    "structure": "38 tools, 3 apps",
+    "fmt": "passed",
+    "clippy": "targeted app/shell/bus/platform all-targets passed",
+    "tests": "15 targeted Rust tests and 3 adapter tests passed",
+    "native": "both macOS x86_64 release binaries; interactive acceptance not claimed",
+    "local": {
+      "mode": "local delivery of compiled artifacts",
+      "date": "2026-10-17T10:41:55.876Z",
+      "results": [
+        "Hub: real catalogue, favourites and widget layout survive reload; search and launch work.",
+        "Desk: Rust hash, minimize/restore, arrangement/maximize, theme/language/mode, spaces retain iframe content; layout restores."
+      ],
+      "errors": []
+    },
+    "public": {
+      "mode": "public HTTPS",
+      "date": "2026-10-17T10:46:39.215Z",
+      "results": [
+        "Hub: real catalogue, favourites and widget layout survive reload; search and launch work.",
+        "Desk: Rust hash, minimize/restore, arrangement/maximize, theme/language/mode, spaces retain iframe content; layout restores.",
+        "Blocked browser storage shows a clear warning; in-memory favourites remain usable."
+      ],
+      "errors": []
+    }
+  },
+  "deployment": {
+    "order": [
+      "run",
+      "desk",
+      "hub",
+      "site"
+    ],
+    "versions": [
+      "870e1fad-e13a-4b95-a5ba-da635d6e5137",
+      "20388807-b117-4d4c-a008-c8e96e41eed0",
+      "52c2e584-a92b-4032-98b3-0e4833f05aad",
+      "2506821b-2955-4976-948c-52226aa28a90"
+    ],
+    "api": "unchanged",
+    "databases": "unchanged",
+    "publicDesktopDownloads": false
+  },
+  "limitations": [
+    "No Rust account/sync client yet",
+    "No typed tool transfers or persistent connections",
+    "Native tools open in separate installed windows; embedding/IPC pending",
+    "Widget renderers not fully modular yet",
+    "Windows/Linux, desktop packaging and interactive native acceptance pending"
+  ]
+}

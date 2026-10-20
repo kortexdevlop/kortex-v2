@@ -1,9 +1,9 @@
 ---
-import { toolPath, type Lang, type ToolEntry } from '../lib/data';
+import { toolPath, universes, type Lang, type ToolEntry } from '../lib/data';
 const { t, lang } = Astro.props as { t: ToolEntry; lang: Lang };
+const hue = universes.find((u) => u.id === t.tool.universe)?.hue ?? 250;
 ---
-<a class="k-card tool-card" href={toolPath(t, lang)}>
-  <img class="tool-icon" src={`/icons/${t.tool.id}.svg`} width="48" height="48" alt="" loading="lazy" />
-  <strong>{t.tool.name[lang]}</strong>
-  <span class="k-muted">{t.tool.tagline[lang]}</span>
+<a class="tool-card" href={toolPath(t, lang)} style={`--hue:${hue}`}>
+  <span class="tool-plate"><img src={`/icons/${t.tool.id}.svg`} width="56" height="56" alt="" loading="lazy" /></span>
+  <span class="tool-meta"><strong>{t.tool.name[lang]}</strong><span>{t.tool.tagline[lang]}</span></span>
 </a>

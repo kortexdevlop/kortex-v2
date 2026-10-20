@@ -1,7 +1,7 @@
 name: release
 
 # Builds the CLI, the Store and the desktop apps on Linux, macOS and Windows, signs the release index
-# and (when RELEASES_TOKEN is set) publishes everything to the public binaries-only repo.
+# and (when asked) publishes everything as a GitHub Release of this repository, which is public (ADR 0024).
 #
 # Minutes are scarce on a private repository (macOS counts x10, Windows x2): this workflow only runs
 # on `release/*` tags or by hand, never on push. See docs/guides/release.md.
@@ -10,18 +10,18 @@ on:
     inputs:
       tools:
         description: 'Tool ids to build (space separated) or "all"'
-        default: 'secure.password-generator'
+        default: 'all'
       only:
-        description: 'Run a single OS only: linux, macos, windows or all'
+        description: 'Build linux, macos, windows, all or web only'
         type: choice
-        options: [all, linux, macos, windows]
+        options: [all, linux, macos, windows, web]
         default: all
       intel_mac:
         description: 'Also build macOS x86_64 (costs more minutes)'
         type: boolean
-        default: false
+        default: true
       publish:
-        description: 'Publish to kortex-releases (needs the RELEASES_TOKEN secret)'
+        description: 'Publish a GitHub Release with the packages and the signed index'
         type: boolean
         default: false
   push:
@@ -49,17 +49,21 @@ jobs:
         env:
           ONLY: ${{ github.event_name == 'workflow_dispatch' && inputs.only || 'all' }}
         run: |
-          all='[{"os":"ubuntu-latest","name":"linux","targets":"x86_64-unknown-linux-gnu"},{"os":"macos-latest","name":"macos","targets":"aarch64-apple-darwin"},{"os":"windows-latest","name":"windows","targets":"x86_64-pc-windows-msvc"}]'
-          if [ "$ONLY" = "all" ]; then m="$all"; else m=$(echo "$all" | jq -c --arg n "$ONLY" '[.[] | select(.name == $n)]'); fi
+          all='[{"os":"ubuntu-latest","name":"linux","targets":"x86_64-unknown-linux-gnu"},{"os":"macos-15-intel","name":"macos","targets":"aarch64-apple-darwin"},{"os":"windows-latest","name":"windows","targets":"x86_64-pc-windows-msvc"}]'
+          if [ "$ONLY" = "all" ] || [ "$ONLY" = "web" ]; then m="$all"; else m=$(echo "$all" | jq -c --arg n "$ONLY" '[.[] | select(.name == $n)]'); fi
           echo "matrix={\"include\":$m}" >> "$GITHUB_OUTPUT"
 
   build:
+    if: github.event_name != 'workflow_dispatch' || inputs.only != 'web'
     needs: plan
+    env:
+      CARGO_PROFILE_RELEASE_LTO: thin
+      CARGO_PROFILE_RELEASE_CODEGEN_UNITS: 8
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 90
+    timeout-minutes: 120
     defaults:
       run:
         shell: bash
@@ -73,9 +77,16 @@ jobs:
           sudo apt-get install -y libwebkit2gtk-4.1-dev libgtk-3-dev libxdo-dev libayatana-appindicator3-dev
       - uses: Swatinem/rust-cache@v2
         with:
+          cache-on-failure: true
           workspaces: |
             .
-            .kortex/desktop/* -> .kortex/target-desktop
+          cache-directories: |
+            .kortex/target-desktop
+      # Hosted Apple Silicon runners were repeatedly unavailable (2026-10-20): the Intel runner
+      # cross-compiles the arm64 target, which is only packaged and signed here, never executed.
+      - name: Apple Silicon target
+        if: runner.os == 'macOS'
+        run: rustup target add aarch64-apple-darwin
       - name: Extra macOS target
         if: runner.os == 'macOS' && env.INTEL_MAC == 'true'
         run: |
@@ -83,36 +94,120 @@ jobs:
           echo "EXTRA_TARGETS=x86_64-apple-darwin" >> "$GITHUB_ENV"
       - name: Design tokens (embedded in every app)
         run: cargo xtask tokens
+      - name: Validate contracts and catalogue
+        run: cargo xtask check
       - name: Build, sign (macOS ad hoc) and package
         run: |
           set -euo pipefail
           if [ "$TOOLS" = "all" ]; then TOOL_LIST=$(cargo xtask list-tools); else TOOL_LIST="$TOOLS"; fi
+          APP_LIST=$(python -c 'import json; print(" ".join(a["app"]["id"] for a in json.load(open("registry/apps.json", encoding="utf-8"))["apps"] if a["app"]["status"] in ["beta", "stable"]))')
           for target in ${{ matrix.targets }} ${EXTRA_TARGETS:-}; do
             cargo xtask build-cli --target "$target"
-            cargo xtask build-app apps.store --target "$target"
+            for id in $APP_LIST; do cargo xtask build-app "$id" --target "$target"; done
             for id in $TOOL_LIST; do cargo xtask build-desktop "$id" --target "$target"; done
             if [ "$RUNNER_OS" = "macOS" ]; then
               # Free ad hoc signature: required to run on Apple Silicon. Gatekeeper still warns on browser
               # downloads; installs through the CLI/Store carry no quarantine flag. Paid signing can be
               # added here later without touching anything else.
-              find "dist/desktop/$target" -type f -perm -u+x -exec codesign --force --sign - {} \;
+              while IFS= read -r -d '' binary; do
+                codesign --force --sign - "$binary"
+                codesign --verify --strict "$binary"
+              done < <(find "dist/desktop/$target" -type f -perm -u+x -print0)
             fi
             cargo xtask package cli --target "$target"
-            cargo xtask package apps.store --target "$target"
+            for id in $APP_LIST; do cargo xtask package "$id" --target "$target"; done
             for id in $TOOL_LIST; do cargo xtask package "$id" --target "$target"; done
           done
+          python scripts/verify-release-packages.py --tools "$TOOLS" --targets "${{ matrix.targets }} ${EXTRA_TARGETS:-}"
           ls -la dist/release
       - uses: actions/upload-artifact@v4
         with:
           name: packages-${{ matrix.name }}
-          path: dist/release/*.tar.gz
+          path: |
+            dist/release/*.tar.gz
+            dist/release/build-proof-*.json
           if-no-files-found: error
           retention-days: 7
 
+  web:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup show
+      - uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+          workspaces: |
+            .
+          cache-directories: |
+            .kortex/target
+            .kortex/target-worker
+            .kortex/target-apps
+            ~/.cache/dioxus
+      - name: Existing Dioxus compiler (official pinned binary)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/dioxus"
+          gh release download v0.7.10 --repo DioxusLabs/dioxus --pattern 'dx-x86_64-unknown-linux-gnu.tar.gz' --pattern 'dx-x86_64-unknown-linux-gnu.sha256' --dir "$RUNNER_TEMP/dioxus"
+          cd "$RUNNER_TEMP/dioxus"
+          sha256sum --check --ignore-missing dx-x86_64-unknown-linux-gnu.sha256
+          tar -xzf dx-x86_64-unknown-linux-gnu.tar.gz
+          find "$RUNNER_TEMP/dioxus" -type f -name dx -exec chmod +x {} \;
+          find "$RUNNER_TEMP/dioxus" -type f -name dx -printf '%h\n' >> "$GITHUB_PATH"
+      - name: Existing wasm-bindgen compiler (pinned to the worker contract)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/wasm-bindgen"
+          gh release download 0.2.129 --repo wasm-bindgen/wasm-bindgen --pattern 'wasm-bindgen-0.2.129-x86_64-unknown-linux-musl.tar.gz' --dir "$RUNNER_TEMP/wasm-bindgen"
+          cd "$RUNNER_TEMP/wasm-bindgen"
+          echo '82d12bb940e2d4e72e0d5605387fc1b8ca179044e012b620f0ce4e7440e8320e  wasm-bindgen-0.2.129-x86_64-unknown-linux-musl.tar.gz' | sha256sum --check
+          tar -xzf wasm-bindgen-0.2.129-x86_64-unknown-linux-musl.tar.gz
+          find "$RUNNER_TEMP/wasm-bindgen" -type f -name wasm-bindgen -printf '%h\n' >> "$GITHUB_PATH"
+      - name: Compile all requested tools and released apps for WebAssembly
+        env:
+          DX_CLI_TELEMETRY: 'false'
+        run: |
+          set -euo pipefail
+          cargo xtask tokens
+          cargo xtask check
+          if [ "$TOOLS" = "all" ]; then cargo xtask build all; else cargo xtask build $TOOLS; fi
+          APP_LIST=$(python -c 'import json; print(" ".join(a["app"]["id"] for a in json.load(open("registry/apps.json", encoding="utf-8"))["apps"] if a["app"]["status"] in ["beta", "stable"]))')
+          for id in $APP_LIST; do cargo xtask build-app "$id" --web; done
+      - name: Headless engines (engine.wasm + worker.js) for Flow, Mind and other hosts
+        env:
+          DX_CLI_TELEMETRY: 'false'
+        run: |
+          set -euo pipefail
+          if [ "$TOOLS" = "all" ]; then cargo xtask build-engine all; else cargo xtask build-engine $TOOLS; fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: headless-engines
+          path: dist/engines/
+          if-no-files-found: error
+          retention-days: 7
+      - uses: actions/upload-artifact@v4
+        with:
+          name: web-bundles-and-receipts
+          path: |
+            dist/run/
+            dist/apps/
+            .kortex/build/*/build-receipt.json
+            .kortex/app-receipts/*-web.json
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 7
+
+
   publish:
-    needs: build
+    if: github.event_name != 'workflow_dispatch' || inputs.only != 'web'
+    needs: [build, web]
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - run: rustup show
@@ -131,20 +226,25 @@ jobs:
           KORTEX_SIGNING_KEY: ${{ secrets.KORTEX_SIGNING_KEY }}
         run: |
           test -n "$KORTEX_SIGNING_KEY" || { echo "::error::secret KORTEX_SIGNING_KEY missing"; exit 1; }
-          cargo xtask release-index --base-url "https://github.com/kortexdevlop/kortex-releases/releases/download/${{ steps.rel.outputs.tag }}"
+          cargo xtask release-index --base-url "https://github.com/${{ github.repository }}/releases/download/${{ steps.rel.outputs.tag }}"
           ls -la dist/release
       - uses: actions/upload-artifact@v4
         with:
-          name: signed-release
-          path: dist/release/*
-          retention-days: 14
-      - name: Publish to kortex-releases
-        if: (github.event_name == 'push' || inputs.publish) && env.RELEASES_TOKEN != ''
+          name: signed-release-index
+          path: |
+            dist/release/index.json
+            dist/release/index.json.sig
+            dist/release/cli-latest.txt
+            dist/release/build-proof-*.json
+          if-no-files-found: error
+          retention-days: 7
+      - name: Publish the GitHub Release
+        if: github.event_name == 'push' || inputs.publish
         env:
-          RELEASES_TOKEN: ${{ secrets.RELEASES_TOKEN }}
-          GH_TOKEN: ${{ secrets.RELEASES_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           gh release create "${{ steps.rel.outputs.tag }}" dist/release/* \
-            --repo kortexdevlop/kortex-releases \
+            --repo "${{ github.repository }}" \
+            --target "${{ github.sha }}" \
             --title "${{ steps.rel.outputs.tag }}" \
-            --notes "Binaries and signed index. Source code is private; verify with the Kortex public key."
+            --notes "Binaries and signed index (Ed25519). Verify with the Kortex public key; the installers check every SHA-256."

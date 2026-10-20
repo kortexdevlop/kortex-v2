@@ -128,3 +128,29 @@ fn errors_on_too_few_files_and_invalid_pdf() {
         Err("invalid_pdf")
     );
 }
+
+#[test]
+fn dynamic_entry_rejects_a_file_that_is_not_a_pdf_by_content() {
+    use kortex::runtime::{ToolError, Value, ValueMap};
+    let fake = FileData {
+        name: "report.pdf".into(),
+        mime: "application/pdf".into(),
+        bytes: b"plain text renamed to .pdf".to_vec(),
+    };
+    let real = make_pdf("real.pdf", &["A"], false);
+    let rejected = block_on(tool_pdf_merge::run_map(
+        &ValueMap::from([("files".to_owned(), Value::Files(vec![real.clone(), fake]))]),
+        &ValueMap::new(),
+        &mut Cx::new(),
+    ));
+    assert_eq!(
+        rejected,
+        Err(ToolError::with_detail("file_type_mismatch", "report.pdf"))
+    );
+    let accepted = block_on(tool_pdf_merge::run_map(
+        &ValueMap::from([("files".to_owned(), Value::Files(vec![real.clone(), real]))]),
+        &ValueMap::new(),
+        &mut Cx::new(),
+    ));
+    assert!(accepted.is_ok(), "{accepted:?}");
+}

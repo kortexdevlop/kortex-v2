@@ -1,11 +1,21 @@
 {
-  // Local development only for now: nothing is deployed (decision: no public deploy yet).
   "name": "kortex-api",
   "main": "src/index.ts",
   "compatibility_date": "2026-09-01",
-  "ai": { "binding": "AI" },
+  "ai": {
+    "binding": "AI",
+    "remote": true
+  },
+  "version_metadata": {
+    "binding": "CF_VERSION_METADATA"
+  },
   "d1_databases": [
-    { "binding": "DB", "database_name": "kortex-accounts", "database_id": "00000000-0000-0000-0000-000000000000", "migrations_dir": "migrations" }
+    {
+      "binding": "DB",
+      "database_name": "kortex-accounts",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations"
+    }
   ],
   "vars": {
     "ALLOWED_ORIGINS": "http://localhost:4321,http://localhost:8787",
@@ -16,10 +26,40 @@
   "env": {
     "production": {
       "vars": {
-        "ALLOWED_ORIGINS": "https://kortex.site,https://workspace.kortex.site,https://flow.kortex.site,https://agent.kortex.site,https://search.kortex.site,https://dashboard.kortex.site",
+        "ALLOWED_ORIGINS": "https://kortex.site,https://workspace.kortex.site,https://flow.kortex.site,https://agent.kortex.site,https://search.kortex.site,https://dashboard.kortex.site,https://store.kortex.site",
         "COOKIE_NAME": "__Host-kortex_session",
         "COOKIE_SECURE": "true",
-        "PBKDF2_ITERATIONS": "5000"
+        "PBKDF2_ITERATIONS": "5000",
+        "WEBAUTHN_RP_ID": "kortex.site",
+        "WEBAUTHN_ORIGIN": "https://kortex.site",
+        "TURNSTILE_REQUIRED": "true"
+      },
+      "name": "kortex-api",
+      "ai": {
+        "binding": "AI"
+      },
+      "version_metadata": {
+        "binding": "CF_VERSION_METADATA"
+      },
+      "workers_dev": false,
+      "routes": [
+        {
+          "pattern": "api.kortex.site",
+          "custom_domain": true
+        }
+      ],
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "kortex-accounts-fresh-20261017",
+          "database_id": "14db05e6-f667-4423-a289-946a0f18ebca",
+          "migrations_dir": "migrations"
+        }
+      ],
+      "triggers": {
+        "crons": [
+          "17 3 * * *"
+        ]
       }
     }
   }

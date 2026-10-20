@@ -1,0 +1,317 @@
+{
+  "apps": [
+    {
+      "app": {
+        "ai": false,
+        "aliases": {},
+        "id": "apps.desk",
+        "name": {
+          "en": "Kortex Desk",
+          "fr": "Kortex Desk"
+        },
+        "offline": false,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "desk",
+          "fr": "desk"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Your workspace, your tools.",
+          "fr": "Votre espace de travail, vos outils."
+        },
+        "ui": "custom",
+        "universe": "apps",
+        "version": "0.2.2",
+        "viral_priority": 3,
+        "web_worker": false
+      },
+      "inputs": [],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": null
+      },
+      "outputs": [],
+      "params": [],
+      "permissions": {
+        "clipboard": "none",
+        "filesystem": "none",
+        "network": true,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {},
+        "keywords": {},
+        "related": []
+      },
+      "variants": []
+    },
+    {
+      "app": {
+        "ai": true,
+        "aliases": {},
+        "id": "apps.flow",
+        "name": {
+          "en": "Kortex Flow",
+          "fr": "Kortex Flow"
+        },
+        "offline": false,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "flow",
+          "fr": "flow"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Chain your tools into local workflows.",
+          "fr": "Enchaînez vos outils en workflows locaux."
+        },
+        "ui": "custom",
+        "universe": "apps",
+        "version": "0.1.2",
+        "viral_priority": 3,
+        "web_worker": false
+      },
+      "inputs": [],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": null
+      },
+      "outputs": [],
+      "params": [],
+      "permissions": {
+        "clipboard": "none",
+        "filesystem": "write",
+        "network": true,
+        "privacy": "ai-consent",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {},
+        "keywords": {},
+        "related": []
+      },
+      "variants": []
+    },
+    {
+      "app": {
+        "ai": false,
+        "aliases": {},
+        "id": "apps.hub",
+        "name": {
+          "en": "Kortex Hub",
+          "fr": "Kortex Hub"
+        },
+        "offline": false,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "hub",
+          "fr": "hub"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Your personal dashboard.",
+          "fr": "Votre tableau de bord personnel."
+        },
+        "ui": "custom",
+        "universe": "apps",
+        "version": "0.2.2",
+        "viral_priority": 3,
+        "web_worker": false
+      },
+      "inputs": [],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": null
+      },
+      "outputs": [],
+      "params": [],
+      "permissions": {
+        "clipboard": "none",
+        "filesystem": "none",
+        "network": true,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {},
+        "keywords": {},
+        "related": []
+      },
+      "variants": []
+    },
+    {
+      "app": {
+        "ai": false,
+        "aliases": {},
+        "id": "apps.mind",
+        "name": {
+          "en": "Kortex Mind",
+          "fr": "Kortex Mind"
+        },
+        "offline": false,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "mind",
+          "fr": "mind"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Describe what you need: Mind picks the tools and runs them on your device.",
+          "fr": "Décrivez votre besoin : Mind choisit les outils et les lance sur votre appareil."
+        },
+        "ui": "custom",
+        "universe": "apps",
+        "version": "0.1.2",
+        "viral_priority": 3,
+        "web_worker": false
+      },
+      "inputs": [],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": null
+      },
+      "outputs": [],
+      "params": [],
+      "permissions": {
+        "clipboard": "none",
+        "filesystem": "write",
+        "network": true,
+        "privacy": "ai-consent",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {},
+        "keywords": {},
+        "related": []
+      },
+      "variants": []
+    },
+    {
+      "app": {
+        "ai": false,
+        "aliases": {},
+        "id": "apps.seek",
+        "name": {
+          "en": "Kortex Seek",
+          "fr": "Kortex Seek"
+        },
+        "offline": false,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "seek",
+          "fr": "seek"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Describe what you need, Seek finds the tool.",
+          "fr": "Décrivez votre besoin, Seek trouve l’outil."
+        },
+        "ui": "custom",
+        "universe": "apps",
+        "version": "0.1.2",
+        "viral_priority": 3,
+        "web_worker": false
+      },
+      "inputs": [],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": null
+      },
+      "outputs": [],
+      "params": [],
+      "permissions": {
+        "clipboard": "none",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {},
+        "keywords": {},
+        "related": []
+      },
+      "variants": []
+    },
+    {
+      "app": {
+        "ai": false,
+        "aliases": {},
+        "id": "apps.store",
+        "name": {
+          "en": "Kortex Store",
+          "fr": "Kortex Store"
+        },
+        "offline": false,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "store",
+          "fr": "store"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Explore your Kortex tools and their permissions.",
+          "fr": "Découvrez vos outils Kortex et leurs permissions."
+        },
+        "ui": "custom",
+        "universe": "apps",
+        "version": "0.3.1",
+        "viral_priority": 3,
+        "web_worker": false
+      },
+      "inputs": [],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": null
+      },
+      "outputs": [],
+      "params": [],
+      "permissions": {
+        "clipboard": "none",
+        "filesystem": "write",
+        "network": true,
+        "privacy": "local",
+        "sensitive": true
+      },
+      "schema": 1,
+      "search": {
+        "intents": {},
+        "keywords": {},
+        "related": []
+      },
+      "variants": []
+    }
+  ],
+  "schema": 1
+}

@@ -1,0 +1,21 @@
+{
+  "date": "2026-10-19",
+  "release_run": "39168043521",
+  "commit": "02f53c9e8507027f1fd2ac064ce8f616b024c919",
+  "versions": {
+    "kortex-run": "f61455f2-8127-4a69-b084-3515c8ba73c8",
+    "kortex-desk": "b0b44f9d-1778-43bc-88df-846a06ee31d6",
+    "kortex-flow": "a3a1b497-486e-4d3d-85d8-704fe5da9c06",
+    "kortex-hub": "13c14f51-6efc-464c-8fe8-1efd0dee2944",
+    "kortex-mind": "7656809f-d7e3-4e78-974a-ab2d5d1f5442",
+    "kortex-seek": "de6b0c37-ed3c-47d9-b89d-a1874d42bc25",
+    "kortex-store": "cfb4ea34-9767-425e-9325-40a80d610a25",
+    "kortex-site": "88601235-d75c-495d-bbb9-eec4a481a88c"
+  },
+  "previous_versions_note": "see 2026-10-18-mind-publication.json for the prior api/site/run/desk/hub/store versions; flow/seek/mind previous: ea1bbc17.../355a56cf.../ac0ee11e...",
+  "checks": [
+    "6 app hosts 200 with manifest and sw.js",
+    "flow engines served (text/javascript)",
+    "live browser run text.cleaner -> case-converter on flow.kortex.site, no page error"
+  ]
+}
