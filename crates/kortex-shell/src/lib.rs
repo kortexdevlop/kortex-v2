@@ -202,18 +202,27 @@ pub fn use_appearance() -> Appearance {
     });
     // The shared cookie (set on any Kortex host) wins over this host's own saved copy.
     let theme = use_signal(|| {
-        kortex_platform::document::shared_get("theme").unwrap_or_else(|| load::<String>("shell", "theme").0)
+        kortex_platform::document::shared_get("theme")
+            .unwrap_or_else(|| load::<String>("shell", "theme").0)
     });
     let mode = use_signal(|| {
-        let x = kortex_platform::document::shared_get("mode").unwrap_or_else(|| load::<String>("shell", "mode").0);
+        let x = kortex_platform::document::shared_get("mode")
+            .unwrap_or_else(|| load::<String>("shell", "mode").0);
         if ["simple", "medium", "pro"].contains(&x.as_str()) {
             x
         } else {
             "medium".into()
         }
     });
-    let size = use_signal(|| kortex_platform::document::shared_get("size").unwrap_or_else(|| "normal".into()));
-    use_context_provider(|| Appearance { lang, theme, mode, size });
+    let size = use_signal(|| {
+        kortex_platform::document::shared_get("size").unwrap_or_else(|| "normal".into())
+    });
+    use_context_provider(|| Appearance {
+        lang,
+        theme,
+        mode,
+        size,
+    });
     use_effect(move || {
         kortex_platform::document::apply_theme(&theme());
         kortex_platform::document::apply_size(&size());
@@ -225,7 +234,12 @@ pub fn use_appearance() -> Appearance {
         remember("mode", &mode());
         remember("size", &size());
     });
-    Appearance { lang, theme, mode, size }
+    Appearance {
+        lang,
+        theme,
+        mode,
+        size,
+    }
 }
 #[component]
 pub fn Frame(title: String, subtitle: String, children: Element) -> Element {
@@ -239,12 +253,20 @@ pub fn Frame(title: String, subtitle: String, children: Element) -> Element {
         (url("hub", &lang), "Kortex Hub", "hub"),
         (url("desk", &lang), "Kortex Desk", "desk"),
         (
-            format!("{}{}", url("root", &lang), if fr { "outils" } else { "tools" }),
+            format!(
+                "{}{}",
+                url("root", &lang),
+                if fr { "outils" } else { "tools" }
+            ),
             if fr { "Tous les outils" } else { "All tools" },
             "tools",
         ),
         (
-            format!("{}{}", url("root", &lang), if fr { "compte" } else { "account" }),
+            format!(
+                "{}{}",
+                url("root", &lang),
+                if fr { "compte" } else { "account" }
+            ),
             if fr { "Compte" } else { "Account" },
             "account",
         ),

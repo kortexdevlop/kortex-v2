@@ -63,6 +63,6 @@ test('application host validates origin and exact iframe, and removes its listen
   assert.deepEqual(sent,[]);assert.deepEqual(ready,[]);
   listeners.message({origin:'https://run.kortex.site',source:child,data});
   assert.deepEqual(ready,[{version:1,frame:7}]);
-  assert.deepEqual(sent,[[{type:'kortex:init',mode:'pro',lang:'en',theme:'dark'},'https://run.kortex.site']]);
+  assert.deepEqual(sent,[[{type:'kortex:init',mode:'pro',lang:'en',theme:'dark',size:'normal'},'https://run.kortex.site']]);
   stop('stop');await running;assert.equal(removed,true);
 });

@@ -18,3 +18,13 @@
 .store-count, .store-universe { justify-self: start; align-self: flex-start; }
 .store-hero .k-btn { justify-self: start; margin-top: var(--k-space-2); }
 .store-delivery { display: grid; gap: var(--k-space-2); }
+.store-actions { display: flex; flex-wrap: wrap; gap: var(--k-space-2); align-items: center; }
+.store-actions .k-btn { flex: 1 1 auto; }
+.store-apps { display: grid; gap: var(--k-space-3); margin-block: var(--k-space-4); }
+.store-app-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: var(--k-space-3); }
+.store-app { display: grid; gap: var(--k-space-3); }
+.store-info { display: grid; gap: var(--k-space-1); }
+.store-notice { margin: 0; font-weight: var(--k-type-weight-strong); color: var(--k-success); }
+.store-notice-error { color: var(--k-danger); }
+.store-scrim { position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; padding: var(--k-space-4); background: var(--k-overlay); }
+.store-confirm { width: min(100%, 420px); display: grid; gap: var(--k-space-4); box-shadow: var(--k-shadow-5); }

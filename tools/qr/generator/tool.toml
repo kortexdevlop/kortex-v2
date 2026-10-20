@@ -2,7 +2,7 @@ schema = 1
 
 [tool]
 id = "qr.generator"
-version = "1.0.0"
+version = "1.0.1"
 universe = "qr"
 status = "beta"
 ui = "auto"

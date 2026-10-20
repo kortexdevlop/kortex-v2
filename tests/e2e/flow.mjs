@@ -189,7 +189,7 @@ try {
   await lab.addInitScript(() => localStorage.clear());
   await lab.goto(origin + '/', { waitUntil: 'networkidle' });
   const [kx, ky] = await center(lab.locator('#flow-canvas'));
-  await dragTo(lab, lab.locator('[data-add="text"]'), kx - 300, ky - 120);
+  await dragTo(lab, lab.locator('[data-add="text"]'), kx - 150, ky - 120);
   assert.equal(await lab.locator('[data-node="n1"][data-kind="text"]').count(), 1);
   checks.push('drag a node from the palette');
   await lab.locator('.flow-inspector textarea').fill('error: disk full');

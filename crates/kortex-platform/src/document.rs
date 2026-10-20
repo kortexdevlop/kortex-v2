@@ -150,7 +150,8 @@ pub mod shared {
         SHORT.iter().find(|(k, _)| *k == key).map(|(_, s)| *s)
     }
     fn allowed(key: &str, value: &str) -> bool {
-        KEYS.iter().any(|(k, values, _)| *k == key && values.contains(&value))
+        KEYS.iter()
+            .any(|(k, values, _)| *k == key && values.contains(&value))
     }
 
     /// Value of `key` inside a cookie payload such as `t=dark&m=pro` (unknown values are ignored).
@@ -171,12 +172,16 @@ pub mod shared {
         let Some(wanted) = short(key) else {
             return payload.to_owned();
         };
-        let keep = allowed(key, value) && KEYS.iter().any(|(k, _, default)| *k == key && *default != value);
+        let keep = allowed(key, value)
+            && KEYS
+                .iter()
+                .any(|(k, _, default)| *k == key && *default != value);
         let mut pairs: Vec<String> = payload
             .split('&')
             .filter(|pair| {
-                pair.split_once('=')
-                    .is_some_and(|(k, v)| k != wanted && SHORT.iter().any(|(name, s)| *s == k && allowed(name, v)))
+                pair.split_once('=').is_some_and(|(k, v)| {
+                    k != wanted && SHORT.iter().any(|(name, s)| *s == k && allowed(name, v))
+                })
             })
             .map(str::to_owned)
             .collect();
@@ -190,11 +195,12 @@ pub mod shared {
     /// `Set-Cookie` text for `payload` (`Domain` only when the page is served from `domain`).
     #[must_use]
     pub fn cookie_text(payload: &str, host: &str, domain: &str, secure: bool) -> String {
-        let scope = if !domain.is_empty() && (host == domain || host.ends_with(&format!(".{domain}"))) {
-            format!("; Domain={domain}")
-        } else {
-            String::new()
-        };
+        let scope =
+            if !domain.is_empty() && (host == domain || host.ends_with(&format!(".{domain}"))) {
+                format!("; Domain={domain}")
+            } else {
+                String::new()
+            };
         let age = if payload.is_empty() { 0 } else { 31_536_000 };
         format!(
             "{COOKIE}={payload}; Path=/; Max-Age={age}; SameSite=Lax{scope}{}",
@@ -211,7 +217,9 @@ fn browser_field(owner: &wasm_bindgen::JsValue, name: &str) -> wasm_bindgen::JsV
 #[cfg(target_arch = "wasm32")]
 fn cookie_payload() -> String {
     let document = browser_field(&js_sys::global(), "document");
-    let all = browser_field(&document, "cookie").as_string().unwrap_or_default();
+    let all = browser_field(&document, "cookie")
+        .as_string()
+        .unwrap_or_default();
     all.split(';')
         .filter_map(|c| c.trim().split_once('='))
         .find(|(name, _)| *name == shared::COOKIE)
@@ -227,10 +235,11 @@ pub fn shared_get(key: &str) -> Option<String> {
     }
     #[cfg(not(target_arch = "wasm32"))]
     {
-        preference_get("shared", key)
-            .ok()
-            .flatten()
-            .filter(|v| shared::KEYS.iter().any(|(k, values, _)| *k == key && values.contains(&v.as_str())))
+        preference_get("shared", key).ok().flatten().filter(|v| {
+            shared::KEYS
+                .iter()
+                .any(|(k, values, _)| *k == key && values.contains(&v.as_str()))
+        })
     }
 }
 /// Stores a shared preference after an explicit choice. `domain` is the parent domain the
@@ -242,10 +251,16 @@ pub fn shared_set(domain: &str, key: &str, value: &str) {
         let payload = shared::merge(&cookie_payload(), key, value);
         let global = js_sys::global();
         let location = browser_field(&global, "location");
-        let host = browser_field(&location, "hostname").as_string().unwrap_or_default();
+        let host = browser_field(&location, "hostname")
+            .as_string()
+            .unwrap_or_default();
         let secure = browser_field(&location, "protocol").as_string().as_deref() == Some("https:");
         let text = shared::cookie_text(&payload, &host, domain, secure);
-        let _ = js_sys::Reflect::set(&browser_field(&global, "document"), &JsValue::from_str("cookie"), &JsValue::from_str(&text));
+        let _ = js_sys::Reflect::set(
+            &browser_field(&global, "document"),
+            &JsValue::from_str("cookie"),
+            &JsValue::from_str(&text),
+        );
     }
     #[cfg(not(target_arch = "wasm32"))]
     {
@@ -554,9 +569,18 @@ mod shared_tests {
 
     #[test]
     fn parse_reads_known_values_only() {
-        assert_eq!(parse("t=dark&m=pro&s=large", "theme").as_deref(), Some("dark"));
-        assert_eq!(parse("t=dark&m=pro&s=large", "mode").as_deref(), Some("pro"));
-        assert_eq!(parse("t=dark&m=pro&s=large", "size").as_deref(), Some("large"));
+        assert_eq!(
+            parse("t=dark&m=pro&s=large", "theme").as_deref(),
+            Some("dark")
+        );
+        assert_eq!(
+            parse("t=dark&m=pro&s=large", "mode").as_deref(),
+            Some("pro")
+        );
+        assert_eq!(
+            parse("t=dark&m=pro&s=large", "size").as_deref(),
+            Some("large")
+        );
         assert_eq!(parse("t=neon", "theme"), None);
         assert_eq!(parse("", "mode"), None);
         assert_eq!(parse("t=dark", "nope"), None);
@@ -568,14 +592,20 @@ mod shared_tests {
         assert_eq!(merge("t=dark", "mode", "pro"), "m=pro&t=dark");
         assert_eq!(merge("t=dark&m=pro", "theme", ""), "m=pro");
         assert_eq!(merge("t=dark&m=pro", "mode", "medium"), "t=dark");
-        assert_eq!(merge("t=dark&x=1&m=weird", "size", "large"), "s=large&t=dark");
+        assert_eq!(
+            merge("t=dark&x=1&m=weird", "size", "large"),
+            "s=large&t=dark"
+        );
         assert_eq!(merge("t=dark", "theme", ""), "");
     }
 
     #[test]
     fn cookie_is_scoped_and_expires_when_empty() {
         let text = cookie_text("t=dark", "flow.kortex.site", "kortex.site", true);
-        assert_eq!(text, "k-prefs=t=dark; Path=/; Max-Age=31536000; SameSite=Lax; Domain=kortex.site; Secure");
+        assert_eq!(
+            text,
+            "k-prefs=t=dark; Path=/; Max-Age=31536000; SameSite=Lax; Domain=kortex.site; Secure"
+        );
         let local = cookie_text("t=dark", "localhost", "kortex.site", false);
         assert!(!local.contains("Domain") && !local.contains("Secure"));
         assert!(cookie_text("", "kortex.site", "kortex.site", true).contains("Max-Age=0"));

@@ -24,11 +24,10 @@ pub struct Texts {
     pub version: &'static str,
     pub new_version: &'static str,
 }
-#[must_use]
-pub fn texts(lang: &str) -> Texts {
+fn catalog(lang: &str) -> &'static kortex_i18n::Catalog {
     static FR: std::sync::OnceLock<kortex_i18n::Catalog> = std::sync::OnceLock::new();
     static EN: std::sync::OnceLock<kortex_i18n::Catalog> = std::sync::OnceLock::new();
-    let catalog = if lang == "fr" {
+    if lang == "fr" {
         FR.get_or_init(|| {
             kortex_i18n::Catalog::from_toml(include_str!("../locales/fr.toml")).unwrap_or_default()
         })
@@ -36,7 +35,18 @@ pub fn texts(lang: &str) -> Texts {
         EN.get_or_init(|| {
             kortex_i18n::Catalog::from_toml(include_str!("../locales/en.toml")).unwrap_or_default()
         })
-    };
+    }
+}
+
+/// One `[ui]` text of the Store locales.
+#[must_use]
+pub fn text(lang: &str, key: &str) -> String {
+    catalog(lang).t(&format!("ui.{key}")).to_owned()
+}
+
+#[must_use]
+pub fn texts(lang: &str) -> Texts {
+    let catalog = catalog(lang);
     Texts {
         title: catalog.t("ui.title"),
         subtitle: catalog.t("ui.subtitle"),

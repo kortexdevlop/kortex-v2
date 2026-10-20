@@ -13,6 +13,28 @@ pub struct ToolStatus {
     pub supported: bool,
 }
 
+/// What the Store knows about this device's packages.
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct Snapshot {
+    pub items: Vec<ToolStatus>,
+    /// E-mail of the account linked to this device, if any.
+    pub account: Option<String>,
+    /// Why the signed index could not be loaded (offline, bad signature…).
+    pub error: Option<String>,
+}
+
+/// Result of one install, update or removal.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Outcome {
+    Done,
+    /// No account on this device: installs are refused (same rule as the CLI).
+    SignedOut,
+    /// The account asks to confirm installs with its password.
+    NeedsPassword,
+    WrongPassword,
+    Failed(String),
+}
+
 /// What a row's primary button does.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Action {

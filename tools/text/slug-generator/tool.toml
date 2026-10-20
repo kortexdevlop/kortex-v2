@@ -1,7 +1,7 @@
 schema = 1
 [tool]
 id = "text.slug-generator"
-version = "1.0.0"
+version = "1.0.1"
 universe = "text"
 status = "beta"
 ui = "auto"

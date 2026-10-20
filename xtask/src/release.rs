@@ -193,6 +193,7 @@ kortex-platform = {{ path = "{root}/crates/kortex-platform" }}
 kortex-runtime = {{ path = "{root}/crates/kortex-runtime" }}
 kortex-contract = {{ path = "{root}/crates/kortex-contract" }}
 kortex-i18n = {{ path = "{root}/crates/kortex-i18n" }}
+serde_json = "1"
 
 [workspace]
 
@@ -260,13 +261,36 @@ fn main() -> std::process::ExitCode {{
     std::process::ExitCode::SUCCESS
 }}
 
+/// Language: `$KORTEX_LANG`, then the choice made in the Kortex apps on this device, then the
+/// system locale when it is set (terminal launches); French otherwise, like the apps.
+fn language() -> String {{
+    let env = |key: &str| kortex_platform::native::env::var(key).ok().filter(|v| !v.is_empty());
+    let pick = |v: &str| if v.starts_with("en") {{ "en" }} else {{ "fr" }};
+    if let Some(v) = env("KORTEX_LANG") {{
+        return pick(&v).to_owned();
+    }}
+    if let Ok(Some(v)) = kortex_platform::document::preference_get("shell", "lang") {{
+        if let Ok(v) = serde_json::from_str::<String>(&v) {{
+            return pick(&v).to_owned();
+        }}
+    }}
+    env("LC_ALL").or_else(|| env("LANG")).map_or_else(|| "fr".to_owned(), |v| pick(&v).to_owned())
+}}
+
 #[component]
 fn App() -> Element {{
-    let lang = kortex_platform::native::env::var("KORTEX_LANG").ok().or_else(|| kortex_platform::native::env::var("LANG").ok()).filter(|l| l.starts_with("fr")).map_or("en", |_| "fr").to_owned();
+    let lang = use_hook(language);
     let contract = kortex_contract::parse(tool::CONTRACT).expect("contract");
     let locale_src = if lang == "fr" {{ include_str!("{tool_dir}/locales/fr.toml") }} else {{ include_str!("{tool_dir}/locales/en.toml") }};
     let locale = kortex_i18n::Catalog::from_toml(locale_src).unwrap_or_default();
-    let mode = kortex_platform::native::env::var("KORTEX_MODE").ok();
+    // Same display preferences as the Kortex apps on this device (theme, mode, text size).
+    let mode = kortex_platform::native::env::var("KORTEX_MODE").ok().or_else(|| kortex_platform::document::shared_get("mode"));
+    use_effect(move || {{
+        kortex_platform::document::apply_theme(&kortex_platform::document::shared_get("theme").unwrap_or_default());
+        kortex_platform::document::apply_size(&kortex_platform::document::shared_get("size").unwrap_or_default());
+    }});
+    let html_lang = lang.clone();
+    use_effect(move || kortex_platform::document::apply_language(&html_lang));
     rsx! {{
         style {{ "{{CSS}}" }}
         main {{ style: "padding: var(--k-space-4); max-width: 720px; margin: 0 auto;",

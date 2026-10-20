@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-20",
+  "lot": 36,
+  "steps": ["10.3", "10.4", "10.6", "10.8", "6.x"],
+  "audit": {
+    "published_release": "manual-39262336661 (commit 4f25167, 2026-10-19)",
+    "design_gap": "installed binaries contain none of the Porcelain tokens (--k-ink, --k-surface-3, --k-border-strong, --k-accent-soft)",
+    "update_gap": "tool and app versions unchanged since that release, so `kortex update` offered nothing",
+    "store_gap": "no install action since commit 7ed41ae; 'in preparation' notice on web and desktop",
+    "launcher_gap": "~/Applications/Kortex Kortex Store.app",
+    "language_gap": "desktop tools fell back to English without LANG (Finder launch)"
+  },
+  "versions": { "tools": "1.0.1 (38)", "apps.desk": "0.2.1", "apps.flow": "0.1.1", "apps.hub": "0.2.1", "apps.mind": "0.1.1", "apps.seek": "0.1.1", "apps.store": "0.3.0" },
+  "checks": [
+    "cargo test -p kortex-pkg (launcher names, legacy cleanup on reinstall and removal)",
+    "cargo test -p kortex-store (SSR package actions); --ignored delivery test against the production signed index: 44 entries, install refused without an account",
+    "cargo check -p kortex-store for wasm32 (web feature)",
+    "debug Store desktop launched and alive; keychain access granted by the user",
+    "cargo xtask build-desktop text.cleaner: Porcelain tokens embedded, --engine run OK, window alive without LANG",
+    "site build 208 pages, site tests, smoke e2e, visual audit /telecharger /en/download /store /en/store (32 views, 0 blocking defect)",
+    "tests/e2e/flow.mjs full recipe; scripts/tests host-fallback + offline-routing",
+    "scripts/gate.sh"
+  ],
+  "not_checked": [
+    "desktop windows not inspected visually (no screen-recording permission for the agent shell)",
+    "install from the Store with password confirmation (the account password is the user's)",
+    "signing in from the Store (still kortex login)",
+    "Windows, Linux and macOS ARM acceptance"
+  ]
+}

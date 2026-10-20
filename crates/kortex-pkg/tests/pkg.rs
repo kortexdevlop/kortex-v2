@@ -662,3 +662,34 @@ fn self_update_swaps_the_binary_only_when_newer_and_verified() {
     assert!(self_update(&bad, &e.index_path(), exe, TARGET, "0.1.0").is_err());
     assert_eq!(std::fs::read(exe).expect("exe"), b"current");
 }
+
+#[test]
+fn app_launchers_do_not_double_the_kortex_prefix_and_old_names_are_removed() {
+    let e = env("launcher-names");
+    let bin = e.home.root().join("bin-store");
+    std::fs::create_dir_all(e.home.root()).expect("root");
+    std::fs::write(&bin, b"#!/bin/sh\n").expect("bin");
+    shortcuts::create(&e.home, "apps.store", "Kortex Store", &bin);
+    let made = shortcuts::existing(&e.home, "apps.store", "Kortex Store");
+    assert_eq!(made.len(), 1, "{made:?}");
+    let file = made[0]
+        .file_name()
+        .expect("name")
+        .to_string_lossy()
+        .into_owned();
+    assert!(!file.contains("Kortex Kortex"), "{file}");
+    assert!(file.contains("Store"), "{file}");
+    if cfg!(target_os = "macos") {
+        // A launcher named by an earlier release is cleaned up too.
+        let legacy = e
+            .home
+            .user_home()
+            .join("Applications/Kortex Kortex Store.app");
+        std::fs::create_dir_all(&legacy).expect("legacy");
+        shortcuts::create(&e.home, "apps.store", "Kortex Store", &bin);
+        assert!(!legacy.exists(), "reinstall replaces the old name");
+        std::fs::create_dir_all(&legacy).expect("legacy");
+        shortcuts::remove(&e.home, "apps.store", "Kortex Store");
+        assert!(!legacy.exists() && !made[0].exists());
+    }
+}

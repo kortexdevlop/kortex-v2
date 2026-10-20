@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.2.1
+- Desktop release rebuilt with the current Kortex design and features.
+
 ## 0.1.0
 - Shared Rust/Dioxus web and desktop application.
 
