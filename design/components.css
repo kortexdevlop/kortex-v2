@@ -183,8 +183,13 @@
   .k-dropzone { display: grid; gap: var(--k-space-1); place-items: center; padding: var(--k-space-7) var(--k-space-5); border: 1.5px dashed var(--k-border-strong); border-radius: var(--k-radius-card);
     background: var(--k-surface-2); text-align: center; cursor: pointer;
     transition: transform var(--k-motion-slow) var(--k-motion-spring), border-color var(--k-motion-base) var(--k-motion-ease), background-color var(--k-motion-base) var(--k-motion-ease); }
-  .k-dropzone::before { content: ""; width: 40px; height: 40px; margin-bottom: var(--k-space-2); border-radius: var(--k-radius-field); background: var(--k-surface);
-    box-shadow: var(--k-shadow-1), var(--k-shadow-hairline); }
+  /* Upload glyph drawn as a mask so it follows the text color in both themes. */
+  .k-dropzone::before { content: ""; width: 28px; height: 28px; margin-bottom: var(--k-space-2); background: var(--k-text-2);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 15V4M7.5 8.5 12 4l4.5 4.5'/%3E%3Cpath d='M4 14.5v3A2.5 2.5 0 0 0 6.5 20h11a2.5 2.5 0 0 0 2.5-2.5v-3'/%3E%3C/svg%3E") center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 15V4M7.5 8.5 12 4l4.5 4.5'/%3E%3Cpath d='M4 14.5v3A2.5 2.5 0 0 0 6.5 20h11a2.5 2.5 0 0 0 2.5-2.5v-3'/%3E%3C/svg%3E") center / contain no-repeat;
+    transition: transform var(--k-motion-slow) var(--k-motion-out), background-color var(--k-motion-base) var(--k-motion-ease); }
+  .k-dropzone:hover::before { transform: translateY(-2px); background: var(--k-text); }
+  .k-dropzone[data-over="true"]::before { background: var(--k-accent); transform: translateY(-3px); }
   .k-dropzone strong { font-weight: var(--k-type-weight-strong); }
   .k-dropzone:hover { border-color: var(--k-text-2); }
   .k-dropzone[data-over="true"] { border-color: var(--k-accent); background: var(--k-accent-soft); transform: scale(1.01); }

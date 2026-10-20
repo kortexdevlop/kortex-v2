@@ -54,6 +54,16 @@
       ],
       "port": 4352,
       "autoPort": true
+    },
+    {
+      "name": "app-hub",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "python3 -m http.server $PORT --directory dist/apps/apps.hub"
+      ],
+      "port": 4353,
+      "autoPort": true
     }
   ]
 }

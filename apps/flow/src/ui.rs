@@ -856,7 +856,7 @@ pub fn App() -> Element {
                         let mut open = ctx.lib_open;
                         open.set(!open());
                     },
-                    "📚 " {l.t("lib.title")}
+                    {l.t("lib.title")}
                 }
                 button {
                     class: "k-btn",
@@ -868,7 +868,7 @@ pub fn App() -> Element {
                         let mut open = ctx.hist_open;
                         open.set(!open());
                     },
-                    "🕘 " {l.t("hist.title")}
+                    {l.t("hist.title")}
                 }
                 span { class: "flow-sep" }
                 button {
@@ -901,7 +901,7 @@ pub fn App() -> Element {
                             }
                         });
                     },
-                    "▶ " {l.t("ui.run")}
+                    {l.t("ui.run")}
                 }
                 if running() {
                     button {

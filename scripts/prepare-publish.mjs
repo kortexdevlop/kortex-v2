@@ -39,6 +39,9 @@ for (const {app} of appRegistry.apps.filter(({app}) => ['beta', 'stable'].includ
   if (receipt.target !== 'web') throw new Error(`Missing web build proof: ${name}`);
   targets.push([name, `dist/apps/apps.${name}`, domains[name]]);
 }
+// Content-hashed build outputs never change under the same name: cache them for a year.
+const forever = '  Cache-Control: public, max-age=31536000, immutable\n';
+const immutable = { site: `\n/_astro/*\n${forever}`, run: `\n/:tool/assets/*\n${forever}`, app: `\n/assets/*\n${forever}` };
 for (const [name, source, host] of targets) {
   const dest = join(root, 'dist/publish', name);
   rmSync(dest, {recursive: true, force: true});
@@ -73,7 +76,7 @@ for (const [name, source, host] of targets) {
     ? `default-src 'self'; script-src 'self' ${[...scriptHashes].join(' ')}${turnstile}; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://${domains.run}${features.account ? ` https://${domains.api}` : ''}; frame-src https://${domains.run}${turnstile}; worker-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'self'; form-action 'self'`
     : name !== 'run' ? `default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://${domains.api}; frame-src https://${domains.run}; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'`
     : `default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors https://${domains.root} https://${domains.desk} https://${domains.hub}; form-action 'none'`;
-  writeFileSync(join(dest, '_headers'), `/*\n  Content-Security-Policy: ${csp}\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: no-referrer\n  Strict-Transport-Security: max-age=31536000\n  Permissions-Policy: camera=(), microphone=(), geolocation=()\n\n/sw.js\n  Cache-Control: no-cache\n\n/*/sw.js\n  Cache-Control: no-cache\n`);
+  writeFileSync(join(dest, '_headers'), `/*\n  Content-Security-Policy: ${csp}\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: no-referrer\n  Strict-Transport-Security: max-age=31536000\n  Permissions-Policy: camera=(), microphone=(), geolocation=()\n\n/sw.js\n  Cache-Control: no-cache\n\n/*/sw.js\n  Cache-Control: no-cache\n${immutable[name === 'site' ? 'site' : name === 'run' ? 'run' : 'app']}`);
   if (count > 20000) throw new Error(`Too many assets: ${count}`);
   mkdirSync(join(root, `services/${name}`), {recursive: true});
   writeFileSync(join(root, `services/${name}/wrangler.jsonc`), JSON.stringify({
