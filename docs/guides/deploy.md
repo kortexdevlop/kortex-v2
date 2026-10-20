@@ -1,11 +1,11 @@
 # Static publication
 
-The current public scope is the Astro site and the 38 existing web tools. The account API is deployed with D1; desktop downloads remain disabled until the public release feed is ready. No new tool may be added (user decision, 2026-10-16).
+The current public scope is the Astro site and the 38 existing web tools. The account API is deployed with D1. Desktop downloads have been public since 2026-10-19 (`desktop_releases = true`): build the site with `KORTEX_RELEASE_DIR` pointing at the files of the current public GitHub Release, never at a local test index (`web/site/scripts/sync.mjs` refuses it). No new tool may be added (user decision, 2026-10-16).
 
 1. Build only changed tool bundles with `cargo xtask build <id…>` when engine/UI sources changed.
 2. Provide Cloudflare credentials through Wrangler's normal authentication or `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`. Never save credentials in source files.
 3. Run `pnpm run deploy`. This rebuilds Astro, prepares public artifacts, prints the inventory, applies pending account migrations, publishes the API and checks its health, then publishes the tool host followed by the site host.
-4. Check HTTPS, one complete tool execution, search, and the account flow and unavailable desktop download page. Record versions and results in `docs/PROGRESS.md`.
+4. Check HTTPS, one complete tool execution, search, the account flow and the `/telecharger` page with the index served under `/registry/` identical to the release. Record versions and results in `docs/PROGRESS.md`.
 
 Domains come from `brand/domains.toml`; `scripts/prepare-publish.mjs` generates the static Wrangler configurations from the site/tool/app inventory. The staging directories are `dist/publish/site` and `dist/publish/run`. Local desktop release test feeds, installation scripts, hidden files, source maps and Rust sources are excluded or rejected. File size/count checks enforce the static asset free-plan limits verified on 2026-10-16.
 

@@ -53,7 +53,7 @@ Version consolidée du 16 octobre 2026, après retrait des prototypes non confor
 6.3 Auth mot de passe : dérivation client et vérification serveur selon ADR 0005, cohérentes entre Rust et clients existants ; mesurer CPU réel avant validation de charge. Passkeys avec origine/RP/UV/challenges contrôlés.
 6.4 Aucun contenu de fichier envoyé à l’IA sans consentement explicite par fichier. Les permissions sensibles, réseau et écritures doivent être confirmées dans les parcours qui les exigent.
 6.5 Synchronisation de métadonnées uniquement, jamais des fichiers. Secrets exclus des exports non protégés, journaux et sync. Respecter les rétentions et droits RGPD.
-6.6 Dépôt source privé, licence propriétaire ; dépôt de releases public limité aux binaires, index signé et notes. Le wasm public reste inspectable par nature.
+6.6 Dépôt source `kortex-v2` public depuis le 2026-10-19 (décision explicite de l’utilisateur, ADR 0024), licence propriétaire « tous droits réservés ». Les GitHub Releases ne contiennent que binaires, index signé et notes. Aucun secret dans Git ; une fuite impose la rotation. Le wasm public reste inspectable par nature.
 
 ## 7. Compilation et validation
 
@@ -70,7 +70,7 @@ Version consolidée du 16 octobre 2026, après retrait des prototypes non confor
 8.1 La consigne persistante autorise la publication de chaque lot terminé après ses contrôles utiles. Pas de nouvelle demande d’autorisation pour une publication déjà autorisée dans ce périmètre.
 8.2 CI/CD est la voie nominale ; la publication locale reproductible est le secours autorisé par l’utilisateur. Elle ne remplace pas la finalisation de la CI.
 8.3 Aucune suppression irréversible de repo/Worker/DNS/base, force-push ou dépense sans instruction explicite et inventaire préalable. Une demande de suppression ciblée autorise ce retrait, pas la destruction des ressources partagées.
-8.4 Ne pas publier une fonction locale comme opérationnelle en production. Garder IA, téléchargements et apps non validées indisponibles.
+8.4 Ne pas publier une fonction locale comme opérationnelle en production. Garder IA et apps non validées indisponibles. Les téléchargements desktop sont ouverts depuis le 2026-10-19 par décision explicite de l’utilisateur ; leurs limites restent affichées et suivies (release.md, PLAN 10.x).
 8.5 Conserver un lien entre sources, artefacts, contrôles et version publiée. Tester un parcours réel utile en fin de lot ; ne pas multiplier les recettes identiques sans changement ou échec nouveau.
 
 ## 9. Suivi et langues

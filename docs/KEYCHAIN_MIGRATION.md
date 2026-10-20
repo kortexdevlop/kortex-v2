@@ -1,6 +1,6 @@
 # Desktop credential migration — step 8.5
 
-Status: native adapter, protected records, migration/rollback and caller error propagation implemented; **full local gate passed; OS acceptance pending**. Authority: RULES.md §§4/6/7 and MASTER_PROMPT.md account/distribution requirements. No new product tool, service, dependency or paid signature is authorized by this document.
+Status: native adapter, protected records, migration/rollback and caller error propagation implemented; **full local gate passed; keyring backends exercised in CI on Linux, macOS and Windows with isolated stores (run 39241467253, commit ed9b945); interactive acceptance in a normal user session declared by the user on 2026-10-19, not replayed by the agent**. Authority: RULES.md §§4/6/7 and MASTER_PROMPT.md account/distribution requirements. No new product tool, service, dependency or paid signature is authorized by this document.
 
 ## Existing behavior and affected callers
 
@@ -32,7 +32,7 @@ Consumers include CLI login/logout/whoami and package commands, plus the native 
 | macOS / Windows / Linux | Each changed native consumer compiled and the OS backend exercised | Passed with injected store; actual OS acceptance pending |
 | Browser boundary | Browser build excludes native secret backend; HttpOnly session handling retained | Passed with injected store; actual OS acceptance pending |
 
-Run the targeted failure/migration cases as one group, then the repository gate before commit. Compile changed native consumers for the affected OS targets and the shared app web target to prove feature isolation. Rebuild/reuse the 38 tool artifacts only according to actual compiled inputs and valid receipts; never relabel an old binary as a new-source build. Keep desktop public distribution closed until 8.5, 10.4, 10.6, 10.7 and 10.9 have their own required evidence.
+Run the targeted failure/migration cases as one group, then the repository gate before commit. Compile changed native consumers for the affected OS targets and the shared app web target to prove feature isolation. Rebuild/reuse the 38 tool artifacts only according to actual compiled inputs and valid receipts; never relabel an old binary as a new-source build. Historical note: public desktop distribution was opened by the user on 2026-10-19, after the native keyring backends passed in CI on Linux, macOS and Windows (credentials run 39241467253); 10.4, 10.6, 10.7 and 10.9 keep their own evidence requirements.
 
 ## Implementation evidence in progress
 Native-only keyring 4.2.0 is justified in deps.md and ADR 0022. Memory backends are injected explicitly per Home. The initial grouped gate passed for the native adapter/callers. The final full gate passed including the anonymous-install regression, distinct logout outcomes and compilation of the opt-in isolated OS recipe. Native smoke steps time out after three minutes to avoid a blocking unlock prompt consuming the CI budget. credentials.yml builds the native workspace for four targets and compiles Store web with an explicit native-dependency exclusion check. Native roundtrips use isolated CI stores/public fixture data; they are ignored in ordinary local tests. No production keychain item is used by tests. The 168 earlier release binaries remain bound to their older commits.
