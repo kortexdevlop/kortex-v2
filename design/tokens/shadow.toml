@@ -1,6 +1,11 @@
+# Soft multi-layer shadows; the ink follows the theme (colors.toml `shadow-ink`).
 0 = "none"
-1 = "0 1px 2px rgb(11 15 25 / .04), 0 2px 6px rgb(11 15 25 / .03), 0 4px 12px rgb(11 15 25 / .02)"
-2 = "0 1px 2px rgb(11 15 25 / .05), 0 4px 12px rgb(11 15 25 / .05), 0 8px 24px rgb(11 15 25 / .04)"
-3 = "0 2px 4px rgb(11 15 25 / .05), 0 8px 24px rgb(11 15 25 / .06), 0 16px 48px rgb(11 15 25 / .05)"
-4 = "0 4px 8px rgb(11 15 25 / .06), 0 16px 40px rgb(11 15 25 / .08), 0 32px 80px rgb(11 15 25 / .07)"
-5 = "0 8px 16px rgb(11 15 25 / .08), 0 24px 64px rgb(11 15 25 / .10), 0 48px 120px rgb(11 15 25 / .10)"
+1 = "0 1px 2px rgb(var(--k-shadow-ink) / .06), 0 2px 8px rgb(var(--k-shadow-ink) / .04)"
+2 = "0 1px 2px rgb(var(--k-shadow-ink) / .05), 0 6px 16px rgb(var(--k-shadow-ink) / .06), 0 12px 32px rgb(var(--k-shadow-ink) / .04)"
+3 = "0 2px 4px rgb(var(--k-shadow-ink) / .05), 0 10px 28px rgb(var(--k-shadow-ink) / .08), 0 24px 56px rgb(var(--k-shadow-ink) / .06)"
+4 = "0 4px 8px rgb(var(--k-shadow-ink) / .06), 0 18px 44px rgb(var(--k-shadow-ink) / .1), 0 36px 88px rgb(var(--k-shadow-ink) / .08)"
+5 = "0 8px 16px rgb(var(--k-shadow-ink) / .08), 0 28px 72px rgb(var(--k-shadow-ink) / .14), 0 56px 128px rgb(var(--k-shadow-ink) / .12)"
+# Glass edge: inner top highlight + hairline, layered on top of an elevation shadow.
+inset = "inset 0 1px 0 var(--k-glass-highlight), inset 0 0 0 1px var(--k-glass-border)"
+glow = "0 0 0 1px var(--k-accent), 0 8px 28px var(--k-glow)"
+ring = "0 0 0 4px var(--k-glow)"

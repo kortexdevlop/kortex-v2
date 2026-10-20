@@ -1,0 +1,336 @@
+{
+  "date": "2026-10-20",
+  "lot": 31,
+  "scope": "Refonte visuelle Liquid Glass (visuel uniquement)",
+  "method": {
+    "lighthouse": "Lighthouse 12 (npx, hors dépôt) sur astro preview local, mobile simulé et preset desktop, Google Chrome local en headless",
+    "visual_audit": "tests/e2e/visual-audit.mjs : 21 pages × 375/768/1280/1920 px × clair/sombre (FR et EN parmi les pages), axe-core 4 WCAG 2.1 AA injecté depuis le paquet Lighthouse",
+    "note": "Mesures locales ; à refaire en production après publication."
+  },
+  "lighthouse": {
+    "before": [
+      {
+        "page": "/",
+        "preset": "mobile",
+        "performance": 79,
+        "accessibility": 100,
+        "best_practices": 100,
+        "seo": 100,
+        "lcp_ms": 1496,
+        "cls": 0,
+        "tbt_ms": 923
+      },
+      {
+        "page": "/",
+        "preset": "desktop",
+        "performance": 100,
+        "accessibility": 100,
+        "best_practices": 100,
+        "seo": 100,
+        "lcp_ms": 455,
+        "cls": 0.006,
+        "tbt_ms": 0
+      },
+      {
+        "page": "/outils",
+        "preset": "mobile",
+        "performance": 100,
+        "accessibility": 100,
+        "best_practices": 100,
+        "seo": 100,
+        "lcp_ms": 1404,
+        "cls": 0.009,
+        "tbt_ms": 0
+      },
+      {
+        "page": "/outils",
+        "preset": "desktop",
+        "performance": 100,
+        "accessibility": 100,
+        "best_practices": 100,
+        "seo": 100,
+        "lcp_ms": 497,
+        "cls": 0,
+        "tbt_ms": 0
+      },
+      {
+        "page": "/calcul-pourcentage",
+        "preset": "mobile",
+        "performance": 100,
+        "accessibility": 100,
+        "best_practices": 100,
+        "seo": 100,
+        "lcp_ms": 1446,
+        "cls": 0.011,
+        "tbt_ms": 0
+      },
+      {
+        "page": "/calcul-pourcentage",
+        "preset": "desktop",
+        "performance": 100,
+        "accessibility": 100,
+        "best_practices": 100,
+        "seo": 100,
+        "lcp_ms": 367,
+        "cls": 0,
+        "tbt_ms": 16
+      },
+      {
+        "page": "/flow",
+        "preset": "mobile",
+        "performance": 100,
+        "accessibility": 100,
+        "best_practices": 100,
+        "seo": 66,
+        "lcp_ms": 1358,
+        "cls": 0.017,
+        "tbt_ms": 0
+      },
+      {
+        "page": "/flow",
+        "preset": "desktop",
+        "performance": 100,
+        "accessibility": 100,
+        "best_practices": 100,
+        "seo": 66,
+        "lcp_ms": 341,
+        "cls": 0.001,
+        "tbt_ms": 0
+      },
+      {
+        "page": "/telecharger",
+        "preset": "mobile",
+        "performance": 98,
+        "accessibility": 100,
+        "best_practices": 100,
+        "seo": 100,
+        "lcp_ms": 1383,
+        "cls": 0.009,
+        "tbt_ms": 151
+      },
+      {
+        "page": "/telecharger",
+        "preset": "desktop",
+        "performance": 100,
+        "accessibility": 100,
+        "best_practices": 100,
+        "seo": 100,
+        "lcp_ms": 349,
+        "cls": 0.011,
+        "tbt_ms": 0
+      },
+      {
+        "page": "/compte",
+        "preset": "mobile",
+        "performance": 94,
+        "accessibility": 100,
+        "best_practices": 96,
+        "seo": 66,
+        "lcp_ms": 1379,
+        "cls": 0.143,
+        "tbt_ms": 0
+      },
+      {
+        "page": "/compte",
+        "preset": "desktop",
+        "performance": 100,
+        "accessibility": 100,
+        "best_practices": 96,
+        "seo": 66,
+        "lcp_ms": 642,
+        "cls": 0.049,
+        "tbt_ms": 0
+      }
+    ],
+    "after": [
+      {
+        "page": "/",
+        "preset": "mobile",
+        "performance": 95,
+        "accessibility": 100,
+        "best_practices": 100,
+        "seo": 100,
+        "lcp_ms": 1660,
+        "cls": 0,
+        "tbt_ms": 229
+      },
+      {
+        "page": "/",
+        "preset": "desktop",
+        "performance": 100,
+        "accessibility": 100,
+        "best_practices": 100,
+        "seo": 100,
+        "lcp_ms": 420,
+        "cls": 0,
+        "tbt_ms": 0
+      },
+      {
+        "page": "/outils",
+        "preset": "mobile",
+        "performance": 100,
+        "accessibility": 100,
+        "best_practices": 100,
+        "seo": 100,
+        "lcp_ms": 1672,
+        "cls": 0,
+        "tbt_ms": 0
+      },
+      {
+        "page": "/outils",
+        "preset": "desktop",
+        "performance": 100,
+        "accessibility": 100,
+        "best_practices": 100,
+        "seo": 100,
+        "lcp_ms": 446,
+        "cls": 0,
+        "tbt_ms": 0
+      },
+      {
+        "page": "/calcul-pourcentage",
+        "preset": "mobile",
+        "performance": 100,
+        "accessibility": 100,
+        "best_practices": 100,
+        "seo": 100,
+        "lcp_ms": 1373,
+        "cls": 0,
+        "tbt_ms": 0
+      },
+      {
+        "page": "/calcul-pourcentage",
+        "preset": "desktop",
+        "performance": 100,
+        "accessibility": 100,
+        "best_practices": 100,
+        "seo": 100,
+        "lcp_ms": 384,
+        "cls": 0,
+        "tbt_ms": 0
+      },
+      {
+        "page": "/flow",
+        "preset": "mobile",
+        "performance": 100,
+        "accessibility": 100,
+        "best_practices": 100,
+        "seo": 66,
+        "lcp_ms": 1375,
+        "cls": 0,
+        "tbt_ms": 0
+      },
+      {
+        "page": "/flow",
+        "preset": "desktop",
+        "performance": 100,
+        "accessibility": 100,
+        "best_practices": 100,
+        "seo": 66,
+        "lcp_ms": 373,
+        "cls": 0,
+        "tbt_ms": 0
+      },
+      {
+        "page": "/telecharger",
+        "preset": "mobile",
+        "performance": 100,
+        "accessibility": 100,
+        "best_practices": 100,
+        "seo": 100,
+        "lcp_ms": 1522,
+        "cls": 0,
+        "tbt_ms": 0
+      },
+      {
+        "page": "/telecharger",
+        "preset": "desktop",
+        "performance": 100,
+        "accessibility": 100,
+        "best_practices": 100,
+        "seo": 100,
+        "lcp_ms": 380,
+        "cls": 0,
+        "tbt_ms": 0
+      },
+      {
+        "page": "/compte",
+        "preset": "mobile",
+        "performance": 100,
+        "accessibility": 100,
+        "best_practices": 96,
+        "seo": 66,
+        "lcp_ms": 1368,
+        "cls": 0,
+        "tbt_ms": 0
+      },
+      {
+        "page": "/compte",
+        "preset": "desktop",
+        "performance": 100,
+        "accessibility": 100,
+        "best_practices": 96,
+        "seo": 66,
+        "lcp_ms": 515,
+        "cls": 0,
+        "tbt_ms": 0
+      }
+    ]
+  },
+  "css_weight": {
+    "kortex_css_bytes": {
+      "before": 73691,
+      "after": 91071
+    },
+    "kortex_css_gzip": {
+      "before": 51813,
+      "after": 55297
+    },
+    "site_page_css": "Base 9,2 Ko + Home 5,1 Ko externalisés et mis en cache (auparavant inline)",
+    "site_js": "+ ≈1 Ko inline (tilt et repli IntersectionObserver), aucune dépendance ajoutée"
+  },
+  "visual_audit": {
+    "first_pass": {
+      "views": 168,
+      "blocking": 20,
+      "found": [
+        "onglets de navigation 40 px",
+        "segments 36 px",
+        "blocs de commandes défilants non focalisables (/telecharger)",
+        "police monospace 13 px (code)",
+        "vert succès 4,4:1 sur fond givré",
+        "case de l’admin 13 px"
+      ]
+    },
+    "final_pass": {
+      "views": 168,
+      "blocking": 0,
+      "overflow": 0,
+      "console_errors": 0,
+      "axe_violations": 0
+    }
+  },
+  "keyboard_recipe": [
+    "Tab : focus visible sur les onglets de l’en-tête",
+    "Ctrl+K ouvre la palette, saisie, Entrée ouvre la page outil avec le Stage",
+    "Échap ferme le Stage et rend le focus au bouton Ouvrir"
+  ],
+  "defects_found_and_fixed": [
+    "Stage cassé par un backdrop-filter sur le hero d’outil (bloc conteneur du position:fixed) — corrigé avant commit",
+    "/compte CLS 0,143 (pied de page qui saute) — 0 après la refonte du layout",
+    "classe orpheline k-btn-ghost dans le Store",
+    "règle .flow-secret dupliquée"
+  ],
+  "defects_not_visual_logged": [
+    "/applications et src/lib/apps.ts : Seek, Flow et Mind affichés « en préparation », sans lien et en noindex alors que search/flow/agent sont publiés",
+    "404 uniquement en français",
+    "Contenus FR/EN inchangés par consigne"
+  ],
+  "not_verified": [
+    "Safari macOS/iOS et Firefox réels (seulement Chromium)",
+    "trace de performance 60 fps",
+    "webview desktop inspectée visuellement (binaire Flow macOS lancé 10 s sans erreur, non capturé)",
+    "Desk/Hub/Mind/Seek/Store recompilés localement (recompilation par la release CI)",
+    "zoom navigateur 200 % (approché par la largeur 375 px)"
+  ]
+}

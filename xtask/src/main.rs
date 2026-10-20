@@ -16,6 +16,7 @@ mod registry;
 mod release;
 mod schema;
 mod stats;
+mod style_check;
 mod tokens;
 mod tools;
 mod worker;

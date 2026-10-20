@@ -15,7 +15,7 @@ const jsonLd = [
 ];
 ---
 <Base title={`${name} — Kortex`} description={t.tool.tagline[lang]} lang={lang} alt={{ fr: path('fr'), en: path('en') }} jsonLd={jsonLd} ogImage={`/og/${lang}/${t.tool.slug[lang]}.png`}>
-  <section class="hero">
+  <section class="hero tool-hero">
     <img class="tool-icon" src={`/icons/${t.tool.id}.svg`} width="72" height="72" alt="" />
     <h1>{name}</h1>
     <p class="k-muted">{t.tool.tagline[lang]}</p>

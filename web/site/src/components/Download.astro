@@ -43,24 +43,24 @@ const win = 'irm https://kortex.site/install.ps1 | iex';
 
   <h2>{T.step1}</h2>
   <div class="dl-grid">
-    <section class="k-card k-stack" data-os="unix"><h3>{T.mac}</h3><pre class="dl-cmd"><code>{unix}</code></pre><button class="k-btn" data-variant="ghost" type="button" data-copy={unix}>Copier / Copy</button></section>
-    <section class="k-card k-stack" data-os="win"><h3>{T.win}</h3><pre class="dl-cmd"><code>{win}</code></pre><button class="k-btn" data-variant="ghost" type="button" data-copy={win}>Copier / Copy</button></section>
+    <section class="k-card k-stack" data-os="unix" data-tilt><h3>{T.mac}</h3><pre class="dl-cmd" tabindex="0"><code>{unix}</code></pre><button class="k-btn" data-variant="ghost" type="button" data-copy={unix}>Copier / Copy</button></section>
+    <section class="k-card k-stack" data-os="win" data-tilt><h3>{T.win}</h3><pre class="dl-cmd" tabindex="0"><code>{win}</code></pre><button class="k-btn" data-variant="ghost" type="button" data-copy={win}>Copier / Copy</button></section>
   </div>
 
   <h2>{T.step2}</h2>
   <p class="k-muted">{T.step2text}</p>
-  <pre class="dl-cmd"><code>kortex available
+  <pre class="dl-cmd" tabindex="0"><code>kortex available
 kortex install secure.password-generator
 kortex install --all</code></pre>
 
   <h2>{T.commands}</h2>
-  <pre class="dl-cmd"><code>kortex installed          kortex update --all
+  <pre class="dl-cmd" tabindex="0"><code>kortex installed          kortex update --all
 kortex update --self      kortex open &lt;tool&gt;
 kortex login              kortex doctor</code></pre>
 
   <h2>{T.verifyTitle}</h2>
   <p class="k-muted">{T.verifyT}</p>
-  <pre class="dl-cmd"><code>kortex doctor</code></pre>
+  <pre class="dl-cmd" tabindex="0"><code>kortex doctor</code></pre>
 
   <h2>{T.manualTitle}</h2>
   <p class="k-muted">{T.manualIntro}</p>
@@ -74,9 +74,9 @@ kortex login              kortex doctor</code></pre>
   <p class="k-muted">{T.removeT}</p>
 </Base>
 <style is:global>
-  .dl-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--k-space-4); }
-  .dl-cmd { margin: 0; padding: var(--k-space-4); border-radius: var(--k-radius-field); background: var(--k-surface-2); overflow-x: auto; font-family: var(--k-type-mono); font-size: 0.9rem; }
-  [data-os][data-detected] { border-color: var(--k-accent); box-shadow: var(--k-shadow-3); }
+  .dl-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: var(--k-space-4); }
+  .dl-cmd { margin: 0; padding: var(--k-space-4); border-radius: var(--k-radius-field); background: var(--k-glass-strong); border: 1px solid var(--k-glass-edge); box-shadow: var(--k-shadow-inset); overflow-x: auto; font-family: var(--k-type-mono); font-size: 0.9rem; line-height: 1.6; }
+  [data-os][data-detected] { border-color: var(--k-accent); box-shadow: var(--k-shadow-inset), var(--k-shadow-glow); }
 </style>
 <script>
   // Highlight the command for the visitor's system and make the buttons copy it.

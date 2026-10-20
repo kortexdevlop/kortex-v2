@@ -6,10 +6,10 @@
 .store-filters select { width: auto; }
 .store-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: var(--k-space-4); }
 .store-tool { display: flex; flex-direction: column; gap: var(--k-space-3); }
-.store-tool h2 { font-size: 1.2rem; }
+.store-tool h2 { font-size: var(--k-type-scale-1); }
 .store-tool > p { flex: 1; }
 .store-tool .k-btn { min-height: 44px; text-align: center; }
 .store-badges { display: flex; gap: var(--k-space-2); color: var(--k-text-2); flex-wrap: wrap; }
-.store-detail { position: fixed; inset: auto var(--k-space-4) var(--k-space-4); max-height: 80vh; overflow: auto; z-index: 20; box-shadow: var(--k-shadow-4); background: var(--k-surface); padding: var(--k-space-5); border-radius: var(--k-radius-card); }
+.store-detail { position: fixed; inset: auto var(--k-space-4) max(var(--k-space-4), env(safe-area-inset-bottom)); max-height: 80vh; overflow: auto; z-index: 20; border: 1px solid var(--k-glass-edge); box-shadow: var(--k-shadow-inset), var(--k-shadow-5); background: linear-gradient(180deg, var(--k-glass-highlight), transparent 20%), var(--k-glass-strong); -webkit-backdrop-filter: blur(var(--k-glass-blur-lg)) saturate(var(--k-glass-saturate)); backdrop-filter: blur(var(--k-glass-blur-lg)) saturate(var(--k-glass-saturate)); padding: var(--k-space-5); border-radius: var(--k-radius-sheet); animation: k-appear var(--k-motion-slow) var(--k-motion-out) both; }
 .store-detail dl { display: grid; grid-template-columns: auto 1fr; gap: var(--k-space-3); }
 .store-detail dd { margin: 0; }

@@ -184,6 +184,9 @@ pub fn run(filter: Option<&str>) -> Result<(), String> {
     }
 
     if filter.is_none() {
+        errors.extend(crate::style_check::run());
+    }
+    if filter.is_none() {
         let current: Vec<_> = all.iter().filter_map(|t| t.contract.clone().ok()).collect();
         match crate::compat::baseline_registry() {
             Some((reference, registry)) => {

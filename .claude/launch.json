@@ -24,6 +24,16 @@
       ],
       "port": 4330,
       "autoPort": true
+    },
+    {
+      "name": "app",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "python3 -m http.server $PORT --directory dist/apps/${KORTEX_APP:-apps.flow}"
+      ],
+      "port": 4340,
+      "autoPort": true
     }
   ]
 }

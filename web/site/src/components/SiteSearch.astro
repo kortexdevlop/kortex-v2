@@ -18,19 +18,24 @@ const t = lang === 'fr'
   </div>
 </dialog>
 <style is:global>
-  .seek-trigger { display: inline-flex; align-items: center; gap: var(--k-space-2); min-height: 36px; padding: 0 var(--k-space-3); border: 1px solid var(--k-border); border-radius: 999px; background: var(--k-surface); color: var(--k-text-2); font: inherit; cursor: pointer; transition: box-shadow var(--k-motion-base) var(--k-motion-ease); }
-  .seek-trigger:hover { box-shadow: var(--k-shadow-1); color: var(--k-text); }
-  .seek-trigger kbd { font: inherit; font-size: 0.75rem; padding: 1px 6px; border-radius: 6px; background: var(--k-surface-2); }
-  @media (max-width: 640px) { .seek-label, .seek-trigger kbd { display: none; } }
-  dialog.seek { width: min(640px, 92vw); margin: 12vh auto auto; padding: 0; border: 1px solid var(--k-border); border-radius: var(--k-radius-panel); background: var(--k-bg); color: var(--k-text); box-shadow: var(--k-shadow-5); }
-  dialog.seek::backdrop { background: var(--k-overlay); backdrop-filter: blur(16px); }
+  .seek-trigger { display: inline-flex; align-items: center; gap: var(--k-space-2); min-height: 44px; min-width: 44px; padding: 0 var(--k-space-2) 0 var(--k-space-3); border: 1px solid var(--k-glass-edge); border-radius: var(--k-radius-pill);
+    background: var(--k-glass-strong); color: var(--k-text-2); font: inherit; cursor: pointer; box-shadow: var(--k-shadow-inset); transition: box-shadow var(--k-motion-base) var(--k-motion-ease), color var(--k-motion-base) var(--k-motion-ease); }
+  .seek-trigger:hover { box-shadow: var(--k-shadow-inset), var(--k-shadow-2); color: var(--k-text); }
+  .seek-trigger kbd { padding: 0 var(--k-space-2); border-radius: var(--k-radius-pill); background: var(--k-surface-2); line-height: 1.7; }
+  @media (max-width: 767px) { .seek-label, .seek-trigger kbd { display: none; } .seek-trigger { justify-content: center; padding: 0; } }
+  dialog.seek { width: min(640px, calc(100vw - 2 * var(--k-space-4))); margin: 12vh auto auto; padding: 0; border: 1px solid var(--k-glass-edge); border-radius: var(--k-radius-sheet);
+    background: linear-gradient(180deg, var(--k-glass-highlight), transparent 20%), var(--k-glass-strong); color: var(--k-text); box-shadow: var(--k-shadow-inset), var(--k-shadow-5);
+    -webkit-backdrop-filter: blur(var(--k-glass-blur-lg)) saturate(var(--k-glass-saturate)); backdrop-filter: blur(var(--k-glass-blur-lg)) saturate(var(--k-glass-saturate)); }
+  dialog.seek[open] { animation: k-appear var(--k-motion-slow) var(--k-motion-out) both; }
+  dialog.seek::backdrop { background: var(--k-overlay); -webkit-backdrop-filter: blur(var(--k-glass-blur-sm)); backdrop-filter: blur(var(--k-glass-blur-sm)); }
   .seek-box { padding: var(--k-space-4); display: grid; gap: var(--k-space-3); }
   .seek-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--k-space-1); max-height: 50vh; overflow: auto; }
-  .seek-item a { display: grid; grid-template-columns: 32px 1fr; gap: var(--k-space-3); align-items: center; padding: var(--k-space-3); border-radius: var(--k-radius-field); color: inherit; text-decoration: none; }
-  .seek-item[aria-selected="true"] a, .seek-item a:hover { background: var(--k-surface-2); }
+  .seek-item a { display: grid; grid-template-columns: 32px 1fr; gap: var(--k-space-3); align-items: center; min-height: 44px; padding: var(--k-space-3); border-radius: var(--k-radius-field); color: inherit; text-decoration: none; transition: background-color var(--k-motion-fast) var(--k-motion-ease); }
+  .seek-item[aria-selected="true"] a, .seek-item a:hover { background: var(--k-glass-strong); box-shadow: var(--k-shadow-inset), var(--k-shadow-1); }
   .seek-item svg { width: 28px; height: 28px; color: var(--k-accent); }
   .seek-item small { display: block; color: var(--k-text-2); }
-  .seek-hint { margin: 0; font-size: 0.85rem; }
+  @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) { dialog.seek { background: var(--k-surface); -webkit-backdrop-filter: none; backdrop-filter: none; } }
+  .seek-hint { margin: 0; font-size: var(--k-type-scale-sm); }
 </style>
 <script>
   import { search, type SeekEntry } from '../lib/site-search';

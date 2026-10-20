@@ -95,10 +95,11 @@ const T = {
   </div>
 </Base>
 <style is:global>
-  .acct-link { justify-self: start; border: 0; background: none; color: var(--k-accent); font: inherit; cursor: pointer; padding: 0; }
-  .acct-note { font-size: 0.85rem; margin: 0; }
+  .acct-link { justify-self: start; min-height: 44px; border: 0; background: none; color: var(--k-accent); font: inherit; font-weight: var(--k-type-weight-medium); cursor: pointer; padding: 0; }
+  .acct-link:hover { text-decoration: underline; }
+  .acct-note { font-size: var(--k-type-scale-sm); margin: 0; }
   .acct-actions { display: flex; gap: var(--k-space-3); flex-wrap: wrap; }
-  [data-account] { max-width: 480px; margin-top: var(--k-space-6); }
+  [data-account] { max-width: 520px; margin-top: var(--k-space-6); min-height: 420px; }
 </style>
 <script>
   import { setupSecurity } from '../lib/account-security';

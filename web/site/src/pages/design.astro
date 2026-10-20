@@ -1,23 +1,137 @@
 ---
 import Base from '../layouts/Base.astro';
-const sp = [1,2,3,4,5,6,7,8,9,10];
-const sh = [0,1,2,3,4,5];
-const colors = ['bg','surface','surface-2','text','text-2','accent','accent-2','success','danger'];
+const space = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const shadows = ['1', '2', '3', '4', '5', 'glow'];
+const radii = ['control', 'field', 'card', 'sheet', 'panel', 'pill'];
+const colors = ['bg', 'surface', 'surface-2', 'text', 'text-2', 'accent', 'accent-2', 'success', 'danger'];
+const glass = ['glass', 'glass-strong', 'glass-border', 'glass-edge', 'glass-highlight', 'glow'];
+const scale = ['5', '4', '3', '2', '1', '0', 'sm'];
+const motion = ['ease', 'out', 'spring'];
 ---
-<Base title="Design" description="Kortex design system" lang="fr" noindex>
-  <h1>Design system</h1>
-  <h2>Couleurs</h2>
-  <div class="grid">{colors.map((c) => <div class="k-card"><div style={`height:48px;border-radius:var(--k-radius-control);background:var(--k-${c});border:1px solid var(--k-border)`}></div><code>--k-{c}</code></div>)}</div>
-  <h2>Ombres</h2>
-  <div class="grid">{sh.map((s) => <div class="k-card" style={`box-shadow:var(--k-shadow-${s})`}>Niveau {s}</div>)}</div>
-  <h2>Boutons et champs</h2>
-  <p><button class="k-btn">Principal</button> <button class="k-btn" data-variant="ghost">Secondaire</button></p>
-  <p><input class="k-input" placeholder="Champ de saisie" /></p>
-  <div class="k-segmented" role="radiogroup"><button class="k-segment" aria-checked="false">Simple</button><button class="k-segment" aria-checked="true">Medium</button><button class="k-segment" aria-checked="false">Pro</button></div>
-  <h2>Zone de dépôt</h2>
-  <div class="k-dropzone" tabindex="0"><strong>Déposer un fichier</strong><span class="k-muted">ou cliquer pour choisir</span></div>
-  <h2>Progression</h2>
-  <div class="k-progress"><div class="k-progress-bar" style="width:60%"></div></div>
-  <h2>Espacements</h2>
-  {sp.map((s) => <div style={`height:12px;margin:4px 0;width:var(--k-space-${s});background:var(--k-accent);border-radius:6px`}></div>)}
+<Base title="Design — Kortex" description="Kortex design system: Liquid Glass tokens and components" lang="fr" noindex>
+  <section class="hero">
+    <p class="k-muted">Kortex · Liquid Glass</p>
+    <h1>Design system</h1>
+    <p class="k-muted ds-lead">Catalogue vivant : chaque élément ci-dessous utilise uniquement les tokens de <code>design/tokens</code> et les composants de <code>design/components.css</code>. Basculez le thème et le mode pour l’auditer.</p>
+  </section>
+
+  <section class="ds-section">
+    <h2>Matière</h2>
+    <div class="ds-material">
+      <div class="k-glass ds-pane"><strong>k-glass</strong><span class="k-muted">Flou, saturation, reflet haut, contour fin</span></div>
+      <div class="k-glass-strong ds-pane"><strong>k-glass-strong</strong><span class="k-muted">Surfaces de saisie, menus, dialogues</span></div>
+      <div class="k-card ds-pane" data-active="true"><strong>État actif</strong><span class="k-muted">Lueur <code>--k-shadow-glow</code></span></div>
+    </div>
+  </section>
+
+  <section class="ds-section">
+    <h2>Couleurs</h2>
+    <div class="grid ds-swatches">{colors.map((c) => <div class="k-card ds-swatch"><span style={`background:var(--k-${c})`}></span><code>--k-{c}</code></div>)}</div>
+    <h3>Verre</h3>
+    <div class="grid ds-swatches">{glass.map((c) => <div class="k-card ds-swatch"><span style={`background:var(--k-${c})`}></span><code>--k-{c}</code></div>)}</div>
+  </section>
+
+  <section class="ds-section">
+    <h2>Typographie</h2>
+    <div class="k-card ds-type">{scale.map((s) => <p style={`font-size:var(--k-type-scale-${s})`}><code>scale-{s}</code> Des outils gratuits, privés.</p>)}
+      <p class="ds-num"><code>tabular-nums</code> 1 234,56 € · 98,7 % · 00:42</p>
+    </div>
+  </section>
+
+  <section class="ds-section">
+    <h2>Rayons et ombres</h2>
+    <div class="grid">{radii.map((r) => <div class="k-glass ds-radius" style={`border-radius:var(--k-radius-${r})`}><code>radius-{r}</code></div>)}</div>
+    <div class="grid ds-shadows">{shadows.map((s) => <div class="ds-shadow" style={`box-shadow:var(--k-shadow-inset),var(--k-shadow-${s})`}><code>shadow-{s}</code></div>)}</div>
+  </section>
+
+  <section class="ds-section">
+    <h2>Boutons</h2>
+    <div class="ds-row">
+      <button class="k-btn" type="button">Principal</button>
+      <button class="k-btn" data-variant="ghost" type="button">Secondaire</button>
+      <button class="k-btn" data-variant="icon" type="button" aria-label="Rechercher" data-tooltip="Rechercher"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5" /><path d="m16 16 4 4" /></svg></button>
+      <button class="k-btn" type="button" disabled>Désactivé</button>
+      <button class="k-icon-btn" type="button" aria-label="Fermer"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg></button>
+    </div>
+  </section>
+
+  <section class="ds-section">
+    <h2>Champs et contrôles</h2>
+    <div class="ds-controls k-card">
+      <label class="k-field"><span class="k-muted">Champ</span><input class="k-input" placeholder="Champ de saisie" /></label>
+      <label class="k-field"><span class="k-muted">Liste</span><select class="k-input"><option>Option A</option><option>Option B</option></select></label>
+      <label class="k-field"><span class="k-muted">Texte long</span><textarea class="k-input k-textarea">{'{ "kortex": true }'}</textarea></label>
+      <label class="k-switch"><input type="checkbox" role="switch" checked /><span>Interrupteur</span></label>
+      <label class="k-field"><span class="k-muted">Curseur</span><input class="k-range" type="range" min="0" max="100" value="62" style="--k-range:62%" /></label>
+      <div class="k-segmented" role="radiogroup" aria-label="Mode"><button class="k-segment" type="button" role="radio" aria-checked="false">Simple</button><button class="k-segment" type="button" role="radio" aria-checked="true">Medium</button><button class="k-segment" type="button" role="radio" aria-checked="false">Pro</button></div>
+      <div class="k-tabbar k-glass" role="tablist" aria-label="Exemple d’onglets"><button type="button" role="tab" aria-selected="true">Vue</button><button type="button" role="tab" aria-selected="false">Historique</button><button type="button" role="tab" aria-selected="false">Réglages</button></div>
+    </div>
+  </section>
+
+  <section class="ds-section">
+    <h2>Données</h2>
+    <div class="grid">
+      <div class="k-card ds-gauge">
+        <svg class="k-gauge" viewBox="0 0 36 36" aria-hidden="true"><circle class="k-gauge-track" cx="18" cy="18" r="15.5" /><circle class="k-gauge-value" cx="18" cy="18" r="15.5" pathLength="100" style="--k-value:62" /></svg>
+        <div class="k-stat"><span class="k-stat-value">62 %</span><span class="k-stat-label">Jauge circulaire</span></div>
+      </div>
+      <div class="k-card k-stack">
+        <div class="k-stat"><span class="k-stat-value">1 284</span><span class="k-stat-label">Indicateur de donnée</span></div>
+        <svg class="k-spark" viewBox="0 0 120 40" preserveAspectRatio="none" aria-hidden="true"><path d="M0 32 C 18 30, 26 12, 44 18 S 72 34, 86 16 S 110 6, 120 8" /></svg>
+      </div>
+      <div class="k-card k-stack">
+        <span class="k-muted">Progression</span>
+        <div class="k-progress" role="progressbar" aria-label="Progression" aria-valuemin="0" aria-valuemax="100" aria-valuenow="60"><div class="k-progress-bar" style="width:60%"></div></div>
+        <span class="k-muted">Indéterminée</span>
+        <div class="k-progress" role="progressbar" aria-label="Chargement"><div class="k-progress-bar"></div></div>
+        <div class="k-skeleton" style="height:16px"></div>
+      </div>
+    </div>
+    <div class="k-tablewrap ds-table"><table class="k-table"><thead><tr><th>Mois</th><th>Montant</th><th>Taux</th></tr></thead><tbody><tr><td>1</td><td>1 250,00 €</td><td>3,2 %</td></tr><tr><td>2</td><td>1 254,17 €</td><td>3,2 %</td></tr></tbody></table></div>
+    <div class="k-output ds-output"><code>c3ab8ff13720e8ad9047dd39466b3c8974e592c2fa383d4a3960714caef0c4f2</code><button class="k-btn" data-variant="ghost" type="button">Copier</button></div>
+  </section>
+
+  <section class="ds-section">
+    <h2>Fichiers</h2>
+    <div class="k-dropzone" tabindex="0"><strong>Déposer un fichier</strong><span class="k-muted">ou cliquer pour choisir</span></div>
+    <ul class="k-files ds-files"><li class="k-file-row"><span>rapport.pdf</span><span class="k-file-actions"><button class="k-icon-btn" type="button" aria-label="Monter">↑</button><button class="k-icon-btn" type="button" aria-label="Retirer">×</button></span></li></ul>
+    <div class="ds-row"><span class="k-badge">100 % local</span><span class="k-badge">Hors ligne</span><span class="k-kbd">⌘K</span><span class="k-error">Erreur traduite</span><span class="k-success">Succès</span></div>
+  </section>
+
+  <section class="ds-section">
+    <h2>Mouvement</h2>
+    <div class="grid">{motion.map((m) => <div class="k-card ds-motion" style={`--curve:var(--k-motion-${m})`} data-tilt><span></span><code>motion-{m}</code></div>)}</div>
+  </section>
+
+  <section class="ds-section">
+    <h2>Espacements (grille 8 px)</h2>
+    {space.map((s) => <div class="ds-space"><code>space-{s}</code><span style={`width:var(--k-space-${s})`}></span></div>)}
+  </section>
 </Base>
+<style>
+  .ds-lead { max-width: 60ch; }
+  .ds-section { margin-top: var(--k-space-8); display: grid; gap: var(--k-space-4); }
+  .ds-section h2 { margin: 0; }
+  .ds-material { display: grid; gap: var(--k-space-4); grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); padding: var(--k-space-6); border-radius: var(--k-radius-panel);
+    background: radial-gradient(60% 80% at 20% 20%, var(--k-ambient-1), transparent), radial-gradient(60% 80% at 90% 80%, var(--k-ambient-3), transparent), var(--k-surface-2); }
+  .ds-pane { display: grid; gap: var(--k-space-1); min-height: 140px; align-content: end; padding: var(--k-space-5); border-radius: var(--k-radius-card); }
+  .ds-swatches { grid-template-columns: repeat(auto-fill, minmax(min(100%, 160px), 1fr)); }
+  .ds-swatch { display: grid; gap: var(--k-space-2); padding: var(--k-space-3); }
+  .ds-swatch span { height: 56px; border-radius: var(--k-radius-control); border: 1px solid var(--k-border); }
+  .ds-type p { margin: 0 0 var(--k-space-2); line-height: 1.2; overflow-wrap: anywhere; }
+  .ds-type code { display: inline-block; min-width: 7ch; font-size: var(--k-type-scale-sm); color: var(--k-text-2); }
+  .ds-num { font-variant-numeric: tabular-nums; }
+  .ds-radius { display: grid; place-items: center; height: 96px; }
+  .ds-shadows { margin-top: var(--k-space-4); }
+  .ds-shadow { display: grid; place-items: center; height: 96px; border-radius: var(--k-radius-card); background: var(--k-surface); }
+  .ds-row { display: flex; flex-wrap: wrap; gap: var(--k-space-3); align-items: center; }
+  .ds-controls { display: grid; gap: var(--k-space-4); max-width: 560px; }
+  .ds-controls > .k-segmented, .ds-controls > .k-tabbar { justify-self: start; }
+  .ds-gauge { display: flex; align-items: center; gap: var(--k-space-5); }
+  .ds-table, .ds-output, .ds-files { margin-top: var(--k-space-2); }
+  .ds-motion { display: grid; gap: var(--k-space-3); }
+  .ds-motion span { width: 24px; height: 24px; border-radius: var(--k-radius-round); background: var(--k-accent); box-shadow: var(--k-shadow-glow); transition: transform var(--k-motion-slower) var(--curve); }
+  .ds-motion:hover span { transform: translateX(120px); }
+  .ds-space { display: grid; grid-template-columns: 10ch 1fr; align-items: center; gap: var(--k-space-3); margin: var(--k-space-1) 0; }
+  .ds-space span { display: block; height: 12px; border-radius: var(--k-radius-pill); background: var(--k-accent); }
+</style>

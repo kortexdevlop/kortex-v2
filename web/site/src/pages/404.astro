@@ -2,6 +2,15 @@
 import Base from '../layouts/Base.astro';
 ---
 <Base title="404 — Kortex" description="Page introuvable" lang="fr" noindex>
-  <h1>Page introuvable</h1>
-  <p><a href="/">Retour à l'accueil</a></p>
+  <section class="k-card k-stack nf">
+    <p class="nf-code" aria-hidden="true">404</p>
+    <h1>Page introuvable</h1>
+    <p><a class="k-btn" href="/">Retour à l'accueil</a></p>
+  </section>
+<style>
+  .nf { max-width: 560px; margin: var(--k-space-8) auto 0; padding: var(--k-space-7); text-align: center; justify-items: center; }
+  .nf h1 { margin: 0; }
+  .nf-code { margin: 0; font-size: clamp(4rem, 14vw, 7rem); font-weight: var(--k-type-weight-strong); letter-spacing: var(--k-type-tracking-display); line-height: 1;
+    background: linear-gradient(180deg, var(--k-accent), var(--k-accent-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+</style>
 </Base>

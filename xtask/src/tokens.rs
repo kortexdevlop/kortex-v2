@@ -58,7 +58,7 @@ fn font_face(path: &Path) -> Result<String, String> {
 pub fn run() -> Result<(), String> {
     let dir = Path::new("design/tokens");
     let mut root = String::new();
-    for name in ["space", "radius", "shadow", "motion", "type"] {
+    for name in ["space", "radius", "shadow", "motion", "type", "glass"] {
         let t = read_table(&dir.join(format!("{name}.toml")))?;
         root.push_str(&declarations(&format!("{name}-"), &t)?);
     }

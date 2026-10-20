@@ -214,6 +214,7 @@ pub fn Frame(title: String, subtitle: String, children: Element) -> Element {
     rsx! {
      style { {include_str!("../../../design/dist/kortex.css")} }
         style { "{CSS}" }
+     div {class:"k-ambient","aria-hidden":"true"}
      div {class:"app-shell",
       aside {class:"app-rail",
        a {class:"app-brand",href:url("root",&lang), "Kortex"}

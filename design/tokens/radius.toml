@@ -1,4 +1,7 @@
-control = "10px"
+control = "12px"
 field = "16px"
 card = "24px"
+sheet = "28px"
 panel = "32px"
+pill = "999px"
+round = "50%"

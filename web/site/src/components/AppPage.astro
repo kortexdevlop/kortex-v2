@@ -28,10 +28,10 @@ const description = app?.description[lang] ?? (fr ? 'Découvrez les applications
       <div class="app-links">{apps.filter(other => other.id !== app.id).map(other => <a class="k-btn" data-variant="ghost" href={`${prefix(lang)}/${other.id}`}>{other.name}</a>)}</div>
     </section>
   </> : <>
-    <section class="app-hero"><h1>{fr ? 'Les applications Kortex' : 'Kortex apps'}</h1><p>{description}</p></section>
-    <div class="grid">{apps.map(item => <a class="k-card k-stack app-card" href={`${prefix(lang)}/${item.id}`}>
+    <div class="apps-layout"><section class="app-hero apps-pin"><h1>{fr ? 'Les applications Kortex' : 'Kortex apps'}</h1><p>{description}</p></section>
+    <div class="grid apps-grid">{apps.map(item => <a class="k-card k-stack app-card reveal" href={`${prefix(lang)}/${item.id}`} data-tilt>
       <span class="badge">{item.status[lang]}</span><h2>{item.name}</h2><p>{item.title[lang]}</p><span class="k-muted">{fr ? 'Découvrir' : 'Explore'} →</span>
-    </a>)}</div>
+    </a>)}</div></div>
     <section class="app-related"><h2>{fr ? 'Un socle commun, des usages complémentaires' : 'A shared foundation for different needs'}</h2>
       <p>{fr ? 'Les applications utiliseront les mêmes contrats et moteurs que les outils indépendants. Les traitements de fichiers restent locaux ; tout recours à l’IA nécessite votre consentement.' : 'Apps will use the same contracts and engines as standalone tools. File processing stays local; any use of AI requires your consent.'}</p>
     </section>
@@ -39,12 +39,23 @@ const description = app?.description[lang] ?? (fr ? 'Découvrez les applications
 </Base>
 <style>
   .app-hero { max-width: 760px; padding-block: var(--k-space-7); }
-  .app-hero h1 { font-size: clamp(2rem, 5vw, 3.5rem); line-height: 1.12; }
-  .app-hero p { line-height: 1.7; }
-  .app-card { color: inherit; text-decoration: none; }
+  .app-hero h1 { font-size: clamp(2.25rem, 5vw, var(--k-type-scale-5)); line-height: 1.1; }
+  .app-hero p { line-height: 1.7; color: var(--k-text-2); font-size: 1.075rem; }
+  .app-hero .badge { margin-block: var(--k-space-2) 0; }
+  .app-hero .k-btn { margin-top: var(--k-space-3); }
+  .app-card { color: inherit; text-decoration: none; align-content: start; }
   .app-card h2, .app-card p { margin: 0; }
+  .app-card h2 { font-size: var(--k-type-scale-1); }
   .app-card .badge { justify-self: start; margin: 0; }
+  .app-card .k-muted { margin-top: auto; font-weight: var(--k-type-weight-medium); }
   .app-related { margin-top: var(--k-space-8); }
   .app-links { display: flex; flex-wrap: wrap; gap: var(--k-space-2); }
   li { margin-block: var(--k-space-2); }
+  /* /applications: the intro stays pinned beside the app grid on wide screens. */
+  @media (min-width: 1024px) {
+    .apps-layout { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); gap: var(--k-space-7); align-items: start; }
+    .apps-pin { position: sticky; top: calc(var(--k-space-9) + var(--k-space-4)); padding-block: 0; }
+    .apps-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .apps-grid .app-card { min-height: 220px; }
+  }
 </style>

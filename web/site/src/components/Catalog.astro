@@ -10,9 +10,14 @@ const groups = universes.map((u) => ({ u, items: tools.filter((x) => x.tool.univ
   <h1>{t.all}</h1>
   {groups.length === 0 && <p class="k-muted">{t.empty}</p>}
   {groups.map((g) => (
-    <section>
+    <section class="catalog-group reveal">
       <h2><a href={universePath(g.u,lang)}>{g.u.name}</a></h2>
       <div class="grid">{g.items.map((x) => <ToolCard t={x} lang={lang} />)}</div>
     </section>
   ))}
 </Base>
+<style>
+  .catalog-group { margin-top: var(--k-space-8); }
+  .catalog-group h2 a { color: inherit; text-decoration: none; }
+  .catalog-group h2 a:hover { color: var(--k-accent); }
+</style>

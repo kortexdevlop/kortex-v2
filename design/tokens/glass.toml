@@ -1,0 +1,5 @@
+# Frosted-glass material: blur radii and saturation for backdrop-filter.
+blur-sm = "12px"
+blur-md = "24px"
+blur-lg = "40px"
+saturate = "180%"

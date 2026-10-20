@@ -9,6 +9,8 @@ const nav = lang === 'fr'
   ? { apps: 'Applications', appsHref: '/applications', tools: 'Outils', all: '/outils', other: 'EN', account: 'Compte', accountHref: '/compte', dl: 'Télécharger', dlHref: '/telecharger' }
   : { apps: 'Apps', appsHref: '/en/apps', tools: 'Tools', all: '/en/tools', other: 'FR', account: 'Account', accountHref: '/en/account', dl: 'Download', dlHref: '/en/download' };
 const otherHref = alt ? (lang === 'fr' ? alt.en : alt.fr) : (lang === 'fr' ? '/en' : '/');
+const here = Astro.url.pathname.replace(/\/$/, '') || '/';
+const current = (href: string) => (here === href || here.startsWith(`${href}/`) ? 'page' : undefined);
 ---
 <!doctype html>
 <html lang={lang}>
@@ -22,7 +24,9 @@ const otherHref = alt ? (lang === 'fr' ? alt.en : alt.fr) : (lang === 'fr' ? '/e
     {alt && <link rel="alternate" hreflang="fr" href={`${site}${alt.fr}`} />}
     {alt && <link rel="alternate" hreflang="en" href={`${site}${alt.en}`} />}
     {alt && <link rel="alternate" hreflang="x-default" href={`${site}${alt.fr}`} />}
-    <meta name="theme-color" content="#ffffff" />
+    <meta name="theme-color" content="#eef1f5" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0b0d11" media="(prefers-color-scheme: dark)" />
+    <meta name="color-scheme" content="light dark" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="apple-touch-icon" href="/icons/kortex-192.png" />
     <meta property="og:type" content="website" />
@@ -40,26 +44,29 @@ const otherHref = alt ? (lang === 'fr' ? alt.en : alt.fr) : (lang === 'fr' ? '/e
     {jsonLd.map((d) => <script type="application/ld+json" set:html={JSON.stringify(d)} />)}
   </head>
   <body>
+    <div class="k-ambient" aria-hidden="true"></div>
     <header class="site-head">
       <a class="brand" href={prefix(lang) || '/'} aria-label="Kortex">
         <svg width="28" height="28" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 13V51M22 33C30 33 37 28 43 15C46 25 40 32 33 36C41 38 46 44 47 51" /></svg>
         <span>Kortex</span>
       </a>
-      <nav>
+      <nav class="site-links k-tabbar" aria-label={lang === 'fr' ? 'Navigation principale' : 'Main navigation'}>
+        <a href={nav.all} aria-current={current(nav.all)}>{nav.tools}</a>
+        <a href={nav.appsHref} aria-current={current(nav.appsHref)}>{nav.apps}</a>
+        <a href={nav.dlHref} aria-current={current(nav.dlHref)}>{nav.dl}</a>
+        <a href={nav.accountHref} aria-current={current(nav.accountHref)}>{nav.account}</a>
+      </nav>
+      <div class="site-controls">
         <SiteSearch lang={lang} />
         <select class="mode-select" data-mode-select aria-label={lang === 'fr' ? 'Mode (Simple, Medium, Pro)' : 'Mode (Simple, Medium, Pro)'}>
           <option value="simple">Simple</option><option value="medium" selected>Medium</option><option value="pro">Pro</option>
         </select>
         <button class="theme-toggle" type="button" data-theme-toggle aria-label={lang === 'fr' ? 'Changer de thème' : 'Switch theme'}>◐</button>
-        <a href={nav.all}>{nav.tools}</a>
-        <a href={nav.appsHref}>{nav.apps}</a>
-        <a href={nav.dlHref}>{nav.dl}</a>
-        <a href={nav.accountHref}>{nav.account}</a>
-        <a href={otherHref} hreflang={lang === 'fr' ? 'en' : 'fr'}>{nav.other}</a>
-      </nav>
+        <a class="lang-switch" href={otherHref} hreflang={lang === 'fr' ? 'en' : 'fr'} lang={lang === 'fr' ? 'en' : 'fr'} title={lang === 'fr' ? 'English' : 'Français'}>{nav.other}</a>
+      </div>
     </header>
     <main><slot /></main>
-    <footer class="site-foot k-muted">
+    <footer class="site-foot k-glass k-muted">
       <span>© Kortex</span>
       <span>{lang === 'fr' ? 'Vos fichiers ne quittent jamais votre appareil.' : 'Your files never leave your device.'}</span>
       <nav class="foot-links">
@@ -96,31 +103,122 @@ const otherHref = alt ? (lang === 'fr' ? alt.en : alt.fr) : (lang === 'fr' ? '/e
         });
       })();
     </script>
+    <script is:inline>
+      (() => {
+        // Pointer tilt on [data-tilt] cards (fine pointers only, never with reduced motion).
+        const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (!still && matchMedia('(hover: hover) and (pointer: fine)').matches) {
+          let el = null, raf = 0;
+          const reset = (n) => n && (n.style.removeProperty('--k-rx'), n.style.removeProperty('--k-ry'));
+          addEventListener('pointermove', (e) => {
+            const t = e.target instanceof Element ? e.target.closest('[data-tilt]') : null;
+            if (t !== el) { reset(el); el = t; }
+            if (!el) return;
+            cancelAnimationFrame(raf);
+            raf = requestAnimationFrame(() => {
+              const r = el.getBoundingClientRect();
+              el.style.setProperty('--k-rx', `${((e.clientY - r.top) / r.height - 0.5) * -6}deg`);
+              el.style.setProperty('--k-ry', `${((e.clientX - r.left) / r.width - 0.5) * 6}deg`);
+            });
+          }, { passive: true });
+        }
+        // Reveal fallback where scroll-driven animations are missing.
+        if (!still && !CSS.supports('animation-timeline: view()') && 'IntersectionObserver' in window) {
+          document.documentElement.classList.add('k-io');
+          const io = new IntersectionObserver((es) => es.forEach((x) => x.isIntersecting && (x.target.classList.add('is-in'), io.unobserve(x.target))), { rootMargin: '0px 0px -8% 0px' });
+          document.querySelectorAll('.reveal').forEach((n) => io.observe(n));
+        }
+      })();
+    </script>
     <script is:inline>if ('serviceWorker' in navigator && location.hostname !== 'localhost') navigator.serviceWorker.register('/sw.js');</script>
   </body>
 </html>
 <style is:global>
+  @view-transition { navigation: auto; }
   [hidden] { display: none !important; }
-  main { max-width: 1080px; margin: 0 auto; padding: var(--k-space-8) var(--k-space-4) var(--k-space-9); }
-  .site-head { position: sticky; top: var(--k-space-3); z-index: 10; display: flex; justify-content: space-between; align-items: center; max-width: 1080px; margin: var(--k-space-3) auto 0; padding: var(--k-space-2) var(--k-space-4); border: 1px solid var(--k-border); border-radius: var(--k-radius-panel); background: var(--k-overlay); backdrop-filter: blur(20px) saturate(1.4); box-shadow: var(--k-shadow-2); }
+  body { display: flex; flex-direction: column; }
+  main { flex: 1; width: 100%; max-width: 1200px; min-height: 100dvh; margin: 0 auto; padding: var(--k-space-8) max(var(--k-space-4), env(safe-area-inset-right)) var(--k-space-9) max(var(--k-space-4), env(safe-area-inset-left)); }
+  main > h1, main > section > h1 { font-size: clamp(2.25rem, 5vw, var(--k-type-scale-5)); }
+  /* Glass header: a thin pane that condenses (stronger glass, deeper shadow) once the page scrolls. */
+  .site-head { position: sticky; top: max(var(--k-space-3), env(safe-area-inset-top)); z-index: 10; display: flex; align-items: center; gap: var(--k-space-3) var(--k-space-4); flex-wrap: wrap;
+    width: calc(100% - 2 * var(--k-space-4)); max-width: 1200px; margin: var(--k-space-3) auto 0; padding: var(--k-space-2) var(--k-space-2) var(--k-space-2) var(--k-space-4);
+    border: 1px solid var(--k-glass-edge); border-radius: var(--k-radius-pill); isolation: isolate; view-transition-name: site-head;
+    background: linear-gradient(180deg, var(--k-glass-highlight), transparent 40%), var(--k-glass); box-shadow: var(--k-shadow-inset), var(--k-shadow-1);
+    -webkit-backdrop-filter: blur(var(--k-glass-blur-lg)) saturate(var(--k-glass-saturate)); backdrop-filter: blur(var(--k-glass-blur-lg)) saturate(var(--k-glass-saturate)); }
+  .site-head::after { content: ""; position: absolute; inset: -1px; z-index: -1; border-radius: inherit; background: var(--k-glass-strong); box-shadow: var(--k-shadow-3); opacity: 0; pointer-events: none; }
+  @supports (animation-timeline: scroll()) {
+    .site-head { animation: k-head-condense linear both; animation-timeline: scroll(root); animation-range: 0 160px; }
+    .site-head::after { animation: k-fade-in linear both; animation-timeline: scroll(root); animation-range: 0 160px; }
+    @keyframes k-head-condense { to { transform: scale(0.985); } }
+    @keyframes k-fade-in { to { opacity: 1; } }
+    .k-ambient { animation: k-parallax linear both; animation-timeline: scroll(root); }
+    @keyframes k-parallax { to { transform: translate3d(0, -12vh, 0); } }
+  }
   .site-head a { color: inherit; text-decoration: none; }
-  .brand { display: inline-flex; align-items: center; gap: var(--k-space-2); font-weight: 650; letter-spacing: -0.02em; }
-  .site-head { flex-wrap: wrap; row-gap: var(--k-space-2); }
-  .site-head nav { display: flex; flex-wrap: wrap; gap: var(--k-space-3) var(--k-space-4); align-items: center; justify-content: flex-end; }
-  @media (max-width: 900px) { .site-head { border-radius: var(--k-radius-card); } .site-head nav { flex: 1 1 100%; justify-content: flex-start; } }
-  .site-foot { display: flex; justify-content: space-between; gap: var(--k-space-4); flex-wrap: wrap; max-width: 1080px; margin: 0 auto; padding: var(--k-space-6) var(--k-space-4); }
-  .hero h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); margin: 0 0 var(--k-space-4); }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: var(--k-space-4); }
-  .tool-card { display: grid; gap: var(--k-space-2); color: inherit; text-decoration: none; }
-  .tool-icon { display: block; border-radius: 22%; }
+  .brand { display: inline-flex; align-items: center; gap: var(--k-space-2); min-height: 44px; font-weight: var(--k-type-weight-strong); letter-spacing: var(--k-type-tracking-tight); }
+  .site-links { flex: 1 1 auto; justify-content: center; }
+  .site-controls { display: flex; align-items: center; gap: var(--k-space-2); margin-left: auto; }
+  .mode-select, .theme-toggle, .lang-switch { min-height: 44px; border: 1px solid var(--k-glass-edge); border-radius: var(--k-radius-pill); background: var(--k-glass-strong); color: var(--k-text-2); font: inherit; cursor: pointer;
+    box-shadow: var(--k-shadow-inset); transition: color var(--k-motion-base) var(--k-motion-ease), box-shadow var(--k-motion-base) var(--k-motion-ease); }
+  .mode-select { padding: 0 var(--k-space-3); }
+  .theme-toggle, .lang-switch { display: inline-grid; place-items: center; min-width: 44px; font-weight: var(--k-type-weight-medium); }
+  .mode-select:hover, .theme-toggle:hover, .lang-switch:hover { color: var(--k-text); box-shadow: var(--k-shadow-inset), var(--k-shadow-2); }
+  @media (max-width: 1023px) {
+    .site-head { border-radius: var(--k-radius-sheet); }
+    .site-links { order: 3; flex: 1 1 100%; justify-content: flex-start; margin-inline: calc(-1 * var(--k-space-2)); }
+  }
+  @media (max-width: 599px) {
+    .site-head { padding-left: var(--k-space-3); }
+    .mode-select { max-width: 104px; }
+    .brand span { display: none; }
+    .site-links { justify-content: space-between; gap: 0; }
+    .site-links > a { padding: 0 var(--k-space-2); }
+    main { padding-top: var(--k-space-6); }
+  }
+  .site-foot { display: flex; justify-content: space-between; align-items: center; gap: var(--k-space-3) var(--k-space-5); flex-wrap: wrap; width: calc(100% - 2 * var(--k-space-4)); max-width: 1200px;
+    margin: 0 auto max(var(--k-space-4), env(safe-area-inset-bottom)); padding: var(--k-space-5) var(--k-space-6); border-radius: var(--k-radius-card); font-size: var(--k-type-scale-sm); }
+  .foot-links { display: flex; gap: var(--k-space-1) var(--k-space-4); flex-wrap: wrap; }
+  .foot-links a { display: inline-flex; align-items: center; min-height: 44px; color: inherit; }
+  .foot-links a:hover { color: var(--k-text); }
+  /* Shared site blocks */
+  .hero h1 { font-size: clamp(2.5rem, 6.4vw, 4.5rem); margin: 0 0 var(--k-space-4); font-weight: var(--k-type-weight-strong); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 248px), 1fr)); gap: var(--k-space-4); }
+  .tool-card { display: grid; align-content: start; gap: var(--k-space-2); }
+  .tool-card strong { font-weight: var(--k-type-weight-strong); letter-spacing: var(--k-type-tracking-tight); }
+  .tool-card .k-muted { font-size: var(--k-type-scale-sm); line-height: 1.5; }
+  .tool-icon { display: block; border-radius: var(--k-radius-control); filter: drop-shadow(0 6px 12px var(--k-glow)); }
   .tool-card svg, .glyph svg { width: 32px; height: 32px; color: var(--k-accent); }
+  [data-tilt] { transform: perspective(900px) rotateX(var(--k-rx, 0deg)) rotateY(var(--k-ry, 0deg)) translateY(var(--k-lift, 0px)); transform-style: preserve-3d; }
+  a.k-card[data-tilt]:hover { --k-lift: -3px; transform: perspective(900px) rotateX(var(--k-rx, 0deg)) rotateY(var(--k-ry, 0deg)) translateY(var(--k-lift)); }
+  .tool-hero { display: grid; justify-items: start; gap: var(--k-space-2); padding: var(--k-space-6); border-radius: var(--k-radius-panel); border: 1px solid var(--k-glass-edge);
+    background: linear-gradient(180deg, var(--k-glass-highlight), transparent 30%), var(--k-glass-strong); box-shadow: var(--k-shadow-inset), var(--k-shadow-2); }
+  /* No backdrop-filter here: it would become the containing block of the fixed Stage inside the hero. */
+  .tool-hero h1 { font-size: clamp(2rem, 5vw, var(--k-type-scale-5)); margin: var(--k-space-3) 0 0; }
+  .tool-hero p { margin: 0; font-size: 1.075rem; }
+  .tool-hero .badges { margin: var(--k-space-2) 0 var(--k-space-3); }
+  @media (max-width: 479px) { .tool-hero { padding: var(--k-space-5); border-radius: var(--k-radius-card); } }
   .badges { display: flex; flex-wrap: wrap; gap: var(--k-space-2); margin: var(--k-space-4) 0; }
-  .badge { padding: var(--k-space-1) var(--k-space-3); border-radius: 999px; background: var(--k-surface-2); font-size: 0.85rem; color: var(--k-text-2); }
+  .badge { display: inline-flex; align-items: center; min-height: 28px; padding: 0 var(--k-space-3); border-radius: var(--k-radius-pill); background: var(--k-glass); border: 1px solid var(--k-glass-edge); font-size: var(--k-type-scale-sm); font-weight: var(--k-type-weight-medium); color: var(--k-text-2); }
+  .prose { max-width: 72ch; }
   .prose h2 { margin-top: var(--k-space-7); }
-  .mode-select { min-height: 36px; padding: 0 var(--k-space-3); border: 1px solid var(--k-border); border-radius: 999px; background: var(--k-surface); color: var(--k-text-2); font: inherit; cursor: pointer; }
-  .theme-toggle { min-width: 36px; min-height: 36px; border: 1px solid var(--k-border); border-radius: 999px; background: var(--k-surface); color: var(--k-text-2); font: inherit; cursor: pointer; }
-  .theme-toggle:hover { color: var(--k-text); box-shadow: var(--k-shadow-1); }
-  .foot-links { display: flex; gap: var(--k-space-4); flex-wrap: wrap; } .foot-links a { color: inherit; }
+  .prose p, .prose li { line-height: 1.7; }
+  main nav[aria-label] a, .prose a { color: var(--k-accent); }
   details { padding: var(--k-space-3) 0; border-bottom: 1px solid var(--k-border); }
-  summary { cursor: pointer; font-weight: 600; }
+  summary { display: flex; align-items: center; min-height: 44px; cursor: pointer; font-weight: var(--k-type-weight-medium); }
+  /* Scroll reveal: native scroll-driven animation; IntersectionObserver fallback adds .is-in (html.k-io). */
+  @supports (animation-timeline: view()) {
+    .reveal { animation: k-reveal linear both; animation-timeline: view(); animation-range: entry 0% entry 30%; }
+  }
+  @keyframes k-reveal { from { opacity: 0; transform: translateY(24px) scale(0.985); } to { opacity: 1; transform: none; } }
+  .k-io .reveal:not(.is-in) { opacity: 0; transform: translateY(24px); }
+  .k-io .reveal { transition: opacity var(--k-motion-slower) var(--k-motion-out), transform var(--k-motion-slower) var(--k-motion-out); }
+  ::view-transition-old(root), ::view-transition-new(root) { animation-duration: var(--k-motion-slow); animation-timing-function: var(--k-motion-ease); }
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .site-head { background: var(--k-surface); } }
+  @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) { .tool-hero, .site-head, .site-head::after { background: var(--k-surface); -webkit-backdrop-filter: none; backdrop-filter: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    @view-transition { navigation: none; }
+    .site-head, .site-head::after, .k-ambient, .reveal { animation: none !important; }
+    .site-head::after { opacity: 1; }
+    [data-tilt] { transform: none !important; }
+  }
 </style>
