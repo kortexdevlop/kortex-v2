@@ -101,6 +101,19 @@ pub fn decide(
         .into();
         plan.web_tools = web.0.iter().cloned().collect();
         plan.web_apps = web.1.iter().cloned().collect();
+        // Ids the published index has never heard of (a new tool) have no desktop package yet.
+        plan.native_tools = web
+            .0
+            .iter()
+            .filter(|id| !previous.tools.contains_key(*id))
+            .cloned()
+            .collect();
+        plan.native_apps = web
+            .1
+            .iter()
+            .filter(|id| !previous.tools.contains_key(*id))
+            .cloned()
+            .collect();
         if force_all {
             plan.reason = "forced".into();
         } else {
@@ -547,6 +560,18 @@ mod tests {
             p.native_tools.is_empty() && p.native_apps.is_empty() && !p.cli,
             "native packages are reused"
         );
+        // A tool the published index never listed still gets its desktop packages.
+        let mut with_new = ids();
+        with_new.0.push("text.new".into());
+        let fresh = decide(
+            &index(false),
+            Some(&files(&["docs/PLAN.md"])),
+            &workspace(),
+            &versions("1.0.0"),
+            &with_new,
+            false,
+        );
+        assert_eq!(fresh.native_tools, BTreeSet::from(["text.new".to_owned()]));
         assert!(p.unbumped.is_empty());
         let unknown = decide(
             &index(true),
