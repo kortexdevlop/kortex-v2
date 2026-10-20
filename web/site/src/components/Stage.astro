@@ -85,8 +85,10 @@ const t = lang === 'fr'
   };
   const swap = (fn: () => void) => {
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if ('startViewTransition' in document && !reduce) (document as any).startViewTransition(fn);
-    else fn();
+    if (!('startViewTransition' in document) || reduce) return fn();
+    // A transition can be skipped (e.g. during the page's own navigation transition): fn still runs.
+    const t = (document as any).startViewTransition(fn);
+    for (const p of [t.ready, t.finished, t.updateCallbackDone]) p.catch(() => {});
   };
   const setUrl = (open: boolean) => {
     const u = new URL(location.href);
