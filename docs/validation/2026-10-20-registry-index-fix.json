@@ -1,0 +1,17 @@
+{
+  "date": "2026-10-20",
+  "incident": "kortex.site/registry/* served the local release test index (dist/release, generated 2026-10-16: macOS Intel only, 3 entries, relative package names) instead of the signed index of GitHub release manual-39262336661 (44 entries, 4 platforms, absolute URLs). The installers could not download a package. Cause: site builds were run with KORTEX_RELEASE_DIR=dist/release. Published by lots 33 to 35 at least (the lot 32 record already says dist/release matched production, so it may predate them).",
+  "fix": "site rebuilt with the files downloaded from the GitHub release (index.json, index.json.sig, cli-latest.txt, now kept in dist/release-public) and republished with publish.mjs --site-only",
+  "site_version": "bb42fb49-fa9b-41e2-86ba-9b3f9d5e8827",
+  "broken_site_version": "0bfa7eea-e459-4288-b8f5-e61c67df496f",
+  "guard": "web/site/scripts/sync.mjs refuses a release index without absolute https URLs or without the four platforms",
+  "checks": [
+    "production index.json, index.json.sig and cli-latest.txt identical to the GitHub release files",
+    "curl -fsSL https://kortex.site/install.sh | sh in an empty HOME (macOS x86_64): CLI downloaded from the GitHub release and installed",
+    "kortex doctor: folder, platform, registry and index OK (valid signature, 44 entries); kortex available: 44 entries"
+  ],
+  "not_checked": [
+    "kortex login and kortex install of a tool: the agent shell cannot reach the system keychain ('échec du trousseau système')",
+    "Windows and Linux installation, double-click of the Store or other apps, Gatekeeper/SmartScreen prompts"
+  ]
+}

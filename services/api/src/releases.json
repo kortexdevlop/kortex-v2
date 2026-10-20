@@ -8,6 +8,13 @@
    "versions": {}
   },
   {
+   "file": "2026-10-20-prefs-cookie-publication.json",
+   "date": "2026-10-20",
+   "run": "39431397816",
+   "commit": "f42093f164",
+   "versions": {}
+  },
+  {
    "file": "2026-10-20-porcelain-publication.json",
    "date": "2026-10-20",
    "run": "39414571666",
@@ -154,13 +161,6 @@
     "kortex-store": "491cdefd-4618-42dd-a561-a2604042fbc1",
     "kortex-site": "c18ba821-b145-4633-93fd-84ec2fdf99a3"
    }
-  },
-  {
-   "file": "2026-10-18-mind-publication.json",
-   "date": "2026-10-18",
-   "run": "39156702154",
-   "commit": null,
-   "versions": {}
   }
  ]
 }

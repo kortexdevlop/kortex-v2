@@ -23,6 +23,15 @@ for (const f of ['install.sh', 'install.ps1', 'registry']) rmSync(join(out, 'pub
 if (desktopReleases) {
   const rel = process.env.KORTEX_RELEASE_DIR;
   if (!rel) throw new Error('KORTEX_RELEASE_DIR is required to publish desktop releases');
+  // A local release test (relative package names, one platform) must never reach the public registry:
+  // the installers need absolute https package URLs and every platform of the published release.
+  const published = JSON.parse(readFileSync(join(rel, 'index.json'), 'utf8'));
+  const targets = new Set(Object.keys(published.cli?.targets ?? {}));
+  const urls = [...Object.values(published.cli?.targets ?? {}), ...Object.values(published.tools ?? {}).flatMap((t) => Object.values(t.targets ?? {}))].map((t) => t.url);
+  const wanted = ['aarch64-apple-darwin', 'x86_64-apple-darwin', 'x86_64-pc-windows-msvc', 'x86_64-unknown-linux-gnu'];
+  if (urls.length === 0 || urls.some((u) => !/^https:\/\//.test(u)) || wanted.some((t) => !targets.has(t))) {
+    throw new Error(`${join(rel, 'index.json')} is not a published release index (needs absolute https URLs and ${wanted.join(', ')}); download the GitHub release files instead of using a local test build`);
+  }
   for (const f of ['install.sh', 'install.ps1']) cpSync(join(root, 'installers', f), join(out, 'public', f));
   mkdirSync(join(out, 'public/registry'), { recursive: true });
   for (const f of ['index.json', 'index.json.sig', 'cli-latest.txt']) cpSync(join(rel, f), join(out, 'public/registry', f));
