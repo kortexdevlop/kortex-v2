@@ -1,6 +1,13 @@
 {
  "publications": [
   {
+   "file": "2026-10-20-tool-opening-mobile-publication.json",
+   "date": "2026-10-20",
+   "run": null,
+   "commit": "86f6d4f3fb",
+   "versions": {}
+  },
+  {
    "file": "2026-10-20-porcelain-publication.json",
    "date": "2026-10-20",
    "run": "39414571666",

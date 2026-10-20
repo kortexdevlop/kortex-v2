@@ -23,6 +23,8 @@
       else delete document.documentElement.dataset.theme;
       if (['fr', 'en'].includes(e.data.lang) && typeof dioxus !== 'undefined') { document.documentElement.lang=e.data.lang; dioxus.send('lang:'+e.data.lang); }
       if (['simple', 'medium', 'pro'].includes(e.data.mode) && typeof dioxus !== 'undefined') dioxus.send(e.data.mode);
+      if (e.data.size === 'large') document.documentElement.dataset.size = 'large';
+      else if (e.data.size === '' || e.data.size === 'normal') delete document.documentElement.dataset.size;
     } else if (e.data.type === 'kortex:files' && Array.isArray(e.data.files)) {
       pending = e.data.files;
       let tries = 0;

@@ -75,10 +75,12 @@ const runHost = new URL(src).origin;
     if (forced === 'light' || forced === 'dark') return forced;
     return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   };
-  const mode = (): string => { try { return localStorage.getItem('k-mode') || 'medium'; } catch { return 'medium'; } };
+  const prefs = () => (window as any).kortexPrefs as { get(): { mode: string; size: string } };
+  const mode = (): string => prefs().get().mode;
+  const size = (): string => prefs().get().size || 'normal';
   const flush = () => {
     if (!ready) return;
-    post({ type: 'kortex:init', theme: theme(), mode: mode() });
+    post({ type: 'kortex:init', theme: theme(), mode: mode(), size: size() });
     if (pendingFiles) { post({ type: 'kortex:files', files: pendingFiles }); pendingFiles = null; }
   };
   addEventListener('message', (e) => {
@@ -87,9 +89,10 @@ const runHost = new URL(src).origin;
     win.setAttribute('data-ready', '');
     flush();
   });
-  const sync = () => post({ type: 'kortex:init', theme: theme(), mode: mode() });
+  const sync = () => post({ type: 'kortex:init', theme: theme(), mode: mode(), size: size() });
   addEventListener('kortex:theme', sync);
   addEventListener('kortex:mode', sync);
+  addEventListener('kortex:size', sync);
   frame.addEventListener('load', () => { ready = false; win.removeAttribute('data-ready'); });
 
   const load = () => {

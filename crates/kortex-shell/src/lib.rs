@@ -168,6 +168,19 @@ pub struct Appearance {
     pub lang: Signal<String>,
     pub theme: Signal<String>,
     pub mode: Signal<String>,
+    pub size: Signal<String>,
+}
+/// Remembers a shared preference (cookie on the web) only once it differs from the default,
+/// so merely opening a page never sets a cookie.
+fn remember(key: &str, value: &str) {
+    let default = match key {
+        "mode" => "medium",
+        "size" => "normal",
+        _ => "",
+    };
+    if value != default || kortex_platform::document::shared_get(key).is_some() {
+        kortex_platform::document::shared_set(&domain("root"), key, value);
+    }
 }
 pub fn use_appearance() -> Appearance {
     // Installable PWA: the offline shell of this app (generated at build time, same-origin only).
@@ -187,24 +200,32 @@ pub fn use_appearance() -> Appearance {
             initial
         }
     });
-    let theme = use_signal(|| load::<String>("shell", "theme").0);
+    // The shared cookie (set on any Kortex host) wins over this host's own saved copy.
+    let theme = use_signal(|| {
+        kortex_platform::document::shared_get("theme").unwrap_or_else(|| load::<String>("shell", "theme").0)
+    });
     let mode = use_signal(|| {
-        let x = load::<String>("shell", "mode").0;
+        let x = kortex_platform::document::shared_get("mode").unwrap_or_else(|| load::<String>("shell", "mode").0);
         if ["simple", "medium", "pro"].contains(&x.as_str()) {
             x
         } else {
             "medium".into()
         }
     });
-    use_context_provider(|| Appearance { lang, theme, mode });
+    let size = use_signal(|| kortex_platform::document::shared_get("size").unwrap_or_else(|| "normal".into()));
+    use_context_provider(|| Appearance { lang, theme, mode, size });
     use_effect(move || {
         kortex_platform::document::apply_theme(&theme());
+        kortex_platform::document::apply_size(&size());
         kortex_platform::document::apply_language(&lang());
         save("shell", "lang", &lang());
         save("shell", "theme", &theme());
         save("shell", "mode", &mode());
+        remember("theme", &theme());
+        remember("mode", &mode());
+        remember("size", &size());
     });
-    Appearance { lang, theme, mode }
+    Appearance { lang, theme, mode, size }
 }
 #[component]
 pub fn Frame(title: String, subtitle: String, children: Element) -> Element {
@@ -213,6 +234,7 @@ pub fn Frame(title: String, subtitle: String, children: Element) -> Element {
     let fr = lang == "fr";
     let mode = (appearance.mode)();
     let dark = (appearance.theme)() == "dark";
+    let large = (appearance.size)() == "large";
     let links = [
         (url("hub", &lang), "Kortex Hub", "hub"),
         (url("desk", &lang), "Kortex Desk", "desk"),
@@ -279,6 +301,10 @@ pub fn Frame(title: String, subtitle: String, children: Element) -> Element {
             path{d:"M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z"}
            }
           }
+         }
+         button {class:"k-icon-btn app-icon app-size",r#type:"button","aria-pressed":"{large}","aria-label":if fr{"Texte plus grand"}else{"Larger text"},title:if fr{"Texte plus grand"}else{"Larger text"},
+          onclick:move |_| {let next=if (appearance.size)()=="large"{"normal"}else{"large"};appearance.size.set(next.into());},
+          "Aa"
          }
          button {class:"k-icon-btn app-icon app-lang",r#type:"button",lang:if fr{"en"}else{"fr"},
           onclick:move |_|{let next=if (appearance.lang)()=="fr"{"en"}else{"fr"};appearance.lang.set(next.into());},

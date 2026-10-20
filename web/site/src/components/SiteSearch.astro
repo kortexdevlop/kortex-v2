@@ -21,7 +21,7 @@ const t = lang === 'fr'
   .seek-trigger { display: inline-flex; align-items: center; gap: var(--k-space-2); min-height: 44px; min-width: 44px; width: 232px; padding: 0 var(--k-space-2) 0 var(--k-space-3); border: 1px solid var(--k-border); border-radius: var(--k-radius-pill);
     background: var(--k-surface-2); color: var(--k-text-2); font: inherit; font-size: var(--k-type-scale-sm); cursor: pointer; transition: border-color var(--k-motion-base) var(--k-motion-ease), color var(--k-motion-base) var(--k-motion-ease), background-color var(--k-motion-base) var(--k-motion-ease); }
   .seek-trigger:hover { border-color: var(--k-border-strong); color: var(--k-text); background: var(--k-surface); }
-  .seek-trigger .seek-label { flex: 1; text-align: left; }
+  .seek-trigger .seek-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
   .seek-trigger kbd { padding: 0 var(--k-space-2); border-radius: var(--k-radius-control); background: var(--k-surface); border: 1px solid var(--k-border); line-height: 1.6; }
   @media (max-width: 1239px) { .seek-trigger { width: auto; } .seek-trigger .seek-label { flex: none; } }
   @media (max-width: 1099px) { .seek-label, .seek-trigger kbd { display: none; } .seek-trigger { justify-content: center; width: 44px; padding: 0; border-color: transparent; background: transparent; } .seek-trigger:hover { background: var(--k-surface-2); } .seek-trigger svg { width: 20px; height: 20px; } }

@@ -1,5 +1,5 @@
 ---
-import { prefix, type Lang } from '../lib/data';
+import { prefix, domains, type Lang } from '../lib/data';
 import SiteSearch from '../components/SiteSearch.astro';
 interface Props { title: string; description: string; lang: Lang; alt?: { fr: string; en: string }; noindex?: boolean; jsonLd?: object[]; ogImage?: string; wide?: boolean }
 const { title, description, lang, alt, noindex = false, jsonLd = [], ogImage, wide = false } = Astro.props;
@@ -10,8 +10,8 @@ const nav = fr
   ? { apps: 'Applications', appsHref: '/applications', tools: 'Outils', all: '/outils', other: 'EN', account: 'Compte', accountHref: '/compte', dl: 'Télécharger', dlHref: '/telecharger' }
   : { apps: 'Apps', appsHref: '/en/apps', tools: 'Tools', all: '/en/tools', other: 'FR', account: 'Account', accountHref: '/en/account', dl: 'Download', dlHref: '/en/download' };
 const T = fr
-  ? { main: 'Navigation principale', settings: 'Réglages d’affichage', mode: 'Mode des outils', theme: 'Thème', lang: 'Langue', english: 'English', tagline: 'Des outils gratuits qui s’exécutent sur votre appareil. Vos fichiers ne le quittent jamais.', product: 'Produit', legal: 'Informations' }
-  : { main: 'Main navigation', settings: 'Display settings', mode: 'Tool mode', theme: 'Theme', lang: 'Language', english: 'Français', tagline: 'Free tools that run on your device. Your files never leave it.', product: 'Product', legal: 'Information' };
+  ? { main: 'Navigation principale', settings: 'Réglages d’affichage', mode: 'Mode des outils', theme: 'Thème', lang: 'Langue', english: 'English', tagline: 'Des outils gratuits qui s’exécutent sur votre appareil. Vos fichiers ne le quittent jamais.', product: 'Produit', legal: 'Informations', reset: 'Réinitialiser mes préférences' }
+  : { main: 'Main navigation', settings: 'Display settings', mode: 'Tool mode', theme: 'Theme', lang: 'Language', english: 'Français', tagline: 'Free tools that run on your device. Your files never leave it.', product: 'Product', legal: 'Information', reset: 'Reset my preferences' };
 const otherHref = alt ? (fr ? alt.en : alt.fr) : (fr ? '/en' : '/');
 const here = Astro.url.pathname.replace(/\/$/, '') || '/';
 const current = (href: string) => (here === href || here.startsWith(`${href}/`) ? 'page' : undefined);
@@ -51,8 +51,54 @@ const legal = fr
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" href="/icons/kortex.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="/kortex.css" />
-    <script is:inline>
-      try { localStorage.removeItem('kortex-desk-v1'); localStorage.removeItem('kortex-hub-v1'); const t = localStorage.getItem('k-theme'); if (t) document.documentElement.dataset.theme = t; } catch {}
+    <script is:inline define:vars={{ rootDomain: domains.root }}>
+      try { localStorage.removeItem('kortex-desk-v1'); localStorage.removeItem('kortex-hub-v1'); } catch {}
+      // Display preferences (theme, tool mode, text size). One cookie `k-prefs` valid for the whole parent domain
+      // so the choice follows the person across kortex.site, the apps and the tools; it is written only when a
+      // setting is changed. The previous per-host localStorage copy is still read as a fallback.
+      (() => {
+        const NAME = 'k-prefs';
+        const OK = { theme: ['light', 'dark'], mode: ['simple', 'medium', 'pro'], size: ['large'] };
+        const SHORT = { theme: 't', mode: 'm', size: 's' };
+        const DEFAULT = { theme: '', mode: 'medium', size: '' };
+        const ls = (k) => { try { return localStorage.getItem(k); } catch { return null; } };
+        const payload = () => { try { const c = document.cookie.split(';').map((x) => x.trim()).find((x) => x.startsWith(NAME + '=')); return c ? c.slice(NAME.length + 1) : ''; } catch { return ''; } };
+        const parse = (text) => { const out = {}; for (const pair of text.split('&')) { const [k, v] = pair.split('='); for (const key in SHORT) if (SHORT[key] === k && OK[key].includes(v)) out[key] = v; } return out; };
+        const get = () => { const c = parse(payload()); return {
+          theme: c.theme ?? (OK.theme.includes(ls('k-theme')) ? ls('k-theme') : DEFAULT.theme),
+          mode: c.mode ?? (OK.mode.includes(ls('k-mode')) ? ls('k-mode') : DEFAULT.mode),
+          size: c.size ?? DEFAULT.size,
+        }; };
+        const write = (values) => {
+          const text = Object.keys(SHORT).filter((k) => values[k] && values[k] !== DEFAULT[k]).map((k) => SHORT[k] + '=' + values[k]).sort().join('&');
+          const host = location.hostname;
+          const scope = host === rootDomain || host.endsWith('.' + rootDomain) ? '; Domain=' + rootDomain : '';
+          try { document.cookie = NAME + '=' + text + '; Path=/; Max-Age=' + (text ? 31536000 : 0) + '; SameSite=Lax' + scope + (location.protocol === 'https:' ? '; Secure' : ''); } catch {}
+        };
+        const apply = (v) => {
+          const root = document.documentElement;
+          if (v.theme) root.dataset.theme = v.theme; else delete root.dataset.theme;
+          if (v.size === 'large') root.dataset.size = 'large'; else delete root.dataset.size;
+        };
+        window.kortexPrefs = {
+          get,
+          set(key, value) {
+            const v = { ...get(), [key]: value };
+            write(v);
+            // Same-host copy for pages that still read it, and for a browser that blocks cookies.
+            try { if (key === 'theme') (value ? localStorage.setItem('k-theme', value) : localStorage.removeItem('k-theme')); if (key === 'mode') localStorage.setItem('k-mode', value); } catch {}
+            apply(v);
+            window.dispatchEvent(new Event('kortex:' + key));
+          },
+          reset() {
+            write({});
+            try { localStorage.removeItem('k-theme'); localStorage.removeItem('k-mode'); } catch {}
+            apply(get());
+            for (const k of ['theme', 'mode', 'size']) window.dispatchEvent(new Event('kortex:' + k));
+          },
+        };
+        apply(get());
+      })();
     </script>
     {jsonLd.map((d) => <script type="application/ld+json" set:html={JSON.stringify(d)} />)}
   </head>
@@ -92,6 +138,7 @@ const legal = fr
                 <svg class="i-light" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4" /></svg>
                 <svg class="i-dark" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z" /></svg>
               </button>
+              <button class="site-icon size-toggle" type="button" data-size-toggle aria-pressed="false" aria-label={fr ? 'Texte plus grand' : 'Larger text'} title={fr ? 'Texte plus grand' : 'Larger text'}>Aa</button>
               <a class="site-icon lang-switch" href={otherHref} hreflang={fr ? 'en' : 'fr'} lang={fr ? 'en' : 'fr'} title={T.english} aria-label={T.english}>{nav.other}</a>
             </div>
           </div>
@@ -128,52 +175,50 @@ const legal = fr
         <nav class="foot-col" aria-label={T.legal}>
           <p class="foot-title">{T.legal}</p>
           {legal.map(([href, label]) => <a href={href}>{label}</a>)}
+          <button class="foot-reset" type="button" data-prefs-reset>{T.reset}</button>
         </nav>
       </div>
       <p class="foot-copy k-muted">© Kortex</p>
     </footer>
     <script is:inline>
       (() => {
-        const btn = document.querySelector('[data-theme-toggle]');
-        if (!btn) return;
-        const order = ['auto', 'light', 'dark'];
-        const labels = JSON.parse(btn.dataset.labels || '{}');
-        const cur = () => { try { return localStorage.getItem('k-theme') || 'auto'; } catch { return 'auto'; } };
-        const show = (m) => { btn.dataset.state = m; if (labels[m]) btn.setAttribute('aria-label', labels[m]); };
-        const apply = (m) => {
-          if (m === 'auto') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = m;
-          try { m === 'auto' ? localStorage.removeItem('k-theme') : localStorage.setItem('k-theme', m); } catch {}
-          show(m);
-          window.dispatchEvent(new Event('kortex:theme'));
-        };
-        show(cur());
-        btn.addEventListener('click', () => apply(order[(order.indexOf(cur()) + 1) % order.length]));
-      })();
-    </script>
-    <script is:inline>
-      (() => {
-        // Simple / Medium / Pro: a radio group; same storage key and event as before.
+        // Theme (auto / light / dark), text size, Simple / Medium / Pro and reset, all through kortexPrefs.
+        const prefs = window.kortexPrefs;
+        const theme = document.querySelector('[data-theme-toggle]');
+        if (theme) {
+          const order = ['', 'light', 'dark'];
+          const names = ['auto', 'light', 'dark'];
+          const labels = JSON.parse(theme.dataset.labels || '{}');
+          const show = () => { const m = prefs.get().theme; theme.dataset.state = names[order.indexOf(m)]; theme.setAttribute('aria-label', labels[names[order.indexOf(m)]] || ''); };
+          show();
+          theme.addEventListener('click', () => prefs.set('theme', order[(order.indexOf(prefs.get().theme) + 1) % order.length]));
+          window.addEventListener('kortex:theme', show);
+        }
+        const size = document.querySelector('[data-size-toggle]');
+        if (size) {
+          const show = () => size.setAttribute('aria-pressed', String(prefs.get().size === 'large'));
+          show();
+          size.addEventListener('click', () => prefs.set('size', prefs.get().size === 'large' ? '' : 'large'));
+          window.addEventListener('kortex:size', show);
+        }
         const group = document.querySelector('[data-mode-group]');
-        if (!group) return;
-        const items = [...group.querySelectorAll('[data-mode]')];
-        const read = () => { try { return localStorage.getItem('k-mode') || 'medium'; } catch { return 'medium'; } };
-        const paint = (m) => items.forEach((b) => { const on = b.dataset.mode === m; b.setAttribute('aria-checked', String(on)); b.tabIndex = on ? 0 : -1; });
-        const pick = (m) => {
-          try { localStorage.setItem('k-mode', m); } catch {}
-          paint(m);
-          window.dispatchEvent(new Event('kortex:mode'));
-        };
-        paint(read());
-        items.forEach((b, i) => {
-          b.addEventListener('click', () => pick(b.dataset.mode));
-          b.addEventListener('keydown', (e) => {
-            const step = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0;
-            if (!step) return;
-            e.preventDefault();
-            const next = items[(i + step + items.length) % items.length];
-            pick(next.dataset.mode); next.focus();
+        if (group) {
+          const items = [...group.querySelectorAll('[data-mode]')];
+          const paint = () => { const m = prefs.get().mode; items.forEach((b) => { const on = b.dataset.mode === m; b.setAttribute('aria-checked', String(on)); b.tabIndex = on ? 0 : -1; }); };
+          paint();
+          window.addEventListener('kortex:mode', paint);
+          items.forEach((b, i) => {
+            b.addEventListener('click', () => prefs.set('mode', b.dataset.mode));
+            b.addEventListener('keydown', (e) => {
+              const step = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0;
+              if (!step) return;
+              e.preventDefault();
+              const next = items[(i + step + items.length) % items.length];
+              prefs.set('mode', next.dataset.mode); next.focus();
+            });
           });
-        });
+        }
+        document.querySelector('[data-prefs-reset]')?.addEventListener('click', () => prefs.reset());
       })();
     </script>
     <script is:inline>
@@ -242,6 +287,9 @@ const legal = fr
   .setting { display: flex; align-items: center; gap: var(--k-space-1); }
   .setting-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   .settings-toggle { display: none; }
+  .size-toggle[aria-pressed="true"] { background: var(--k-surface-2); color: var(--k-text); }
+  .foot-reset { justify-self: start; display: inline-flex; align-items: center; min-height: 44px; padding: 0; border: 0; background: none; color: var(--k-text-2); font: inherit; cursor: pointer; text-align: left; transition: color var(--k-motion-base) var(--k-motion-ease); }
+  .foot-reset:hover { color: var(--k-text); }
   .mode-seg .k-segment { padding-inline: var(--k-space-3); }
 
   /* Below 1100 px the display settings fold into a popover. */
@@ -269,8 +317,9 @@ const legal = fr
     .tab-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; display: grid; grid-template-columns: repeat(4, 1fr); padding: var(--k-space-1) var(--k-space-2) max(var(--k-space-1), env(safe-area-inset-bottom));
       background: var(--k-glass); border-top: 1px solid var(--k-border);
       -webkit-backdrop-filter: blur(var(--k-glass-blur-lg)) saturate(var(--k-glass-saturate)); backdrop-filter: blur(var(--k-glass-blur-lg)) saturate(var(--k-glass-saturate)); }
-    .tab-bar a { display: grid; justify-items: center; align-content: center; gap: 2px; min-height: 52px; color: var(--k-text-2); text-decoration: none; font-size: var(--k-type-scale-sm); font-weight: var(--k-type-weight-medium); }
+    .tab-bar a { display: grid; justify-items: center; align-content: center; gap: 2px; min-width: 0; min-height: 52px; padding-inline: 2px; color: var(--k-text-2); text-decoration: none; font-size: var(--k-type-scale-sm); font-weight: var(--k-type-weight-medium); }
     .tab-bar a[aria-current="page"] { color: var(--k-text); }
+    .tab-bar a > span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; letter-spacing: -0.01em; }
     .tab-bar svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform var(--k-motion-fast) var(--k-motion-ease); }
     .tab-bar a:active svg { transform: scale(0.9); }
     .tab-bar a[aria-current="page"] svg { stroke-width: 2; }

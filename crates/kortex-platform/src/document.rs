@@ -133,6 +133,139 @@ fn preference_store(namespace: &str) -> crate::Result<crate::storage::NativeStor
         .ok_or_else(|| crate::PlatformError("storage_unavailable".into()))?;
     crate::storage::NativeStorage::open(root.join("preferences"), namespace)
 }
+/// Preferences shared by every Kortex host (site, apps, tools): theme, mode and text size.
+/// On the web they live in one cookie valid for the whole parent domain (the only way to share
+/// them across subdomains); natively they live in the shared preference store.
+pub mod shared {
+    /// Keys, their allowed values and the value meaning "unchanged".
+    pub const KEYS: [(&str, &[&str], &str); 3] = [
+        ("theme", &["light", "dark"], ""),
+        ("mode", &["simple", "medium", "pro"], "medium"),
+        ("size", &["large"], "normal"),
+    ];
+    pub const COOKIE: &str = "k-prefs";
+    const SHORT: [(&str, &str); 3] = [("theme", "t"), ("mode", "m"), ("size", "s")];
+
+    fn short(key: &str) -> Option<&'static str> {
+        SHORT.iter().find(|(k, _)| *k == key).map(|(_, s)| *s)
+    }
+    fn allowed(key: &str, value: &str) -> bool {
+        KEYS.iter().any(|(k, values, _)| *k == key && values.contains(&value))
+    }
+
+    /// Value of `key` inside a cookie payload such as `t=dark&m=pro` (unknown values are ignored).
+    #[must_use]
+    pub fn parse(payload: &str, key: &str) -> Option<String> {
+        let wanted = short(key)?;
+        payload
+            .split('&')
+            .filter_map(|pair| pair.split_once('='))
+            .find(|(k, _)| *k == wanted)
+            .map(|(_, v)| v.to_owned())
+            .filter(|v| allowed(key, v))
+    }
+
+    /// Payload with `key` set to `value`; a default or unknown value removes the key.
+    #[must_use]
+    pub fn merge(payload: &str, key: &str, value: &str) -> String {
+        let Some(wanted) = short(key) else {
+            return payload.to_owned();
+        };
+        let keep = allowed(key, value) && KEYS.iter().any(|(k, _, default)| *k == key && *default != value);
+        let mut pairs: Vec<String> = payload
+            .split('&')
+            .filter(|pair| {
+                pair.split_once('=')
+                    .is_some_and(|(k, v)| k != wanted && SHORT.iter().any(|(name, s)| *s == k && allowed(name, v)))
+            })
+            .map(str::to_owned)
+            .collect();
+        if keep {
+            pairs.push(format!("{wanted}={value}"));
+        }
+        pairs.sort();
+        pairs.join("&")
+    }
+
+    /// `Set-Cookie` text for `payload` (`Domain` only when the page is served from `domain`).
+    #[must_use]
+    pub fn cookie_text(payload: &str, host: &str, domain: &str, secure: bool) -> String {
+        let scope = if !domain.is_empty() && (host == domain || host.ends_with(&format!(".{domain}"))) {
+            format!("; Domain={domain}")
+        } else {
+            String::new()
+        };
+        let age = if payload.is_empty() { 0 } else { 31_536_000 };
+        format!(
+            "{COOKIE}={payload}; Path=/; Max-Age={age}; SameSite=Lax{scope}{}",
+            if secure { "; Secure" } else { "" }
+        )
+    }
+}
+
+#[cfg(target_arch = "wasm32")]
+fn browser_field(owner: &wasm_bindgen::JsValue, name: &str) -> wasm_bindgen::JsValue {
+    use wasm_bindgen::JsValue;
+    js_sys::Reflect::get(owner, &JsValue::from_str(name)).unwrap_or(JsValue::UNDEFINED)
+}
+#[cfg(target_arch = "wasm32")]
+fn cookie_payload() -> String {
+    let document = browser_field(&js_sys::global(), "document");
+    let all = browser_field(&document, "cookie").as_string().unwrap_or_default();
+    all.split(';')
+        .filter_map(|c| c.trim().split_once('='))
+        .find(|(name, _)| *name == shared::COOKIE)
+        .map(|(_, v)| v.to_owned())
+        .unwrap_or_default()
+}
+
+/// Shared preference (`theme`, `mode`, `size`); `None` when the person never chose one.
+pub fn shared_get(key: &str) -> Option<String> {
+    #[cfg(target_arch = "wasm32")]
+    {
+        shared::parse(&cookie_payload(), key)
+    }
+    #[cfg(not(target_arch = "wasm32"))]
+    {
+        preference_get("shared", key)
+            .ok()
+            .flatten()
+            .filter(|v| shared::KEYS.iter().any(|(k, values, _)| *k == key && values.contains(&v.as_str())))
+    }
+}
+/// Stores a shared preference after an explicit choice. `domain` is the parent domain the
+/// cookie is shared on; a default value removes the preference (and the cookie when it is empty).
+pub fn shared_set(domain: &str, key: &str, value: &str) {
+    #[cfg(target_arch = "wasm32")]
+    {
+        use wasm_bindgen::JsValue;
+        let payload = shared::merge(&cookie_payload(), key, value);
+        let global = js_sys::global();
+        let location = browser_field(&global, "location");
+        let host = browser_field(&location, "hostname").as_string().unwrap_or_default();
+        let secure = browser_field(&location, "protocol").as_string().as_deref() == Some("https:");
+        let text = shared::cookie_text(&payload, &host, domain, secure);
+        let _ = js_sys::Reflect::set(&browser_field(&global, "document"), &JsValue::from_str("cookie"), &JsValue::from_str(&text));
+    }
+    #[cfg(not(target_arch = "wasm32"))]
+    {
+        let _ = domain;
+        let kept = shared::merge("", key, value);
+        let _ = preference_set("shared", key, if kept.is_empty() { "" } else { value });
+    }
+}
+/// Forgets every shared preference.
+pub fn shared_clear(domain: &str) {
+    for (key, _, default) in shared::KEYS {
+        shared_set(domain, key, default);
+    }
+}
+pub fn apply_size(size: &str) {
+    let large = size == "large";
+    eval(&format!(
+        "if({large}){{document.documentElement.dataset.size='large';}}else{{delete document.documentElement.dataset.size;}}"
+    ));
+}
 pub fn initial_language() -> String {
     #[cfg(target_arch = "wasm32")]
     {
@@ -180,7 +313,7 @@ pub fn tool_host_init(frame: u64, origin: &str, init: &impl serde::Serialize) {
     eval(&format!(
         r#"const [frame, origin, init] = {args};
       const element=Array.from(document.querySelectorAll('iframe[data-kortex-window]')).find(e=>e.dataset.kortexWindow===String(frame));
-      element?.contentWindow?.postMessage({{type:'kortex:init',...init}},origin);"#
+      element?.contentWindow?.postMessage({{type:'kortex:init',size:document.documentElement.dataset.size||'normal',...init}},origin);"#
     ));
 }
 pub async fn element_size(element: &dioxus::html::MountedData) -> crate::Result<(f64, f64)> {
@@ -412,5 +545,39 @@ mod tests {
             value,
             serde_json::json!(["AP8=", "application/octet-stream", name])
         );
+    }
+}
+
+#[cfg(test)]
+mod shared_tests {
+    use super::shared::{cookie_text, merge, parse};
+
+    #[test]
+    fn parse_reads_known_values_only() {
+        assert_eq!(parse("t=dark&m=pro&s=large", "theme").as_deref(), Some("dark"));
+        assert_eq!(parse("t=dark&m=pro&s=large", "mode").as_deref(), Some("pro"));
+        assert_eq!(parse("t=dark&m=pro&s=large", "size").as_deref(), Some("large"));
+        assert_eq!(parse("t=neon", "theme"), None);
+        assert_eq!(parse("", "mode"), None);
+        assert_eq!(parse("t=dark", "nope"), None);
+    }
+
+    #[test]
+    fn merge_keeps_valid_pairs_and_drops_defaults() {
+        assert_eq!(merge("", "theme", "dark"), "t=dark");
+        assert_eq!(merge("t=dark", "mode", "pro"), "m=pro&t=dark");
+        assert_eq!(merge("t=dark&m=pro", "theme", ""), "m=pro");
+        assert_eq!(merge("t=dark&m=pro", "mode", "medium"), "t=dark");
+        assert_eq!(merge("t=dark&x=1&m=weird", "size", "large"), "s=large&t=dark");
+        assert_eq!(merge("t=dark", "theme", ""), "");
+    }
+
+    #[test]
+    fn cookie_is_scoped_and_expires_when_empty() {
+        let text = cookie_text("t=dark", "flow.kortex.site", "kortex.site", true);
+        assert_eq!(text, "k-prefs=t=dark; Path=/; Max-Age=31536000; SameSite=Lax; Domain=kortex.site; Secure");
+        let local = cookie_text("t=dark", "localhost", "kortex.site", false);
+        assert!(!local.contains("Domain") && !local.contains("Secure"));
+        assert!(cookie_text("", "kortex.site", "kortex.site", true).contains("Max-Age=0"));
     }
 }

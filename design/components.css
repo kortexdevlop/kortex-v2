@@ -11,6 +11,8 @@
     font-family: var(--k-type-sans); font-size: var(--k-type-scale-0); font-weight: var(--k-type-weight-regular); line-height: 1.55;
     -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; font-synthesis-weight: none;
   }
+  /* Text size preference (Kortex cookie `k-prefs`): every rem-based size grows together. */
+  :root[data-size="large"] { font-size: 112.5%; }
   h1, h2, h3, h4 { font-family: var(--k-type-display); font-weight: var(--k-type-weight-strong); letter-spacing: var(--k-type-tracking-tight); line-height: 1.15; text-wrap: balance; }
   h1 { font-weight: var(--k-type-weight-display); letter-spacing: var(--k-type-tracking-display); line-height: 1.05; }
   p { text-wrap: pretty; }
