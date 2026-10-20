@@ -11,7 +11,7 @@ Version consolidée du 16 octobre 2026, après retrait des prototypes non confor
 
 ## 2. Périmètre actuel
 
-2.1 Le catalogue est gelé à 38 outils. La cible historique 150+ et les listes de nouveaux outils sont suspendues.
+2.1 Le catalogue est gelé à 38 outils, plus `image.compress` autorisé explicitement par l’utilisateur le 2026-10-20 (39 outils, recette ADR 0034). La cible historique 150+ et les autres nouveaux outils restent suspendus.
 2.2 Corriger et finir l’existant, puis développer les applications prévues, dans l’ordre des dépendances de PLAN.md.
 2.3 Aucun outil supplémentaire, service payant ou dépense. Cloudflare gratuit uniquement. Aucun fichier utilisateur traité sur le serveur.
 2.4 Les fonctions absentes, prototypes, compilations non vérifiées et cibles non testées restent explicitement non validés.
@@ -53,7 +53,7 @@ Version consolidée du 16 octobre 2026, après retrait des prototypes non confor
 6.3 Auth mot de passe : dérivation client et vérification serveur selon ADR 0005, cohérentes entre Rust et clients existants ; mesurer CPU réel avant validation de charge. Passkeys avec origine/RP/UV/challenges contrôlés.
 6.4 Aucun contenu de fichier envoyé à l’IA sans consentement explicite par fichier. Les permissions sensibles, réseau et écritures doivent être confirmées dans les parcours qui les exigent.
 6.5 Synchronisation de métadonnées uniquement, jamais des fichiers. Secrets exclus des exports non protégés, journaux et sync. Respecter les rétentions et droits RGPD.
-6.6 Dépôt source `kortex-v2` public depuis le 2026-10-19 (décision explicite de l’utilisateur, ADR 0024), licence propriétaire « tous droits réservés ». Les GitHub Releases ne contiennent que binaires, index signé et notes. Aucun secret dans Git ; une fuite impose la rotation. Le wasm public reste inspectable par nature.
+6.6 Dépôt source `kortex-v2` public depuis le 2026-10-19 (décision explicite de l’utilisateur, ADR 0024), licence propriétaire « tous droits réservés ». Les GitHub Releases ne contiennent que binaires, archives de bundles web compilés, index et catalogue signés, et notes (aucune source). Aucun secret dans Git ; une fuite impose la rotation. Le wasm public reste inspectable par nature.
 
 ## 7. Compilation et validation
 
@@ -63,7 +63,7 @@ Version consolidée du 16 octobre 2026, après retrait des prototypes non confor
 7.4 Un reçu source/artefact vérifiable peut éviter une compilation identique. Un artefact sans reçu ou une compilation historique ne prouve pas sa fraîcheur actuelle.
 7.5 Une app n’est complète/installable qu’après compilations web et desktop, contrats/checks, tests pertinents et recettes requises. Une première compilation ne clôt pas toutes ses fonctions.
 7.6 Avant commit, appliquer le gate du dépôt. Sans commit, effectuer les contrôles pertinents au lot et préciser leur portée. La CI doit compiler les bundles modifiés et contrôler aussi les apps.
-7.7 Les builds desktop de release sont groupés, déclenchés par tag ou manuellement, pas sur chaque push. Rester dans le budget gratuit et contrôler les artefacts publics.
+7.7 Les builds desktop ne concernent que les identifiants modifiés ; ils s’enchaînent après une CI verte sur `main` ou manuellement (décision de l’utilisateur du 2026-10-20, ADR 0034), jamais sur chaque push de branche ou de PR. Rester dans le budget gratuit et contrôler les artefacts publics.
 
 ## 8. Publication et opérations
 

@@ -2,7 +2,7 @@
 
 Le cahier des charges fonctionnel ci-dessous est appliqué avec [RULES.md](RULES.md), version consolidée des règles et des instructions utilisateur. Les consignes utilisateur les plus récentes priment ; les ADR et journaux ne peuvent pas y déroger.
 
-Périmètre actuel : **38 outils gelés**, correction de l’existant, applications Rust/Dioxus dans `apps/`, publication des lots terminés après contrôles groupés. Les anciennes cibles de croissance et chiffres indicatifs ne déclenchent aucun ajout d’outil. `docs/PLAN.md` contient les étapes et leurs validations.
+Périmètre actuel : **38 outils gelés, plus `image.compress` autorisé le 2026-10-20 (39)**, correction de l’existant, applications Rust/Dioxus dans `apps/`, publication des lots terminés après contrôles groupés. Les anciennes cibles de croissance et chiffres indicatifs ne déclenchent aucun ajout d’outil. `docs/PLAN.md` contient les étapes et leurs validations.
 
 ## 0. Ton rôle et ta façon de travailler
 
@@ -590,7 +590,7 @@ Matrice de build, paquets, signatures, registre signé, CLI `kortex`, scripts d'
 ### Phase 10 — Kortex Hub (dashboard + widgets + compte)
 
 ### Phase 11 — Catalogue
-Catalogue gelé à 38 outils : terminer les fonctions/contrats existants, vérifier les cibles web et desktop, compiler les changements et leurs dépendants, publier les lots validés. Aucun nouvel outil. Mettre à jour les preuves du plan et PROGRESS.md.
+Catalogue gelé à 38 outils plus `image.compress` (2026-10-20) : terminer les fonctions/contrats existants, vérifier les cibles web et desktop, compiler les changements et leurs dépendants, publier les lots validés. Aucun nouvel outil. Mettre à jour les preuves du plan et PROGRESS.md.
 
 ### Phase 12 — Finition & lancement
 Audit perf (Lighthouse), audit accessibilité, audit sécurité (en-têtes, CSP, auth), relecture des textes FR/EN, test sur vrais appareils (iOS Safari, Android Chrome, Windows, macOS, Linux), mentions légales, monitoring d'erreurs léger (journal client agrégé, sans données personnelles).
