@@ -1,7 +1,13 @@
 {
   "date": "2026-10-20",
   "lot": 36,
-  "steps": ["10.3", "10.4", "10.6", "10.8", "6.x"],
+  "steps": [
+    "10.3",
+    "10.4",
+    "10.6",
+    "10.8",
+    "6.x"
+  ],
   "audit": {
     "published_release": "manual-39262336661 (commit 4f25167, 2026-10-19)",
     "design_gap": "installed binaries contain none of the Porcelain tokens (--k-ink, --k-surface-3, --k-border-strong, --k-accent-soft)",
@@ -10,7 +16,15 @@
     "launcher_gap": "~/Applications/Kortex Kortex Store.app",
     "language_gap": "desktop tools fell back to English without LANG (Finder launch)"
   },
-  "versions": { "tools": "1.0.1 (38)", "apps.desk": "0.2.1", "apps.flow": "0.1.1", "apps.hub": "0.2.1", "apps.mind": "0.1.1", "apps.seek": "0.1.1", "apps.store": "0.3.0" },
+  "versions": {
+    "tools": "1.0.1 (38)",
+    "apps.desk": "0.2.1",
+    "apps.flow": "0.1.1",
+    "apps.hub": "0.2.1",
+    "apps.mind": "0.1.1",
+    "apps.seek": "0.1.1",
+    "apps.store": "0.3.0"
+  },
   "checks": [
     "cargo test -p kortex-pkg (launcher names, legacy cleanup on reinstall and removal)",
     "cargo test -p kortex-store (SSR package actions); --ignored delivery test against the production signed index: 44 entries, install refused without an account",
@@ -26,5 +40,22 @@
     "install from the Store with password confirmation (the account password is the user's)",
     "signing in from the Store (still kortex login)",
     "Windows, Linux and macOS ARM acceptance"
-  ]
+  ],
+  "publication": {
+    "blocked_run": "39442732562 (0d2d987): hosted macOS arm64 runner not acquired three times",
+    "release_run": "39454686081",
+    "commit": "880bb195c6bde845f2a1a2e543a7e095b4e40d15",
+    "github_release": "manual-39454686081",
+    "macos_runner": "macos-15-intel, arm64 cross-compiled and signed ad hoc",
+    "web_artifacts": "38 tools and 6 apps verified (scripts/verify-web-artifacts.mjs)",
+    "site_version": "cfb30ab8-01b2-483e-9630-c64046ab2505",
+    "store_version": "7f8eef07-9796-47ef-8bba-ead0da413394",
+    "production_checks": [
+      "kortex.site/registry/index.json identical to the release index (44 entries, 4 targets)",
+      "/telecharger: account step and Store install",
+      "store.kortex.site: download link instead of the old notice",
+      "kortex update text.cleaner: 1.0.1 installed, intact, Porcelain tokens embedded"
+    ],
+    "follow_up": "CLI still 0.1.0: self-update does not replace it and keeps the old launcher name"
+  }
 }
