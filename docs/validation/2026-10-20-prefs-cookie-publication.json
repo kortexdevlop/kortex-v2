@@ -1,0 +1,16 @@
+{
+  "date": "2026-10-20",
+  "lot": 35,
+  "release_run": "39431397816",
+  "commit": "f42093f164aa73df59303f8f0c927a4d5d87ebfd",
+  "artifacts_verified": "38 tools and 6 apps (scripts/verify-web-artifacts.mjs)",
+  "publication": "scripts/publish.mjs --static-only (API unchanged)",
+  "site_version": "0bfa7eea-e459-4288-b8f5-e61c67df496f",
+  "production_checks": [
+    "kortex.site: no cookie before a choice; after theme/mode/size choices, cookie k-prefs = m=simple&s=large&t=dark, Domain=.kortex.site, Secure, SameSite=Lax, not HttpOnly, 365 days",
+    "flow, store, search, agent, dashboard, workspace .kortex.site: dark theme, large text and Simple mode restored from the cookie alone, no overflow at 390 px",
+    "calc.percentage opened from the site: run.kortex.site tool receives dark theme and large text (18 px root), no overflow",
+    "footer reset link removes the cookie"
+  ],
+  "not_checked": ["Safari/Firefox and real devices", "browsers that block third-party or all cookies (localStorage fallback only)"]
+}
