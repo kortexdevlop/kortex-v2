@@ -14,6 +14,7 @@
 | `png` 0.17 | tool qr.generator (dev) | décodeur indépendant pour valider notre encodeur PNG | — | dev only |
 | `lopdf` 0.45 (sans features par défaut) | tool pdf.merge | lecture/écriture PDF, irréaliste à réécrire | pdf-writer (écriture seule) | ~200 Ko brotli |
 | `image` 0.25 (png, jpeg, webp, gif, bmp) | tool image.convert | décodeurs/encodeurs de référence | codecs individuels (plus de glue) | ~170 Ko brotli |
+| `png` 0.18, `color_quant` 1.1 | tool image.compress | palette PNG 256 couleurs (NeuQuant) et écriture d'un PNG indexé avec transparence ; irréaliste à réécrire | quantification maison (qualité moindre) | déjà dans le graphe via `image` (mêmes versions) |
 
 | `serde_json` 1 (preserve_order, arbitrary_precision) | tools/code/json-formatter | formatage JSON en gardant l'ordre et les nombres | manuelle | petit |
 | `wasm-bindgen` 0.2.129 | docs/spikes/web-worker-demo | exposer le moteur Rust à un Web Worker pour le spike de Phase 0 | protocole wasm manuel (fragile) | spike uniquement, hors produit |

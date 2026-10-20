@@ -1,0 +1,13 @@
+[ui]
+title = "Compresseur d'images"
+[errors]
+missing_input = "Ajoutez au moins une image."
+invalid_image = "Un des fichiers n'est pas une image valide ou dépasse 20 000 px."
+encode_failed = "Impossible d'encoder l'image."
+invalid_param = "Valeur invalide."
+cancelled = "Annulé."
+[outputs]
+compressed = "Images compressées"
+original_bytes = "Poids d'origine (octets)"
+compressed_bytes = "Poids compressé (octets)"
+saved_percent = "Gain (%)"

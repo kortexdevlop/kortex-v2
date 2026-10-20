@@ -56,7 +56,6 @@
       "app": {
         "ai": true,
         "aliases": {},
-        "bundles_engines": true,
         "id": "apps.flow",
         "name": {
           "en": "Kortex Flow",
@@ -161,7 +160,6 @@
       "app": {
         "ai": false,
         "aliases": {},
-        "bundles_engines": true,
         "id": "apps.mind",
         "name": {
           "en": "Kortex Mind",

@@ -3624,6 +3624,238 @@
       "limits": {
         "max_batch": 100,
         "max_input_bytes": "100MB",
+        "timeout_s": 180
+      },
+      "outputs": [
+        {
+          "default_format": "image/jpeg",
+          "formats": [
+            "image/jpeg",
+            "image/png",
+            "image/webp"
+          ],
+          "id": "compressed",
+          "type": "files<image/*>"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "original_bytes",
+          "type": "integer"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "compressed_bytes",
+          "type": "integer"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "saved_percent",
+          "type": "integer"
+        }
+      ],
+      "params": [
+        {
+          "default": 75,
+          "id": "quality",
+          "label": {
+            "en": "JPG quality (1-100)",
+            "fr": "Qualité JPG (1-100)"
+          },
+          "level": "simple",
+          "options": null,
+          "range": [
+            1.0,
+            100.0
+          ],
+          "type": "integer"
+        },
+        {
+          "default": "keep",
+          "id": "format",
+          "label": {
+            "en": "Output format",
+            "fr": "Format de sortie"
+          },
+          "level": "medium",
+          "options": [
+            "keep",
+            "jpg",
+            "png",
+            "webp"
+          ],
+          "range": null,
+          "type": "enum"
+        },
+        {
+          "default": 0,
+          "id": "max_side",
+          "label": {
+            "en": "Maximum side in px (0 = unchanged)",
+            "fr": "Taille maximale en px (0 = inchangée)"
+          },
+          "level": "medium",
+          "options": null,
+          "range": [
+            0.0,
+            20000.0
+          ],
+          "type": "integer"
+        },
+        {
+          "default": "256",
+          "id": "png_colors",
+          "label": {
+            "en": "PNG colors",
+            "fr": "Couleurs PNG"
+          },
+          "level": "pro",
+          "options": [
+            "256",
+            "full"
+          ],
+          "range": null,
+          "type": "enum"
+        }
+      ],
+      "permissions": {
+        "clipboard": "none",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "reduce a photo's file size to send it by email",
+            "compress png images for my website"
+          ],
+          "fr": [
+            "réduire le poids d'une photo pour l'envoyer par mail",
+            "compresser des images png pour mon site"
+          ]
+        },
+        "keywords": {
+          "en": [
+            "compress image",
+            "reduce photo size",
+            "shrink image",
+            "optimize image",
+            "jpg",
+            "png",
+            "webp"
+          ],
+          "fr": [
+            "compresser image",
+            "réduire le poids d'une photo",
+            "alléger image",
+            "optimiser image",
+            "jpg",
+            "png",
+            "webp"
+          ]
+        },
+        "related": [
+          "image.convert",
+          "pdf.merge"
+        ]
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "image.compress",
+        "name": {
+          "en": "Image Compressor",
+          "fr": "Compresseur d'images"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "image-compressor",
+          "fr": "compresseur-images"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Shrink your photos without uploading them anywhere.",
+          "fr": "Réduisez le poids de vos photos sans les envoyer nulle part."
+        },
+        "ui": "auto",
+        "universe": "image",
+        "version": "1.0.0",
+        "viral_priority": 1,
+        "web_worker": true
+      },
+      "variants": [
+        {
+          "id": "compress-jpg",
+          "name": {
+            "en": "Compress a JPG image",
+            "fr": "Compresser une image JPG"
+          },
+          "preset": {
+            "format": "jpg"
+          },
+          "slug": {
+            "en": "compress-jpg",
+            "fr": "compresser-jpg"
+          }
+        },
+        {
+          "id": "compress-png",
+          "name": {
+            "en": "Compress a PNG image",
+            "fr": "Compresser une image PNG"
+          },
+          "preset": {
+            "format": "png"
+          },
+          "slug": {
+            "en": "compress-png",
+            "fr": "compresser-png"
+          }
+        },
+        {
+          "id": "compress-photo-for-email",
+          "name": {
+            "en": "Reduce a photo for email",
+            "fr": "Réduire une photo pour un e-mail"
+          },
+          "preset": {
+            "format": "jpg",
+            "max_side": "1600",
+            "quality": "70"
+          },
+          "slug": {
+            "en": "reduce-photo-for-email",
+            "fr": "reduire-photo-pour-mail"
+          }
+        }
+      ]
+    },
+    {
+      "inputs": [
+        {
+          "id": "images",
+          "label": {
+            "en": "Images",
+            "fr": "Images"
+          },
+          "max_len": null,
+          "multiline": false,
+          "required": true,
+          "type": "files<image/*>"
+        }
+      ],
+      "limits": {
+        "max_batch": 100,
+        "max_input_bytes": "100MB",
         "timeout_s": 120
       },
       "outputs": [
