@@ -1,6 +1,13 @@
 {
  "publications": [
   {
+   "file": "2026-10-20-porcelain-publication.json",
+   "date": "2026-10-20",
+   "run": "39414571666",
+   "commit": "3bffe3a655",
+   "versions": {}
+  },
+  {
    "file": "2026-10-20-liquid-glass-publication.json",
    "date": "2026-10-20",
    "run": "39352469374",

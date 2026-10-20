@@ -71,3 +71,9 @@ h2{font-size:var(--k-type-scale-1);font-weight:var(--k-type-weight-strong);lette
 .app-account-content{margin:var(--k-space-2) 0 var(--k-space-4);line-height:1.6}
 .app-account-email{overflow-wrap:anywhere}
 .app-account-content .app-note p{margin-bottom:var(--k-space-3)}
+/* Disclosure rows in every app: a full 44 px target with a drawn chevron. */
+.app-main details>summary{display:flex;align-items:center;gap:var(--k-space-2);min-height:44px;cursor:pointer;font-weight:var(--k-type-weight-medium);list-style:none}
+.app-main details>summary::-webkit-details-marker{display:none}
+.app-main details>summary::after{content:"";width:7px;height:7px;margin-left:var(--k-space-1);border-right:1.5px solid var(--k-text-2);border-bottom:1.5px solid var(--k-text-2);transform:rotate(45deg) translateY(-2px);transition:transform var(--k-motion-slow) var(--k-motion-out)}
+.app-main details[open]>summary::after{transform:rotate(-135deg) translateY(-2px)}
+.app-main .mind-composer details>summary::after{display:none}
