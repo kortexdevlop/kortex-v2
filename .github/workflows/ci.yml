@@ -53,7 +53,10 @@ jobs:
       - run: cargo xtask icons
       - run: node --test scripts/tests/offline-routing.test.mjs scripts/tests/host-fallback.test.mjs
       - run: pnpm --filter @kortex/site test
+      # Downloads need the signed release index, provided only by a real publication.
       - run: pnpm site:build
+        env:
+          PUBLIC_DESKTOP_RELEASES_ENABLED: 'false'
       - name: Chromium for the e2e smoke test (ephemeral runner)
         run: pnpm exec playwright install --with-deps chromium
       - name: E2E smoke on three key pages of the built site

@@ -672,11 +672,16 @@ fn app_launchers_do_not_double_the_kortex_prefix_and_old_names_are_removed() {
     shortcuts::create(&e.home, "apps.store", "Kortex Store", &bin);
     let made = shortcuts::existing(&e.home, "apps.store", "Kortex Store");
     assert_eq!(made.len(), 1, "{made:?}");
-    let file = made[0]
-        .file_name()
-        .expect("name")
-        .to_string_lossy()
-        .into_owned();
+    // Linux names the file after the id and carries the label in `Name=`.
+    let file = if cfg!(any(target_os = "macos", target_os = "windows")) {
+        made[0]
+            .file_name()
+            .expect("name")
+            .to_string_lossy()
+            .into_owned()
+    } else {
+        std::fs::read_to_string(&made[0]).expect("desktop entry")
+    };
     assert!(!file.contains("Kortex Kortex"), "{file}");
     assert!(file.contains("Store"), "{file}");
     if cfg!(target_os = "macos") {

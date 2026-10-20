@@ -49,7 +49,7 @@ jobs:
         env:
           ONLY: ${{ github.event_name == 'workflow_dispatch' && inputs.only || 'all' }}
         run: |
-          all='[{"os":"ubuntu-latest","name":"linux","targets":"x86_64-unknown-linux-gnu"},{"os":"macos-latest","name":"macos","targets":"aarch64-apple-darwin"},{"os":"windows-latest","name":"windows","targets":"x86_64-pc-windows-msvc"}]'
+          all='[{"os":"ubuntu-latest","name":"linux","targets":"x86_64-unknown-linux-gnu"},{"os":"macos-15-intel","name":"macos","targets":"aarch64-apple-darwin"},{"os":"windows-latest","name":"windows","targets":"x86_64-pc-windows-msvc"}]'
           if [ "$ONLY" = "all" ] || [ "$ONLY" = "web" ]; then m="$all"; else m=$(echo "$all" | jq -c --arg n "$ONLY" '[.[] | select(.name == $n)]'); fi
           echo "matrix={\"include\":$m}" >> "$GITHUB_OUTPUT"
 
@@ -82,6 +82,11 @@ jobs:
             .
           cache-directories: |
             .kortex/target-desktop
+      # Hosted Apple Silicon runners were repeatedly unavailable (2026-10-20): the Intel runner
+      # cross-compiles the arm64 target, which is only packaged and signed here, never executed.
+      - name: Apple Silicon target
+        if: runner.os == 'macOS'
+        run: rustup target add aarch64-apple-darwin
       - name: Extra macOS target
         if: runner.os == 'macOS' && env.INTEL_MAC == 'true'
         run: |
