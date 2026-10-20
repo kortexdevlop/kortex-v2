@@ -1,6 +1,22 @@
 {
  "publications": [
   {
+   "file": "2026-10-20-liquid-glass-publication.json",
+   "date": "2026-10-20",
+   "run": "39352469374",
+   "commit": "78d89441df",
+   "versions": {
+    "kortex-run": "443e5676-0a9c-4426-8f6b-065f2794ae82",
+    "kortex-desk": "17d6567f-d279-4c58-8233-14c1eb77c139",
+    "kortex-flow": "9873b8b5-25b1-42da-b005-2858cde348d8",
+    "kortex-hub": "dc8bcac0-b7df-4254-a096-8101cc2e4690",
+    "kortex-mind": "423e73f9-296f-442b-9dd6-2a2734f0f174",
+    "kortex-seek": "e38cb089-7d9c-4aef-b662-956d7b50e6c0",
+    "kortex-store": "205f0421-635d-4ba2-8f34-79d331b42888",
+    "kortex-site": "7204c60d-437f-46e3-9049-ec30987182de"
+   }
+  },
+  {
    "file": "2026-10-20-flow-triggers-builder-quota-admin-publication.json",
    "date": "2026-10-20",
    "run": "39343540301",

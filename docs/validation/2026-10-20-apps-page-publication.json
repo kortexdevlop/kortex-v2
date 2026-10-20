@@ -1,0 +1,17 @@
+{
+  "date": "2026-10-20",
+  "commit": "60b09ce",
+  "scope": "site only (publish.mjs --site-only); API, run and app hosts unchanged",
+  "release_index": "dist/release, identical to the production registry before publication",
+  "versions": {
+    "kortex-site": "8a5798a3-b363-4e87-897d-e3e61e55e6b7"
+  },
+  "rollback": { "kortex-site": "7204c60d-437f-46e3-9049-ec30987182de" },
+  "production_checks": [
+    "/applications, /seek, /flow, /mind and /en/apps, /en/seek, /en/flow, /en/mind: 200, no noindex, no 'in preparation' text",
+    "app pages link to search/flow/agent.kortex.site (FR /, EN /en/), hosts answer 200",
+    "sitemap.xml lists /seek, /flow, /mind and their /en/ pages",
+    "unknown URL: 404 with French and English text"
+  ],
+  "not_checked": ["Safari/Firefox", "Lighthouse after this publication"]
+}
