@@ -51,6 +51,15 @@
    }
   },
   {
+   "file": "2026-10-20-apps-page-publication.json",
+   "date": "2026-10-20",
+   "run": null,
+   "commit": "60b09ce",
+   "versions": {
+    "kortex-site": "8a5798a3-b363-4e87-897d-e3e61e55e6b7"
+   }
+  },
+  {
    "file": "2026-10-19-flow-nodes-publication.json",
    "date": "2026-10-19",
    "run": "39242109559",

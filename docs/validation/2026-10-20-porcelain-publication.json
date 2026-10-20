@@ -1,0 +1,20 @@
+{
+  "date": "2026-10-20",
+  "lot": 33,
+  "release_run": "39414571666",
+  "commit": "3bffe3a655c7d69b6d317f095256dc318a84067d",
+  "artifacts_verified": "38 tools and 6 apps (scripts/verify-web-artifacts.mjs)",
+  "publication": "scripts/publish.mjs --static-only (API unchanged)",
+  "site_version": "555536ce-17ea-44ed-9b71-fe962c701093",
+  "local_checks": [
+    "cargo xtask check OK (38 tools, 6 apps, tokens-only style check)",
+    "cargo check native for kortex-shell and the 6 apps",
+    "tests/e2e/visual-audit.mjs: 168 views, 0 blocking defect, 0 axe WCAG 2.1 AA violation",
+    "tests/e2e/smoke.mjs OK; site unit tests OK"
+  ],
+  "production_checks": [
+    "kortex.site: Stage opens calc.percentage from run.kortex.site, run returns 20.00, console clean",
+    "flow.kortex.site: new frame (icon rail, segmented mode) rendered, console clean"
+  ],
+  "not_checked": ["Safari/Firefox", "desktop webview", "Lighthouse in production"]
+}
