@@ -1,0 +1,11 @@
+[package]
+name = "tool-code-jwt-decoder"
+version = "0.1.0"
+edition.workspace = true
+publish.workspace = true
+license.workspace = true
+
+[dependencies]
+kortex = { path = "../../../crates/kortex" }
+kortex-date = { path = "../../../crates/kortex-date" }
+serde_json = { version = "1", features = ["preserve_order"] }

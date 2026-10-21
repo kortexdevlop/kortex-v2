@@ -164,6 +164,89 @@ pub fn decide(
     plan
 }
 
+/// What changed in `Cargo.lock` between two versions: the workspace crates whose entry changed (a
+/// new tool crate, a bumped crate version) and whether any external dependency changed.
+#[derive(Debug, Default, PartialEq, Eq)]
+pub struct LockDelta {
+    pub workspace: BTreeSet<String>,
+    pub external: bool,
+}
+
+fn lock_packages(text: &str) -> std::collections::BTreeMap<String, (bool, String)> {
+    text.split("[[package]]")
+        .skip(1)
+        .filter_map(|block| {
+            let field = |key: &str| {
+                block
+                    .lines()
+                    .find_map(|l| {
+                        l.strip_prefix(key)?
+                            .trim()
+                            .strip_prefix('"')?
+                            .split('"')
+                            .next()
+                    })
+                    .map(str::to_owned)
+            };
+            let name = field("name =")?;
+            let version = field("version =").unwrap_or_default();
+            let external = block.lines().any(|l| l.starts_with("source ="));
+            Some((
+                format!("{name} {version}"),
+                (external, block.trim().to_owned()),
+            ))
+        })
+        .collect()
+}
+
+#[must_use]
+pub fn lock_delta(before: &str, after: &str) -> LockDelta {
+    let (old, new) = (lock_packages(before), lock_packages(after));
+    let mut delta = LockDelta::default();
+    for key in old.keys().chain(new.keys()) {
+        if old.get(key) == new.get(key) {
+            continue;
+        }
+        let external = old.get(key).or(new.get(key)).is_some_and(|(e, _)| *e);
+        if external {
+            delta.external = true;
+        } else if let Some((name, _)) = key.split_once(' ') {
+            delta.workspace.insert(name.to_owned());
+        }
+    }
+    delta
+}
+
+/// A `Cargo.lock` change that only touches workspace crates (a tool added, a crate version bumped)
+/// is not a global change: it counts as a change of those crates alone. Any external dependency
+/// change stays global (it can alter every bundle).
+fn refine_lock(files: &mut Vec<String>, base: &str, head: &str, krates: &[crate::changed::Krate]) {
+    if !files.iter().any(|f| f == "Cargo.lock") {
+        return;
+    }
+    let show = |rev: &str| {
+        std::process::Command::new("git")
+            .args(["show", &format!("{rev}:Cargo.lock")])
+            .output()
+            .ok()
+            .filter(|o| o.status.success())
+            .map(|o| String::from_utf8_lossy(&o.stdout).into_owned())
+    };
+    let (Some(before), Some(after)) = (show(base), show(head)) else {
+        return;
+    };
+    let delta = lock_delta(&before, &after);
+    if delta.external {
+        return;
+    }
+    files.retain(|f| f != "Cargo.lock");
+    for name in &delta.workspace {
+        if let Some(krate) = krates.iter().find(|k| &k.name == name) {
+            files.push(format!("{}/Cargo.toml", krate.dir));
+        }
+    }
+}
+
 /// `cargo xtask feed-plan --previous-dir D [--previous-channel C] [--force-all] [--force-cli] [--head REF]`: reads the
 /// published signed index in `D` (`index.json` + `index.json.sig`), refuses anything not signed by
 /// the release key, and prints what to build as `key=value` lines and `.kortex/feed-plan.json`.
@@ -181,10 +264,11 @@ pub fn plan(args: &[String]) -> Result<(), String> {
         .map_err(|e| format!("l'index publié est refusé : {e}"))?;
     let krates = crate::changed::workspace(&std::env::current_dir().map_err(|e| e.to_string())?)?;
     let head = flag(args, "--head").unwrap_or_else(|| "HEAD".into());
-    let files = previous
-        .source_commit
-        .as_deref()
-        .and_then(|base| crate::changed::git_files_between(base, &head).ok());
+    let files = previous.source_commit.as_deref().and_then(|base| {
+        let mut files = crate::changed::git_files_between(base, &head).ok()?;
+        refine_lock(&mut files, base, &head, &krates);
+        Some(files)
+    });
     let versions = current_versions()?;
     let plan = decide(
         &previous,
@@ -618,6 +702,29 @@ mod tests {
             2,
             "unknown base commit: rebuild the web"
         );
+    }
+
+    #[test]
+    fn a_new_tool_in_the_lockfile_is_not_a_global_change() {
+        let before = "[[package]]\nname = \"serde\"\nversion = \"1.0.0\"\nsource = \"registry+x\"\n\n[[package]]\nname = \"tool-text-a\"\nversion = \"0.1.0\"\n";
+        let added = format!(
+            "{before}\n[[package]]\nname = \"tool-text-new\"\nversion = \"0.1.0\"\ndependencies = [\"serde\"]\n"
+        );
+        let d = lock_delta(before, &added);
+        assert_eq!(d.workspace, BTreeSet::from(["tool-text-new".to_owned()]));
+        assert!(!d.external);
+        // A crate version bump only concerns that crate.
+        let bumped = before.replace(
+            "tool-text-a\"\nversion = \"0.1.0",
+            "tool-text-a\"\nversion = \"0.1.1",
+        );
+        assert_eq!(
+            lock_delta(before, &bumped).workspace,
+            BTreeSet::from(["tool-text-a".to_owned()])
+        );
+        // An external dependency change stays global.
+        let upgraded = before.replace("1.0.0", "1.0.1");
+        assert!(lock_delta(before, &upgraded).external);
     }
 
     #[test]
