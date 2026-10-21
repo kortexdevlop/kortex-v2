@@ -88,7 +88,14 @@ pub fn decide(
             .get(id)
             .is_some_and(|t| t.targets.contains_key("web"))
     };
-    let missing_web = web.0.iter().chain(web.1.iter()).any(|id| !has_web(id));
+    // Bootstrap only when a *published* entry has no web archive yet; an id the index has never
+    // listed is simply new and is added below.
+    let missing_web = web
+        .0
+        .iter()
+        .chain(web.1.iter())
+        .any(|id| previous.tools.contains_key(id) && !has_web(id));
+    let is_new = |id: &String| !previous.tools.contains_key(id);
     let affected = files.map(|f| crate::changed::affected(f, krates));
     if missing_web || files.is_none() {
         // Bootstrap: the published release has no web archives (or no known commit). Everything
@@ -133,6 +140,9 @@ pub fn decide(
         ),
         _ => (BTreeSet::new(), BTreeSet::new(), false),
     };
+    let (mut tools, mut apps) = (tools, apps);
+    tools.extend(web.0.iter().filter(|id| is_new(id)).cloned());
+    apps.extend(web.1.iter().filter(|id| is_new(id)).cloned());
     if plan.reason.is_empty() {
         plan.reason = if tools.is_empty() && apps.is_empty() && !cli {
             "nothing to publish".into()
@@ -725,6 +735,28 @@ mod tests {
         // An external dependency change stays global.
         let upgraded = before.replace("1.0.0", "1.0.1");
         assert!(lock_delta(before, &upgraded).external);
+    }
+
+    #[test]
+    fn a_brand_new_tool_is_added_without_rebuilding_anything_else() {
+        let mut with_new = ids();
+        with_new.0.push("text.new".into());
+        let f = files(&["tools/text/new/src/engine.rs", "tools/text/new/tool.toml"]);
+        let p = decide(
+            &index(true),
+            Some(&f),
+            &workspace(),
+            &versions("1.0.0"),
+            &with_new,
+            false,
+        );
+        assert_eq!(
+            p.web_tools,
+            BTreeSet::from(["text.new".to_owned()]),
+            "{p:?}"
+        );
+        assert_eq!(p.native_tools, p.web_tools);
+        assert!(p.web_apps.is_empty() && !p.cli && p.unbumped.is_empty());
     }
 
     #[test]
