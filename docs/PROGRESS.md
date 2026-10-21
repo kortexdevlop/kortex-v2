@@ -545,3 +545,10 @@ stable: 0 · beta: 38 · draft: 0 — calc 13, code 8, color 2, convert 2, image
 - **Chaîne** : PR 5 → CI verte → `feed.yml` automatique (`FEED_AUTO=true`) : seul `code.jwt-decoder` construit (web + Linux/Windows/Mac), release `feed-3`, index et catalogue séquence 3. Deux défauts corrigés avant l'envoi grâce à une simulation locale de `feed-plan` : `Cargo.lock` limité aux crates du workspace n'est plus global ; un outil jamais publié n'amorce plus tout le web.
 - **Vérifié en production** : voir PLAN 19.13 (apps non reconstruites qui affichent l'outil, moteur exécuté par l'hôte, paquet Mac conforme à l'index, CLI).
 - **Reste** : installation par le Store/`kortex install` (compte), Flow/Mind desktop, hors ligne, Windows/Linux/ARM.
+
+## Session 2026-10-21 — Deux outils de plus : `calc.bmi` et `text.diff` (41e et 42e, autorisés par l'utilisateur)
+
+- **Outils** : Calculateur d'IMC (OMS, fourchette de poids « normal », 3 tests) et Comparateur de textes (LCS ligne à ligne, options casse/espaces, 4 000 lignes max, 5 tests). Règles du gel mises à jour (CLAUDE.md = AGENTS.md, RULES §2.1, MASTER).
+- **Chaîne** : simulation `feed-plan` (seuls les deux outils) → gate → PR 9 → CI verte → `feed.yml` automatique (run 39617223118) : web + Linux/Windows/Mac des deux outils seulement ; index et catalogue séquence 5 (48 entrées, 42 outils). Aucune app, ni CLI, ni autre outil reconstruits.
+- **Vérifié en production** : Store 42 outils et Hub 42 outils (apps non reconstruites) listent les deux ; Seek trouve « Calculateur d'IMC » et « Comparer deux textes » ; palette de Flow ; moteurs exécutés par l'hôte de `run` (IMC 24,2 « normal » ; diff 2 ajouts/1 retrait) ; pages FR/EN en 200 ; paquets macOS Intel conformes à l'index signé, lancés par la CLI (IMC 25,9 « overweight »).
+- **Incident de processus** : le gate local a échoué (test `catalogue_and_search_are_real_and_local` dépendant du catalogue en cache du poste : 40 contre 42) mais l'enchaînement de commandes a envoyé quand même ; la CI propre était verte. Corrigé : `scripts/gate.sh` s'exécute avec un `KORTEX_HOME` vide, et l'envoi est désormais conditionné au code de sortie du gate.
