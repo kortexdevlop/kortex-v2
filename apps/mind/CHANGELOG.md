@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.1.3
+- Reads the signed contract catalogue published by kortex.site (verified, cached for offline use): a tool added later appears without updating this app. Desktop lists the tools really installed, including ones this build does not know.
+
 ## 0.1.2
 - Desktop: attaching files opens the system dialog; an unreadable file shows a translated note.
 

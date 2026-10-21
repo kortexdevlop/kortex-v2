@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.3.2
+- Reads the signed contract catalogue published by kortex.site (verified, cached for offline use): a tool added later appears without updating this app. Desktop lists the tools really installed, including ones this build does not know.
+
 ## 0.3.1
 - Desktop: rebuilt with the shared file-picker fix of the Kortex UI.
 

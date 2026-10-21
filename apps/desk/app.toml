@@ -1,7 +1,7 @@
 schema = 1
 [app]
 id = "apps.desk"
-version = "0.2.2"
+version = "0.2.3"
 universe = "apps"
 status = "beta"
 ui = "custom"
