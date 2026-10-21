@@ -1,12 +1,5 @@
 name: deploy
 on:
-  pull_request:
-    paths:
-      - '.github/workflows/deploy.yml'
-      - '.github/web-build.json'
-      - 'scripts/verify-web-*'
-      - 'scripts/prepare-publish.mjs'
-      - 'scripts/publish.mjs'
   workflow_dispatch:
     inputs:
       source_run:

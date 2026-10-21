@@ -27,7 +27,7 @@ try {
       ['jpg en png', 'Convertir JPG en PNG', /\/convertir-jpg-en-png\?open=1$/],
       ['mdp', 'Générateur de mots de passe', /\?open=1$/],
       ['fusioner pdf', 'Fusionner des PDF', /\?open=1$/],
-      ['réduire le poids d’une photo pour l’envoyer par mail', "Convertisseur d'images", /\?open=1$/],
+      ['réduire le poids d’une photo pour l’envoyer par mail', 'Réduire une photo pour un e-mail', /\?open=1$/],
     ]],
     ['en-US', '/en/', [
       ['merge several pdf files', 'Merge PDF', /\/en\/.*\?open=1$/],
