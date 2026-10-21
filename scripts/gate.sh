@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 # Local quality gate: same checks as CI. Any failure stops the script (non-zero exit).
 set -euo pipefail
+# Tests must not depend on what is installed or cached on this machine (a cached catalogue or
+# installed tools change what the apps list): they get an empty Kortex home, like a clean CI runner.
+KORTEX_HOME="$(mktemp -d)"
+export KORTEX_HOME
 pnpm install --frozen-lockfile --silent   # same as CI: the lockfile must match every package.json
 rm -f design/dist/kortex.css   # like a clean checkout: it must be (re)generated, never assumed
 cargo xtask tokens            # embedded by the Store and desktop apps
