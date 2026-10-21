@@ -1,0 +1,10 @@
+[ui]
+title = "BMI Calculator"
+[errors]
+invalid_param = "Invalid value."
+cancelled = "Cancelled."
+[outputs]
+bmi = "BMI (kg/m²)"
+category = "Category"
+healthy_min_kg = "Lowest \"normal\" weight (kg)"
+healthy_max_kg = "Highest \"normal\" weight (kg)"

@@ -235,6 +235,158 @@
         {
           "default_format": null,
           "formats": null,
+          "id": "bmi",
+          "type": "number"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "category",
+          "type": "text"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "healthy_min_kg",
+          "type": "number"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "healthy_max_kg",
+          "type": "number"
+        }
+      ],
+      "params": [
+        {
+          "default": 70,
+          "id": "weight_kg",
+          "label": {
+            "en": "Weight (kg)",
+            "fr": "Poids (kg)"
+          },
+          "level": "simple",
+          "options": null,
+          "range": [
+            1.0,
+            700.0
+          ],
+          "type": "number"
+        },
+        {
+          "default": 170,
+          "id": "height_cm",
+          "label": {
+            "en": "Height (cm)",
+            "fr": "Taille (cm)"
+          },
+          "level": "simple",
+          "options": null,
+          "range": [
+            50.0,
+            272.0
+          ],
+          "type": "number"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "calculate my bmi",
+            "check whether my weight is normal for my height"
+          ],
+          "fr": [
+            "calculer mon imc",
+            "savoir si mon poids est normal par rapport à ma taille"
+          ]
+        },
+        "keywords": {
+          "en": [
+            "bmi",
+            "body mass index",
+            "weight",
+            "height",
+            "calculate bmi"
+          ],
+          "fr": [
+            "imc",
+            "indice de masse corporelle",
+            "poids",
+            "taille",
+            "corpulence",
+            "calculer son imc"
+          ]
+        },
+        "related": [
+          "calc.percentage",
+          "convert.units"
+        ]
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "calc.bmi",
+        "name": {
+          "en": "BMI Calculator",
+          "fr": "Calculateur d'IMC"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "bmi-calculator",
+          "fr": "calculateur-imc"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Work out your body mass index from your weight and height.",
+          "fr": "Calculez votre indice de masse corporelle à partir de votre poids et de votre taille."
+        },
+        "ui": "auto",
+        "universe": "calc",
+        "version": "1.0.0",
+        "viral_priority": 1,
+        "web_worker": false
+      },
+      "variants": [
+        {
+          "id": "imc-adulte",
+          "name": {
+            "en": "Calculate your BMI",
+            "fr": "Calculer son IMC"
+          },
+          "preset": {
+            "height_cm": "170",
+            "weight_kg": "70"
+          },
+          "slug": {
+            "en": "calculate-your-bmi",
+            "fr": "calculer-son-imc"
+          }
+        }
+      ]
+    },
+    {
+      "inputs": [],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": null,
+        "timeout_s": 10
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
           "id": "final_value",
           "type": "number"
         },
@@ -5349,6 +5501,175 @@
         "web_worker": false
       },
       "variants": []
+    },
+    {
+      "inputs": [
+        {
+          "id": "original",
+          "label": {
+            "en": "Original text",
+            "fr": "Texte d'origine"
+          },
+          "max_len": 500000,
+          "multiline": false,
+          "required": true,
+          "type": "text"
+        },
+        {
+          "id": "modified",
+          "label": {
+            "en": "Modified text",
+            "fr": "Texte modifié"
+          },
+          "max_len": 500000,
+          "multiline": false,
+          "required": true,
+          "type": "text"
+        }
+      ],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": "2MB",
+        "timeout_s": 30
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "diff",
+          "type": "text"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "added",
+          "type": "integer"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "removed",
+          "type": "integer"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "unchanged",
+          "type": "integer"
+        }
+      ],
+      "params": [
+        {
+          "default": false,
+          "id": "ignore_case",
+          "label": {
+            "en": "Ignore case",
+            "fr": "Ignorer la casse"
+          },
+          "level": "medium",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        },
+        {
+          "default": false,
+          "id": "ignore_whitespace",
+          "label": {
+            "en": "Ignore extra whitespace",
+            "fr": "Ignorer les espaces en trop"
+          },
+          "level": "medium",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "compare two versions of a text",
+            "see what changed between two texts"
+          ],
+          "fr": [
+            "comparer deux versions d'un texte",
+            "voir ce qui a changé entre deux textes"
+          ]
+        },
+        "keywords": {
+          "en": [
+            "compare two texts",
+            "differences",
+            "diff",
+            "text compare",
+            "what changed",
+            "compare versions"
+          ],
+          "fr": [
+            "comparer deux textes",
+            "différences",
+            "diff",
+            "comparateur",
+            "ce qui a changé",
+            "comparer des versions"
+          ]
+        },
+        "related": [
+          "text.deduplicate",
+          "text.find-replace"
+        ]
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "text.diff",
+        "name": {
+          "en": "Text Diff",
+          "fr": "Comparateur de textes"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "text-diff",
+          "fr": "comparateur-de-textes"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Compare two texts and see what changed, line by line.",
+          "fr": "Comparez deux textes et voyez ce qui a changé, ligne par ligne."
+        },
+        "ui": "auto",
+        "universe": "text",
+        "version": "1.0.0",
+        "viral_priority": 1,
+        "web_worker": false
+      },
+      "variants": [
+        {
+          "id": "compare-two-texts",
+          "name": {
+            "en": "Compare two texts",
+            "fr": "Comparer deux textes"
+          },
+          "preset": {
+            "ignore_case": "false"
+          },
+          "slug": {
+            "en": "compare-two-texts",
+            "fr": "comparer-deux-textes"
+          }
+        }
+      ]
     },
     {
       "inputs": [

@@ -2,7 +2,7 @@
 
 Le cahier des charges fonctionnel ci-dessous est appliqué avec [RULES.md](RULES.md), version consolidée des règles et des instructions utilisateur. Les consignes utilisateur les plus récentes priment ; les ADR et journaux ne peuvent pas y déroger.
 
-Périmètre actuel : **38 outils gelés, plus `image.compress` autorisé le 2026-10-20 (39)**, correction de l’existant, applications Rust/Dioxus dans `apps/`, publication des lots terminés après contrôles groupés. Les anciennes cibles de croissance et chiffres indicatifs ne déclenchent aucun ajout d’outil. `docs/PLAN.md` contient les étapes et leurs validations.
+Périmètre actuel : **38 outils gelés, plus 4 ajouts autorisés par l’utilisateur (`image.compress`, `code.jwt-decoder`, `text.diff`, `calc.bmi`) = 42**, correction de l’existant, applications Rust/Dioxus dans `apps/`, publication des lots terminés après contrôles groupés. Les anciennes cibles de croissance et chiffres indicatifs ne déclenchent aucun ajout d’outil. `docs/PLAN.md` contient les étapes et leurs validations.
 
 ## 0. Ton rôle et ta façon de travailler
 
