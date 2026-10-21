@@ -150,10 +150,21 @@ pub fn bundle_crates<'a>(krates: &'a [Krate], dir: &str) -> Vec<&'a Krate> {
         .collect()
 }
 
+/// Files inside a crate that cannot change what is compiled into a bundle or a binary.
+fn is_bundle_neutral(file: &str) -> bool {
+    (file.contains("/tests/") && !file.contains("/src/")) || file.ends_with("/CHANGELOG.md")
+}
+
 /// Whether a change to `files` can alter the crate `name` (it or a dependency changed, or a global
 /// path such as the toolchain or the lockfile).
 #[must_use]
 pub fn touches(files: &[String], krates: &[Krate], name: &str) -> bool {
+    let files: Vec<String> = files
+        .iter()
+        .filter(|f| !is_bundle_neutral(f))
+        .cloned()
+        .collect();
+    let files = files.as_slice();
     if files.iter().any(|file| {
         GLOBAL_PATHS
             .iter()
@@ -174,6 +185,13 @@ pub fn touches(files: &[String], krates: &[Krate], name: &str) -> bool {
 
 #[must_use]
 pub fn affected(files: &[String], krates: &[Krate]) -> Affected {
+    // Tests and changelogs never end up in a bundle: they must not trigger a rebuild.
+    let files: Vec<String> = files
+        .iter()
+        .filter(|f| !is_bundle_neutral(f))
+        .cloned()
+        .collect();
+    let files = files.as_slice();
     let mut result = Affected::default();
     let mut changed: BTreeSet<&str> = BTreeSet::new();
     let mut registry_changed = false;
@@ -357,6 +375,21 @@ mod tests {
         let r = affected(&files(&["crates/kortex-calendar/src/lib.rs"]), &workspace());
         assert_eq!(r.tools, BTreeSet::from(["calc.b".to_owned()]));
         assert!(r.apps.is_empty());
+    }
+
+    #[test]
+    fn tests_and_changelogs_rebuild_nothing() {
+        let f = files(&[
+            "tools/text/a/tests/engine.rs",
+            "tools/text/a/CHANGELOG.md",
+            "crates/kortex-pkg/tests/pkg.rs",
+        ]);
+        let r = affected(&f, &workspace());
+        assert!(r.tools.is_empty() && r.apps.is_empty() && !r.all, "{r:?}");
+        assert!(!touches(&f, &workspace(), "kortex-cli"));
+        // Source files of the same crate still count.
+        let src = affected(&files(&["tools/text/a/src/engine.rs"]), &workspace());
+        assert_eq!(src.tools.len(), 1);
     }
 
     #[test]
