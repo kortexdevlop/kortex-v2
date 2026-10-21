@@ -1,0 +1,16 @@
+[ui]
+title = "Décodeur JWT"
+[errors]
+empty_input = "Collez un jeton JWT."
+invalid_token = "Ce n'est pas un jeton JWT : il doit avoir trois parties séparées par des points."
+encrypted_token = "Ce jeton est chiffré (JWE) : il ne peut pas être lu sans sa clé."
+invalid_header = "L'en-tête du jeton est illisible."
+invalid_payload = "Le contenu du jeton est illisible."
+invalid_param = "Valeur invalide."
+cancelled = "Annulé."
+[outputs]
+header = "En-tête"
+payload = "Contenu (payload)"
+algorithm = "Algorithme"
+issued_at = "Émis le (UTC)"
+expires_at = "Expire le (UTC)"

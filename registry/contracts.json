@@ -2432,6 +2432,158 @@
     {
       "inputs": [
         {
+          "id": "token",
+          "label": {
+            "en": "JWT",
+            "fr": "Jeton JWT"
+          },
+          "max_len": 200000,
+          "multiline": false,
+          "required": true,
+          "type": "text"
+        }
+      ],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": "1MB",
+        "timeout_s": 10
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "header",
+          "type": "text"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "payload",
+          "type": "text"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "algorithm",
+          "type": "text"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "issued_at",
+          "type": "text"
+        },
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "expires_at",
+          "type": "text"
+        }
+      ],
+      "params": [
+        {
+          "default": true,
+          "id": "pretty",
+          "label": {
+            "en": "Pretty-print the JSON",
+            "fr": "Mettre en forme le JSON"
+          },
+          "level": "medium",
+          "options": null,
+          "range": null,
+          "type": "bool"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "read the contents of a jwt token",
+            "see when my login token expires"
+          ],
+          "fr": [
+            "lire le contenu d'un token jwt",
+            "voir quand expire mon jeton de connexion"
+          ]
+        },
+        "keywords": {
+          "en": [
+            "jwt",
+            "token",
+            "decode jwt",
+            "read a token",
+            "bearer",
+            "json web token"
+          ],
+          "fr": [
+            "jwt",
+            "jeton",
+            "token",
+            "décoder jwt",
+            "lire un token",
+            "bearer"
+          ]
+        },
+        "related": [
+          "code.base64",
+          "code.json-formatter"
+        ]
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "code.jwt-decoder",
+        "name": {
+          "en": "JWT Decoder",
+          "fr": "Décodeur JWT"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "jwt-decoder",
+          "fr": "decodeur-jwt"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Read the contents of a JWT without sending it anywhere.",
+          "fr": "Lisez le contenu d'un jeton JWT sans l'envoyer nulle part."
+        },
+        "ui": "auto",
+        "universe": "code",
+        "version": "1.0.0",
+        "viral_priority": 1,
+        "web_worker": false
+      },
+      "variants": [
+        {
+          "id": "bearer-token",
+          "name": {
+            "en": "Decode a Bearer token",
+            "fr": "Décoder un token Bearer"
+          },
+          "preset": {
+            "pretty": "true"
+          },
+          "slug": {
+            "en": "decode-bearer-token",
+            "fr": "decoder-token-bearer"
+          }
+        }
+      ]
+    },
+    {
+      "inputs": [
+        {
           "id": "text",
           "label": {
             "en": "Text",

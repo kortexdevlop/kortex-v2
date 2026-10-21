@@ -6840,6 +6840,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "tool-code-jwt-decoder"
+version = "0.1.0"
+dependencies = [
+ "kortex",
+ "kortex-date",
+ "serde_json",
+]
+
+[[package]]
 name = "tool-code-markdown-table"
 version = "0.1.0"
 dependencies = [

@@ -1,0 +1,16 @@
+[ui]
+title = "JWT Decoder"
+[errors]
+empty_input = "Paste a JWT."
+invalid_token = "This is not a JWT: it must have three parts separated by dots."
+encrypted_token = "This token is encrypted (JWE): it cannot be read without its key."
+invalid_header = "The token header is unreadable."
+invalid_payload = "The token payload is unreadable."
+invalid_param = "Invalid value."
+cancelled = "Cancelled."
+[outputs]
+header = "Header"
+payload = "Payload"
+algorithm = "Algorithm"
+issued_at = "Issued at (UTC)"
+expires_at = "Expires at (UTC)"

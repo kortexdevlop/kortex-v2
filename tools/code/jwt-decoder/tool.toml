@@ -1,0 +1,80 @@
+schema = 1
+
+[tool]
+id = "code.jwt-decoder"
+version = "1.0.0"
+universe = "code"
+status = "beta"
+ui = "auto"
+platforms = ["web", "desktop"]
+offline = true
+ai = false
+viral_priority = 1
+
+[tool.name]
+fr = "Décodeur JWT"
+en = "JWT Decoder"
+[tool.tagline]
+fr = "Lisez le contenu d'un jeton JWT sans l'envoyer nulle part."
+en = "Read the contents of a JWT without sending it anywhere."
+[tool.slug]
+fr = "decodeur-jwt"
+en = "jwt-decoder"
+
+[search]
+keywords.fr = ["jwt", "jeton", "token", "décoder jwt", "lire un token", "bearer"]
+keywords.en = ["jwt", "token", "decode jwt", "read a token", "bearer", "json web token"]
+intents.fr = ["lire le contenu d'un token jwt", "voir quand expire mon jeton de connexion"]
+intents.en = ["read the contents of a jwt token", "see when my login token expires"]
+related = ["code.base64", "code.json-formatter"]
+
+[limits]
+max_input_bytes = "1MB"
+timeout_s = 10
+
+[[inputs]]
+id = "token"
+type = "text"
+required = true
+max_len = 200000
+label = { fr = "Jeton JWT", en = "JWT" }
+
+[[params]]
+id = "pretty"
+type = "bool"
+default = true
+level = "medium"
+label = { fr = "Mettre en forme le JSON", en = "Pretty-print the JSON" }
+
+[[outputs]]
+id = "header"
+type = "text"
+
+[[outputs]]
+id = "payload"
+type = "text"
+
+[[outputs]]
+id = "algorithm"
+type = "text"
+
+[[outputs]]
+id = "issued_at"
+type = "text"
+
+[[outputs]]
+id = "expires_at"
+type = "text"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "write"
+sensitive = false
+privacy = "local"
+
+[[variants]]
+id = "bearer-token"
+slug = { fr = "decoder-token-bearer", en = "decode-bearer-token" }
+name = { fr = "Décoder un token Bearer", en = "Decode a Bearer token" }
+preset = { pretty = "true" }
