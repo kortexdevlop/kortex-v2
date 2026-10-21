@@ -22,6 +22,10 @@ on:
         description: 'Rebuild everything (shared change not detected, or bootstrap)'
         type: boolean
         default: false
+      force_cli:
+        description: 'Publish the CLI even though its code did not change since the published commit'
+        type: boolean
+        default: false
       publish:
         description: 'Create the release and deploy (false: build and package only)'
         type: boolean
@@ -71,6 +75,7 @@ jobs:
         run: |
           set -euo pipefail
           force=""; [ "${{ inputs.force_all }}" = "true" ] && force="--force-all"
+          [ "${{ inputs.force_cli }}" = "true" ] && force="$force --force-cli"
           cargo xtask feed-plan --previous-dir .kortex/previous $force | tee plan.txt
           cat plan.txt >> "$GITHUB_OUTPUT"
           if grep -qE '^(native_tools|native_apps)=.+' plan.txt || grep -q '^cli=true' plan.txt; then echo native=true >> "$GITHUB_OUTPUT"; else echo native=false >> "$GITHUB_OUTPUT"; fi

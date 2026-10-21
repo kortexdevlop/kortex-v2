@@ -164,7 +164,7 @@ pub fn decide(
     plan
 }
 
-/// `cargo xtask feed-plan --previous-dir D [--previous-channel C] [--force-all] [--head REF]`: reads the
+/// `cargo xtask feed-plan --previous-dir D [--previous-channel C] [--force-all] [--force-cli] [--head REF]`: reads the
 /// published signed index in `D` (`index.json` + `index.json.sig`), refuses anything not signed by
 /// the release key, and prints what to build as `key=value` lines and `.kortex/feed-plan.json`.
 pub fn plan(args: &[String]) -> Result<(), String> {
@@ -194,6 +194,18 @@ pub fn plan(args: &[String]) -> Result<(), String> {
         &web_ids()?,
         args.iter().any(|a| a == "--force-all"),
     );
+    // `--force-cli`: publish the CLI although no file of its closure changed since the published
+    // commit (a version bump of the CLI crate would touch Cargo.lock and so rebuild everything).
+    let mut plan = plan;
+    if args.iter().any(|a| a == "--force-cli") && !plan.cli {
+        plan.cli = true;
+        if let (Some(now), Some(published)) = (versions.get("cli"), &previous.cli)
+            && !is_newer(now, &published.version)
+        {
+            plan.unbumped
+                .push(format!("cli ({now}, publiée : {})", published.version));
+        }
+    }
     if !plan.unbumped.is_empty() {
         return Err(format!(
             "✗ modifié sans monter la version (corrige `version` dans tool.toml/app.toml/Cargo.toml de la CLI) :\n  {}",
@@ -377,6 +389,26 @@ pub fn restore_web(args: &[String]) -> Result<(), String> {
             fs::create_dir_all(to.parent().ok_or("chemin invalide")?).map_err(|e| e.to_string())?;
             let mut file = fs::File::create(&to).map_err(|e| e.to_string())?;
             std::io::copy(&mut entry, &mut file).map_err(|e| e.to_string())?;
+        }
+        if id.starts_with("apps.") {
+            // The publisher checks every app file against a receipt; the archive itself was already
+            // verified against the signed index, so the receipt is derived from the extracted tree.
+            let mut files = Vec::new();
+            collect(&dest, &dest, &mut files)?;
+            let mut hashes = serde_json::Map::new();
+            for relative in files {
+                let bytes = fs::read(dest.join(&relative)).map_err(|e| e.to_string())?;
+                hashes.insert(
+                    relative.to_string_lossy().replace('\\', "/"),
+                    sha256_hex(&bytes).into(),
+                );
+            }
+            fs::create_dir_all(".kortex/app-receipts").map_err(|e| e.to_string())?;
+            fs::write(
+                format!(".kortex/app-receipts/{id}-web.json"),
+                json!({"target": "web", "files": hashes}).to_string(),
+            )
+            .map_err(|e| e.to_string())?;
         }
         restored += 1;
     }
