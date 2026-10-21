@@ -1,0 +1,10 @@
+[ui]
+title = "Calculateur d'IMC"
+[errors]
+invalid_param = "Valeur invalide."
+cancelled = "Annulé."
+[outputs]
+bmi = "IMC (kg/m²)"
+category = "Catégorie"
+healthy_min_kg = "Poids minimal « normal » (kg)"
+healthy_max_kg = "Poids maximal « normal » (kg)"

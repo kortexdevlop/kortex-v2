@@ -1,0 +1,77 @@
+schema = 1
+
+[tool]
+id = "calc.bmi"
+version = "1.0.0"
+universe = "calc"
+status = "beta"
+ui = "auto"
+platforms = ["web", "desktop"]
+offline = true
+ai = false
+viral_priority = 1
+
+[tool.name]
+fr = "Calculateur d'IMC"
+en = "BMI Calculator"
+[tool.tagline]
+fr = "Calculez votre indice de masse corporelle à partir de votre poids et de votre taille."
+en = "Work out your body mass index from your weight and height."
+[tool.slug]
+fr = "calculateur-imc"
+en = "bmi-calculator"
+
+[search]
+keywords.fr = ["imc", "indice de masse corporelle", "poids", "taille", "corpulence", "calculer son imc"]
+keywords.en = ["bmi", "body mass index", "weight", "height", "calculate bmi"]
+intents.fr = ["calculer mon imc", "savoir si mon poids est normal par rapport à ma taille"]
+intents.en = ["calculate my bmi", "check whether my weight is normal for my height"]
+related = ["calc.percentage", "convert.units"]
+
+[limits]
+timeout_s = 10
+
+[[params]]
+id = "weight_kg"
+type = "number"
+default = 70
+level = "simple"
+label = { fr = "Poids (kg)", en = "Weight (kg)" }
+range = [1, 700]
+
+[[params]]
+id = "height_cm"
+type = "number"
+default = 170
+level = "simple"
+label = { fr = "Taille (cm)", en = "Height (cm)" }
+range = [50, 272]
+
+[[outputs]]
+id = "bmi"
+type = "number"
+
+[[outputs]]
+id = "category"
+type = "text"
+
+[[outputs]]
+id = "healthy_min_kg"
+type = "number"
+
+[[outputs]]
+id = "healthy_max_kg"
+type = "number"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "write"
+sensitive = false
+privacy = "local"
+
+[[variants]]
+id = "imc-adulte"
+slug = { fr = "calculer-son-imc", en = "calculate-your-bmi" }
+name = { fr = "Calculer son IMC", en = "Calculate your BMI" }
+preset = { weight_kg = "70", height_cm = "170" }

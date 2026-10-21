@@ -1,0 +1,12 @@
+[ui]
+title = "Text Diff"
+[errors]
+empty_input = "Enter at least one of the two texts."
+too_many_lines = "The texts are too long: 4,000 lines at most on each side."
+invalid_param = "Invalid value."
+cancelled = "Cancelled."
+[outputs]
+diff = "Differences (+ added, - removed)"
+added = "Added lines"
+removed = "Removed lines"
+unchanged = "Unchanged lines"

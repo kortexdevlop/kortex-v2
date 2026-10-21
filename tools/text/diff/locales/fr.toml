@@ -1,0 +1,12 @@
+[ui]
+title = "Comparateur de textes"
+[errors]
+empty_input = "Saisissez au moins un des deux textes."
+too_many_lines = "Les textes sont trop longs : 4 000 lignes au maximum de chaque côté."
+invalid_param = "Valeur invalide."
+cancelled = "Annulé."
+[outputs]
+diff = "Différences (+ ajouté, - retiré)"
+added = "Lignes ajoutées"
+removed = "Lignes retirées"
+unchanged = "Lignes inchangées"

@@ -1,0 +1,90 @@
+schema = 1
+
+[tool]
+id = "text.diff"
+version = "1.0.0"
+universe = "text"
+status = "beta"
+ui = "auto"
+platforms = ["web", "desktop"]
+offline = true
+ai = false
+viral_priority = 1
+
+[tool.name]
+fr = "Comparateur de textes"
+en = "Text Diff"
+[tool.tagline]
+fr = "Comparez deux textes et voyez ce qui a changé, ligne par ligne."
+en = "Compare two texts and see what changed, line by line."
+[tool.slug]
+fr = "comparateur-de-textes"
+en = "text-diff"
+
+[search]
+keywords.fr = ["comparer deux textes", "différences", "diff", "comparateur", "ce qui a changé", "comparer des versions"]
+keywords.en = ["compare two texts", "differences", "diff", "text compare", "what changed", "compare versions"]
+intents.fr = ["comparer deux versions d'un texte", "voir ce qui a changé entre deux textes"]
+intents.en = ["compare two versions of a text", "see what changed between two texts"]
+related = ["text.deduplicate", "text.find-replace"]
+
+[limits]
+max_input_bytes = "2MB"
+timeout_s = 30
+
+[[inputs]]
+id = "original"
+type = "text"
+required = true
+max_len = 500000
+label = { fr = "Texte d'origine", en = "Original text" }
+
+[[inputs]]
+id = "modified"
+type = "text"
+required = true
+max_len = 500000
+label = { fr = "Texte modifié", en = "Modified text" }
+
+[[params]]
+id = "ignore_case"
+type = "bool"
+default = false
+level = "medium"
+label = { fr = "Ignorer la casse", en = "Ignore case" }
+
+[[params]]
+id = "ignore_whitespace"
+type = "bool"
+default = false
+level = "medium"
+label = { fr = "Ignorer les espaces en trop", en = "Ignore extra whitespace" }
+
+[[outputs]]
+id = "diff"
+type = "text"
+
+[[outputs]]
+id = "added"
+type = "integer"
+
+[[outputs]]
+id = "removed"
+type = "integer"
+
+[[outputs]]
+id = "unchanged"
+type = "integer"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "write"
+sensitive = false
+privacy = "local"
+
+[[variants]]
+id = "compare-two-texts"
+slug = { fr = "comparer-deux-textes", en = "compare-two-texts" }
+name = { fr = "Comparer deux textes", en = "Compare two texts" }
+preset = { ignore_case = "false" }

@@ -6731,6 +6731,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "tool-calc-bmi"
+version = "0.1.0"
+dependencies = [
+ "kortex",
+]
+
+[[package]]
 name = "tool-calc-compound-interest"
 version = "0.1.0"
 dependencies = [
@@ -6975,6 +6982,13 @@ dependencies = [
 
 [[package]]
 name = "tool-text-deduplicate"
+version = "0.1.0"
+dependencies = [
+ "kortex",
+]
+
+[[package]]
+name = "tool-text-diff"
 version = "0.1.0"
 dependencies = [
  "kortex",
