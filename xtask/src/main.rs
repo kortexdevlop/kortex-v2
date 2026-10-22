@@ -25,7 +25,7 @@ mod tools;
 
 use std::process::ExitCode;
 
-const USAGE: &str = "Commandes : tokens | registry | check [id] | stats | icons | keygen | build-desktop | build-cli | build-app | list-tools | package | feed-plan | package-web | restore-web | release-index | build <id…|all> | build-player-web | new-tool --universe U --name N [--custom] | new-app --name N | dev <id> [--desktop] | ci-budget | changed --base REF | schema <id|all> [--lang fr|en] | fingerprint <id> | build-engine <id…|all> | engines-check [id…|all]";
+const USAGE: &str = "Commandes : tokens | registry | check [id] | stats | icons | keygen | build-desktop | build-cli | build-player | player-fingerprint | build-app | list-tools | package | feed-plan | package-web | restore-web | release-index | build <id…|all> | build-player-web | new-tool --universe U --name N [--custom] | new-app --name N | dev <id> [--desktop] | ci-budget | changed --base REF | schema <id|all> [--lang fr|en] | fingerprint <id> | build-engine <id…|all> | engines-check [id…|all]";
 
 /// Path for embedding in generated TOML/Rust source: forward slashes work on every OS, while
 /// Windows backslashes would be read as (invalid) escape sequences.
@@ -52,6 +52,8 @@ fn main() -> ExitCode {
         }),
         Some("build-app") => release::build_app(&args[1..]),
         Some("build-cli") => release::build_cli(&args[1..]),
+        Some("build-player") => release::build_player(&args[1..]),
+        Some("player-fingerprint") => release::player_fingerprint(&args[1..]),
         Some("package") => release::package(&args[1..]),
         Some("feed-plan") => feed::plan(&args[1..]),
         Some("package-web") => feed::package_web(&args[1..]),

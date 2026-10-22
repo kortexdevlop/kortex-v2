@@ -1,0 +1,64 @@
+# Compiles the desktop players once (ADR 0035) and keeps them as reusable files in the rolling
+# release `players`: adding or updating a tool then only pastes its payload into them
+# (`scripts/add-tool.sh`), nothing is compiled. Run it only when `crates/kortex-player` or a crate
+# it links changes. The macOS players are built and uploaded from a Mac (same command).
+name: players
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {os: ubuntu-latest, target: x86_64-unknown-linux-gnu, ext: ''}
+          - {os: windows-latest, target: x86_64-pc-windows-msvc, ext: '.exe'}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup show
+      - name: Linux system libraries (webview and tray)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libgtk-3-dev libxdo-dev libayatana-appindicator3-dev
+      - uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+          cache-directories: |
+            .kortex/target-desktop
+      - run: cargo xtask tokens
+      - run: cargo xtask build-player --target ${{ matrix.target }}
+      - name: Stage the player under its release name
+        run: |
+          mkdir -p out
+          cp "dist/players/${{ matrix.target }}/kortex-player${{ matrix.ext }}" "out/kortex-player-${{ matrix.target }}${{ matrix.ext }}"
+          if [ "$RUNNER_OS" = "Linux" ]; then cargo xtask player-fingerprint > out/fingerprint.txt; fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: players-${{ matrix.target }}
+          path: out/*
+          retention-days: 3
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: players-*
+          merge-multiple: true
+          path: out
+      - name: Publish the players
+        run: |
+          set -euo pipefail
+          gh release view players --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || gh release create players --repo "$GITHUB_REPOSITORY" --title players --notes "Prebuilt desktop players (ADR 0035), used by scripts/add-tool.sh."
+          gh release upload players out/* --repo "$GITHUB_REPOSITORY" --clobber
+          ls -la out

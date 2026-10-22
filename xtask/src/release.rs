@@ -138,7 +138,7 @@ fn tool_ids(arg: &str) -> Result<Vec<String>, String> {
         .collect()
 }
 
-/// `cargo xtask build-desktop <id…|all> [--target T]`: the desktop binary of each tool is the
+/// `cargo xtask build-desktop <id…|all> [--target T] [--players-dir D]`: the desktop binary of each tool is the
 /// shared player (compiled once per target) with the tool's payload written into its reserved
 /// region (ADR 0035). Nothing is compiled per tool except its engine, when its sources changed.
 pub fn build_desktop(args: &[String]) -> Result<(), String> {
@@ -151,7 +151,29 @@ pub fn build_desktop(args: &[String]) -> Result<(), String> {
     for arg in which {
         ids.extend(tool_ids(arg)?);
     }
-    crate::player::build_desktop(&ids, &target)
+    let players = flag(args, "--players-dir").map(PathBuf::from);
+    crate::player::build_desktop(&ids, &target, players.as_deref())
+}
+
+/// `cargo xtask build-player [--target T]`: compiles the desktop player only (no tool) and leaves
+/// it in `dist/players/<target>/`, ready to be published as a reusable file.
+pub fn build_player(args: &[String]) -> Result<(), String> {
+    let target = host_target(args)?;
+    let root = abs(".")?;
+    let out = crate::player::build_player(&root, &target)?;
+    println!("✓ {}", out.display());
+    Ok(())
+}
+
+/// `cargo xtask player-fingerprint`: hash of everything the desktop player is built from. A
+/// published player is reusable while it equals the local value.
+pub fn player_fingerprint(_args: &[String]) -> Result<(), String> {
+    let root = abs(".")?;
+    println!(
+        "{}",
+        crate::build::source_fingerprint(&root, &root.join("crates/kortex-player"))?
+    );
+    Ok(())
 }
 
 /// Metadata of an app (`apps/<name>/app.toml`), e.g. `apps.store`.

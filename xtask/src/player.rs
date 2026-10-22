@@ -98,10 +98,34 @@ fn sign_ad_hoc(binary: &Path) -> Result<(), String> {
 
 /// Builds the engines, the player, then one assembled binary per id in
 /// `dist/desktop/<target>/<id>/`.
-pub fn build_desktop(ids: &[String], target: &str) -> Result<(), String> {
+///
+/// With `players_dir` the player of the target is taken from `<players_dir>/<target>/` instead of
+/// being compiled: assembling a tool never needs a compiler once the players exist.
+pub fn build_desktop(
+    ids: &[String],
+    target: &str,
+    players_dir: Option<&Path>,
+) -> Result<(), String> {
     let root = abs(".")?;
     engine::build_engine(ids)?;
-    let player_path = build_player(&root, target)?;
+    let player_path = match players_dir {
+        Some(dir) => {
+            let exe = if target.contains("windows") {
+                "kortex-player.exe"
+            } else {
+                "kortex-player"
+            };
+            let path = dir.join(target).join(exe);
+            if !path.is_file() {
+                return Err(format!(
+                    "lecteur absent : {} (voir `scripts/add-tool.sh`, release `players`)",
+                    path.display()
+                ));
+            }
+            path
+        }
+        None => build_player(&root, target)?,
+    };
     let player = fs::read(&player_path).map_err(|e| e.to_string())?;
     for id in ids {
         let tool = tools::discover()?
