@@ -4,8 +4,16 @@ version = "0.1.0"
 edition.workspace = true
 publish.workspace = true
 
+[features]
+project-persistence = ["kortex-project/persistence"]
+
+[[example]]
+name = "durable_project"
+required-features = ["project-persistence"]
+
 [dependencies]
 kortex-contract = { path = "../kortex-contract" }
+kortex-project = { path = "../kortex-project" }
 kortex-runtime = { path = "../kortex-runtime" }
 kortex-platform = { path = "../kortex-platform" }
 serde = { version = "1", features = ["derive"] }

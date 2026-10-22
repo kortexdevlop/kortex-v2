@@ -12,11 +12,13 @@ pub fn resolve(base: &str, url: &str) -> String {
     if url.contains("://") || url.starts_with('/') {
         return url.to_owned();
     }
-    let dir = base.rsplit_once('/').map_or("", |(d, _)| d);
+    let (dir, separator) = base
+        .rfind(['/', '\\'])
+        .map_or(("", "/"), |index| (&base[..index], &base[index..=index]));
     if dir.is_empty() {
         url.to_owned()
     } else {
-        format!("{dir}/{url}")
+        format!("{dir}{separator}{url}")
     }
 }
 
@@ -85,6 +87,11 @@ mod tests {
             "https://cdn/a.tgz"
         );
         assert_eq!(resolve("index.json", "a.tgz"), "a.tgz");
+        #[cfg(windows)]
+        assert_eq!(
+            resolve(r"C:\kortex\registry\index.json", r"pkg\a.tar.gz"),
+            r"C:\kortex\registry\pkg\a.tar.gz"
+        );
     }
 
     #[test]

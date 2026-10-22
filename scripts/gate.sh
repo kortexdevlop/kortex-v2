@@ -11,6 +11,7 @@ cargo xtask tokens            # embedded by the Store and desktop apps
 cargo fmt --all -- --check
 cargo clippy --workspace --all-targets -- -D warnings
 cargo test --workspace
+cargo test -p kortex-platform -p kortex-project -p kortex-workflow --features kortex-project/persistence,kortex-workflow/project-persistence
 before=$(cat design/dist/kortex.css registry/contracts.json | shasum)
 cargo xtask tokens
 cargo xtask registry
@@ -21,4 +22,5 @@ pnpm --filter @kortex/site test
 pnpm --filter @kortex/shared test
 pnpm --filter @kortex/api typecheck
 pnpm --filter @kortex/api test
+node --test scripts/sync-modular-catalog.test.mjs
 echo "✓ gate OK"

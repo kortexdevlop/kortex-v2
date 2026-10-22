@@ -178,6 +178,16 @@ async fn send(request: Request) -> Result<ValueMap, RunError> {
     outputs(status, &body, request.fail_on_error)
 }
 
+// Headers can contain arbitrary secrets; refuse redirects to a different authority.
+#[cfg(any(not(target_arch = "wasm32"), test))]
+fn same_origin(left: &str, right: &str) -> bool {
+    fn authority(url: &str) -> Option<&str> {
+        url.strip_prefix("https://")
+            .map(|rest| rest.split(['/', '?', '#']).next().unwrap_or(""))
+    }
+    matches!((authority(left), authority(right)), (Some(a), Some(b)) if a.eq_ignore_ascii_case(b))
+}
+
 /// The HTTP node on desktop: a native request on a background thread, redirects followed by hand
 /// (GET only, at most three) so every hop is checked against the same policy.
 #[cfg(not(target_arch = "wasm32"))]
@@ -224,7 +234,7 @@ async fn send(request: Request) -> Result<ValueMap, RunError> {
                             } else {
                                 String::new()
                             };
-                            if check_url(&absolute).is_err() {
+                            if check_url(&absolute).is_err() || !same_origin(&url, &absolute) {
                                 Err(failure("redirect_not_allowed", None))
                             } else {
                                 url = absolute;
@@ -272,4 +282,28 @@ fn connector_request(job: &Job) -> Result<Request, RunError> {
         })
         .collect();
     kortex_workflow::connector::expand(action, &values, &|name| crate::secrets::get(name))
+}
+
+#[cfg(test)]
+mod redirect_tests {
+    use super::same_origin;
+    #[test]
+    fn secrets_never_cross_authorities() {
+        assert!(same_origin(
+            "https://api.example/a",
+            "https://API.example/b"
+        ));
+        assert!(!same_origin(
+            "https://api.example/a",
+            "https://other.example/b"
+        ));
+        assert!(!same_origin(
+            "https://api.example/a",
+            "https://api.example:444/b"
+        ));
+        assert!(!same_origin(
+            "https://api.example/a",
+            "http://api.example/b"
+        ));
+    }
 }

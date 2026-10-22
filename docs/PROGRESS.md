@@ -1,7 +1,35 @@
 # Progress
-_Last update: 2026-10-17 — Store publié, compilations GitHub et préparation CI statique_
 
-## Current phase
+## Reprise parallèle du 22 octobre 2026 — ressources et sauvegarde durable
+
+- Reprise explicite utilisateur à partir du snapshot minimal, en trois tâches : ressources locales, CAS/sessions durables, intégration workflow ; parent : backend IndexedDB, tests réels navigateur, intégration et documentation.
+- Implémentation : broker de capacités média privées avec lectures bornées ; store natif verrouillé et IndexedDB transactionnel ≤1 Mio ; session candidate enregistrée avant exposition ; workflow persistant par commande. Exemple réel repris aux révisions 3, 6, 9, avec conflit refusé.
+- Tests : sept médias natifs (sparse 40 Gio exécuté), treize projet/persistence, six tests du module workflow projet. Chrome réel deux onglets : CAS concurrent, recharge, isolation, corruption, tailles et révisions u64 exactes. Vérifications wasm et Clippy ciblés réussis ; compilation native Flow/Mind/lecteur réussie. Contrôle web des dépendants consigné dans validation/2026-10-22-local-projects.json.
+- Limites : pas d’UI éditeur ni branchement produit Flow/Mind ; historique et reçus non persistés ; médias à réautoriser ; pas de codecs, flux continu ni recette multi-OS. Aucun commit/publication, gate complet non exécuté. Suite : relocalisation/courtier puis SDK d’UI dédiée ; distribution 10.10–10.13 conservée au plan.
+
+## Plan complété le 22 octobre 2026 — distribution et identité des apps
+
+- Demande utilisateur ajoutée aux étapes 10.10–10.13 : commande d’installation directe du Store, installation alternative CLI Kortex simplifiée, création de vrais raccourcis bureau et nom/icône propres à chaque app à la place des valeurs Dioxus par défaut.
+- Report dans le plan externe 3 000 outils ; critères de recette Windows/macOS/Linux et coexistence CLI/Store précisés. Modification documentaire seulement, aucune fonctionnalité déclarée livrée ni publication effectuée.
+
+## Session du 22 octobre 2026 — démarrage parallèle des fondations
+
+- Instruction utilisateur : commencer les chantiers 1/2/3 du plan proposé en parallèle. Trois agents ont travaillé sur stabilisation, opérations/projets et catalogue ; revue croisée et intégration assurées par le parent.
+- Sources : correctifs de sécurité natifs et API ; contrat v2 additif ; nouvelle bibliothèque pure de projets utilisée par le workflow partagé ; catalogue fragmenté signé et voie de génération/résolution locale, avec publication coexistante.
+- Validé localement : 84 tests API + typecheck, 3 shared, 11 site, 8 scripts ; 64 tests Rust contrat/projet/workflow, 14 catalogue, 3 xtask et 65 sécurité native. Compilations wasm contrat/projet/workflow/catalogue/Flow/image/lecteur et native lecteur réussies ; Clippy ciblés contrat/projet/catalogue/xtask/hôte/Flow/image réussis. Construction site : 238 pages. Format/diff et syntaxe scripts/YAML réussis. Preuves : validation/2026-10-22-scale-foundations.json. Gate workspace complet non exécuté.
+- Limites : aucun éditeur photo/vidéo, UI custom, stockage médias durable, tâches natives interruptibles ou bascule des apps sur le catalogue v2 déclarés réalisés. Aucun commit/déploiement ni nouvelle recette OS. ADMIN_USER_IDS doit être provisionné par l’opérateur lors du futur déploiement API.
+- Prochaine tranche : ressources locales et sauvegarde de projets via plateforme, prototypes de présentation dédiée et adoption progressive par les hôtes, après validation de la tranche présente.
+
+## Session du 22 octobre 2026 — audit local demandé par l’utilisateur
+
+- Commit examiné : `3723779ba48cfe0a495bec885e1fab653e42b5f8`. Rapport livré hors dépôt : `outputs/kortex-audit-complet.md` dans le dossier parent de ce checkout ; 41 constats et 15 validations complémentaires, avec sources et corrections proposées.
+- Contrôles : 78 tests API, 3 shared, 11 site, 7 scripts et 39 Rust ciblés réussis ; typecheck API et format Rust réussis. Deux défauts de comptabilité IA et deux validations d’entrée incorrectes reproduits avec des sondes locales.
+- Aucun changement produit, commit ou déploiement. Les résumés plus bas restent historiques ; cet audit ne valide ni les builds complets web/native ni l’état de production.
+- Suite proposée : corriger les six points prioritaires du rapport avec tests de non-régression, puis les transactions IA, l’annulation et les budgets mémoire. Aucune correction entreprise dans cette session d’analyse.
+- Planification complémentaire demandée : proposition externe `outputs/kortex-plan-3000-outils.md` (dossier parent), 13 lots pour catalogue 3 000 outils, contrats multi-opérations, projets médias locaux, UI personnalisées et intégration Flow/Mind. Proposition seulement : aucune nouvelle architecture ni étape du produit déclarée implémentée ; aucun nouvel outil créé.
+_Historical snapshot: 2026-10-17 — Store publié, compilations GitHub et préparation CI statique_
+
+## Historical phase — 17 October, not revalidated by this local session
 Store 0.2 web publié, 38 outils gelés. Les 168 exécutables de release sont récupérés/vérifiés/extraits dans `.kortex/binaries/` : 42 par cible Linux, macOS ARM/Intel et Windows ; runs 39031294481 (7ed41ae) et 39049702070 (ca3d623). Le run corrigé Windows est vert, index Ed25519 vérifié pour ses 42 paquets seulement. Ces releases précèdent le lot trousseau en développement. Nouveau lot 8.5/10.4 : keyring 4.2 natif dans plateforme, API Result, migration vérifiée et rollback, diagnostics masqués, révocation après échec de persistance, refus des installations CLI anonymes. Gate final local complet passé ; CI native/web ciblée à exécuter ; aucune recette OS nouvelle déclarée validée. Préparation statique CI déjà verte, secrets Cloudflare absents ; Store/Hub/Desk/outils web existants restent publiés. Distribution desktop publique fermée : permissions/bundles/installations OS encore ouverts.
 
 ## Journal historique — ne vaut pas validation de l’état actuel
@@ -575,3 +603,15 @@ stable: 0 · beta: 38 · draft: 0 — calc 13, code 8, color 2, convert 2, image
 
 - **Fait** : `docs/guides/add-tool.md` aligné (44 outils, voie rapide nominale, voie CI marquée alternative, `web_worker`) ; `scripts/add-tool.sh` lance le gate de l'outil (`version`, `check`, `cargo test`, `engines-check`), exige `main`, `--no-commit` s'arrête après le build local, message de reprise en cas d'échec.
 - **Limites** : script vérifié par `bash -n` seulement, non exécuté ; `seek-index.json` reste un second commit (généré à l'étape 8).
+
+## Suite locale — sauvegarde minimale
+- Feature persistence : sauvegarde/réouverture de snapshots via Storage plateforme, limite 64 Kio, validation identité/schéma. Historique et droits médias non persistés.
+- Écart annoncé : les agents ont atteint leur limite d’utilisation avant de livrer médias/CAS/workflow durable. Cette tranche ne réalise pas ces capacités ; un seul écrivain doit être garanti par l’hôte. Aucun déploiement.
+- Contrôles suite : 6 tests projet et 2 tests stockage natif réussis ; compilation wasm et Clippy all-targets de la feature persistence réussis. Aucun parcours navigateur ni recette GUI validé.
+
+## Lot préparatoire — fondations pour 2 000 à 3 000 outils
+
+- **Fait localement** : contrats multi-opérations v2 avec adaptateur des 44 outils, projets et commandes durables, références de médias bornées, catalogue modulaire signé et publication incrémentale compatible avec l’ancien index, protections de sécurité, versions incrémentées pour 44 outils, 6 apps et la CLI. Plan complet : [scale-3000-tools.md](plans/scale-3000-tools.md). Cette tranche ne livre pas encore d’éditeurs photo/vidéo ni de migration UI de Flow/Mind.
+- **Corrections découvertes par la validation** : les nombres décimaux dans les contrats v2 sont maintenant des valeurs JSON standard ; les URLs de paquets relatifs respectent les séparateurs Windows. Clippy global, tests Rust complets, tests de persistance, `xtask check`, suites site/shared/API (84 tests API), et contrôle de publication catalogue passent localement. Preuves : [scale-foundations](validation/2026-10-22-scale-foundations.json) et [local-projects](validation/2026-10-22-local-projects.json).
+- **Publication** : en attente du commit, de la CI sur PR puis sur `main`, et des workflows autorisés de publication du feed et de déploiement API. Aucun changement de secrets ni de compte distant effectué. `ADMIN_USER_IDS` sera uniquement constaté par le workflow ; aucun identifiant administrateur n’est ajouté par cette tranche.
+- **Limites** : résultats de compilation multi-OS à confirmer sur CI ; pas de recette d’installation de tous les paquets, de crash/power-loss, ni de performances sur vrais médias lourds. Les futures demandes « Store installable par commande / CLI simplifiée », raccourcis bureau et identité visuelle propre à chaque app sont consignées dans le plan, pas implémentées ici.

@@ -1,7 +1,7 @@
 schema = 1
 [tool]
 id = "calc.age"
-version = "1.0.3"
+version = "1.0.4"
 universe = "calc"
 status = "beta"
 ui = "auto"

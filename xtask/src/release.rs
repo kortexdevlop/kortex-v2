@@ -424,13 +424,7 @@ pub fn release_index(args: &[String]) -> Result<(), String> {
 
     let mut tool_map: BTreeMap<String, ToolRelease> = BTreeMap::new();
     let mut cli: Option<CliRelease> = None;
-    let mut files: Vec<_> = fs::read_dir("dist/release")
-        .map_err(|e| format!("dist/release : {e}"))?
-        .filter_map(Result::ok)
-        .map(|e| e.path())
-        .filter(|p| p.to_string_lossy().ends_with(".tar.gz"))
-        .collect();
-    files.sort();
+    let files = package_files(Path::new("dist/release"))?;
     if files.is_empty() {
         return Err("aucun paquet dans dist/release (lance `package` d'abord)".into());
     }
@@ -543,12 +537,30 @@ pub fn release_index(args: &[String]) -> Result<(), String> {
     parse_verified_catalog(&catalog, &catalog_sig, public.trim())?;
     fs::write("dist/release/catalog.json", &catalog).map_err(|e| e.to_string())?;
     fs::write("dist/release/catalog.json.sig", &catalog_sig).map_err(|e| e.to_string())?;
+    crate::catalog::publish(&catalog, &seed, Path::new("dist/release"), public.trim())?;
     println!(
         "✓ dist/release/index.json + catalog.json + .sig ({} outil(s), CLI : {}, canal {channel}, séquence {sequence})",
         index.tools.len(),
         index.cli.as_ref().map_or("non", |_| "oui")
     );
     Ok(())
+}
+
+/// Collect package archives while excluding catalogue-only payloads left by an earlier attempt.
+fn package_files(root: &Path) -> Result<Vec<PathBuf>, String> {
+    let mut files: Vec<_> = fs::read_dir(root)
+        .map_err(|e| e.to_string())?
+        .filter_map(Result::ok)
+        .map(|entry| entry.path())
+        .filter(|path| {
+            path.is_file()
+                && path.to_string_lossy().ends_with(".tar.gz")
+                && path.file_name().and_then(|name| name.to_str())
+                    != Some("catalog-contracts-v2.tar.gz")
+        })
+        .collect();
+    files.sort();
+    Ok(files)
 }
 
 /// CLI release, tool releases and sequence of a merged index.
@@ -766,5 +778,22 @@ mod tests {
         let seed = [9_u8; 32];
         assert_eq!(b64_seed(&b64(&seed)), Ok(seed));
         assert!(b64_seed("short").is_err());
+    }
+
+    #[test]
+    fn catalogue_archive_is_never_treated_as_a_package_on_release_retry() {
+        let root =
+            std::env::temp_dir().join(format!("kortex-release-retry-{}", std::process::id()));
+        fs::create_dir_all(&root).unwrap();
+        let package = root.join("web-test.one-1.0.0.tar.gz");
+        fs::write(&package, b"package").unwrap();
+        assert_eq!(package_files(&root).unwrap(), vec![package.clone()]);
+        fs::write(
+            root.join("catalog-contracts-v2.tar.gz"),
+            b"contract fragments, no package manifest",
+        )
+        .unwrap();
+        assert_eq!(package_files(&root).unwrap(), vec![package]);
+        fs::remove_dir_all(root).unwrap();
     }
 }

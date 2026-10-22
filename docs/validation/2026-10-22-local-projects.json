@@ -1,0 +1,42 @@
+{
+  "date": "2026-10-22",
+  "scope": "Proposal 3.2 and 3.5: bounded local media, revision-checked snapshots and durable shared workflows",
+  "source_state": "local uncommitted modifications",
+  "checks": [
+    {"command": "cargo test -p kortex-platform --test media", "status": "passed", "tests": 7, "sparse_fixture_bytes": 42949672960, "selected_read_bytes": 4, "sparse_fixture_skipped": false},
+    {"command": "cargo test -p kortex-project --features persistence", "status": "passed", "tests": 13},
+    {"command": "cargo test -p kortex-workflow --features project-persistence project::tests", "status": "passed", "tests": 6},
+    {"command": "cargo check -p kortex-platform --target wasm32-unknown-unknown", "status": "passed"},
+    {"command": "cargo check -p kortex-project --features persistence --target wasm32-unknown-unknown", "status": "passed"},
+    {"command": "cargo check -p kortex-workflow --features project-persistence --target wasm32-unknown-unknown", "status": "passed"},
+    {"command": "cargo clippy -p kortex-platform --all-targets -- -D warnings", "status": "passed"},
+    {"command": "cargo clippy -p kortex-platform --target wasm32-unknown-unknown -- -D warnings", "status": "passed"},
+    {"command": "cargo clippy -p kortex-project --features persistence --all-targets -- -D warnings", "status": "passed"},
+    {"command": "cargo clippy -p kortex-workflow --features project-persistence --all-targets -- -D warnings", "status": "passed"},
+    {"command": "cargo run -p kortex-workflow --features project-persistence --example durable_project -- ../work/durable-project-recipe", "status": "passed", "successive_reopened_revisions": [3, 6, 9], "stale_writer_rejected": true},
+    {"command": "node tests/e2e/project-store.mjs", "status": "passed", "browser": "local Chrome headless", "coverage": ["two tabs with one CAS winner", "reload", "namespace isolation", "corrupt record", "1 MiB bound", "invalid id", "exact u64 revisions beyond JS safe integer"]},
+    {"scope": "Actual Blob adapter extracted from media.rs and executed in Node", "status": "passed", "coverage": ["metadata", "range slice", "fake object rejection", "overridden getters/methods bypass rejection"]},
+    {"command": "cargo check -p kortex-flow -p kortex-mind -p kortex-player", "status": "passed"},
+    {"command": "cargo clippy -p kortex-platform -p kortex-project -p kortex-workflow --target wasm32-unknown-unknown --features kortex-project/persistence,kortex-workflow/project-persistence -- -D warnings", "status": "passed"},
+    {"command": "cargo fmt --all -- --check", "status": "passed"},
+    {"command": "git diff --check", "status": "passed"},
+    {"scope": "Modified script/CI syntax", "status": "passed", "javascript_files": 6, "yaml_files": 3},
+    {"command": "cargo check --target wasm32-unknown-unknown -p kortex-flow -p kortex-mind -p kortex-player --no-default-features --features kortex-flow/web,kortex-mind/web,kortex-player/web,kortex-workflow/project-persistence", "status": "passed", "preexisting_warnings": 4}
+  ],
+  "review": ["Native and durable-session cross-review", "Independent read-only review of IndexedDB adapter and Rust bridge; no blocking issue found"],
+  "limits": [
+    "No product editor UI or Flow/Mind UI cutover",
+    "No native immutable media snapshot; same-size edits with identical timestamps may evade detection",
+    "No browser acceptance of the full Rust media path; Blob adapter execution and wasm checks only",
+    "Snapshots <=1 MiB; legacy Storage helpers remain <=64 KiB and single-writer",
+    "Undo history, retry receipts and media capabilities are not persisted",
+    "No resource relinking or cross-origin broker",
+    "Native storage uses a trusted host directory and blocking I/O on host-managed background threads",
+    "Browser storage can be denied or evicted",
+    "Per-command commits, not an atomic whole workflow",
+    "No forced-crash/power-loss or multi-OS installation acceptance"
+  ],
+  "full_workspace_gate": "passed locally on 2026-10-22: cargo clippy --workspace --all-targets -- -D warnings; cargo test --workspace; durable project feature tests; tokens/registry regeneration and freshness; cargo xtask check; site/shared/API tests and API typecheck",
+  "commit": null,
+  "deployment": "not performed"
+}

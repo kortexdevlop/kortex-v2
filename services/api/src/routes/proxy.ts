@@ -82,7 +82,9 @@ function decodeBody(body: unknown, base64: unknown): Uint8Array | string | undef
     return body;
   }
   if (typeof base64 === 'string' && body === undefined && /^[A-Za-z0-9+/]*={0,2}$/.test(base64) && base64.length <= MAX_REQUEST_BODY * 1.4) {
-    const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+    let bytes: Uint8Array;
+    try { bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0)); }
+    catch { throw new HttpError(400, 'invalid_body'); }
     if (bytes.byteLength > MAX_REQUEST_BODY) throw new HttpError(413, 'payload_too_large');
     return bytes;
   }

@@ -91,11 +91,14 @@ impl EngineModule {
                 let Some(memory) = caller.get_export("memory").and_then(Extern::into_memory) else {
                     return 1;
                 };
-                let mut bytes = vec![0_u8; len as usize];
-                if kortex_platform::fill_random(&mut bytes).is_err() {
+                let Some(end) = (ptr as usize).checked_add(len as usize) else {
+                    return 1;
+                };
+                if len as usize > MEMORY_LIMIT || end > memory.data_size(&caller) {
                     return 1;
                 }
-                u32::from(memory.write(&mut caller, ptr as usize, &bytes).is_err())
+                let bytes = &mut memory.data_mut(&mut caller)[ptr as usize..end];
+                u32::from(kortex_platform::fill_random(bytes).is_err())
             },
         )?;
         linker.func_wrap(
@@ -132,6 +135,9 @@ impl EngineModule {
         cancel: &CancelToken,
         timeout: Option<Duration>,
     ) -> Result<Vec<u8>, ToolError> {
+        if request.len() > MEMORY_LIMIT {
+            return Err(failed("request exceeds host memory limit"));
+        }
         let mut store = Store::new(
             &self.engine,
             Host {
@@ -181,7 +187,17 @@ impl EngineModule {
             }
         })?;
         let (out_ptr, out_len) = ((packed >> 32) as u32, (packed & 0xffff_ffff) as u32);
-        let mut response = vec![0_u8; out_len as usize];
+        let end = (out_ptr as usize)
+            .checked_add(out_len as usize)
+            .ok_or_else(|| failed("response range overflow"))?;
+        if out_len as usize > MEMORY_LIMIT || end > memory.data_size(&store) {
+            return Err(failed("response outside guest memory or host limit"));
+        }
+        let mut response = Vec::new();
+        response
+            .try_reserve_exact(out_len as usize)
+            .map_err(|_| failed("response allocation failed"))?;
+        response.resize(out_len as usize, 0);
         memory
             .read(&store, out_ptr as usize, &mut response)
             .map_err(trap)?;
@@ -231,6 +247,29 @@ mod tests {
             &CancelToken::default(),
             None,
         )
+    }
+
+    #[test]
+    fn hostile_response_length_is_rejected_before_host_allocation() {
+        let guest = fixed_guest("", "(return (i64.const 4294967295))");
+        let error = run(&guest).expect_err("invalid guest range");
+        assert!(error.detail.is_some_and(|d| d.contains("response outside")));
+    }
+
+    #[test]
+    fn hostile_response_pointer_is_rejected_before_host_allocation() {
+        let guest = fixed_guest("", "(return (i64.const -4294967295))");
+        let error = run(&guest).expect_err("invalid response pointer");
+        assert!(error.detail.is_some_and(|d| d.contains("response outside")));
+    }
+
+    #[test]
+    fn hostile_random_length_is_rejected_before_host_allocation() {
+        let guest = fixed_guest(
+            r#"(import "kx_host" "fill_random" (func $random (param i32 i32) (result i32)))"#,
+            "(if (i32.eqz (call $random (i32.const 0) (i32.const -1))) (then unreachable))",
+        );
+        assert!(run(&guest).is_ok());
     }
 
     #[test]

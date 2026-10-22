@@ -73,5 +73,12 @@ Font file only, no npm dependency kept: `inter-latin-wght-normal.woff2` from `@f
 
 | `wasmtime` 50 (`cranelift`, `runtime`, `std`, `parallel-compilation`) | kortex-engine-host | exécute le `engine.wasm` de chaque outil dans le lecteur desktop, en `--engine` et dans `xtask engines-check` (ADR 0035). Mesure du 2026-10-21 sur `image.compress` (PNG de 5,4 Mo) : 0,32 s contre 0,24 s en natif | `wasmi` (2,1 s, 9× plus lent, mesuré), un moteur natif compilé par outil (écarté par l'ADR 0035) | environ 12 Mo ajoutés au lecteur ; compilation d'un module ≈ 0,5 s au premier usage (en arrière-plan au démarrage) |
 | `wat` 1 | kortex-engine-host (dev) | écrit des invités wasm de test en texte | octets assemblés à la main | dev only |
+
+### Scale foundations (2026-10-22, proposal lots 2–5)
+
+`kortex-project` is an internal pure crate used by the shared workflow project-command executor and its executable example. It reuses the already approved `serde`, `serde_json` and `kortex-contract` dependencies for versioned project metadata, opaque resource references, transactional commands, bounded history and a cooperative job lifecycle. `kortex-workflow` depends on it to run the same command plan that an editor or Mind host can submit. There is no new external package, storage backend, codec or async runtime. This is an executable local foundation, not a claim that photo/video UI, persistence or process cancellation are delivered.
+
+The modular catalogue reuses `kortex-catalog`'s existing Ed25519, SHA-256 and serde dependencies. `xtask` generates and resolves the immutable contract fragments using existing filesystem/platform access; no new third-party dependency is introduced.
 | `sha2` 0.10 | kortex-payload | empreinte SHA-256 du paquet d'outil (déjà autorisé pour d'autres usages) | — | déjà dans le graphe |
 
+`kortex-project` optional feature `persistence` reuses internal `kortex-platform::Storage` for legacy bounded local snapshots and `kortex-platform::projects::SnapshotStore` for durable revision-checked sessions. `kortex-workflow/project-persistence` opts into the same commands. Default project core stays pure. Media reads use standard native file APIs inside the platform and existing wasm-bindgen/js-sys Blob primitives; browser snapshot storage uses a minimal IndexedDB adapter, not a second project implementation. No new external dependency (ADR 0037).

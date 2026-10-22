@@ -13,7 +13,9 @@ export interface Env {
   AI_USER_CAP?: string;
   AI_USER_REFILL_3H?: string;
   AI_GLOBAL_DAILY?: string;
-  /** E-mails (comma-separated, a Worker secret) allowed to read the owner's dashboard. */
+  /** Provisioned account ids (comma-separated Worker secret), never self-claimed emails. */
+  ADMIN_USER_IDS?: string;
+  /** Legacy configuration, intentionally no longer grants administrative access. */
   ADMIN_EMAILS?: string;
   /** Workers version metadata binding: the live version of this Worker. */
   CF_VERSION_METADATA?: { id: string; tag?: string; timestamp: string };

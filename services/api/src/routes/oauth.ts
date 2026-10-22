@@ -45,7 +45,7 @@ export function redirectAllowed(ctx: Ctx, raw: unknown): raw is string {
 async function tokenRequest(ctx: Ctx, grant: 'authorization_code' | 'refresh_token'): Promise<Response> {
   const userId = await requireSession(ctx);
   const body = await readJson(ctx.req, 4_000);
-  if (!isRecord(body) || typeof body.provider !== 'string' || !(body.provider in PROVIDERS)) throw new HttpError(400, 'unknown_provider');
+  if (!isRecord(body) || typeof body.provider !== 'string' || !Object.hasOwn(PROVIDERS, body.provider)) throw new HttpError(400, 'unknown_provider');
   const provider = PROVIDERS[body.provider]!;
   const creds = secretOf(ctx, body.provider);
   if (!creds) throw new HttpError(503, 'provider_unavailable');

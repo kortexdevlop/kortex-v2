@@ -256,7 +256,8 @@ jobs:
       - name: GitHub Release (only the rebuilt packages, the index and the catalogue)
         run: |
           flags=""; [ "$CHANNEL" = "test" ] && flags="--prerelease"
-          gh release create "${{ steps.rel.outputs.tag }}" dist/release/* --repo "${{ github.repository }}" --target "$SOURCE_SHA" --title "${{ steps.rel.outputs.tag }}" $flags \
+          shopt -s nullglob
+          gh release create "${{ steps.rel.outputs.tag }}" dist/release/*.json dist/release/*.sig dist/release/*.txt dist/release/*.tar.gz --repo "${{ github.repository }}" --target "$SOURCE_SHA" --title "${{ steps.rel.outputs.tag }}" $flags \
             --notes "Incremental feed ($CHANNEL): rebuilt packages, signed index and signed contract catalogue. Source commit $SOURCE_SHA."
       - uses: pnpm/action-setup@v4
         if: env.CHANNEL == 'stable'

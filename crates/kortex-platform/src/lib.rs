@@ -3,6 +3,10 @@
 use std::collections::BTreeMap;
 
 pub mod clipboard;
+pub mod media;
+pub mod projects;
+#[cfg(target_arch = "wasm32")]
+mod projects_web;
 pub mod public;
 pub mod storage;
 

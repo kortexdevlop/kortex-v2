@@ -97,18 +97,8 @@ pub fn forget_key() {
     VAULT.with(|v| *v.borrow_mut() = None);
 }
 
-fn random(bytes: &mut [u8]) {
-    use std::sync::atomic::{AtomicU64, Ordering};
-    static COUNTER: AtomicU64 = AtomicU64::new(0);
-    if kortex_platform::fill_random(bytes).is_ok() {
-        return;
-    }
-    // Without a random source, nonces still must never repeat under one key: a strictly growing
-    // counter mixed with the clock is unique per call (a nonce needs to be unique, not secret).
-    let unique = COUNTER.fetch_add(1, Ordering::SeqCst) ^ (kortex_platform::now_ms() << 20);
-    for (i, byte) in bytes.iter_mut().enumerate() {
-        *byte = unique.to_le_bytes()[i % 8] ^ u8::try_from(i).unwrap_or(0).wrapping_mul(37);
-    }
+fn random(bytes: &mut [u8]) -> Result<(), SyncError> {
+    kortex_platform::fill_random(bytes).map_err(|_| SyncError::Server("random_unavailable".into()))
 }
 
 /// Runs a sync and merges the result into `library`; the caller keeps the returned state.

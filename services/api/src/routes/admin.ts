@@ -6,28 +6,29 @@ import { requireSession } from '../session.ts';
 import releases from '../releases.json' with { type: 'json' };
 
 /**
- * The owner's dashboard data (`GET /v1/admin/overview`). Only a signed-in account whose e-mail is in
- * the `ADMIN_EMAILS` secret (comma-separated) gets it; everyone else, and every deployment where the
+ * The owner's dashboard data (`GET /v1/admin/overview`). Only a provisioned account id in
+ * the `ADMIN_USER_IDS` secret (comma-separated) gets it; everyone else, and every deployment where the
  * secret is not set, sees a plain 404 as if the route did not exist. Aggregates only: no content,
  * no raw account id, no e-mail.
  */
 async function requireAdmin(ctx: Ctx): Promise<void> {
-  const allowed = (ctx.env.ADMIN_EMAILS ?? '').split(',').map((e) => e.trim().toLowerCase()).filter(Boolean);
+  const allowed = (ctx.env.ADMIN_USER_IDS ?? '').split(',').map((id) => id.trim()).filter(Boolean);
   if (allowed.length === 0) throw new HttpError(404, 'not_found');
   const uid = await requireSession(ctx);
-  const row = await ctx.env.DB.prepare('SELECT email FROM users WHERE id = ?1').bind(uid).first<{ email: string }>();
-  if (!row || !allowed.includes(row.email.toLowerCase())) throw new HttpError(404, 'not_found');
+  if (!allowed.includes(uid)) throw new HttpError(404, 'not_found');
   await rateLimit(ctx, `admin:${uid}`, 30, 60);
 }
 
 interface HostStatus { host: string; ok: boolean; status: number; ms: number }
 
 /** One cheap request per public host, from the server side, so the owner sees what visitors see. */
-async function probe(host: string): Promise<HostStatus> {
+async function probe(host: string, apiHost: string): Promise<HostStatus> {
   const started = Date.now();
   try {
-    const res = await fetch(`https://${host}/`, { method: 'HEAD', redirect: 'manual', signal: AbortSignal.timeout(4000) });
-    return { host, ok: res.status < 500, status: res.status, ms: Date.now() - started };
+    const api = host === apiHost;
+    const res = await fetch(`https://${host}${api ? '/v1/health' : '/'}`, { method: api ? 'GET' : 'HEAD', redirect: 'manual', signal: AbortSignal.timeout(4000) });
+    const ok = res.status >= 200 && res.status < 300 && (!api || (await res.json() as { ok?: boolean }).ok === true);
+    return { host, ok, status: res.status, ms: Date.now() - started };
   } catch {
     return { host, ok: false, status: 0, ms: Date.now() - started };
   }
@@ -43,7 +44,7 @@ export async function overview(ctx: Ctx): Promise<Response> {
   const [ai, errors, probes, users, sessions, syncItems, buckets, limiter] = await Promise.all([
     aiStats(ctx.env, now),
     db.prepare('SELECT day, app, kind, n FROM client_errors WHERE day >= ?1 ORDER BY day DESC, app, kind').bind(since).all<{ day: string; app: string; kind: string; n: number }>(),
-    Promise.all(hosts.map(probe)),
+    Promise.all(hosts.map((host) => probe(host, new URL(ctx.req.url).hostname))),
     count('users'), count('sessions'), count('sync_items'), count('ai_buckets'), count('rate_limits'),
   ]);
   const meta = ctx.env.CF_VERSION_METADATA;

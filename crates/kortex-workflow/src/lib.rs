@@ -12,6 +12,7 @@ pub mod http;
 pub mod logic;
 #[cfg(not(target_arch = "wasm32"))]
 pub mod process;
+pub mod project;
 
 pub use logic::{
     AI_FORMATS, AI_TASKS, AI_TOOL, DELAY_TOOL, FILE_PORT, FILES_PORT, LOGIC_OPS, MAX_DELAY_MS,

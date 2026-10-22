@@ -88,6 +88,7 @@ impl Device {
                 counter = counter.wrapping_mul(31).wrapping_add(17);
                 *b = counter;
             }
+            Ok(())
         };
         let job = Job {
             passphrase,
@@ -260,4 +261,54 @@ fn server_problems_and_damaged_data_are_reported_without_changing_anything() {
         .0 += 1;
     let mut b = Device::new(2);
     assert_eq!(b.sync(&server, "pp", 3_000), Err(SyncError::Corrupt));
+}
+
+#[test]
+fn unavailable_randomness_never_creates_a_vault() {
+    let server = Server::default();
+    let mut random = |_: &mut [u8]| Err(SyncError::Server("random_unavailable".into()));
+    let mut cache = None;
+    let mut library = Library::default();
+    let mut state = State::default();
+    let result = block_on(sync(
+        &server,
+        Job {
+            passphrase: "test",
+            rounds: ROUNDS,
+            now: 1,
+            random: &mut random,
+        },
+        &mut cache,
+        &mut library,
+        &mut state,
+    ));
+    assert_eq!(result, Err(SyncError::Server("random_unavailable".into())));
+    assert!(server.items.borrow().is_empty());
+    assert!(cache.is_none());
+    assert_eq!(state.last_sync, 0);
+}
+
+#[test]
+fn unavailable_nonce_never_pushes_an_existing_vault_item() {
+    let server = Server::default();
+    let mut device = Device::new(1);
+    device.sync(&server, "test", 1).expect("create vault");
+    device.save("wlocal", "local", 2);
+    let before = server.items.borrow().clone();
+    let mut random = |_: &mut [u8]| Err(SyncError::Server("random_unavailable".into()));
+    let result = block_on(sync(
+        &server,
+        Job {
+            passphrase: "test",
+            rounds: ROUNDS,
+            now: 2,
+            random: &mut random,
+        },
+        &mut device.cache,
+        &mut device.library,
+        &mut device.state,
+    ));
+    assert_eq!(result, Err(SyncError::Server("random_unavailable".into())));
+    assert_eq!(*server.items.borrow(), before);
+    assert_eq!(device.state.last_sync, 1);
 }

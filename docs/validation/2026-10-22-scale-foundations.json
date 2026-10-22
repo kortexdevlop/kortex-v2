@@ -1,0 +1,51 @@
+{
+  "date": "2026-10-22",
+  "baseline_commit": "3723779ba48cfe0a495bec885e1fab653e42b5f8",
+  "scope": "Local additive first slice of stabilization, operation/project and modular catalogue workstreams",
+  "source_state": "uncommitted local modifications",
+  "checks": [
+    {"scope": "API", "command": "pnpm --filter @kortex/api test", "status": "passed", "tests": 84},
+    {"scope": "API types", "command": "pnpm --filter @kortex/api typecheck", "status": "passed"},
+    {"scope": "shared", "command": "pnpm --filter @kortex/shared test", "status": "passed", "tests": 3},
+    {"scope": "site", "command": "pnpm --filter @kortex/site test", "status": "passed", "tests": 11},
+    {"scope": "transport, offline routing and catalogue publication scripts", "status": "passed", "tests": 8},
+    {"scope": "contract/project/workflow", "command": "cargo test -p kortex-contract -p kortex-project -p kortex-workflow", "status": "passed", "tests": 64},
+    {"scope": "catalogue", "command": "cargo test -p kortex-catalog", "status": "passed", "tests": 14},
+    {"scope": "xtask catalogue/release regressions", "status": "passed", "tests": 3},
+    {"scope": "native security", "command": "cargo test -p tool-image-compress -p kortex-engine-host -p kortex-flow --lib --tests", "status": "passed", "tests": 65, "breakdown": {"engine_host": 8, "flow": 50, "image_compress": 7}},
+    {"scope": "shared foundations wasm", "command": "cargo check --target wasm32-unknown-unknown -p kortex-contract -p kortex-project -p kortex-workflow", "status": "passed"},
+    {"scope": "catalogue wasm", "command": "cargo check --target wasm32-unknown-unknown -p kortex-catalog", "status": "passed"},
+    {"scope": "native player", "command": "cargo check -p kortex-player --features desktop", "status": "passed"},
+    {"scope": "flow/image/player wasm", "command": "cargo check --target wasm32-unknown-unknown -p kortex-flow -p tool-image-compress -p kortex-player --no-default-features --features kortex-flow/web,kortex-player/web", "status": "passed", "preexisting_warnings": ["shell Button import", "Flow check_url dead code", "scheduler Kind and QUEUE_LIMIT dead code"]},
+    {"scope": "contract/project Clippy", "command": "cargo clippy -p kortex-contract -p kortex-project --all-targets -- -D warnings", "status": "passed"},
+    {"scope": "native security Clippy", "command": "cargo clippy -p kortex-engine-host -p kortex-flow -p tool-image-compress --all-targets -- -D warnings", "status": "passed"},
+    {"scope": "catalogue/xtask Clippy", "command": "cargo clippy -p kortex-catalog -p xtask --all-targets -- -D warnings", "status": "passed"},
+    {"scope": "project shared-command example", "command": "cargo run -p kortex-project --example shared_project", "status": "passed", "declared_resource_bytes": 40000000000, "snapshot_bytes": 290, "media_read_or_processed": false},
+    {"scope": "site production build", "command": "PUBLIC_DESKTOP_RELEASES_ENABLED=false pnpm site:build", "status": "passed", "pages": 238},
+    {"scope": "Rust format", "command": "cargo fmt --all -- --check", "status": "passed"},
+    {"scope": "diff whitespace", "command": "git diff --check", "status": "passed"},
+    {"scope": "modified scripts and CI syntax", "status": "passed", "javascript_files": 4, "yaml_files": 3}
+  ],
+  "synthetic_catalogue": {
+    "tools": 3000,
+    "operations": 30000,
+    "root_bytes": 880978,
+    "all_contracts_bytes": 2479891,
+    "selected_contract_bytes": 926,
+    "approximate_debug_build_verify_resolve_seconds": 1.017,
+    "network_or_real_media_benchmark": false
+  },
+  "review": ["Cross-review of catalogue publication retry and floor concurrency; regressions fixed and tested", "Independent read-only review of API changes: no introduced blocking issue found"],
+  "full_workspace_gate": "passed locally on 2026-10-22: cargo clippy --workspace --all-targets -- -D warnings; cargo test --workspace; durable project feature tests; tokens/registry regeneration and freshness; cargo xtask check; site/shared/API tests and API typecheck; modular catalogue publication regression",
+  "installation_acceptance": "not performed",
+  "deployment": "not performed",
+  "remote_secrets_or_accounts_changed": false,
+  "remaining": [
+    "Transaction/idempotency journal for AI settlement under partial D1 failure",
+    "Project persistence and streaming/range media access through kortex-platform",
+    "Extended engine dispatch, codecs and native process supervision",
+    "Custom editor interfaces and product UI integration with Flow/Mind",
+    "Lazy catalogue adoption in six apps and historical fragment retention/cache",
+    "Full workspace gate, OS acceptance and release validation"
+  ]
+}

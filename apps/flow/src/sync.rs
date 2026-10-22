@@ -109,14 +109,14 @@ pub struct Job<'a> {
     /// Key-derivation rounds (the real value is `kortex_vault::ROUNDS`).
     pub rounds: u32,
     pub now: u64,
-    /// Fills a buffer with random bytes.
-    pub random: &'a mut dyn FnMut(&mut [u8]),
+    /// Fills a buffer with secure random bytes, or fails before any ciphertext is written.
+    pub random: &'a mut dyn FnMut(&mut [u8]) -> Result<(), SyncError>,
 }
 
-fn nonce(job: &mut Job<'_>) -> [u8; 12] {
+fn nonce(job: &mut Job<'_>) -> Result<[u8; 12], SyncError> {
     let mut bytes = [0_u8; 12];
-    (job.random)(&mut bytes);
-    bytes
+    (job.random)(&mut bytes)?;
+    Ok(bytes)
 }
 
 fn vault_error(e: VaultError) -> SyncError {
@@ -159,10 +159,16 @@ async fn open_vault(
             }
             None => {
                 // First device of the account: it creates the vault.
-                let salt = kortex_vault::new_salt(|b| (job.random)(b));
+                let mut random_error = None;
+                let salt = kortex_vault::new_salt(|b| {
+                    random_error = (job.random)(b).err();
+                });
+                if let Some(error) = random_error {
+                    return Err(error);
+                }
                 let vault =
                     Vault::derive_with(job.passphrase, &salt, job.rounds).map_err(vault_error)?;
-                let check = vault.check_blob(nonce(job));
+                let check = vault.check_blob(nonce(job)?);
                 match transport
                     .put(VAULT_KEY, json!({"salt": salt, "check": check}), 0)
                     .await?
@@ -249,7 +255,7 @@ pub async fn sync(
         let mut current = item;
         for attempt in 0..2 {
             let plain = serde_json::to_vec(&current).map_err(|_| SyncError::Corrupt)?;
-            let data = json!({"c": vault.seal(&plain, nonce(&mut job))});
+            let data = json!({"c": vault.seal(&plain, nonce(&mut job)?)});
             match transport.put(&key_of(&current.id), data, expected).await? {
                 Put::Done(version) => {
                     state.seen.insert(

@@ -277,6 +277,8 @@ err_too_many_keys = "Too many synced items on this account."
 err_storage = "Could not save the passphrase on this device."
 err_other = "Sync failed"
 
+err_random_unavailable = "Could not generate a secure secret on this device. Try again."
+
 [trigger]
 button = "Trigger"
 help = "Runs this workflow by itself. Only while Kortex Flow is open (a tab or the app); nothing runs in the background."
@@ -301,6 +303,8 @@ auto_off = "Switched off after 5 failures in a row: fix the workflow, then turn 
 err_interval_too_short = "Interval too short (or too long) for this workflow."
 err_bad_time = "Invalid time."
 err_webhook_web = "The local webhook only exists in the app."
+
+err_random_unavailable = "Could not generate a secure secret on this device. Try again."
 
 [builder]
 title = "Describe what I want (AI)"

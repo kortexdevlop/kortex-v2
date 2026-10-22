@@ -1,5 +1,36 @@
 # Plan de réalisation et de remise en conformité — Kortex
 
+## Migration 3 000 outils — première tranche locale, 22 octobre 2026
+
+L’utilisateur a demandé de commencer en parallèle les trois premiers chantiers du plan externe. ADR 0036 décrit le périmètre additif ; aucune nouvelle famille de produit ni aucun outil supplémentaire n’est publié.
+
+| Étapes de la proposition | Résultat de la tranche | Limites restant ouvertes |
+|---|---|---|
+| 0.1–0.4 — stabilisation | Corrections RNG/redirect/mémoire hôte/métadonnées ; API : CAS crédits, jour de réservation, entrées invalides, admin par id provisionné. 65 tests sécurité natifs et 84 tests API réussis ; compilations native lecteur et wasm Flow/image/lecteur réussies. Preuves : validation/2026-10-22-scale-foundations.json. | Ce n’est pas la clôture des 41 constats ; aucun déploiement, secret distant ou recette OS nouvelle. |
+| 2.1–2.5 — contrat v2 | Opérations multiples, références orientées, permissions/effets/capacités ; adaptateur des 44 contrats legacy, sans changer leur ABI. | Pas de dispatch ABI v2 ni d’UI personnalisée livrée. |
+| 3.1 / 3.3–3.4 / 4.1–4.3 — projets/tâches | Modèle pur kortex-project, transactions de commandes/révisions/historique borné, permissions, états de jobs ; exécuteur partagé kortex-workflow::project et exemple exécutable. 64 tests et compilation wasm de ce socle réussis. | Pas de lecture de médias, stockage durable, codecs, superviseur OS ou intégration des UI Flow/Mind. Le label Source n’est pas une autorisation. |
+| 5.1–5.2 — catalogue | Racine signée et fragments immuables coexistants avec legacy ; génération release et résolution locale paresseuse, test synthétique 3 000 outils/30 000 opérations. | Les six apps lisent encore legacy. Conservation des fragments historiques/cache et adoption runtime à finir avant bascule. |
+
+Guide : guides/scale-foundations.md. Suite : ressources/stockage plateforme et prototypes UI custom ; gate complet requis avant commit/publication. Ne pas présenter les 3 000 manifestes synthétiques comme 3 000 outils livrés.
+
+### Reprise 3.2 / 3.5 — ressources et projets durables, 22 octobre 2026
+
+Cette reprise complète la tranche initiale ci-dessus ; ses limites historiques ne décrivent pas les nouvelles API.
+
+| Sous-étape | Résultat local | Limites |
+|---|---|---|
+| 3.2 — accès aux ressources | Broker plateforme natif/Blob, capacités privées liées au projet, révocation et quota ; lectures ≤4 Mio. Sept tests natifs, dont lecture de 4 octets au bout d’un fichier sparse de 40 Gio, et vérifications wasm. | Pas de codecs, flux continu, immutabilité native garantie ou courtier inter-origines. Ressources à réautoriser à la réouverture. |
+| 3.5 — sauvegarde et réouverture | SnapshotStore ≤1 Mio : CAS sous verrou natif ou transaction IndexedDB ; DurableSession expose seulement les écritures confirmées, impose réouverture après ambiguïté/conflit. Treize tests projet et recette réelle deux onglets Chrome réussis. | Historique/reçus volatils, absence de migration automatique et de relocalisation durable des médias. Helpers legacy 64 Kio toujours mono-écrivain. |
+| 3.5 — raccordement workflow | Plan::execute_persisted, résolution avant mutation, enregistrement par commande et arrêt à la première erreur. Exemple exécuté : reprise aux révisions 3/6/9, écrivain périmé refusé. | Aucun branchement des UI produit ; un plan entier n’est pas atomique. |
+
+Décision : ADR 0037 ; guide : guides/scale-foundations.md. Validation détaillée : validation/2026-10-22-local-projects.json. Suite : courtier/relocalisation et SDK de présentation dédiée, puis adoption produit. Les ajouts de distribution 10.10–10.13 restent planifiés. Aucun commit/déploiement ; gate complet et recettes OS ouverts.
+
+## Audit local du 22 octobre 2026 — suivi 17.8
+
+Proposition de migration complémentaire : `outputs/kortex-plan-3000-outils.md` dans le dossier parent, demandée par l’utilisateur pour préparer 2 000–3 000 outils et des éditeurs médias. Ses lots 0–12 restent une proposition séparée ; ils ne remplacent pas les validations historiques ni ne déclarent un développement réalisé.
+
+Audit du commit `3723779ba48cfe0a495bec885e1fab653e42b5f8` : 41 constats et 15 validations complémentaires consignés dans le rapport externe de cette session, sans correction produit ni publication. 138 tests existants réussis (99 JS/TS, 39 Rust ciblés), typecheck API et format Rust réussis. Sondes locales : concurrence et changement de jour des crédits IA, corps Base64 invalide, nom de modèle hérité. Compilation complète web/native, recette OS et état de production non validés par cet audit. Priorités : redirections natives avec identifiants, secours du hasard, bornes des allocations hôte, métadonnées des images et attribution du rôle administrateur.
+
 État au 20 octobre 2026 (dernier lot publié : 36). Référence : [MASTER_PROMPT.md](MASTER_PROMPT.md), relu intégralement, avec les consignes utilisateur plus récentes (gel des 38 outils, publication par lot, suppression des implémentations non conformes, règles réconciliées dans RULES.md). Ce fichier remplace les listes contradictoires de l’ancienne ROADMAP comme suivi opérationnel.
 
 ## État courant — 20 octobre 2026
@@ -235,6 +266,19 @@ Référence : §§2.12, 7.4, 9.6, 11.
 | 10.8 | Publier les binaires seuls et l’index signé | Ouvert depuis le 19 octobre (lot 25) ; lot 36 republie | Non — recette Windows/Linux absente | Release GitHub signée et index servi par kortex.site (garde-fou `sync.mjs`). Lot 36 : versions montées (outils 1.0.1, apps +1, Store 0.3.0) pour que `kortex update` propose les binaires reconstruits au design actuel. |
 | 10.9 | Valider installateurs, désinstallation, doctor et mises à jour optionnelles | Partiel | Non | Code existant, tests historiques ; recette à partir d’une vraie release sur trois OS requise. |
 
+#### Ajouts utilisateur du 22 octobre 2026 — installation simple et identité desktop
+
+Ces exigences complètent la distribution existante et la migration 3 000 outils. Elles sont à réaliser, pas déclarées fonctionnelles par cet ajout documentaire.
+
+| Étape | Livrable / action | État | Validée ? | Condition de validation |
+|---|---|---|---|---|
+| 10.10 | Installer directement Kortex Store avec une commande unique | À réaliser | Non | Depuis une machine sans Kortex, une commande documentée par OS installe les composants nécessaires et le Store prêt à lancer. Vérifier signatures, architecture, erreurs et relance sans installation doublonnée ; publier les commandes exactes après recette. |
+| 10.11 | Proposer aussi une installation simple de Kortex en mode CLI | À compléter | Non | Conserver le parcours actuel sans imposer le Store : une commande installe `kortex`, rend la commande accessible et explique comment installer, ouvrir, mettre à jour et supprimer les apps. Les deux parcours utilisent le même registre local et les mêmes paquets vérifiés. Tester installation propre et coexistence CLI/Store. |
+| 10.12 | Permettre de créer un raccourci bureau pour lancer une app installée | À réaliser / compléter | Non | Action explicite depuis CLI et Store, sans terminal à ouvrir ensuite. Vrai raccourci adapté à Windows/macOS/Linux, bon nom et icône, chemins avec espaces/Unicode, lancement après mise à jour et nettoyage à la désinstallation. Un fichier .cmd seul ne vaut pas recette de raccourci Windows. |
+| 10.13 | Appliquer le nom et l’icône de chaque app à ses fenêtres et à son paquet | À corriger et recetter | Non | Depuis les contrats et visuels de l’app : titre de fenêtre, icône native, barre des tâches/Dock et sélecteur de fenêtres utilisent l’identité Kortex correspondante. Aucun « Dioxus App » ni logo Dioxus par défaut sur les surfaces contrôlées par Kortex. Vérifier les six apps, les outils lancés dans le lecteur partagé, le lancement CLI et le raccourci, sur les OS pris en charge. |
+
+Ordre : mutualiser l’installation (10.10/10.11), brancher les raccourcis (10.12), corriger l’identité commune et les métadonnées de paquets (10.13), puis recette groupée. Aucun nouvel outil requis.
+
 ### 11. Socle obligatoire des applications installables
 
 Référence : §§1, 5.1, 7, 9.
@@ -439,3 +483,19 @@ Inventaire sur disque dans [ARTIFACT_AUDIT.json](ARTIFACT_AUDIT.json), complét�
 Pour chaque identifiant `N.M`, inscrire les fichiers concernés, la cible compilée et son reçu/version, le contrôle indispensable exécuté et son résultat, la recette réellement faite, puis les limites restantes. Une étape structurelle exige un contrôle de structure ; une étape fonctionnelle exige une exécution ; une étape multiplateforme exige ses différentes cibles. Les déclarations historiques restent des déclarations tant que leur portée n’a pas été rapprochée des sources/artefacts actuels.
 
 Le suivi courant du retrait et de sa publication est dans [PROGRESS.md](PROGRESS.md). Les constats d’écart et l’inventaire de suppression sont dans [ARCHITECTURE_AUDIT.md](ARCHITECTURE_AUDIT.md).
+
+### Suite 3.5 — sauvegarde minimale locale
+Feature optionnelle kortex-project/persistence : snapshots 64 Kio via stockage plateforme. Reste : CAS multi-écrivains, reprise des médias, historique durable et intégration UI/workflow. Pas de clôture de 3.2/3.5.
+
+## 21. Fondations de montée en charge — premier lot
+
+| Lot | Résultat | État | Preuve et limite |
+|---|---|---|---|
+| 21.1 | Contrat v2 multi-opérations et adaptateur v1 | Fait localement | Les 44 contrats existants gardent leur opération `run`. Les valeurs TOML sont converties en valeurs JSON standard ; les tests couvrent tous les outils. |
+| 21.2 | État de projet, commandes partagées, révision CAS et sauvegarde durable facultative | Fait localement | Tests natifs, wasm et persistance ; commits de workflow par commande. Pas d’historique durable ni d’intégration produit Flow/Mind. |
+| 21.3 | Références médias locales à accès borné | Fait localement | Adaptateurs natif et navigateur, taille/range bornés et invalidation de fichiers natifs modifiés. Pas de codecs ni de reprise de ressources entre appareils. |
+| 21.4 | Catalogue modulaire signé et publication compatible | Fait localement | Index et fragments immuables, validation hashes/limites, publication incrémentale en plus du registre historique. Test synthétique 3 000 outils ; pas un benchmark réseau ou média réel. |
+| 21.5 | Gate local et chaîne de publication | Gate local passé ; publication en attente | Clippy complet, tests workspace et persistance, validation `xtask`, suites site/shared/API, vérification des workflows. Le merge et les workflows GitHub doivent encore s’exécuter avant de considérer le lot publié. |
+| 21.6 | Installation Store/CLI, raccourcis bureau et nom/icône des fenêtres par app | Planifié | Exigences ajoutées au plan de montée en charge ; aucune implémentation dans ce lot. |
+
+La preuve locale datée est dans `docs/validation/2026-10-22-scale-foundations.json` et `docs/validation/2026-10-22-local-projects.json`. Voir aussi le [plan détaillé pour 2 000 à 3 000 outils](plans/scale-3000-tools.md).

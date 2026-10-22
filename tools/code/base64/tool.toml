@@ -2,7 +2,7 @@ schema = 1
 
 [tool]
 id = "code.base64"
-version = "1.0.3"
+version = "1.0.4"
 universe = "code"
 status = "beta"
 ui = "auto"
