@@ -1,0 +1,72 @@
+schema = 1
+
+[tool]
+id = "text.repeat"
+version = "1.0.0"
+universe = "text"
+status = "beta"
+ui = "auto"
+platforms = ["web", "desktop"]
+offline = true
+ai = false
+viral_priority = 3
+
+[tool.name]
+fr = "Répéteur de texte"
+en = "Text Repeater"
+[tool.tagline]
+fr = "Répétez un texte autant de fois que vous voulez, avec le séparateur de votre choix."
+en = "Repeat a text as many times as you want, with the separator of your choice."
+[tool.slug]
+fr = "repeter-un-texte"
+en = "text-repeater"
+
+[search]
+keywords.fr = ["répéter un texte", "dupliquer un texte", "répétition de mots", "texte répété", "multiplier un texte"]
+keywords.en = ["repeat text", "duplicate text", "repeat a word", "repeated text", "text multiplier"]
+intents.fr = ["répéter une phrase plusieurs fois", "générer un texte de remplissage répété"]
+intents.en = ["repeat a sentence several times", "generate repeated filler text"]
+related = ["text.reverse", "text.lorem-ipsum"]
+
+[limits]
+max_input_bytes = "10MB"
+timeout_s = 30
+
+[[inputs]]
+id = "text"
+type = "text"
+required = true
+max_len = 10000
+label = { fr = "Texte", en = "Text" }
+
+[[params]]
+id = "count"
+type = "integer"
+default = 3
+range = [1, 1000]
+level = "simple"
+label = { fr = "Nombre de répétitions", en = "Number of repetitions" }
+
+[[params]]
+id = "separator"
+type = "text"
+default = " "
+level = "medium"
+label = { fr = "Séparateur", en = "Separator" }
+
+[[outputs]]
+id = "text"
+type = "text"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "write"
+sensitive = false
+privacy = "local"
+
+[[variants]]
+id = "repeat-word"
+slug = { fr = "repeter-un-mot", en = "repeat-a-word" }
+name = { fr = "Répéter un mot", en = "Repeat a word" }
+preset = { count = "10" }

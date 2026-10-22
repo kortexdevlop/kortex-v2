@@ -1,0 +1,10 @@
+[ui]
+title = "Text Repeater"
+[errors]
+empty_input = "Enter a text to repeat."
+cancelled = "Cancelled."
+invalid_param = "Invalid value."
+missing_input = "Enter some content first."
+too_large = "The result would exceed 1 MB: shorten the text or the number of repetitions."
+[outputs]
+text = "Result"

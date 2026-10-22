@@ -1,0 +1,10 @@
+[ui]
+title = "Répéteur de texte"
+[errors]
+empty_input = "Saisissez un texte à répéter."
+cancelled = "Annulé."
+invalid_param = "Valeur invalide."
+missing_input = "Saisissez d'abord un contenu."
+too_large = "Le résultat dépasserait 1 Mo : réduisez le texte ou le nombre de répétitions."
+[outputs]
+text = "Résultat"

@@ -3,7 +3,7 @@
 Autorité : instructions utilisateur récentes, puis `docs/RULES.md` et périmètre fonctionnel de `docs/MASTER_PROMPT.md` (à lire intégralement au début d’une phase). Plan : `docs/PLAN.md`. Journal : `docs/PROGRESS.md`. ADR : décisions compatibles, jamais dérogations unilatérales.
 
 ## Périmètre
-- Catalogue gelé à 38 outils + ajouts autorisés explicitement par l’utilisateur : `image.compress` (2026-10-20), `code.jwt-decoder`, `text.diff`, `calc.bmi` (2026-10-21), `text.reverse` (2026-10-22) = 43. Corriger l’existant ; aucun autre outil sans instruction explicite.
+- Catalogue gelé à 38 outils + ajouts autorisés explicitement par l’utilisateur : `image.compress` (2026-10-20), `code.jwt-decoder`, `text.diff`, `calc.bmi` (2026-10-21), `text.reverse`, `text.repeat` (2026-10-22) = 44. Corriger l’existant ; aucun autre outil sans instruction explicite.
 - Budget zéro, Cloudflare gratuit, licence propriétaire « tous droits réservés ». Dépôt `kortex-v2` public depuis le 2026-10-19 (décision explicite de l’utilisateur : minutes CI gratuites) ; aucun secret dans Git.
 - Aucune action irréversible hors autorisation explicite et inventaire préalable.
 

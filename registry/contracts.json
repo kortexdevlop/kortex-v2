@@ -5948,6 +5948,147 @@
             "en": "Text",
             "fr": "Texte"
           },
+          "max_len": 10000,
+          "multiline": false,
+          "required": true,
+          "type": "text"
+        }
+      ],
+      "limits": {
+        "max_batch": null,
+        "max_input_bytes": "10MB",
+        "timeout_s": 30
+      },
+      "outputs": [
+        {
+          "default_format": null,
+          "formats": null,
+          "id": "text",
+          "type": "text"
+        }
+      ],
+      "params": [
+        {
+          "default": 3,
+          "id": "count",
+          "label": {
+            "en": "Number of repetitions",
+            "fr": "Nombre de répétitions"
+          },
+          "level": "simple",
+          "options": null,
+          "range": [
+            1.0,
+            1000.0
+          ],
+          "type": "integer"
+        },
+        {
+          "default": " ",
+          "id": "separator",
+          "label": {
+            "en": "Separator",
+            "fr": "Séparateur"
+          },
+          "level": "medium",
+          "options": null,
+          "range": null,
+          "type": "text"
+        }
+      ],
+      "permissions": {
+        "clipboard": "write",
+        "filesystem": "none",
+        "network": false,
+        "privacy": "local",
+        "sensitive": false
+      },
+      "schema": 1,
+      "search": {
+        "intents": {
+          "en": [
+            "repeat a sentence several times",
+            "generate repeated filler text"
+          ],
+          "fr": [
+            "répéter une phrase plusieurs fois",
+            "générer un texte de remplissage répété"
+          ]
+        },
+        "keywords": {
+          "en": [
+            "repeat text",
+            "duplicate text",
+            "repeat a word",
+            "repeated text",
+            "text multiplier"
+          ],
+          "fr": [
+            "répéter un texte",
+            "dupliquer un texte",
+            "répétition de mots",
+            "texte répété",
+            "multiplier un texte"
+          ]
+        },
+        "related": [
+          "text.reverse",
+          "text.lorem-ipsum"
+        ]
+      },
+      "tool": {
+        "ai": false,
+        "aliases": {},
+        "id": "text.repeat",
+        "name": {
+          "en": "Text Repeater",
+          "fr": "Répéteur de texte"
+        },
+        "offline": true,
+        "platforms": [
+          "web",
+          "desktop"
+        ],
+        "slug": {
+          "en": "text-repeater",
+          "fr": "repeter-un-texte"
+        },
+        "status": "beta",
+        "tagline": {
+          "en": "Repeat a text as many times as you want, with the separator of your choice.",
+          "fr": "Répétez un texte autant de fois que vous voulez, avec le séparateur de votre choix."
+        },
+        "ui": "auto",
+        "universe": "text",
+        "version": "1.0.0",
+        "viral_priority": 3,
+        "web_worker": false
+      },
+      "variants": [
+        {
+          "id": "repeat-word",
+          "name": {
+            "en": "Repeat a word",
+            "fr": "Répéter un mot"
+          },
+          "preset": {
+            "count": "10"
+          },
+          "slug": {
+            "en": "repeat-a-word",
+            "fr": "repeter-un-mot"
+          }
+        }
+      ]
+    },
+    {
+      "inputs": [
+        {
+          "id": "text",
+          "label": {
+            "en": "Text",
+            "fr": "Texte"
+          },
           "max_len": 100000,
           "multiline": false,
           "required": true,
