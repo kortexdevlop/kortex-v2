@@ -11,7 +11,7 @@ Version consolidée du 16 octobre 2026, après retrait des prototypes non confor
 
 ## 2. Périmètre actuel
 
-2.1 Le catalogue est gelé à 38 outils, plus les ajouts autorisés explicitement par l’utilisateur : `image.compress` (2026-10-20), `code.jwt-decoder`, `text.diff` et `calc.bmi` (2026-10-21), soit 42 outils (recette ADR 0034). La cible historique 150+ et les autres nouveaux outils restent suspendus.
+2.1 Le catalogue est gelé à 38 outils, plus les ajouts autorisés explicitement par l’utilisateur : `image.compress` (2026-10-20), `code.jwt-decoder`, `text.diff` et `calc.bmi` (2026-10-21), `text.reverse` (2026-10-22, outil de recette de la chaîne ADR 0035), soit 43 outils (recette ADR 0034). La cible historique 150+ et les autres nouveaux outils restent suspendus.
 2.2 Corriger et finir l’existant, puis développer les applications prévues, dans l’ordre des dépendances de PLAN.md.
 2.3 Aucun outil supplémentaire, service payant ou dépense. Cloudflare gratuit uniquement. Aucun fichier utilisateur traité sur le serveur.
 2.4 Les fonctions absentes, prototypes, compilations non vérifiées et cibles non testées restent explicitement non validés.

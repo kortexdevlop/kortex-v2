@@ -1,0 +1,13 @@
+[ui]
+title = "Inverseur de texte"
+[errors]
+empty_input = "Saisissez un texte à inverser."
+cancelled = "Annulé."
+invalid_param = "Valeur invalide."
+missing_input = "Saisissez d'abord un contenu."
+[outputs]
+text = "Résultat"
+[options]
+mode_characters = "Les lettres"
+mode_words = "L'ordre des mots"
+mode_lines = "L'ordre des lignes"

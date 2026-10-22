@@ -1,0 +1,71 @@
+schema = 1
+
+[tool]
+id = "text.reverse"
+version = "1.0.0"
+universe = "text"
+status = "beta"
+ui = "auto"
+platforms = ["web", "desktop"]
+offline = true
+ai = false
+viral_priority = 3
+
+[tool.name]
+fr = "Inverseur de texte"
+en = "Text Reverser"
+[tool.tagline]
+fr = "Inversez les lettres, l'ordre des mots ou celui des lignes d'un texte."
+en = "Reverse the letters, the word order or the line order of a text."
+[tool.slug]
+fr = "inverser-un-texte"
+en = "text-reverser"
+
+[search]
+keywords.fr = ["inverser un texte", "texte à l'envers", "retourner un texte", "inverser les mots", "inverser les lignes", "miroir"]
+keywords.en = ["reverse text", "backwards text", "flip text", "reverse words", "reverse lines", "mirror text"]
+intents.fr = ["écrire un texte à l'envers", "inverser l'ordre des lignes d'une liste"]
+intents.en = ["write text backwards", "reverse the order of the lines of a list"]
+related = ["text.sort-lines", "text.case-converter"]
+
+[limits]
+max_input_bytes = "10MB"
+timeout_s = 30
+
+[[inputs]]
+id = "text"
+type = "text"
+required = true
+max_len = 100000
+label = { fr = "Texte", en = "Text" }
+
+[[params]]
+id = "mode"
+type = "enum"
+options = ["characters", "words", "lines"]
+default = "characters"
+level = "simple"
+label = { fr = "Inverser", en = "Reverse" }
+
+[[outputs]]
+id = "text"
+type = "text"
+
+[permissions]
+network = false
+filesystem = "none"
+clipboard = "write"
+sensitive = false
+privacy = "local"
+
+[[variants]]
+id = "backwards"
+slug = { fr = "texte-a-l-envers", en = "backwards-text" }
+name = { fr = "Texte à l'envers", en = "Backwards text" }
+preset = { mode = "characters" }
+
+[[variants]]
+id = "reverse-lines"
+slug = { fr = "inverser-les-lignes", en = "reverse-lines" }
+name = { fr = "Inverser l'ordre des lignes", en = "Reverse line order" }
+preset = { mode = "lines" }
