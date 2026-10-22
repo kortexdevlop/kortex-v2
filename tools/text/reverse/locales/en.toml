@@ -1,0 +1,13 @@
+[ui]
+title = "Text Reverser"
+[errors]
+empty_input = "Enter a text to reverse."
+cancelled = "Cancelled."
+invalid_param = "Invalid value."
+missing_input = "Enter some content first."
+[outputs]
+text = "Result"
+[options]
+mode_characters = "The letters"
+mode_words = "The word order"
+mode_lines = "The line order"
