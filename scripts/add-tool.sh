@@ -73,4 +73,11 @@ node scripts/prepare-publish.mjs >/dev/null
 wrangler_bin="$(command -v wrangler || true)"
 [ -n "$wrangler_bin" ] || PATH="$(dirname "$(npm exec --yes --package=wrangler@4.151.0 -- which wrangler)"):$PATH"
 node scripts/publish.mjs --static-only --only=run,site | tail -3
+if [ "${2:-}" != "--no-commit" ] && ! git diff --quiet -- web/site/public/seek-index.json; then
+  git add web/site/public/seek-index.json
+  git commit -q -m "chore: refresh the search index for $ID [skip ci]
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>"
+  git push -q origin HEAD:main
+fi
 step "terminé : $ID est en ligne (index séquence $SEQ)"

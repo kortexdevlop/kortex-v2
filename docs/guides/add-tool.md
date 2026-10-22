@@ -21,6 +21,10 @@ cargo test -p tool-<univers>-<nom>
 ```
 Vérifier l'outil en ligne de commande : `cargo xtask build-desktop <univers>.<nom>`, l'installer dans un `KORTEX_HOME` de test, puis `kortex run <univers>.<nom> --input … --param …`. La CLI ne lie aucun outil : elle lance le binaire installé en mode `--engine` (ADR 0034).
 
+## Voie rapide : publier un outil en environ 2 minutes (ADR 0035)
+
+Une fois l'outil écrit (contrat, moteur, locales, contenu, tests, glyphe) : `scripts/add-tool.sh <univers>.<nom>`. Aucune CI, aucune compilation sauf le moteur wasm de l'outil : les lecteurs desktop déjà compilés (release GitHub `players`, workflow `players.yml`, à relancer seulement si `crates/kortex-player` ou une crate qu'il lie change) reçoivent son paquet, l'index signé est étendu (clé `~/.kortex-signing-key`), une release `feed-<n>` est créée et seuls les hôtes `run` et `site` sont déployés (`wrangler` connecté). Mesure du 2026-10-22 sur `text.reverse` : 154 s de bout en bout (643 s avant d'optimiser `icons` et `restore-web`). Le commit de l'outil part sur `main` avec `[skip ci]` ; `FEED_AUTO` est à `false` (le flux automatique `feed.yml` reste disponible à la main).
+
 ## Interface, moteur wasm et lecteurs partagés (ADR 0035)
 - L'interface d'un outil est **générée depuis son contrat** (`ui = "auto"`) par les lecteurs partagés : `kortex-player` (web et desktop, mêmes sources). Une interface personnalisée n'est plus prise en charge (RULES §3.8) : `cargo xtask check` refuse `ui = "custom"` et `new-tool --custom` échoue.
 - Un outil ne compile donc **ni interface ni binaire** : seul son moteur Rust pur devient un `engine.wasm` (ABI v1, `kortex_runtime::export_engine!`), le même pour le web, le desktop, Flow, Mind et la CLI.
