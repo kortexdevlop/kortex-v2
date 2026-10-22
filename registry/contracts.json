@@ -5199,7 +5199,7 @@
         },
         "ui": "auto",
         "universe": "text",
-        "version": "1.0.3",
+        "version": "1.0.4",
         "viral_priority": 1,
         "web_worker": false
       },
