@@ -1,7 +1,7 @@
 schema = 1
 [tool]
 id = "calc.date-add"
-version = "1.0.2"
+version = "1.0.3"
 universe = "calc"
 status = "beta"
 ui = "auto"

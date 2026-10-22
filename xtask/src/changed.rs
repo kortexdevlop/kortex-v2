@@ -8,17 +8,12 @@
 use std::collections::{BTreeMap, BTreeSet};
 use std::process::Command;
 
-/// Libraries every generated tool wrapper links besides the tool crate itself.
-const WRAPPER_CRATES: [&str; 5] = [
-    "kortex-ui",
-    "kortex-runtime",
-    "kortex-platform",
-    "kortex-contract",
-    "kortex-i18n",
-];
+/// The shared player every tool is assembled into (ADR 0035); its dependency closure covers the
+/// interface, runtime, platform, contract, i18n, engine host and payload crates.
+const WRAPPER_CRATES: [&str; 1] = ["kortex-player"];
 
 /// Paths whose change can alter every bundle.
-pub const GLOBAL_PATHS: [&str; 12] = [
+pub const GLOBAL_PATHS: [&str; 13] = [
     "Cargo.toml",
     "Cargo.lock",
     "rust-toolchain.toml",
@@ -27,7 +22,8 @@ pub const GLOBAL_PATHS: [&str; 12] = [
     "brand/",
     "xtask/Cargo.toml",
     "xtask/src/build.rs",
-    "xtask/src/worker.rs",
+    "xtask/src/engine.rs",
+    "xtask/src/player.rs",
     "xtask/src/platform_check.rs",
     "xtask/src/tools.rs",
     "xtask/src/apps.rs",
@@ -145,6 +141,20 @@ pub fn bundle_crates<'a>(krates: &'a [Krate], dir: &str) -> Vec<&'a Krate> {
         }
     }
     names
+        .iter()
+        .filter_map(|n| graph.get(n.as_str()).copied())
+        .collect()
+}
+
+/// Workspace crates linked into the `engine.wasm` of the tool in `dir`: its own dependency
+/// closure only (no player, no interface).
+#[must_use]
+pub fn engine_crates<'a>(krates: &'a [Krate], dir: &str) -> Vec<&'a Krate> {
+    let graph: BTreeMap<&str, &Krate> = krates.iter().map(|k| (k.name.as_str(), k)).collect();
+    let Some(own) = krates.iter().find(|k| k.dir == dir) else {
+        return Vec::new();
+    };
+    closure(&own.name, &graph)
         .iter()
         .filter_map(|n| graph.get(n.as_str()).copied())
         .collect()
@@ -334,6 +344,17 @@ mod tests {
     fn workspace() -> Vec<Krate> {
         vec![
             krate("kortex-ui", "crates/kortex-ui", &["kortex-runtime"]),
+            krate(
+                "kortex-player",
+                "crates/kortex-player",
+                &[
+                    "kortex-ui",
+                    "kortex-runtime",
+                    "kortex-platform",
+                    "kortex-contract",
+                    "kortex-i18n",
+                ],
+            ),
             krate("kortex-runtime", "crates/kortex-runtime", &[]),
             krate("kortex-platform", "crates/kortex-platform", &[]),
             krate("kortex-contract", "crates/kortex-contract", &[]),
@@ -354,6 +375,29 @@ mod tests {
 
     fn files(list: &[&str]) -> Vec<String> {
         list.iter().map(|f| (*f).to_owned()).collect()
+    }
+
+    #[test]
+    fn an_interface_change_reaches_every_assembled_tool_but_no_engine() {
+        // The player (and the interface it links) is part of every tool's binary...
+        let r = affected(&files(&["crates/kortex-ui/src/lib.rs"]), &workspace());
+        assert_eq!(
+            r.tools,
+            BTreeSet::from(["text.a".to_owned(), "calc.b".to_owned()])
+        );
+        // ...but an `engine.wasm` links only the tool and its own dependencies.
+        let krates = workspace();
+        let engine: Vec<&str> = engine_crates(&krates, "tools/text/a")
+            .iter()
+            .map(|k| k.name.as_str())
+            .collect();
+        assert!(engine.contains(&"kortex-runtime") && engine.contains(&"tool-text-a"));
+        assert!(!engine.contains(&"kortex-ui") && !engine.contains(&"kortex-player"));
+        let bundle: Vec<&str> = bundle_crates(&krates, "tools/text/a")
+            .iter()
+            .map(|k| k.name.as_str())
+            .collect();
+        assert!(bundle.contains(&"kortex-ui") && bundle.contains(&"kortex-player"));
     }
 
     #[test]

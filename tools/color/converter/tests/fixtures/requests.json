@@ -1,0 +1,38 @@
+[
+ {
+  "inputs": {
+   "text": {
+    "Text": "#336699"
+   }
+  },
+  "params": {
+   "format": {
+    "Text": "hex"
+   }
+  }
+ },
+ {
+  "inputs": {
+   "text": {
+    "Text": "rgb(51, 102, 153)"
+   }
+  },
+  "params": {
+   "format": {
+    "Text": "rgb"
+   }
+  }
+ },
+ {
+  "inputs": {
+   "text": {
+    "Text": "hsl(210, 50%, 40%)"
+   }
+  },
+  "params": {
+   "format": {
+    "Text": "hsl"
+   }
+  }
+ }
+]

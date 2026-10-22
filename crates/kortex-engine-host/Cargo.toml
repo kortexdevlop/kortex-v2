@@ -1,0 +1,13 @@
+[package]
+name = "kortex-engine-host"
+version = "0.1.0"
+edition.workspace = true
+publish.workspace = true
+
+[dependencies]
+kortex-platform = { path = "../kortex-platform" }
+kortex-runtime = { path = "../kortex-runtime" }
+wasmtime = { version = "50", default-features = false, features = ["cranelift", "runtime", "std", "parallel-compilation"] }
+
+[dev-dependencies]
+wat = "1"

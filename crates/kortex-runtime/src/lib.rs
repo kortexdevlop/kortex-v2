@@ -1,4 +1,6 @@
 //! Engine runtime: execution context, shared data types, minimal executor.
+pub mod engine_abi;
+pub mod frame;
 #[cfg(not(target_arch = "wasm32"))]
 pub mod native;
 
@@ -151,6 +153,59 @@ mod wire_bytes {
     }
 }
 
+/// Services of the engine host (module `kx_host` of the engine ABI, ADR 0035).
+#[cfg(all(target_arch = "wasm32", feature = "engine-abi"))]
+mod host {
+    #[link(wasm_import_module = "kx_host")]
+    unsafe extern "C" {
+        pub fn now_ms() -> u64;
+        pub fn fill_random(ptr: *mut u8, len: usize) -> u32;
+        pub fn is_cancelled() -> u32;
+        pub fn progress(milli: u32);
+    }
+}
+
+fn platform_now_ms() -> u64 {
+    #[cfg(all(target_arch = "wasm32", feature = "engine-abi"))]
+    {
+        // SAFETY: the engine host provides `kx_host.now_ms`; it takes and returns plain integers.
+        unsafe { host::now_ms() }
+    }
+    #[cfg(not(all(target_arch = "wasm32", feature = "engine-abi")))]
+    {
+        kortex_platform::now_ms()
+    }
+}
+
+fn platform_fill_random(buf: &mut [u8]) -> bool {
+    #[cfg(all(target_arch = "wasm32", feature = "engine-abi"))]
+    {
+        // SAFETY: the host writes at most `buf.len()` bytes at `buf`, inside this module's memory.
+        unsafe { host::fill_random(buf.as_mut_ptr(), buf.len()) == 0 }
+    }
+    #[cfg(not(all(target_arch = "wasm32", feature = "engine-abi")))]
+    {
+        kortex_platform::fill_random(buf).is_ok()
+    }
+}
+
+fn platform_yield() {
+    #[cfg(not(all(target_arch = "wasm32", feature = "engine-abi")))]
+    kortex_platform::yield_now();
+}
+
+fn host_cancelled() -> bool {
+    #[cfg(all(target_arch = "wasm32", feature = "engine-abi"))]
+    {
+        // SAFETY: plain integer result.
+        unsafe { host::is_cancelled() != 0 }
+    }
+    #[cfg(not(all(target_arch = "wasm32", feature = "engine-abi")))]
+    {
+        false
+    }
+}
+
 /// Cloneable handle to cancel a running engine from another place (UI, Flow, CLI).
 #[derive(Debug, Clone, Default)]
 pub struct CancelToken(Arc<AtomicBool>);
@@ -196,6 +251,11 @@ impl Cx {
     /// Report progress in `0.0..=1.0`.
     pub fn progress(&mut self, value: f32) {
         self.progress = value.clamp(0.0, 1.0);
+        #[cfg(all(target_arch = "wasm32", feature = "engine-abi"))]
+        // SAFETY: plain integer argument; the host may ignore it.
+        unsafe {
+            host::progress((self.progress * 1000.0) as u32);
+        }
     }
 
     #[must_use]
@@ -206,7 +266,7 @@ impl Cx {
     /// # Errors
     /// Returns `ToolError::CANCELLED` once the user cancelled.
     pub fn check_cancelled(&self) -> Result<(), ToolError> {
-        if self.cancel.is_cancelled() {
+        if self.cancel.is_cancelled() || host_cancelled() {
             Err(ToolError::new(ToolError::CANCELLED))
         } else {
             Ok(())
@@ -234,7 +294,7 @@ impl Cx {
         if let Some(c) = &self.clock {
             return c();
         }
-        kortex_platform::now_ms()
+        platform_now_ms()
     }
 
     /// Fill `buf` with random bytes (OS CSPRNG unless an entropy source was injected).
@@ -246,7 +306,11 @@ impl Cx {
             src(buf);
             return Ok(());
         }
-        kortex_platform::fill_random(buf).map_err(|_| ToolError::new("entropy_unavailable"))
+        if platform_fill_random(buf) {
+            Ok(())
+        } else {
+            Err(ToolError::new("entropy_unavailable"))
+        }
     }
 
     pub fn log(&mut self, line: impl Into<String>) {
@@ -268,7 +332,7 @@ pub fn block_on<F: Future>(fut: F) -> F::Output {
         if let Poll::Ready(v) = fut.as_mut().poll(&mut cx) {
             return v;
         }
-        kortex_platform::yield_now();
+        platform_yield();
     }
 }
 

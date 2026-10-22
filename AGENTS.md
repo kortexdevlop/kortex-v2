@@ -8,7 +8,7 @@ Autorité : instructions utilisateur récentes, puis `docs/RULES.md` et périmè
 - Aucune action irréversible hors autorisation explicite et inventaire préalable.
 
 ## Architecture
-- Outils : `tools/<univers>/<nom>/`, contrat `tool.toml`, moteur Rust pur, UI Dioxus commune web/desktop, glyph/locales/content/tests.
+- Outils : `tools/<univers>/<nom>/`, contrat `tool.toml`, moteur Rust pur, UI Dioxus commune web/desktop, glyph/locales/content/tests. Interface web et binaire desktop assemblés depuis les lecteurs partagés `kortex-player` + paquet `.kxp` (ADR 0035), jamais compilés par outil.
 - Apps installables : `apps/<nom>/`, `app.toml` validé et mêmes sources Rust/Dioxus compilées web/desktop. Une app Astro/TS distincte est interdite comme substitut.
 - Site Astro/TS : vitrine, SEO et intégration (navigation, palette site, Stage, compte existant). Workers : TypeScript strict conformément au prompt.
 - Accès runtime plateforme uniquement via `kortex-platform` ; scripts de build et fixtures peuvent gérer leurs artefacts, jamais générer un contournement runtime.

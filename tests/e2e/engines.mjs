@@ -1,13 +1,13 @@
-// Runs headless tool engines (dist/engines/<id>/worker.js) in a real browser Worker.
-// Needs `cargo xtask build-engine <ids…>` first. CHROME_PATH may point at an installed Chrome.
+// Runs headless tool engines (dist/run/<id>/engine/worker.js, ADR 0035) in a real browser Worker.
+// Needs `cargo xtask build <ids…>` first. CHROME_PATH may point at an installed Chrome.
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { extname, resolve, sep } from 'node:path';
 import { chromium } from 'playwright';
 
-const dist = resolve(import.meta.dirname, '../../dist/engines');
-assert.ok(existsSync(dist), 'dist/engines missing: run `cargo xtask build-engine <ids…>` first');
+const dist = resolve(import.meta.dirname, '../../dist/run');
+assert.ok(existsSync(dist), 'dist/run missing: run `cargo xtask build <ids…>` first');
 const types = { '.js': 'text/javascript', '.wasm': 'application/wasm', '.html': 'text/html' };
 const server = createServer((request, response) => {
   const path = resolve(dist, '.' + decodeURIComponent(new URL(request.url, 'http://x').pathname));
@@ -34,7 +34,7 @@ try {
   await page.goto(origin + '/');
   for (const [id, inputs, params, check] of cases) {
     const reply = await page.evaluate(({ origin, id, inputs, params }) => new Promise((resolve, reject) => {
-      const worker = new Worker(`${origin}/${id}/worker.js`, { type: 'module' });
+      const worker = new Worker(`${origin}/${id}/engine/worker.js`, { type: 'module' });
       const timer = setTimeout(() => reject(new Error('worker timeout')), 20000);
       worker.onmessage = event => { clearTimeout(timer); worker.terminate(); resolve(event.data); };
       worker.onerror = event => { clearTimeout(timer); reject(new Error(event.message)); };

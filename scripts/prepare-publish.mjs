@@ -3,7 +3,7 @@ import { readFileSync, writeFileSync, mkdirSync, rmSync, cpSync, readdirSync, st
 import { publicFeatures } from './public-features.mjs';
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
-import { resolve, join, basename } from 'node:path';
+import { resolve, join, basename, relative, sep } from 'node:path';
 const root = resolve(import.meta.dirname, '..');
 // The owner's dashboard lists the recent publications: refresh that data with every deploy.
 spawnSync('node', [join(root, 'scripts/build-admin-data.mjs')], { stdio: 'inherit' });
@@ -41,7 +41,7 @@ for (const {app} of appRegistry.apps.filter(({app}) => ['beta', 'stable'].includ
 }
 // Content-hashed build outputs never change under the same name: cache them for a year.
 const forever = '  Cache-Control: public, max-age=31536000, immutable\n';
-const immutable = { site: `\n/_astro/*\n${forever}`, run: `\n/:tool/assets/*\n${forever}`, app: `\n/assets/*\n${forever}` };
+const immutable = { site: `\n/_astro/*\n${forever}`, run: `\n/assets/*\n${forever}`, app: `\n/assets/*\n${forever}` };
 for (const [name, source, host] of targets) {
   const dest = join(root, 'dist/publish', name);
   rmSync(dest, {recursive: true, force: true});
@@ -66,7 +66,10 @@ for (const [name, source, host] of targets) {
       const path = join(dir, entry.name);
       if (entry.isDirectory()) inspect(path);
       else {
-        if (entry.isSymbolicLink() || /(?:\.map|\.rs|\.toml|\.pem|\.env|\.dev\.vars)$/.test(entry.name)) throw new Error(`Non-public artifact: ${path}`);
+        // The contract and locales of a tool are public data the player reads (ADR 0035); nothing else
+        // ending in .toml may ship.
+        const toolData = name === 'run' && /^[a-z0-9]+\.[a-z0-9-]+\/(?:tool\.toml|locales\/(?:fr|en)\.toml)$/.test(relative(dest, path).split(sep).join('/'));
+        if (entry.isSymbolicLink() || (/(?:\.map|\.rs|\.toml|\.pem|\.env|\.dev\.vars)$/.test(entry.name) && !toolData)) throw new Error(`Non-public artifact: ${path}`);
         if (name === 'site' && entry.name.endsWith('.html')) {
           const html = readFileSync(path, 'utf8');
           for (const [, attributes, body] of html.matchAll(/<script([^>]*)>([\s\S]*?)<\/script>/g)) {

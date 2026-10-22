@@ -2,7 +2,7 @@ schema = 1
 
 [tool]
 id = "image.convert"
-version = "1.0.2"
+version = "1.0.3"
 universe = "image"
 status = "beta"
 ui = "auto"

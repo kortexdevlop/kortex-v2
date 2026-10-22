@@ -187,6 +187,11 @@ pub fn save_output(directory: &Path, name: &str, bytes: &[u8]) -> io::Result<Pat
         }
     }
 }
+/// Prints a diagnostic line on the standard error stream.
+pub fn report(message: &str) {
+    eprintln!("{message}");
+}
+
 pub fn save_download(name: &str, bytes: &[u8]) -> Result<String, String> {
     let dir = env::home_dir()
         .ok_or("dossier personnel introuvable")?
@@ -605,6 +610,24 @@ pub mod task {
     pub fn spawn(name: &str, job: impl FnOnce() + Send + 'static) -> io::Result<()> {
         std::thread::Builder::new()
             .name(name.to_owned())
+            .spawn(job)
+            .map(|_| ())
+    }
+
+    /// [`spawn`] with a stack of `stack_bytes` (reserved address space: only touched pages cost
+    /// memory). Engines run here: an interpreted `engine.wasm` can need far more than the 2 MiB
+    /// default, in particular in debug builds.
+    ///
+    /// # Errors
+    /// The operating system could not create the thread.
+    pub fn spawn_with_stack(
+        name: &str,
+        stack_bytes: usize,
+        job: impl FnOnce() + Send + 'static,
+    ) -> io::Result<()> {
+        std::thread::Builder::new()
+            .name(name.to_owned())
+            .stack_size(stack_bytes)
             .spawn(job)
             .map(|_| ())
     }

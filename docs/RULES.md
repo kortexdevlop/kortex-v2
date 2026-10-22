@@ -25,6 +25,7 @@ Version consolidée du 16 octobre 2026, après retrait des prototypes non confor
 3.5 services contient les Workers TypeScript strict prévus par le prompt : auth, données, quotas, proxy. Rust n’est pas imposé aux Workers ni au site Astro.
 3.6 TOML/JSON/Markdown/CSS, bindings wasm JavaScript générés et adaptateurs plateforme minimaux restent nécessaires. Ils ne doivent pas porter une seconde implémentation métier d’une app.
 3.7 Ajouter un outil ou une app alimente le registre et les générateurs ; ne pas ajouter de branche par identifiant dans le site, la CLI ou le packaging.
+3.8 Une interface web ou un binaire desktop d'outil `ui = "auto"` n'est pas compilé par outil : le lecteur partagé (`kortex-player`) est compilé une fois par cible et le paquet de l'outil (`engine.wasm`, contrat, locales, glyph) est assemblé dedans (ADR 0035, instruction de l'utilisateur du 2026-10-21). Une interface personnalisée exigerait un ADR et une décision explicite.
 
 ## 4. Frontières d’exécution
 

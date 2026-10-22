@@ -2,7 +2,7 @@ schema = 1
 
 [tool]
 id = "code.uuid-generator"
-version = "1.0.2"
+version = "1.0.3"
 universe = "code"
 status = "beta"
 ui = "auto"

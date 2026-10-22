@@ -14,6 +14,10 @@ Voie nominale : après une CI verte sur `main`, `feed.yml` ne reconstruit que ce
 
 Anti-retour (ferme 10.2) : clients (CLI, Store, apps) conservent le plancher `(sequence, sha256)` de l'index et du catalogue acceptés par canal (`~/.kortex/floors.json`, cache web) et refusent une séquence antérieure, un contenu différent à séquence égale ou un autre canal.
 
+## Binaire desktop d'un outil (ADR 0035)
+
+Un binaire d'outil n'est plus compilé : `cargo xtask build-desktop <id…|all> [--target T]` compile **une fois** le lecteur `kortex-player` pour la cible (profil `player`, dépendances optimisées en vitesse, `wasmtime` compris ; 14 minutes à froid, ensuite incrémental), construit le moteur wasm de l'outil si ses sources ont changé, puis écrit son paquet (`tool.toml`, locales, glyphe, `engine.wasm`) dans la zone réservée du lecteur, sur place. Sur macOS la signature ad hoc est refaite après l'assemblage (`codesign --force --sign -` puis `--verify --strict`) ; les archives et l'index ne changent pas de forme. La zone réservée fait 4 Mio (`KORTEX_REGION_KIB` à la compilation du lecteur pour la changer) : un paquet plus grand est refusé avec un message.
+
 ## Workflow GitHub (release complète manuelle)
 
 `release.yml` compile les mêmes sources Rust/Dioxus pour Linux, macOS ARM/Intel et Windows, ainsi que les 38 outils et trois apps web. Les apps sont découvertes depuis leurs contrats. Les paramètres manuels sont `tools=all`, `only=all|linux|macos|windows|web`, `intel_mac` et `publish=false` par défaut.

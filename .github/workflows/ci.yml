@@ -99,7 +99,7 @@ jobs:
   web-changed:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 75
     env:
       DX_CLI_TELEMETRY: 'false'
       GH_TOKEN: ${{ github.token }}
@@ -151,13 +151,31 @@ jobs:
           cargo xtask tokens
           if [ "$ALL" = "true" ]; then cargo xtask build all; elif [ -n "$TOOLS" ]; then cargo xtask build $TOOLS; fi
           for id in $APPS; do cargo xtask build-app "$id" --web; done
+      - name: Engines answer the same natively and through their wasm (ADR 0035)
+        if: steps.changed.outputs.tools != ''
+        env:
+          TOOLS: ${{ steps.changed.outputs.tools }}
+          ALL: ${{ steps.changed.outputs.all }}
+        run: |
+          set -euo pipefail
+          if [ "$ALL" = "true" ]; then cargo xtask engines-check all; else cargo xtask engines-check $TOOLS; fi
       - uses: pnpm/action-setup@v4
-        if: contains(steps.changed.outputs.apps, 'apps.seek') || contains(steps.changed.outputs.apps, 'apps.flow')
+        if: steps.changed.outputs.tools != '' || contains(steps.changed.outputs.apps, 'apps.seek') || contains(steps.changed.outputs.apps, 'apps.flow')
       - uses: actions/setup-node@v4
-        if: contains(steps.changed.outputs.apps, 'apps.seek') || contains(steps.changed.outputs.apps, 'apps.flow')
+        if: steps.changed.outputs.tools != '' || contains(steps.changed.outputs.apps, 'apps.seek') || contains(steps.changed.outputs.apps, 'apps.flow')
         with:
           node-version: 24
           cache: pnpm
+      - name: Browser recipes of the shared web player (workers, large files, offline, interface)
+        if: steps.changed.outputs.tools != ''
+        run: |
+          set -euo pipefail
+          cargo xtask build secure.hash-calculator pdf.merge qr.generator secure.password-generator
+          pnpm install --frozen-lockfile
+          pnpm exec playwright install --with-deps chromium
+          export CHROME_PATH="$(node -e "console.log(require('playwright').chromium.executablePath())")"
+          node scripts/tests/worker-smoke.mjs
+          node scripts/tests/platform-ui-smoke.mjs
       - name: Browser recipes of the rebuilt Seek and Flow apps
         if: contains(steps.changed.outputs.apps, 'apps.seek') || contains(steps.changed.outputs.apps, 'apps.flow')
         env:

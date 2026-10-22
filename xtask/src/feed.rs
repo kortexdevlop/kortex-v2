@@ -535,6 +535,17 @@ mod tests {
             krate("kortex-platform", "crates/kortex-platform", &[]),
             krate("kortex-contract", "crates/kortex-contract", &[]),
             krate("kortex-i18n", "crates/kortex-i18n", &[]),
+            krate(
+                "kortex-player",
+                "crates/kortex-player",
+                &[
+                    "kortex-ui",
+                    "kortex-runtime",
+                    "kortex-platform",
+                    "kortex-contract",
+                    "kortex-i18n",
+                ],
+            ),
             krate("kortex-pkg", "crates/kortex-pkg", &[]),
             krate("kortex-cli", "crates/kortex-cli", &["kortex-pkg"]),
             krate("tool-text-a", "tools/text/a", &[]),

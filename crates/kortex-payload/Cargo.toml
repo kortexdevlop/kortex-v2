@@ -1,0 +1,13 @@
+[package]
+name = "kortex-payload"
+version = "0.1.0"
+edition.workspace = true
+publish.workspace = true
+
+[features]
+# Reserves the payload region in the final binary: only the player turns it on, so the 4 MiB
+# never ends up in xtask, tests or other tools that merely read payloads.
+region = []
+
+[dependencies]
+sha2 = "0.10"

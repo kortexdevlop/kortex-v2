@@ -2,7 +2,7 @@ schema = 1
 
 [tool]
 id = "text.word-counter"
-version = "1.0.2"
+version = "1.0.3"
 universe = "text"
 status = "beta"
 ui = "auto"

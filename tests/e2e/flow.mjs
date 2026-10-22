@@ -19,21 +19,21 @@ const server = createServer((request, response) => {
 await new Promise(done => server.listen(0, '127.0.0.1', done));
 const origin = `http://127.0.0.1:${server.address().port}`;
 // The tool origin: tool engines are not bundled with the app; it runs them through the engine host
-// of the `run` origin (ADR 0034). Local stand-in: dist/run (engine of each tool) + the host page.
+// of the `run` origin (ADR 0034). Local stand-in: dist/run (engine and worker script of each tool),
+// the generic engine worker (ADR 0035) and the host page.
 const runDist = resolve(import.meta.dirname, '../../dist/run');
-const engineDist = resolve(import.meta.dirname, '../../dist/engines');
 const runServer = createServer((request, response) => {
   const pathname = decodeURIComponent(new URL(request.url, 'http://x').pathname);
   const send = (path, extra = {}) => response.writeHead(200, { 'content-type': types[extname(path)] ?? 'application/octet-stream', ...extra }).end(readFileSync(path));
   if (pathname === '/engines/host.html') return send(resolve(import.meta.dirname, '../../web/run-host/host.html'));
+  if (pathname === '/engines/kx-worker.js') return send(resolve(import.meta.dirname, '../../web/run-host/kx-worker.js'));
   if (pathname === '/engines/host.js') {
     const source = readFileSync(resolve(import.meta.dirname, '../../web/run-host/host.js'), 'utf8').replace('__ALLOWED_ORIGINS__', JSON.stringify([origin]));
     return response.writeHead(200, { 'content-type': 'text/javascript' }).end(source);
   }
-  const m = pathname.match(/^\/([a-z0-9]+\.[a-z0-9-]+)\/engine\/(engine\.js|engine_bg\.wasm|worker\.js)$/);
+  const m = pathname.match(/^\/([a-z0-9]+\.[a-z0-9-]+)\/engine\/(engine\.wasm|worker\.js)$/);
   if (!m) return response.writeHead(404).end();
-  const bundled = resolve(runDist, m[1], 'engine', m[2]);
-  const built = existsSync(bundled) ? bundled : resolve(engineDist, m[1], m[2]);
+  const built = resolve(runDist, m[1], 'engine', m[2]);
   if (!existsSync(built)) return response.writeHead(404).end();
   send(built);
 });

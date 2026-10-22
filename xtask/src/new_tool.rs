@@ -32,50 +32,12 @@ fn arg(args: &[String], flag: &str) -> Option<String> {
         .cloned()
 }
 
-/// Turns a fresh scaffold into a `ui = "custom"` tool: `ui` feature, gated module, `src/ui.rs`.
-fn apply_custom(dest: &Path, vars: &[(&str, String)]) -> Result<(), String> {
-    let edit = |file: &str, f: &dyn Fn(String) -> String| -> Result<(), String> {
-        let path = dest.join(file);
-        let text = fs::read_to_string(&path).map_err(|e| format!("{} : {e}", path.display()))?;
-        fs::write(&path, f(text)).map_err(|e| e.to_string())
-    };
-    edit("tool.toml", &|t| {
-        t.replace("ui = \"auto\"", "ui = \"custom\"")
-    })?;
-    edit("Cargo.toml", &|t| {
-        format!(
-            "{}\n[features]\nui = [\"dep:dioxus\", \"dep:kortex-ui\"]\n\n[dependencies.dioxus]\nversion = \"0.7.10\"\ndefault-features = false\nfeatures = [\"macro\", \"html\", \"signals\", \"hooks\"]\noptional = true\n\n[dependencies.kortex-ui]\npath = \"../../../crates/kortex-ui\"\noptional = true\n",
-            t.trim_end()
-        )
-    })?;
-    edit("src/lib.rs", &|t| {
-        format!("{}\n#[cfg(feature = \"ui\")]\npub mod ui;\n", t.trim_end())
-    })?;
-    for (lang, run) in [("fr", "Lancer"), ("en", "Run")] {
-        let path = dest.join(format!("locales/{lang}.toml"));
-        let text = fs::read_to_string(&path).map_err(|e| e.to_string())?;
-        if !text.contains("[ui]\n") {
-            return Err(format!(
-                "{} : section [ui] absente du gabarit",
-                path.display()
-            ));
-        }
-        fs::write(
-            &path,
-            text.replacen("[ui]\n", &format!("[ui]\nrun = \"{run}\"\n"), 1),
-        )
-        .map_err(|e| e.to_string())?;
-    }
-    let mut ui = include_str!("../templates/tool/ui.rs").to_owned();
-    for (k, v) in vars {
-        ui = ui.replace(&format!("{{{{{k}}}}}"), v);
-    }
-    fs::write(dest.join("src/ui.rs"), ui).map_err(|e| e.to_string())
-}
-
 pub fn run(args: &[String]) -> Result<(), String> {
     let universe = arg(args, "--universe")
-        .ok_or("usage : cargo xtask new-tool --universe <univers> --name <nom> [--custom]")?;
+        .ok_or("usage : cargo xtask new-tool --universe <univers> --name <nom>")?;
+    if args.iter().any(|a| a == "--custom") {
+        return Err("--custom : les interfaces personnalisées ne sont pas prises en charge par le lecteur partagé (ADR 0035, RULES 3.8)".to_owned());
+    }
     let name = arg(args, "--name").ok_or("--name manquant")?;
     if !tools::universes()?.contains(&universe) {
         return Err(format!(
@@ -111,16 +73,12 @@ pub fn run(args: &[String]) -> Result<(), String> {
         ),
     ];
     copy_dir(Path::new("tools/_template"), &dest, &vars)?;
-    let custom = args.iter().any(|a| a == "--custom");
-    if custom {
-        apply_custom(&dest, &vars)?;
-    }
     println!(
         "✓ {} créé. Étapes : tool.toml → src/engine.rs → glyph.svg → locales/ + content/ → tests/",
         dest.display()
     );
     println!(
-        "  Ajoute `tools/{universe}/{name}` aux membres du workspace si besoin, puis : cargo xtask registry && cargo xtask cli-gen && cargo xtask check {universe}.{name}"
+        "  Ajoute `tools/{universe}/{name}` aux membres du workspace si besoin, puis : cargo xtask registry && cargo xtask check {universe}.{name} && cargo xtask build {universe}.{name}"
     );
     Ok(())
 }

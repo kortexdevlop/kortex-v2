@@ -60,3 +60,15 @@ fn sorted_dirs(p: &Path) -> Result<Vec<PathBuf>, String> {
     v.sort();
     Ok(v)
 }
+
+/// Directory (relative to the repository root) of the tool `id`.
+///
+/// # Errors
+/// No tool has this identifier.
+pub fn dir_of(id: &str) -> Result<PathBuf, String> {
+    discover()?
+        .into_iter()
+        .find(|t| t.contract.as_ref().is_ok_and(|c| c.tool.id == id))
+        .map(|t| t.dir)
+        .ok_or_else(|| format!("outil `{id}` introuvable"))
+}

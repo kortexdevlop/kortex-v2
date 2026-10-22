@@ -2,7 +2,7 @@ schema = 1
 
 [tool]
 id = "secure.password-generator"
-version = "1.0.2"
+version = "1.0.3"
 universe = "secure"
 status = "beta"
 ui = "auto"
