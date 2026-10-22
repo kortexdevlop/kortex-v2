@@ -296,10 +296,10 @@ jobs:
           pnpm install --frozen-lockfile
           rm -rf dist/run dist/apps
           cargo xtask restore-web --index dist/release/index.json
+          cargo xtask tokens
           # The tool pages are composed from the current web player (ADR 0035): its hashed files,
           # each tool's index.html and offline cache name them, so they are rebuilt here.
           DX_CLI_TELEMETRY=false cargo xtask build-player-web
-          cargo xtask tokens
           cargo xtask registry
           cargo xtask icons
           KORTEX_RELEASE_DIR="$PWD/dist/release" pnpm site:build
