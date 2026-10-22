@@ -1,0 +1,38 @@
+[
+ {
+  "inputs": {
+   "text": {
+    "Text": "the cat and the hat"
+   }
+  },
+  "params": {
+   "search": {
+    "Text": "the"
+   },
+   "replacement": {
+    "Text": "a"
+   },
+   "first_only": {
+    "Bool": false
+   }
+  }
+ },
+ {
+  "inputs": {
+   "text": {
+    "Text": "the cat and the hat"
+   }
+  },
+  "params": {
+   "search": {
+    "Text": "the"
+   },
+   "replacement": {
+    "Text": "a"
+   },
+   "first_only": {
+    "Bool": true
+   }
+  }
+ }
+]

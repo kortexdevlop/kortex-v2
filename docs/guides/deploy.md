@@ -1,6 +1,6 @@
 # Static publication
 
-> **Voie nominale (ADR 0034)** : `feed.yml` publie les hôtes statiques depuis l'index signé fusionné (`xtask restore-web`), avec les secrets GitHub `CLOUDFLARE_API_TOKEN` et `CLOUDFLARE_ACCOUNT_ID`, sans recompiler. Le reste de ce guide décrit le secours local reproductible et la voie `deploy.yml` (manuelle, depuis un run `release.yml`).
+> **Voie nominale (ADR 0034)** : `feed.yml` publie les hôtes statiques depuis l'index signé fusionné (`xtask restore-web`), avec les secrets GitHub `CLOUDFLARE_API_TOKEN` et `CLOUDFLARE_ACCOUNT_ID`, sans recompiler les outils. Seul le lecteur web partagé est recompilé à cette étape (`xtask build-player-web`, ADR 0035) : les pages de chaque outil (`index.html`, cache hors ligne) nomment ses fichiers à empreinte, qui vivent une fois à `/assets/` de l'origine `run`. Le reste de ce guide décrit le secours local reproductible et la voie `deploy.yml` (manuelle, depuis un run `release.yml`).
 
 The current public scope is the Astro site, the web tools of the signed catalogue and the Rust apps. The account API is deployed with D1. Desktop downloads have been public since 2026-10-19 (`desktop_releases = true`): build the site with `KORTEX_RELEASE_DIR` pointing at the files of the current public GitHub Release, never at a local test index (`web/site/scripts/sync.mjs` refuses it). The tool catalogue is frozen except for explicit user authorisations (RULES §2.1).
 

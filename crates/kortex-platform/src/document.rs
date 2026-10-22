@@ -505,6 +505,27 @@ pub fn launch_tool_id() -> Option<String> {
     }
 }
 
+/// Tool id of a tool-origin page: the first segment of its path (`/<id>/…`), `None` elsewhere.
+pub fn page_tool_id() -> Option<String> {
+    #[cfg(target_arch = "wasm32")]
+    {
+        use wasm_bindgen::JsValue;
+        let location =
+            js_sys::Reflect::get(&js_sys::global(), &JsValue::from_str("location")).ok()?;
+        let path = js_sys::Reflect::get(&location, &JsValue::from_str("pathname"))
+            .ok()?
+            .as_string()?;
+        return path
+            .split('/')
+            .find(|segment| !segment.is_empty())
+            .map(str::to_owned);
+    }
+    #[cfg(not(target_arch = "wasm32"))]
+    {
+        None
+    }
+}
+
 /// Cookie-authenticated JSON delivery. No session cookie or token is exposed to Rust/UI storage.
 #[derive(serde::Deserialize)]
 pub struct AccountResponse {

@@ -265,6 +265,29 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
+      - name: Dioxus compiler (official pinned binary)
+        if: env.CHANNEL == 'stable'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/dioxus"
+          gh release download v0.7.10 --repo DioxusLabs/dioxus --pattern 'dx-x86_64-unknown-linux-gnu.tar.gz' --pattern 'dx-x86_64-unknown-linux-gnu.sha256' --dir "$RUNNER_TEMP/dioxus"
+          cd "$RUNNER_TEMP/dioxus"
+          sha256sum --check --ignore-missing dx-x86_64-unknown-linux-gnu.sha256
+          tar -xzf dx-x86_64-unknown-linux-gnu.tar.gz
+          find "$RUNNER_TEMP/dioxus" -type f -name dx -exec chmod +x {} \;
+          find "$RUNNER_TEMP/dioxus" -type f -name dx -printf '%h\n' >> "$GITHUB_PATH"
+      - name: wasm-bindgen compiler (pinned to the Cargo.lock version)
+        if: env.CHANNEL == 'stable'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/wasm-bindgen"
+          gh release download 0.2.129 --repo wasm-bindgen/wasm-bindgen --pattern 'wasm-bindgen-0.2.129-x86_64-unknown-linux-musl.tar.gz' --dir "$RUNNER_TEMP/wasm-bindgen"
+          cd "$RUNNER_TEMP/wasm-bindgen"
+          echo '82d12bb940e2d4e72e0d5605387fc1b8ca179044e012b620f0ce4e7440e8320e  wasm-bindgen-0.2.129-x86_64-unknown-linux-musl.tar.gz' | sha256sum --check
+          tar -xzf wasm-bindgen-0.2.129-x86_64-unknown-linux-musl.tar.gz
+          find "$RUNNER_TEMP/wasm-bindgen" -type f -name wasm-bindgen -printf '%h\n' >> "$GITHUB_PATH"
       - name: Rebuild the static hosts from the merged index (no recompilation) and deploy
         if: env.CHANNEL == 'stable'
         run: |
@@ -273,6 +296,9 @@ jobs:
           pnpm install --frozen-lockfile
           rm -rf dist/run dist/apps
           cargo xtask restore-web --index dist/release/index.json
+          # The tool pages are composed from the current web player (ADR 0035): its hashed files,
+          # each tool's index.html and offline cache name them, so they are rebuilt here.
+          DX_CLI_TELEMETRY=false cargo xtask build-player-web
           cargo xtask tokens
           cargo xtask registry
           cargo xtask icons

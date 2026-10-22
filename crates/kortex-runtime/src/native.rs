@@ -15,6 +15,9 @@ use serde_json::{Value as Json, json};
 
 use crate::{CancelToken, ToolError, ValueMap};
 
+/// Stack of the thread an engine runs on (address space only): see `task::spawn_with_stack`.
+const ENGINE_STACK: usize = 256 << 20;
+
 /// Outcome of one engine run.
 pub type RunOutcome = Result<ValueMap, ToolError>;
 
@@ -55,7 +58,7 @@ fn start(
             slot.complete(outcome);
         }
     };
-    if task::spawn("kortex-engine", job).is_err() {
+    if task::spawn_with_stack("kortex-engine", ENGINE_STACK, job).is_err() {
         slot.complete(Err(failure("worker_failed", "thread unavailable")));
     }
     if let Some(timeout) = timeout {

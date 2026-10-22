@@ -8,9 +8,93 @@ edition = "2024"
 license = "LicenseRef-Proprietary"
 publish = false
 
+# Engines run through wasmtime in tests and in `cargo xtask engines-check`: its compiler is always
+# optimised (a debug-built Cranelift is ten times slower) and without debug assertions.
+[profile.dev.package.wasmtime]
+opt-level = 3
+debug-assertions = false
+overflow-checks = false
+[profile.dev.package.wasmtime-environ]
+opt-level = 3
+debug-assertions = false
+overflow-checks = false
+[profile.dev.package.wasmtime-internal-core]
+opt-level = 3
+debug-assertions = false
+overflow-checks = false
+[profile.dev.package.wasmtime-internal-cranelift]
+opt-level = 3
+debug-assertions = false
+overflow-checks = false
+[profile.dev.package.wasmtime-internal-unwinder]
+opt-level = 3
+debug-assertions = false
+overflow-checks = false
+[profile.dev.package.wasmtime-internal-fiber]
+opt-level = 3
+debug-assertions = false
+overflow-checks = false
+[profile.dev.package.cranelift-codegen]
+opt-level = 3
+debug-assertions = false
+overflow-checks = false
+[profile.dev.package.cranelift-frontend]
+opt-level = 3
+debug-assertions = false
+overflow-checks = false
+[profile.dev.package.cranelift-entity]
+opt-level = 3
+debug-assertions = false
+overflow-checks = false
+[profile.dev.package.cranelift-bforest]
+opt-level = 3
+debug-assertions = false
+overflow-checks = false
+[profile.dev.package.cranelift-bitset]
+opt-level = 3
+debug-assertions = false
+overflow-checks = false
+[profile.dev.package.cranelift-control]
+opt-level = 3
+debug-assertions = false
+overflow-checks = false
+[profile.dev.package.cranelift-native]
+opt-level = 3
+debug-assertions = false
+overflow-checks = false
+[profile.dev.package.cranelift-assembler-x64]
+opt-level = 3
+debug-assertions = false
+overflow-checks = false
+[profile.dev.package.regalloc2]
+opt-level = 3
+debug-assertions = false
+overflow-checks = false
+[profile.dev.package.wasmparser]
+opt-level = 3
+debug-assertions = false
+overflow-checks = false
+[profile.dev.package.gimli]
+opt-level = 3
+debug-assertions = false
+overflow-checks = false
+[profile.dev.package.object]
+opt-level = 3
+debug-assertions = false
+overflow-checks = false
+
 [profile.release]
 opt-level = "z"
 lto = true
 codegen-units = 1
 panic = "abort"
 # NOTE: never set `strip = true` (breaks wasm-bindgen, see docs/spikes.md)
+
+# Desktop player (ADR 0035): the player itself stays small, its dependencies (the wasmtime
+# compiler above all) are built for speed. `cargo xtask build-desktop` uses this profile.
+[profile.player]
+inherits = "release"
+lto = "thin"
+codegen-units = 16
+[profile.player.package."*"]
+opt-level = 3

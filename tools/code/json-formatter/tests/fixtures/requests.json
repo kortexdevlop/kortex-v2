@@ -1,0 +1,56 @@
+[
+ {
+  "inputs": {
+   "text": {
+    "Text": "{\"b\":1,\"a\":[1,2,{\"c\":null}]}"
+   }
+  },
+  "params": {
+   "action": {
+    "Text": "format"
+   },
+   "indent": {
+    "Int": 2
+   },
+   "sort_keys": {
+    "Bool": true
+   }
+  }
+ },
+ {
+  "inputs": {
+   "text": {
+    "Text": "{\"b\": 1, \"a\": [1, 2]}"
+   }
+  },
+  "params": {
+   "action": {
+    "Text": "minify"
+   },
+   "indent": {
+    "Int": 2
+   },
+   "sort_keys": {
+    "Bool": false
+   }
+  }
+ },
+ {
+  "inputs": {
+   "text": {
+    "Text": "{\"a\":"
+   }
+  },
+  "params": {
+   "action": {
+    "Text": "validate"
+   },
+   "indent": {
+    "Int": 2
+   },
+   "sort_keys": {
+    "Bool": false
+   }
+  }
+ }
+]

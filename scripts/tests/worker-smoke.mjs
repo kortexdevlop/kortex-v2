@@ -2,7 +2,7 @@
 // Usage: NODE_PATH=<directory containing playwright> node scripts/tests/worker-smoke.mjs
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { readFile, readdir } from 'node:fs/promises';
+import { access, readFile } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import { createRequire } from 'node:module';
 import { resolve, extname } from 'node:path';
@@ -11,9 +11,8 @@ const root = resolve(import.meta.dirname, '../..');
 const bridge = (await readFile(resolve(root, 'crates/kortex-platform/src/worker.rs'), 'utf8')).split('r#"')[1].split('"#')[0];
 const engines = {};
 for (const id of ['secure.hash-calculator', 'pdf.merge']) {
-  const dirs = (await readdir(resolve(root, 'dist/run', id))).filter(n => n.startsWith('engine-'));
-  assert.equal(dirs.length, 1, `Build ${id} first with cargo xtask build`);
-  engines[id] = `/${id}/${dirs[0]}/worker.js`;
+  await access(resolve(root, 'dist/run', id, 'engine/engine.wasm')).catch(() => assert.fail(`Build ${id} first with cargo xtask build`));
+  engines[id] = `/${id}/engine/worker.js`;
 }
 const server = createServer(async (req, res) => {
   try {
@@ -64,7 +63,9 @@ try {
     }
     const merged = await call('pdf.merge', { files: { Files: [pdf('A'), pdf('B')] } });
     results.pdfBytes = Array.from(merged.Ok.merged.File.bytes);
+    // Not a PDF at all (wrong signature), then a file with the right signature that cannot be parsed.
     results.pdfError = (await call('pdf.merge', { files: { Files: [pdf('A'), { name: 'bad.pdf', mime: 'application/pdf', bytes: new Uint8Array([1, 2]) }] } })).Err.code;
+    results.pdfBroken = (await call('pdf.merge', { files: { Files: [pdf('A'), { name: 'broken.pdf', mime: 'application/pdf', bytes: new TextEncoder().encode('%PDF-1.4 broken') }] } })).Err.code;
     const long = call('secure.hash-calculator', { file: { File: { name: 'cancel.bin', mime: 'application/octet-stream', bytes: new Uint8Array(64 * 1024 * 1024) } } }).catch(e => e);
     setTimeout(() => bridge.cancelWorker(), 20);
     results.cancel = await long;
@@ -80,7 +81,8 @@ try {
   assert.ok(report.uiTicks > 0, 'UI event loop remains active');
   assert.equal(report.transferred, true, 'input ArrayBuffer ownership transferred');
   assert.equal(report.emptyError, 'missing_input');
-  assert.equal(report.pdfError, 'invalid_pdf');
+  assert.equal(report.pdfError, 'file_type_mismatch');
+  assert.equal(report.pdfBroken, 'invalid_pdf');
   assert.equal(report.cancel, 'cancelled');
   assert.equal(report.timeout, 'worker_timeout');
   assert.equal(report.missingWorker, 'worker_failed');

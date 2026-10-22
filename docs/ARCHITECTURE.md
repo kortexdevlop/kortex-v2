@@ -6,7 +6,8 @@
 
 | Couche | Dossier | Langage | Rôle |
 |---|---|---|---|
-| Outils (38, gelés) | `tools/<univers>/<nom>/` | Rust (moteur pur) + Dioxus | Contrat `tool.toml`, moteur, UI auto ou custom, locales, contenu, tests |
+| Outils (42, gelés) | `tools/<univers>/<nom>/` | Rust (moteur pur) | Contrat `tool.toml`, moteur compilé en `engine.wasm` (ABI v1), locales, contenu, tests ; interface générée par le lecteur |
+| Lecteurs partagés | `crates/kortex-player`, `kortex-engine-host`, `kortex-payload` | Rust + Dioxus | Une interface, un hôte wasm (`wasmtime`) et un format de paquet pour tous les outils : le binaire desktop d'un outil est le lecteur dont la zone réservée contient son paquet, le web sert un lecteur unique (ADR 0035) |
 | Applications installables | `apps/<nom>/` | Rust + Dioxus | `app.toml`, mêmes sources compilées web et desktop (features `web` / `desktop`) |
 | Bibliothèques partagées | `crates/kortex-*` | Rust | contrat, macros, runtime, plateforme, UI, shell, bus, i18n, sync, auth, pkg, cli |
 | Site vitrine | `web/site/` | Astro + TypeScript | SEO, catalogue, Stage, palette du site, pages légales |

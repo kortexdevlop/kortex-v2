@@ -52,8 +52,8 @@ jobs:
           cargo xtask tokens
           cargo xtask build-app apps.flow --web
           # Flow runs tool engines through the engine host of the tool origin (ADR 0034): the recipe
-          # serves the engines built here as that origin.
-          cargo xtask build-engine text.cleaner text.case-converter text.slug-generator secure.hash-calculator
+          # serves the tool sites built here (engine, worker script, shared player) as that origin.
+          cargo xtask build text.cleaner text.case-converter text.slug-generator secure.hash-calculator
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:

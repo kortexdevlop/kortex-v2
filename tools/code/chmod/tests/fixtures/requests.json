@@ -1,0 +1,26 @@
+[
+ {
+  "inputs": {
+   "text": {
+    "Text": "755"
+   }
+  },
+  "params": {
+   "direction": {
+    "Text": "to_symbolic"
+   }
+  }
+ },
+ {
+  "inputs": {
+   "text": {
+    "Text": "rwxr-xr-x"
+   }
+  },
+  "params": {
+   "direction": {
+    "Text": "to_octal"
+   }
+  }
+ }
+]

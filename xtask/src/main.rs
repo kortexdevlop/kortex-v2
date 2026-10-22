@@ -6,11 +6,14 @@ mod check;
 mod ci_budget;
 mod compat;
 mod dev;
+mod engine;
+mod engines_check;
 mod feed;
 mod icons;
 mod new_app;
 mod new_tool;
 mod platform_check;
+mod player;
 mod pwa;
 mod registry;
 mod release;
@@ -19,11 +22,10 @@ mod stats;
 mod style_check;
 mod tokens;
 mod tools;
-mod worker;
 
 use std::process::ExitCode;
 
-const USAGE: &str = "Commandes : tokens | registry | check [id] | stats | icons | keygen | build-desktop | build-cli | build-app | list-tools | package | feed-plan | package-web | restore-web | release-index | build <id…|all> | new-tool --universe U --name N [--custom] | new-app --name N | dev <id> [--desktop] | ci-budget | changed --base REF | schema <id|all> [--lang fr|en] | fingerprint <id> | build-engine <id…|all>";
+const USAGE: &str = "Commandes : tokens | registry | check [id] | stats | icons | keygen | build-desktop | build-cli | build-app | list-tools | package | feed-plan | package-web | restore-web | release-index | build <id…|all> | build-player-web | new-tool --universe U --name N [--custom] | new-app --name N | dev <id> [--desktop] | ci-budget | changed --base REF | schema <id|all> [--lang fr|en] | fingerprint <id> | build-engine <id…|all> | engines-check [id…|all]";
 
 /// Path for embedding in generated TOML/Rust source: forward slashes work on every OS, while
 /// Windows backslashes would be read as (invalid) escape sequences.
@@ -38,6 +40,7 @@ fn main() -> ExitCode {
         Some("registry") => registry::run(),
         Some("check") => check::run(args.get(1).map(String::as_str)),
         Some("build") => build::run(&args[1..]),
+        Some("build-player-web") => build::run_player(&args[1..]),
         Some("keygen") => release::keygen(&args[1..]),
         Some("build-desktop") => release::build_desktop(&args[1..]),
         Some("list-tools") => tools::discover().and_then(|ts| {
@@ -59,7 +62,8 @@ fn main() -> ExitCode {
         Some("new-tool") => new_tool::run(&args[1..]),
         Some("new-app") => new_app::run(&args[1..]),
         Some("changed") => changed::run(&args[1..]),
-        Some("build-engine") => worker::build_engine(&args[1..]),
+        Some("build-engine") => engine::build_engine(&args[1..]),
+        Some("engines-check") => engines_check::run(&args[1..]),
         Some("fingerprint") => build::print_fingerprint(&args[1..]),
         Some("schema") => schema::run(&args[1..]),
         Some("dev") => dev::run(&args[1..]),

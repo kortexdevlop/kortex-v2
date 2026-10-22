@@ -85,6 +85,11 @@ pub fn run(filter: Option<&str>) -> Result<(), String> {
                 ));
             }
         }
+        if contract.tool.ui == kortex_contract::UiKind::Custom {
+            errors.push(format!(
+                "✗ {dir} : ui = \"custom\" n'est pas pris en charge par le lecteur partagé (ADR 0035, RULES 3.8) : interface générée seulement, sinon décision explicite et ADR"
+            ));
+        }
         for issue in custom_ui_issues(
             contract.tool.ui == kortex_contract::UiKind::Custom,
             &fs::read_to_string(t.dir.join("Cargo.toml")).unwrap_or_default(),

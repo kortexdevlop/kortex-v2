@@ -1,0 +1,38 @@
+[
+ {
+  "inputs": {
+   "text": {
+    "Text": "255"
+   }
+  },
+  "params": {
+   "from_base": {
+    "Int": 10
+   },
+   "to_base": {
+    "Int": 16
+   },
+   "uppercase": {
+    "Bool": false
+   }
+  }
+ },
+ {
+  "inputs": {
+   "text": {
+    "Text": "ff"
+   }
+  },
+  "params": {
+   "from_base": {
+    "Int": 16
+   },
+   "to_base": {
+    "Int": 2
+   },
+   "uppercase": {
+    "Bool": true
+   }
+  }
+ }
+]

@@ -1,7 +1,7 @@
 schema = 1
 [tool]
 id = "convert.units"
-version = "1.0.2"
+version = "1.0.3"
 universe = "convert"
 status = "beta"
 ui = "auto"
