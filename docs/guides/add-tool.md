@@ -1,6 +1,6 @@
 # Ajouter un outil (recette)
 
-> **Catalogue gelé à 38 outils + `image.compress`** (RULES.md §2.1). Cette recette ne s'applique à un nouvel outil qu'après une autorisation explicite de l'utilisateur ; elle sert aussi de référence pour corriger les outils existants.
+> **Catalogue gelé à 44 outils** (38 d'origine + ajouts explicitement autorisés listés dans CLAUDE.md ; RULES.md §2.1). Cette recette ne s'applique à un nouvel outil qu'après une autorisation explicite de l'utilisateur ; elle sert aussi de référence pour corriger les outils existants.
 
 Écrit pour qu'une IA (ou toi) puisse suivre la procédure sans connaissance préalable du dépôt.
 
@@ -23,7 +23,7 @@ Vérifier l'outil en ligne de commande : `cargo xtask build-desktop <univers>.<n
 
 ## Voie rapide : publier un outil en environ 2 minutes (ADR 0035)
 
-Une fois l'outil écrit (contrat, moteur, locales, contenu, tests, glyphe) : `scripts/add-tool.sh <univers>.<nom>`. Aucune CI, aucune compilation sauf le moteur wasm de l'outil : les lecteurs desktop déjà compilés (release GitHub `players`, workflow `players.yml`, à relancer seulement si `crates/kortex-player` ou une crate qu'il lie change) reçoivent son paquet, l'index signé est étendu (clé `~/.kortex-signing-key`), une release `feed-<n>` est créée et seuls les hôtes `run` et `site` sont déployés (`wrangler` connecté). Mesure du 2026-10-22 sur `text.reverse` : 154 s de bout en bout (643 s avant d'optimiser `icons` et `restore-web`). Le commit de l'outil part sur `main` avec `[skip ci]` ; `FEED_AUTO` est à `false` (le flux automatique `feed.yml` reste disponible à la main).
+**C'est la voie nominale actuelle** (secours local reproductible de la CI, autorisé par CLAUDE.md). Une fois l'outil écrit (contrat, moteur, locales, contenu, tests, glyphe) : `scripts/add-tool.sh <univers>.<nom>` (à lancer depuis `main` ; `--no-commit` s'arrête après le build local, sans rien publier). Le script lance lui-même le gate de l'outil (`registry`, `check`, `cargo test`, `engines-check`) et refuse une modification dont la `version` n'a pas été montée. Si une étape 7 ou 8 échoue après le push, relancer le script : il est rejouable. Aucune CI, aucune compilation sauf le moteur wasm de l'outil : les lecteurs desktop déjà compilés (release GitHub `players`, workflow `players.yml`, à relancer seulement si `crates/kortex-player` ou une crate qu'il lie change) reçoivent son paquet, l'index signé est étendu (clé `~/.kortex-signing-key`), une release `feed-<n>` est créée et seuls les hôtes `run` et `site` sont déployés (`wrangler` connecté). Mesure du 2026-10-22 sur `text.reverse` : 154 s de bout en bout (643 s avant d'optimiser `icons` et `restore-web`). Le commit de l'outil part sur `main` avec `[skip ci]` ; `FEED_AUTO` est à `false` (le flux automatique `feed.yml` reste disponible à la main).
 
 ## Interface, moteur wasm et lecteurs partagés (ADR 0035)
 - L'interface d'un outil est **générée depuis son contrat** (`ui = "auto"`) par les lecteurs partagés : `kortex-player` (web et desktop, mêmes sources). Une interface personnalisée n'est plus prise en charge (RULES §3.8) : `cargo xtask check` refuse `ui = "custom"` et `new-tool --custom` échoue.
@@ -34,13 +34,15 @@ Une fois l'outil écrit (contrat, moteur, locales, contenu, tests, glyphe) : `sc
 
 Ne jamais modifier `web/site` : l'outil apparaît partout via le registre, sans branche par identifiant (RULES.md §3.7).
 
-Tous les moteurs web tournent dans un Worker isolé (annulation immédiate, délai de `[limits].timeout_s` qui inclut le chargement du moteur) ; le champ `web_worker` du contrat n'a plus d'effet (conservé pour la compatibilité des contrats). Les codes d'erreur doivent figurer dans les locales FR/EN. Voir ADR 0008 et 0035.
+Tous les moteurs web tournent dans un Worker isolé (annulation immédiate, délai de `[limits].timeout_s` qui inclut le chargement du moteur) ; ne pas renseigner `web_worker` dans un nouveau contrat (champ sans effet, toléré uniquement pour les anciens contrats). Les codes d'erreur doivent figurer dans les locales FR/EN. Voir ADR 0008 et 0035.
 
 Pour compiler un lot web sans reconstruire les autres outils : `cargo xtask build text.cleaner calc.tip convert.units`. Le lecteur web n'est compilé qu'une fois (reçu `.kortex/build/_player/`), chaque moteur seulement si ses sources ont changé (`.kortex/engines/<id>/receipt.json`).
 
 Les builds conservent un reçu local : si les sources, les bibliothèques liées et tous les fichiers produits sont inchangés, la compilation est évitée. Un fichier de sortie supprimé ou modifié invalide le reçu.
 
-## Publication et disponibilité (ADR 0034)
+## Publication par la CI (voie alternative, ADR 0034)
+
+> Cette voie (`feed.yml` enchaîné après la CI) n'est **pas** celle utilisée aujourd'hui : `FEED_AUTO=false` et les commits de la voie rapide portent `[skip ci]`. Elle reste disponible à la main.
 
 Ajouter ou modifier un outil ne demande **aucune recompilation des apps ni de la CLI**.
 

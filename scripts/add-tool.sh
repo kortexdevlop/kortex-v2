@@ -14,9 +14,21 @@ T0=$(date +%s)
 step() { printf '[%3ss] %s\n' "$(( $(date +%s) - T0 ))" "$*"; }
 [ -f "$KEY" ] || { echo "clé de signature absente : $KEY" >&2; exit 1; }
 export KORTEX_RELEASE_DIR="$PWD/dist/release"
+DIR="tools/${ID%%.*}/${ID#*.}"
+PKG="tool-${ID%%.*}-${ID#*.}"
+if [ "${2:-}" != "--no-commit" ]; then
+  [ "$(git rev-parse --abbrev-ref HEAD)" = "main" ] || { echo "à lancer depuis la branche main (ou avec --no-commit)" >&2; exit 1; }
+  trap 'echo "échec : corriger puis relancer scripts/add-tool.sh $ID (rejouable, le commit déjà poussé est réutilisé)" >&2' ERR
+fi
 
-step "1/8 contrat (registre + garde-fous)"
+step "1/8 gate de l'outil (version, registre, garde-fous, tests, moteurs)"
+if git cat-file -e "HEAD:$DIR/tool.toml" 2>/dev/null && ! git diff --quiet HEAD -- "$DIR"; then
+  [ "$(git show "HEAD:$DIR/tool.toml" | grep -m1 '^version')" != "$(grep -m1 '^version' "$DIR/tool.toml")" ] \
+    || { echo "outil modifié : monter 'version' dans $DIR/tool.toml" >&2; exit 1; }
+fi
 cargo xtask registry >/dev/null && cargo xtask check "$ID" | tail -1
+cargo test -q -p "$PKG"
+cargo xtask engines-check "$ID" | tail -1
 
 step "2/8 moteur wasm"
 cargo xtask build-engine "$ID" | tail -1
@@ -43,6 +55,10 @@ step "5/8 web (fichiers de l'outil)"
 cargo xtask build "$ID" | tail -1
 cargo xtask package-web "$ID" | tail -1
 
+if [ "${2:-}" = "--no-commit" ]; then
+  step "terminé (--no-commit) : build local seulement, rien commité ni publié"
+  exit 0
+fi
 if [ "${2:-}" != "--no-commit" ]; then
   step "6/8 sources de l'outil dans git (sans CI)"
   git add -A "tools/${ID%%.*}/${ID#*.}" registry CLAUDE.md AGENTS.md docs Cargo.lock 2>/dev/null || true

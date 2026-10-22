@@ -570,3 +570,8 @@ stable: 0 · beta: 38 · draft: 0 — calc 13, code 8, color 2, convert 2, image
 - **Mesuré** : première exécution 643 s, seconde 154 s (index séquence 8, outil en ligne sur `run`, le site et l'index signé).
 - **Limites** : la CI n'est plus une étape obligatoire pour un outil (décision de l'utilisateur) ; les lecteurs ne sont recompilés que par `players.yml` (Linux, Windows) et à la main sur Mac ; le lecteur n'est pas vérifié contre une version publiée ; `text.reverse` reste en ligne comme outil de recette.
 
+
+## Session 2026-10-22 — Cohérence de la recette et de la voie rapide
+
+- **Fait** : `docs/guides/add-tool.md` aligné (44 outils, voie rapide nominale, voie CI marquée alternative, `web_worker`) ; `scripts/add-tool.sh` lance le gate de l'outil (`version`, `check`, `cargo test`, `engines-check`), exige `main`, `--no-commit` s'arrête après le build local, message de reprise en cas d'échec.
+- **Limites** : script vérifié par `bash -n` seulement, non exécuté ; `seek-index.json` reste un second commit (généré à l'étape 8).
