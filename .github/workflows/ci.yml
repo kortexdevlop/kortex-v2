@@ -7,6 +7,23 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 jobs:
+  scale-foundations:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup show
+      - uses: Swatinem/rust-cache@v2
+      - name: Pure contracts, projects and signed catalogue regressions
+        run: cargo test --locked -p kortex-contract -p kortex-project -p kortex-catalog
+      - name: Browser compatibility of the shared foundations
+        run: cargo check --locked --target wasm32-unknown-unknown -p kortex-contract -p kortex-project -p kortex-catalog
+      - name: Local resources and durable project commands
+        run: cargo test --locked -p kortex-platform -p kortex-project -p kortex-workflow --features kortex-project/persistence,kortex-workflow/project-persistence
+      - name: Browser compatibility of resource and persistence backends
+        run: cargo check --locked --target wasm32-unknown-unknown -p kortex-platform -p kortex-project -p kortex-workflow --features kortex-project/persistence,kortex-workflow/project-persistence
   rust:
     env:
       CARGO_PROFILE_DEV_DEBUG: '0'
@@ -51,7 +68,7 @@ jobs:
       - run: cargo xtask tokens
       - run: cargo xtask registry
       - run: cargo xtask icons
-      - run: node --test scripts/tests/offline-routing.test.mjs scripts/tests/host-fallback.test.mjs
+      - run: node --test scripts/tests/offline-routing.test.mjs scripts/tests/host-fallback.test.mjs scripts/sync-modular-catalog.test.mjs
       - run: pnpm --filter @kortex/site test
       # Downloads need the signed release index, provided only by a real publication.
       - run: pnpm site:build
@@ -61,6 +78,7 @@ jobs:
         run: pnpm exec playwright install --with-deps chromium
       - name: E2E smoke on three key pages of the built site
         run: pnpm e2e
+      - run: pnpm e2e:projects
   services:
     runs-on: ubuntu-latest
     timeout-minutes: 10

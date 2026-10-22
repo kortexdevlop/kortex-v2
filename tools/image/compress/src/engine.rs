@@ -1,7 +1,7 @@
 //! Batch image compression: JPEG quality, PNG palette reduction (256 colours, NeuQuant) and
 //! best deflate, lossless WebP, optional downscaling. Metadata (EXIF, GPS) is never copied; the
-//! EXIF orientation is applied to the pixels first so photos keep their direction. A result that
-//! would be heavier than the original in the same format returns the original bytes unchanged.
+//! EXIF orientation is applied to the pixels first so photos keep their direction. A result
+//! may be larger than the original because metadata-bearing inputs are never returned unchanged.
 use std::io::Cursor;
 
 use image::codecs::jpeg::JpegEncoder;
@@ -165,7 +165,6 @@ pub async fn run(input: Inputs, params: Params, cx: &mut Cx) -> Result<Outputs, 
     for (i, file) in input.images.iter().enumerate() {
         cx.check_cancelled()?;
         let decoded = decode(file)?;
-        let resized = params.max_side > 0;
         let image = fit(decoded.image, params.max_side);
         let ext = target(&params.format, decoded.format);
         let (bytes, mime) = match ext {
@@ -175,13 +174,8 @@ pub async fn run(input: Inputs, params: Params, cx: &mut Cx) -> Result<Outputs, 
             "png" => (png_full(&image)?, "image/png"),
             _ => return Err(ToolError::with_detail(ToolError::INVALID_PARAM, "format")),
         };
-        let same = ImageFormat::from_mime_type(mime) == Some(decoded.format);
-        // Never heavier than the original in the same format (unless asked to resize).
-        let (bytes, mime, name) = if same && !resized && bytes.len() >= file.bytes.len() {
-            (file.bytes.clone(), mime, file.name.clone())
-        } else {
-            (bytes, mime, output_name(&file.name, ext))
-        };
+        // Always re-encode pixels: the original may contain private metadata.
+        let name = output_name(&file.name, ext);
         before += i64::try_from(file.bytes.len()).unwrap_or(i64::MAX);
         after += i64::try_from(bytes.len()).unwrap_or(i64::MAX);
         compressed.push(FileData {

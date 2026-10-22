@@ -329,3 +329,5 @@ mod tests {
         assert!(key.is_some_and(|k| VerifyingKey::from_bytes(&k).is_ok()));
     }
 }
+
+pub mod modular;

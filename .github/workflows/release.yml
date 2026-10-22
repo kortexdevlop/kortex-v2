@@ -234,6 +234,12 @@ jobs:
           path: |
             dist/release/index.json
             dist/release/index.json.sig
+            dist/release/catalog.json
+            dist/release/catalog.json.sig
+            dist/release/catalog-index-v2.json
+            dist/release/catalog-index-v2.json.sig
+            dist/release/catalog-contracts-v2.tar.gz
+            dist/release/contracts/*.json
             dist/release/cli-latest.txt
             dist/release/build-proof-*.json
           if-no-files-found: error
@@ -243,7 +249,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "${{ steps.rel.outputs.tag }}" dist/release/* \
+          shopt -s nullglob
+          gh release create "${{ steps.rel.outputs.tag }}" dist/release/*.json dist/release/*.sig dist/release/*.txt dist/release/*.tar.gz \
             --repo "${{ github.repository }}" \
             --target "${{ github.sha }}" \
             --title "${{ steps.rel.outputs.tag }}" \

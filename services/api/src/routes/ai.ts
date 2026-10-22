@@ -114,7 +114,7 @@ export async function chat(ctx: Ctx): Promise<Response> {
   const { messages, chars } = parseMessages(b.messages);
   const parsedTools = parseTools(b.tools);
   const modelKey = b.model === undefined ? DEFAULT_MODEL : b.model;
-  if (typeof modelKey !== 'string' || !(modelKey in MODELS)) throw new HttpError(400, 'invalid_model');
+  if (typeof modelKey !== 'string' || !Object.hasOwn(MODELS, modelKey)) throw new HttpError(400, 'invalid_model');
   const model = MODELS[modelKey]!;
   const maxOut = b.max_tokens === undefined ? DEFAULT_OUT_TOKENS : b.max_tokens;
   if (!Number.isInteger(maxOut) || (maxOut as number) < 1 || (maxOut as number) > MAX_OUT_TOKENS) throw new HttpError(400, 'invalid_max_tokens');
@@ -142,11 +142,11 @@ export async function chat(ctx: Ctx): Promise<Response> {
   try {
     out = await ctx.env.AI.run(model.id as never, input as never);
   } catch (e) {
-    await settle(ctx.env, uid, r.cost, 0, modelKey, Date.now(), app); // nothing was consumed: full refund
+    await settle(ctx.env, uid, r.cost, 0, modelKey, Date.now(), app, r.day); // nothing was consumed: full refund
     return providerFailure(ctx, uid, e);
   }
 
-  if (b.stream === true && out instanceof ReadableStream) return streamResponse(ctx, uid, out as ReadableStream<Uint8Array>, r.cost, modelKey, model, inTokens, app);
+  if (b.stream === true && out instanceof ReadableStream) return streamResponse(ctx, uid, out as ReadableStream<Uint8Array>, r.cost, modelKey, model, inTokens, app, r.day);
 
   const result = isRecord(out) ? out : {};
   const choice = Array.isArray(result.choices) && isRecord(result.choices[0]) ? result.choices[0] : {};
@@ -154,7 +154,7 @@ export async function chat(ctx: Ctx): Promise<Response> {
   const content = typeof message.content === 'string' ? message.content : null;
   const toolCalls = Array.isArray(message.tool_calls) && message.tool_calls.length > 0 ? message.tool_calls : undefined;
   const usage = isRecord(result.usage) ? (result.usage as Usage) : undefined;
-  await settle(ctx.env, uid, r.cost, used(usage, model, inTokens, estimateTokens((content ?? '').length)), modelKey, Date.now(), app);
+  await settle(ctx.env, uid, r.cost, used(usage, model, inTokens, estimateTokens((content ?? '').length)), modelKey, Date.now(), app, r.day);
   return json({
     message: { role: 'assistant', content, ...(toolCalls ? { tool_calls: toolCalls } : {}) },
     finish_reason: typeof choice.finish_reason === 'string' ? choice.finish_reason : 'stop',
@@ -174,7 +174,7 @@ async function providerFailure(ctx: Ctx, uid: string, e: unknown): Promise<Respo
 /** Re-emits the provider's SSE as `data: {delta, finish_reason}` events, then `event: done` with the
  *  credits. The reservation is settled exactly once: on the provider's reported neurons at the
  *  end, or on a character-based estimate if the client leaves early or the provider fails. */
-function streamResponse(ctx: Ctx, uid: string, source: ReadableStream<Uint8Array>, reserved: number, modelKey: string, model: ModelInfo, inTokens: number, app: string): Response {
+function streamResponse(ctx: Ctx, uid: string, source: ReadableStream<Uint8Array>, reserved: number, modelKey: string, model: ModelInfo, inTokens: number, app: string, reservationDay: string): Response {
   const reader = source.getReader();
   const decoder = new TextDecoder();
   let buffer = '';
@@ -184,7 +184,7 @@ function streamResponse(ctx: Ctx, uid: string, source: ReadableStream<Uint8Array
   const finish = async (): Promise<void> => {
     if (settled) return;
     settled = true;
-    await settle(ctx.env, uid, reserved, used(usage, model, inTokens, estimateTokens(outChars)), modelKey, Date.now(), app);
+    await settle(ctx.env, uid, reserved, used(usage, model, inTokens, estimateTokens(outChars)), modelKey, Date.now(), app, reservationDay);
   };
   const handle = (line: string, controller: ReadableStreamDefaultController<Uint8Array>): void => {
     if (!line.startsWith('data:')) return;

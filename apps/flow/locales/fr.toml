@@ -277,6 +277,8 @@ err_too_many_keys = "Trop d’éléments synchronisés sur ce compte."
 err_storage = "Impossible d’enregistrer la phrase de passe sur cet appareil."
 err_other = "La synchronisation a échoué"
 
+err_random_unavailable = "Impossible de générer un secret sécurisé sur cet appareil. Réessayez."
+
 [trigger]
 button = "Déclencheur"
 help = "Lance ce workflow tout seul. Ne tourne que lorsque Kortex Flow est ouvert (onglet ou application) ; rien ne s'exécute en arrière-plan."
@@ -301,6 +303,8 @@ auto_off = "Désactivé après 5 échecs de suite : corrigez le workflow puis r�
 err_interval_too_short = "Intervalle trop court (ou trop long) pour ce workflow."
 err_bad_time = "Heure invalide."
 err_webhook_web = "Le webhook local n'existe que dans l'application."
+
+err_random_unavailable = "Impossible de générer un secret sécurisé sur cet appareil. Réessayez."
 
 [builder]
 title = "Décrire ce que je veux (IA)"

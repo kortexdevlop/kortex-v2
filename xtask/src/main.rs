@@ -1,6 +1,7 @@
 //! Project tooling: `cargo xtask <command>`.
 mod apps;
 mod build;
+mod catalog;
 mod changed;
 mod check;
 mod ci_budget;
@@ -25,7 +26,7 @@ mod tools;
 
 use std::process::ExitCode;
 
-const USAGE: &str = "Commandes : tokens | registry | check [id] | stats | icons | keygen | build-desktop | build-cli | build-player | player-fingerprint | build-app | list-tools | package | feed-plan | package-web | restore-web | release-index | build <id…|all> | build-player-web | new-tool --universe U --name N [--custom] | new-app --name N | dev <id> [--desktop] | ci-budget | changed --base REF | schema <id|all> [--lang fr|en] | fingerprint <id> | build-engine <id…|all> | engines-check [id…|all]";
+const USAGE: &str = "Commandes : catalog-resolve --root DIR --id ID --state FILE | tokens | registry | check [id] | stats | icons | keygen | build-desktop | build-cli | build-player | player-fingerprint | build-app | list-tools | package | feed-plan | package-web | restore-web | release-index | build <id…|all> | build-player-web | new-tool --universe U --name N [--custom] | new-app --name N | dev <id> [--desktop] | ci-budget | changed --base REF | schema <id|all> [--lang fr|en] | fingerprint <id> | build-engine <id…|all> | engines-check [id…|all]";
 
 /// Path for embedding in generated TOML/Rust source: forward slashes work on every OS, while
 /// Windows backslashes would be read as (invalid) escape sequences.
@@ -37,6 +38,7 @@ fn main() -> ExitCode {
     let args: Vec<String> = std::env::args().skip(1).collect();
     let result = match args.first().map(String::as_str) {
         Some("tokens") => tokens::run(),
+        Some("catalog-resolve") => catalog::resolve(&args[1..]),
         Some("registry") => registry::run(),
         Some("check") => check::run(args.get(1).map(String::as_str)),
         Some("build") => build::run(&args[1..]),

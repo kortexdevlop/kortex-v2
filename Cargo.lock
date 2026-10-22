@@ -3685,7 +3685,7 @@ dependencies = [
 
 [[package]]
 name = "kortex-cli"
-version = "0.2.1"
+version = "0.2.2"
 dependencies = [
  "flate2",
  "kortex-contract",
@@ -3873,6 +3873,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "kortex-project"
+version = "0.1.0"
+dependencies = [
+ "kortex-contract",
+ "kortex-platform",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "kortex-runtime"
 version = "0.1.0"
 dependencies = [
@@ -3968,6 +3978,7 @@ version = "0.1.0"
 dependencies = [
  "kortex-contract",
  "kortex-platform",
+ "kortex-project",
  "kortex-runtime",
  "serde",
  "serde_json",

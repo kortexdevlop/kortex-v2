@@ -75,7 +75,8 @@ SEQ=$(python3 -c 'import json; print(json.load(open(".kortex/previous/index.json
 TAG="feed-$SEQ"
 cargo xtask release-index --base-url "https://github.com/$REPO/releases/download/$TAG" --channel stable \
   --source-commit "$(git rev-parse HEAD)" --previous .kortex/previous/index.json --key-file "$KEY" | tail -2
-gh release create "$TAG" dist/release/* --repo "$REPO" --target "$(git rev-parse HEAD)" --title "$TAG" \
+shopt -s nullglob
+gh release create "$TAG" dist/release/*.json dist/release/*.sig dist/release/*.txt dist/release/*.tar.gz --repo "$REPO" --target "$(git rev-parse HEAD)" --title "$TAG" \
   --notes "Fast lane: $ID (players reused, nothing compiled but its engine)." >/dev/null
 
 step "8/8 déploiement des hôtes run et site"

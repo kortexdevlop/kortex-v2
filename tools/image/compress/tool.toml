@@ -2,7 +2,7 @@ schema = 1
 
 [tool]
 id = "image.compress"
-version = "1.0.1"
+version = "1.0.2"
 universe = "image"
 status = "beta"
 ui = "auto"

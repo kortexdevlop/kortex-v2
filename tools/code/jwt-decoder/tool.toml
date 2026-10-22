@@ -2,7 +2,7 @@ schema = 1
 
 [tool]
 id = "code.jwt-decoder"
-version = "1.0.1"
+version = "1.0.2"
 universe = "code"
 status = "beta"
 ui = "auto"

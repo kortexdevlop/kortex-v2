@@ -4,6 +4,8 @@
 mod json_schema;
 mod port;
 mod schema;
+/// Additive multi-operation contract; the deployed v1 ABI remains unchanged.
+pub mod v2;
 mod validate;
 
 pub use json_schema::{port_schema, tool_definition};

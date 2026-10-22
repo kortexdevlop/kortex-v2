@@ -11,7 +11,8 @@
     "e2e:mind": "node tests/e2e/mind.mjs",
     "e2e:pwa": "node tests/e2e/pwa.mjs",
     "e2e:prefs": "node tests/e2e/prefs.mjs",
-    "e2e:admin": "node tests/e2e/admin.mjs"
+    "e2e:admin": "node tests/e2e/admin.mjs",
+    "e2e:projects": "node tests/e2e/project-store.mjs"
   },
   "devDependencies": {
     "playwright": "1.63.0"

@@ -10,7 +10,7 @@ Réduisez le poids de vos photos et de vos captures pour les envoyer par e-mail,
 ### Mes images sont-elles envoyées à un serveur ?
 Non. La compression est faite localement, sans aucune requête réseau.
 ### Puis-je obtenir un fichier plus lourd qu'avant ?
-Non : si le résultat n'est pas plus léger que l'original dans le même format, l'image d'origine est conservée telle quelle.
+Oui, notamment pour une image déjà optimisée. Les pixels sont toujours réencodés pour supprimer les métadonnées privées, même si cela augmente le poids.
 ### Que devient la transparence d'un PNG ?
 Elle est conservée pour les PNG et les WebP. Un JPG n'a pas de transparence : elle est remplacée par du blanc.
 ### Quelle qualité choisir ?

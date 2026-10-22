@@ -10,7 +10,7 @@ Reduce the weight of your photos and screenshots to email them, publish them on 
 ### Are my images sent to a server?
 No. Compression is done locally, with no network request.
 ### Can the result be heavier than before?
-No: if the result is not lighter than the original in the same format, the original image is kept unchanged.
+Yes, especially for an already optimized image. Pixels are always re-encoded to remove private metadata, even if this increases the file size.
 ### What happens to PNG transparency?
 It is kept for PNG and WebP. A JPG has no transparency: it is replaced by white.
 ### Which quality should I choose?

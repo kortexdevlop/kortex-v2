@@ -435,10 +435,10 @@ fn sync_error(l: &kortex_i18n::Catalog, code: &str) -> String {
     }
 }
 
-fn token() -> String {
+fn token() -> Result<String, &'static str> {
     let mut bytes = [0_u8; 16];
-    let _ = kortex_platform::fill_random(&mut bytes);
-    bytes.iter().map(|b| format!("{b:02x}")).collect()
+    kortex_platform::fill_random(&mut bytes).map_err(|_| "random_unavailable")?;
+    Ok(bytes.iter().map(|b| format!("{b:02x}")).collect())
 }
 
 fn trigger_error(l: &kortex_i18n::Catalog, code: &str) -> String {
@@ -498,10 +498,13 @@ fn trigger_editor(ctx: Ctx, l: &'static kortex_i18n::Catalog, id: &str, has_ai: 
             }),
             "daily" => apply(Kind::Daily { hour: 9, minute: 0 }),
             "open" => apply(Kind::Open),
-            "webhook" => apply(Kind::Webhook {
-                port: 47_821,
-                token: token(),
-            }),
+            "webhook" => match token() {
+                Ok(token) => apply(Kind::Webhook {
+                    port: 47_821,
+                    token,
+                }),
+                Err(code) => err.set(Some(code.to_owned())),
+            },
             _ => {}
         }
     };

@@ -116,8 +116,8 @@ fn png_palette_is_smaller_and_keeps_transparency() {
 }
 
 #[test]
-fn never_heavier_than_the_original_in_the_same_format() {
-    // Compressing an already compressed image again must not make it heavier.
+fn repeated_palette_encoding_stays_compact() {
+    // This palette fixture remains compact when encoded again.
     let first = go(
         vec![file(&picture(96, 96, 255), ImageFormat::Png, "p.png", None)],
         params("keep", 75, 0, "256"),
@@ -169,4 +169,33 @@ fn errors_are_typed() {
         .map(|_| ())
         .expect_err("range");
     assert_eq!(quality.code, "invalid_param");
+}
+
+#[test]
+fn metadata_is_removed_even_when_reencoding_increases_size() {
+    let mut input = file(
+        &picture(96, 96, 255),
+        ImageFormat::Jpeg,
+        "private.jpg",
+        Some(1),
+    );
+    let secret = b"private-location";
+    let mut comment = vec![0xff, 0xfe];
+    comment.extend_from_slice(
+        &u16::try_from(secret.len() + 2)
+            .expect("length")
+            .to_be_bytes(),
+    );
+    comment.extend_from_slice(secret);
+    input.bytes.splice(2..2, comment);
+    let original_size = input.bytes.len();
+    let out = go(vec![input], params("keep", 100, 0, "256")).expect("encoded");
+    assert!(out.compressed[0].bytes.len() > original_size);
+    assert!(
+        !out.compressed[0]
+            .bytes
+            .windows(secret.len())
+            .any(|w| w == secret)
+    );
+    assert!(image::load_from_memory(&out.compressed[0].bytes).is_ok());
 }

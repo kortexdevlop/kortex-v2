@@ -1,5 +1,6 @@
 // Copies generated design CSS and builds the site data from registry + tool content.
 import { cpSync, mkdirSync, readFileSync, readdirSync, existsSync, writeFileSync, rmSync } from 'node:fs';
+import { syncModularCatalog } from '../../../scripts/sync-modular-catalog.mjs';
 import { publicFeatures } from '../../../scripts/public-features.mjs';
 import { join, resolve } from 'node:path';
 
@@ -37,6 +38,7 @@ if (desktopReleases) {
   for (const f of ['index.json', 'index.json.sig', 'cli-latest.txt']) cpSync(join(rel, f), join(out, 'public/registry', f));
   // Signed contract catalogue (ADR 0034): apps fetch it at runtime, so a new tool needs no app rebuild.
   for (const f of ['catalog.json', 'catalog.json.sig']) if (existsSync(join(rel, f))) cpSync(join(rel, f), join(out, 'public/registry', f));
+  if (existsSync(join(rel, 'catalog-index-v2.json'))) syncModularCatalog(rel, join(out, 'public/registry'), readFileSync(join(root, 'crates/kortex-catalog/release.pub'), 'utf8'));
 }
 
 const registry = JSON.parse(readFileSync(join(root, 'registry/contracts.json'), 'utf8'));

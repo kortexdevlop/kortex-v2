@@ -32,14 +32,14 @@ export const secondsToUtcMidnight = (now: number): number => {
   return Math.ceil((Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() + 1) - now) / 1000);
 };
 
-interface Bucket { tokens: number; updated_at: number }
+interface Bucket { tokens: number; updated_at: number; storedTokens?: number }
 
 async function readBucket(env: Env, uid: string, now: number, factor = 1): Promise<Bucket> {
   const l = limits(env);
   const row = await env.DB.prepare('SELECT tokens, updated_at FROM ai_buckets WHERE user_id = ?1').bind(uid).first<Bucket>();
   if (!row) return { tokens: l.userCap, updated_at: now };
   const refilled = row.tokens + ((now - row.updated_at) / THREE_HOURS_MS) * l.refillPer3h * factor;
-  return { tokens: Math.min(l.userCap, refilled), updated_at: row.updated_at };
+  return { tokens: Math.min(l.userCap, refilled), updated_at: row.updated_at, storedTokens: row.tokens };
 }
 
 export interface CreditsView {
@@ -63,11 +63,12 @@ export async function creditsView(env: Env, uid: string, now = Date.now()): Prom
   return { percent, status: percent <= 15 ? 'low' : 'ok', resets_in_seconds: null };
 }
 
-export type Reservation = { ok: true; cost: number } | { ok: false; reason: 'user_empty' | 'ai_paused' | 'user_daily'; retryAfter: number };
+export type Reservation = { ok: true; cost: number; day: string } | { ok: false; reason: 'user_empty' | 'ai_paused' | 'user_daily'; retryAfter: number };
 
 /** Reserve `cost` neurons from the user's bucket AND the global day budget, atomically enough:
  *  the global counter uses a conditional upsert, the bucket an optimistic update with retries. */
 export async function reserve(env: Env, uid: string, cost: number, now = Date.now()): Promise<Reservation> {
+  if (!Number.isFinite(cost) || cost < 0) throw new Error('invalid_reservation_cost');
   const l = limits(env);
   const day = utcDay(now);
   const factor = refillFactor(await globalUsed(env, now), l.globalDaily);
@@ -96,16 +97,17 @@ export async function reserve(env: Env, uid: string, cost: number, now = Date.no
       return { ok: false, reason: 'ai_paused', retryAfter: secondsToUtcMidnight(now) };
     }
     const left = b.tokens - cost;
-    const exists = await env.DB.prepare('SELECT updated_at FROM ai_buckets WHERE user_id = ?1').bind(uid).first<{ updated_at: number }>();
     let changes: number;
-    if (!exists) {
+    if (b.storedTokens === undefined) {
       const r = await env.DB.prepare('INSERT INTO ai_buckets (user_id, tokens, updated_at) VALUES (?1, ?2, ?3) ON CONFLICT(user_id) DO NOTHING').bind(uid, left, now).run();
       changes = r.meta.changes;
     } else {
-      const r = await env.DB.prepare('UPDATE ai_buckets SET tokens = ?2, updated_at = ?3 WHERE user_id = ?1 AND updated_at = ?4').bind(uid, left, now, exists.updated_at).run();
+      // Compare the exact snapshot used to compute `left`, including tokens: settlements can
+      // change the balance without moving updated_at, and requests can share a millisecond.
+      const r = await env.DB.prepare('UPDATE ai_buckets SET tokens = ?2, updated_at = ?3 WHERE user_id = ?1 AND updated_at = ?4 AND tokens = ?5').bind(uid, left, now, b.updated_at, b.storedTokens).run();
       changes = r.meta.changes;
     }
-    if (changes === 1) return { ok: true, cost };
+    if (changes === 1) return { ok: true, cost, day };
     // Lost a race with a concurrent request: give the global budget back and retry.
     await env.DB.prepare('UPDATE ai_global SET used = MAX(0, used - ?2) WHERE day = ?1').bind(day, cost).run();
     await refundMine();
@@ -114,10 +116,12 @@ export async function reserve(env: Env, uid: string, cost: number, now = Date.no
 }
 
 /** After the call: refund the unused part of the reservation (or charge the overrun). */
-export async function settle(env: Env, uid: string, reserved: number, actual: number, model: string, now = Date.now(), app = 'other'): Promise<void> {
+export async function settle(env: Env, uid: string, reserved: number, actual: number, model: string, now = Date.now(), app = 'other', reservationDay = utcDay(now)): Promise<void> {
+  if (![reserved, actual].every((n) => Number.isFinite(n) && n >= 0)) throw new Error('invalid_settlement_cost');
   const l = limits(env);
   const diff = reserved - actual; // > 0: refund
-  const day = utcDay(now);
+  // Calls may finish after UTC midnight; always settle against their reservation's day.
+  const day = reservationDay;
   await env.DB.prepare('UPDATE ai_global SET used = MAX(0, used - ?2) WHERE day = ?1').bind(day, diff).run();
   await env.DB.prepare('UPDATE ai_buckets SET tokens = MAX(0, MIN(?3, tokens + ?2)) WHERE user_id = ?1').bind(uid, diff, l.userCap).run();
   await env.DB

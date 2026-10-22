@@ -85,7 +85,7 @@ for (const [name, source, host] of targets) {
   inspect(dest);
   // Signed index and contract catalogue: public data the apps fetch without cookies (ADR 0034);
   // their signature, not the transport, is what clients trust.
-  const registryHeaders = '\n/registry/*\n  Access-Control-Allow-Origin: *\n  Cache-Control: no-cache\n';
+  const registryHeaders = '\n/registry/*\n  Access-Control-Allow-Origin: *\n  Cache-Control: no-cache\n/registry/contracts/*\n  Access-Control-Allow-Origin: *\n  Cache-Control: public, max-age=31536000, immutable\n';
   const csp = name === 'site'
     ? `default-src 'self'; script-src 'self' ${[...scriptHashes].join(' ')}${turnstile}; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://${domains.run}${features.account ? ` https://${domains.api}` : ''}; frame-src https://${domains.run}${turnstile}; worker-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'self'; form-action 'self'`
     : name !== 'run' ? `default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://${domains.api} https://${domains.root}; frame-src https://${domains.run}; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'`
