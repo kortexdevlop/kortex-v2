@@ -31,9 +31,6 @@ for t in $TARGETS; do
     chmod +x "$dest"
   fi
 done
-published=$(gh release download players --repo "$REPO" --pattern fingerprint.txt --output - 2>/dev/null || true)
-local_fp=$(cargo xtask player-fingerprint 2>/dev/null || true)
-[ -z "$published" ] || [ "$published" = "$local_fp" ] || echo "  ⚠ le lecteur a changé depuis les lecteurs publiés : relance le workflow 'players'"
 
 step "4/8 assemblage et paquets des 4 plateformes"
 rm -rf dist/release && mkdir -p dist/release

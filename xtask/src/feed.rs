@@ -454,13 +454,30 @@ pub fn restore_web(args: &[String]) -> Result<(), String> {
         {
             return Err(format!("identifiant refusé : {id}"));
         }
-        let url = kortex_pkg::resolve(&source, &artifact.url);
-        let bytes = kortex_pkg::fetch(&url, 256 << 20).map_err(|e| format!("{id} : {e}"))?;
-        if bytes.len() as u64 != artifact.size || sha256_hex(&bytes) != artifact.sha256 {
-            return Err(format!(
-                "{id} : l'archive web ne correspond pas à l'index signé"
-            ));
-        }
+        // Archives are immutable and named by their signed SHA-256: keep them, a publication that
+        // changes one tool then downloads one archive, not all of them.
+        let cached = PathBuf::from(".kortex/web-cache").join(&artifact.sha256);
+        let bytes = match fs::read(&cached) {
+            Ok(bytes)
+                if bytes.len() as u64 == artifact.size && sha256_hex(&bytes) == artifact.sha256 =>
+            {
+                bytes
+            }
+            _ => {
+                let url = kortex_pkg::resolve(&source, &artifact.url);
+                let bytes =
+                    kortex_pkg::fetch(&url, 256 << 20).map_err(|e| format!("{id} : {e}"))?;
+                if bytes.len() as u64 != artifact.size || sha256_hex(&bytes) != artifact.sha256 {
+                    return Err(format!(
+                        "{id} : l'archive web ne correspond pas à l'index signé"
+                    ));
+                }
+                if fs::create_dir_all(".kortex/web-cache").is_ok() {
+                    let _ = fs::write(&cached, &bytes);
+                }
+                bytes
+            }
+        };
         let dest = bundle_dir(id);
         let _ = fs::remove_dir_all(&dest);
         let mut tar = tar::Archive::new(flate2::read::GzDecoder::new(bytes.as_slice()));

@@ -83,6 +83,73 @@ opt-level = 3
 debug-assertions = false
 overflow-checks = false
 
+# `cargo xtask icons` and `restore-web` (image rendering, archives) run in the debug build of xtask:
+# their libraries are optimised, otherwise drawing the sharing images alone takes minutes.
+[profile.dev.package.resvg]
+opt-level = 3
+debug-assertions = false
+overflow-checks = false
+[profile.dev.package.usvg]
+opt-level = 3
+debug-assertions = false
+overflow-checks = false
+[profile.dev.package.tiny-skia]
+opt-level = 3
+debug-assertions = false
+overflow-checks = false
+[profile.dev.package.tiny-skia-path]
+opt-level = 3
+debug-assertions = false
+overflow-checks = false
+[profile.dev.package.fontdb]
+opt-level = 3
+debug-assertions = false
+overflow-checks = false
+[profile.dev.package.png]
+opt-level = 3
+debug-assertions = false
+overflow-checks = false
+[profile.dev.package.miniz_oxide]
+opt-level = 3
+debug-assertions = false
+overflow-checks = false
+[profile.dev.package.flate2]
+opt-level = 3
+debug-assertions = false
+overflow-checks = false
+[profile.dev.package.fdeflate]
+opt-level = 3
+debug-assertions = false
+overflow-checks = false
+[profile.dev.package.crc32fast]
+opt-level = 3
+debug-assertions = false
+overflow-checks = false
+[profile.dev.package.sha2]
+opt-level = 3
+debug-assertions = false
+overflow-checks = false
+[profile.dev.package.tar]
+opt-level = 3
+debug-assertions = false
+overflow-checks = false
+[profile.dev.package.simplecss]
+opt-level = 3
+debug-assertions = false
+overflow-checks = false
+[profile.dev.package.svgtypes]
+opt-level = 3
+debug-assertions = false
+overflow-checks = false
+[profile.dev.package.kurbo]
+opt-level = 3
+debug-assertions = false
+overflow-checks = false
+[profile.dev.package.roxmltree]
+opt-level = 3
+debug-assertions = false
+overflow-checks = false
+
 [profile.release]
 opt-level = "z"
 lto = true

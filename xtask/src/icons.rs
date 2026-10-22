@@ -218,6 +218,24 @@ pub(crate) fn render_png(svg: &str, width: u32) -> Result<Vec<u8>, String> {
     pixmap.encode_png().map_err(|e| e.to_string())
 }
 
+/// Renders `svg` to a PNG unless the file already exists for exactly this SVG and width: the
+/// stamp lives outside `design/dist` so it is never published. Rendering is the slow part, and
+/// adding a tool must not redraw the images of the 42 others.
+fn write_png_cached(path: &str, svg: &str, width: u32) -> Result<(), String> {
+    use std::hash::{Hash, Hasher};
+    let mut hash = std::collections::hash_map::DefaultHasher::new();
+    (svg, width).hash(&mut hash);
+    let want = format!("{:016x}", hash.finish());
+    let stamp = format!(".kortex/icons-cache/{}", path.replace('/', "_"));
+    if std::path::Path::new(path).is_file()
+        && fs::read_to_string(&stamp).is_ok_and(|have| have == want)
+    {
+        return Ok(());
+    }
+    write(path, render_png(svg, width)?)?;
+    write(&stamp, want)
+}
+
 fn write(path: &str, bytes: impl AsRef<[u8]>) -> Result<(), String> {
     if let Some(p) = Path::new(path).parent() {
         fs::create_dir_all(p).map_err(|e| e.to_string())?;
@@ -262,9 +280,10 @@ pub fn run() -> Result<(), String> {
                 footer(lang),
                 hue,
             );
-            write(
+            write_png_cached(
                 &format!("design/dist/og/{lang}/{}.png", c.tool.slug[lang]),
-                render_png(&og, 1200)?,
+                &og,
+                1200,
             )?;
         }
         count += 1;
